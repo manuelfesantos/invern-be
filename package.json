@@ -1,0 +1,17 @@
+{
+  "name": "invern-be",
+  "version": "1.0.0",
+  "description": "Invern Spirit Backend",
+  "main": "index.js",
+  "scripts": {
+    "query": "npx wrangler d1 execute invern-db --remote --file=db/query.sql"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240419.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
