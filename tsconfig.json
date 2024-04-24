@@ -1,12 +1,21 @@
 {
-  "include": ["src/**/*"],
-  "exclude": ["functions/**/*"],
+  "include": ["*/**/*.ts"],
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "NodeNext",
+    "lib": ["esnext"],
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["@cloudflare/workers-types"],
+    "paths": {
+      "@adapters/*": ["libs/adapters/*"],
+      "@modules/*": ["libs/modules/*"],
+      "@utils/*": ["libs/utils/*"],
+      "@entities/*": ["libs/entities/*"]
+    }
   }
 }
