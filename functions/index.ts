@@ -1,6 +1,5 @@
-import {crypto, PagesFunction} from "@cloudflare/workers-types";
-import {messages} from "@utils/constants";
+import { PagesFunction } from "@cloudflare/workers-types";
 
 export const onRequest: PagesFunction = async (context) => {
-    return new Response(messages.hello);
-}
+  return new Response("Hello, World!");
+};

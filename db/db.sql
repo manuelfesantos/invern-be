@@ -1,8 +1,10 @@
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE IF NOT EXISTS users (
-	id VARCHAR(50),
-	username VARCHAR(50),
-	password VARCHAR(50),
-	created_on DATE
+	id VARCHAR(100) PRIMARY KEY,
+	email VARCHAR(50),
+    firstName VARCHAR(50),
+    lastName VARCHAR(50),
+	password VARCHAR(100),
+	cartId VARCHAR(100)
 );
