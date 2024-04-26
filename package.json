@@ -8,7 +8,7 @@
     "build-remote-db": "npx wrangler d1 execute invern-db --remote --file=db/db.sql",
     "query": "npx wrangler d1 execute invern-db --remote --file=db/query.sql",
     "query-local": "npx wrangler d1 execute INVERN_DB --file=db/query.sql",
-    "run-local": "npm run build-db && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26"
+    "run-local": "npm run build-local-db && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26"
   },
   "keywords": [],
   "author": "",

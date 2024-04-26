@@ -5,7 +5,6 @@ import {
   generateErrorResponse,
 } from "@entities/response/error-response";
 import { successResponse } from "@entities/response/success-response";
-import { startTimer } from "@utils/time/timer";
 
 interface Env {
   INVERN_DB: D1Database;
@@ -13,7 +12,6 @@ interface Env {
 
 const bodySchema = z.object({});
 export const onRequest: PagesFunction<Env> = async (context) => {
-  startTimer();
   const { request, env } = context;
   if (request.method !== HttpMethodEnum.POST) {
     return errorResponse.METHOD_NOT_ALLOWED();

@@ -4,14 +4,19 @@ import {
 } from "@entities/response/error-response";
 import { updateUserActionSchema } from "@apps/update-user/types";
 import { actionToUpdateMap } from "@apps/update-user/actions";
+import { HttpParams } from "@entities/http/http-request";
 
-export const updateUser = async (body: unknown, action: string | null) => {
+export const updateUser = async (
+  id: HttpParams,
+  body: unknown,
+  action: string | null,
+) => {
   try {
     if (!action) {
       return errorResponse.BAD_REQUEST("action is required");
     }
     const updateUserAction = updateUserActionSchema.parse(action);
-    return actionToUpdateMap[updateUserAction](body);
+    return await actionToUpdateMap[updateUserAction](id as string, body);
   } catch (error: any) {
     return generateErrorResponse(error);
   }

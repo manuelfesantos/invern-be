@@ -19,6 +19,7 @@ export const userSchema = z.object({
 export type User = z.infer<typeof userSchema>;
 
 export const userDTOSchema = z.object({
+  id: z.string().uuid({ message: "Invalid id" }).optional(),
   email: z
     .string({ required_error: "email is required" })
     .email({ message: "Invalid email" }),

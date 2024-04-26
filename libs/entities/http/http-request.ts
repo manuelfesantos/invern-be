@@ -25,3 +25,5 @@ export const getBodyFromRequest = async (
     ? request.json()
     : undefined;
 };
+
+export type HttpParams = string | string[];
