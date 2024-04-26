@@ -5,21 +5,22 @@ import { hash } from "@utils/crypto";
 import { errorMessages } from "@utils/error-handling/error-messages";
 import { userToUserDTO } from "@entities/user/user-entity";
 
+const { INVALID_CREDENTIALS } = errorMessages;
+
 export const loginUser = async (email: string, password: string) => {
-  const db = getDb();
   const user = await getUser(email);
 
   if (!user) {
     throw new AdapterError(
-      errorMessages.INVALID_CREDENTIALS.message,
-      errorMessages.INVALID_CREDENTIALS.code,
+      INVALID_CREDENTIALS.message,
+      INVALID_CREDENTIALS.code,
     );
   }
 
   if ((await hash(password, user.id)) !== user.password) {
     throw new AdapterError(
-      errorMessages.INVALID_CREDENTIALS.message,
-      errorMessages.INVALID_CREDENTIALS.code,
+      INVALID_CREDENTIALS.message,
+      INVALID_CREDENTIALS.code,
     );
   }
 

@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "types": ["@cloudflare/workers-types"],
     "paths": {
+      "@apps/*": ["apps/*"],
       "@adapters/*": ["libs/adapters/*"],
       "@modules/*": ["libs/modules/*"],
       "@utils/*": ["libs/utils/*"],

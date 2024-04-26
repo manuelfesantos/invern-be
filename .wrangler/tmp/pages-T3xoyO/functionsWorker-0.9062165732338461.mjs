@@ -4037,7 +4037,7 @@ var userToUserDTO = (user) => {
   return userDTOSchema.parse(user);
 };
 
-// ../libs/adapters/users/login-user.ts
+// ../libs/adapters/users/index-user.ts
 var loginUser = async (email, password) => {
   const db2 = getDb();
   const user = await getUser(email);
@@ -4057,7 +4057,7 @@ var loginUser = async (email, password) => {
   return userToUserDTO(user);
 };
 
-// ../libs/entities/http-request/http-request-entity.ts
+// ../libs/entities/http/http-entity.ts
 var httpMethodsSchema = z.enum([
   "GET",
   "POST",
@@ -4068,7 +4068,7 @@ var httpMethodsSchema = z.enum([
 ]);
 var HttpMethodEnum = httpMethodsSchema.enum;
 
-// users/login/index.ts
+// users/index/index.ts
 var bodySchema = z.object({
   email: z.string({ required_error: "email is required" }).email({ message: "Invalid email" }),
   password: z.string({ required_error: "password is required" })
@@ -4197,8 +4197,8 @@ var onRequest5 = async (context) => {
 // ../.wrangler/tmp/pages-T3xoyO/functionsRoutes-0.012984182467264516.mjs
 var routes = [
   {
-    routePath: "/users/login",
-    mountPath: "/users/login",
+    routePath: "/users/index",
+    mountPath: "/users/index",
     method: "",
     middlewares: [],
     modules: [onRequest]
