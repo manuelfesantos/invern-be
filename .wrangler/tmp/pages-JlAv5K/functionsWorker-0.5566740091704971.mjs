@@ -3955,7 +3955,7 @@ var getDb = () => {
   return db;
 };
 
-// ../libs/adapters/users/get-user.ts
+// ../libs/adapters/user/index.ts
 var getUser = async (email) => {
   const db2 = getDb();
   return await db2.prepare(`SELECT * FROM users WHERE email = '${email}'`).first();
@@ -4037,7 +4037,7 @@ var userToUserDTO = (user) => {
   return userDTOSchema.parse(user);
 };
 
-// ../libs/adapters/users/index-user.ts
+// ../libs/adapters/user/index-user.ts
 var loginUser = async (email, password) => {
   const db2 = getDb();
   const user = await getUser(email);
@@ -4057,7 +4057,7 @@ var loginUser = async (email, password) => {
   return userToUserDTO(user);
 };
 
-// users/index/index.ts
+// user/index/index.ts
 var bodySchema = z.object({
   email: z.string({ required_error: "email is required" }).email({ message: "Invalid email" }),
   password: z.string({ required_error: "password is required" })
@@ -4083,7 +4083,7 @@ var onRequest = async (context) => {
   }
 };
 
-// ../libs/adapters/users/create-user.ts
+// ../libs/adapters/user/create-user.ts
 var createUser = async (user, password) => {
   const db2 = getDb();
   const id = crypto.randomUUID();
@@ -4107,7 +4107,7 @@ var createUser = async (user, password) => {
   ).run();
 };
 
-// users/signup/index.ts
+// user/signup/index.ts
 var bodySchema2 = userDTOSchema.extend({
   password: z.string({ required_error: "password is required" })
 });
@@ -4170,7 +4170,7 @@ var onRequest4 = async (context) => {
   return new Response("Hello!");
 };
 
-// users/index.ts
+// user/index.ts
 var onRequest5 = async (context) => {
   const { request, env } = context;
   if (request.method !== "PUT") {
@@ -4204,15 +4204,15 @@ var onRequest6 = async (context) => {
 // ../.wrangler/tmp/pages-JlAv5K/functionsRoutes-0.3793568278293582.mjs
 var routes = [
   {
-    routePath: "/users/index",
-    mountPath: "/users/index",
+    routePath: "/user/index",
+    mountPath: "/user/index",
     method: "",
     middlewares: [],
     modules: [onRequest]
   },
   {
-    routePath: "/users/signup",
-    mountPath: "/users/signup",
+    routePath: "/user/signup",
+    mountPath: "/user/signup",
     method: "",
     middlewares: [],
     modules: [onRequest2]
@@ -4232,8 +4232,8 @@ var routes = [
     modules: [onRequest4]
   },
   {
-    routePath: "/users",
-    mountPath: "/users",
+    routePath: "/user",
+    mountPath: "/user",
     method: "",
     middlewares: [],
     modules: [onRequest5]

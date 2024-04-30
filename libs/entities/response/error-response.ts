@@ -27,7 +27,9 @@ export const errorResponse = {
 
 export const generateErrorResponse = (error: any) => {
   if (error instanceof z.ZodError) {
-    return errorResponse.BAD_REQUEST(error.issues);
+    return errorResponse.BAD_REQUEST(
+      error.issues.map((issue) => issue.message),
+    );
   }
   return error.code
     ? buildErrorResponse(error.message, error.code)

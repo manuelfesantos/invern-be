@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { loginUser } from "@adapters/users/login-user";
+import { loginUser } from "@modules/user/login-signup/login";
 import { generateErrorResponse } from "@entities/response/error-response";
 import { successResponse } from "@entities/response/success-response";
 

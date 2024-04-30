@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { userDTOSchema } from "@entities/user/user-entity";
-import { createUser } from "@adapters/users/create-user";
+import { signupUser } from "@modules/user/login-signup/signup";
 import { generateErrorResponse } from "@entities/response/error-response";
 import { successResponse } from "@entities/response/success-response";
-import { getGlobalPassedTime, getPassedTime, setTimer } from "@utils/timer";
 
 const bodySchema = userDTOSchema.extend({
   password: z.string({ required_error: "password is required" }),
@@ -13,9 +12,7 @@ export const signup = async (body: unknown) => {
   try {
     const user = bodySchema.parse(body);
 
-    const response = await createUser(userDTOSchema.parse(user), user.password);
-
-    setTimer();
+    const response = await signupUser(userDTOSchema.parse(user), user.password);
 
     return successResponse.CREATED("user created", response);
   } catch (error: any) {

@@ -6,15 +6,15 @@ import { onRequest as __index_ts_onRequest } from "/Users/ctw03258/personal_proj
 
 export const routes = [
     {
-      routePath: "/users/index",
-      mountPath: "/users/index",
+      routePath: "/user/index",
+      mountPath: "/user/index",
       method: "",
       middlewares: [],
       modules: [__users_login_index_ts_onRequest],
     },
   {
-      routePath: "/users/signup",
-      mountPath: "/users/signup",
+      routePath: "/user/signup",
+      mountPath: "/user/signup",
       method: "",
       middlewares: [],
       modules: [__users_signup_index_ts_onRequest],
@@ -27,8 +27,8 @@ export const routes = [
       modules: [__carts_index_ts_onRequest],
     },
   {
-      routePath: "/users",
-      mountPath: "/users",
+      routePath: "/user",
+      mountPath: "/user",
       method: "",
       middlewares: [],
       modules: [__users_index_ts_onRequest],

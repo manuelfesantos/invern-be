@@ -1,16 +1,16 @@
 import { D1Database } from "@cloudflare/workers-types";
 
-let db: D1Database | null = null;
+let database: D1Database | null = null;
 
-export const initDb = (database: D1Database) => {
-  if (!db) {
-    db = database;
+export const initDb = (db: D1Database) => {
+  if (!database) {
+    database = db;
   }
 };
 
-export const getDb = () => {
-  if (!db) {
+export const db = () => {
+  if (!database) {
     throw new Error("Database not initialized!");
   }
-  return db;
+  return database;
 };

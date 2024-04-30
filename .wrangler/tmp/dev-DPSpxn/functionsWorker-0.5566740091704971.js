@@ -4450,15 +4450,15 @@ var onRequest6 = async (context) => {
 };
 var routes = [
   {
-    routePath: "/users/index",
-    mountPath: "/users/index",
+    routePath: "/user/index",
+    mountPath: "/user/index",
     method: "",
     middlewares: [],
     modules: [onRequest],
   },
   {
-    routePath: "/users/signup",
-    mountPath: "/users/signup",
+    routePath: "/user/signup",
+    mountPath: "/user/signup",
     method: "",
     middlewares: [],
     modules: [onRequest2],
@@ -4478,8 +4478,8 @@ var routes = [
     modules: [onRequest4],
   },
   {
-    routePath: "/users",
-    mountPath: "/users",
+    routePath: "/user",
+    mountPath: "/user",
     method: "",
     middlewares: [],
     modules: [onRequest5],

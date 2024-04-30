@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "target": "esnext",
     "module": "esnext",

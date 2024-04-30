@@ -1,8 +1,7 @@
-import { userDTOSchema } from "@entities/user/user-entity";
 import { z } from "zod";
 
 export const updateUserActionSchema = z.enum(
-  ["update-email", "update-password", "update-name"],
+  ["update-email", "update-password", "update-name", "add-cart", "delete-cart"],
   {
     message: "Invalid action",
   },

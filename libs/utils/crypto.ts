@@ -1,4 +1,4 @@
-import { decode, encode } from "@utils/encoding";
+import { decode, encode } from "./encoding";
 
 export const hash = async (password: string, id: string) => {
   const encodedText = encode(password + id);

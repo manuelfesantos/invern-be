@@ -3,21 +3,11 @@ import {
   newNameSchema,
   newPasswordSchema,
 } from "@apps/update-user/types";
-import { updateEmail } from "@adapters/users/update-user/update-email";
-import { userDTOSchema } from "@entities/user/user-entity";
+import { updateEmail } from "@modules/user/update-user/update-email";
 import { successResponse } from "@entities/response/success-response";
-import { updatePassword } from "@adapters/users/update-user/update-password";
-import { updateName } from "@adapters/users/update-user/update-name";
+import { updatePassword } from "@modules/user/update-user/update-password";
+import { updateName } from "@modules/user/update-user/update-name";
 import { errorResponse } from "@entities/response/error-response";
-
-export const actionToUpdateMap = {
-  "update-email": async (id: string, body: unknown) =>
-    await updateEmailAction(id, body),
-  "update-password": async (id: string, body: unknown) =>
-    await updatePasswordAction(id, body),
-  "update-name": async (id: string, body: unknown) =>
-    await updateNameAction(id, body),
-};
 
 const updateEmailAction = async (id: string, body: unknown) => {
   const { email } = newEmailSchema.parse(body);
@@ -38,4 +28,10 @@ const updateNameAction = async (id: string, body: unknown) => {
   }
   const response = await updateName(id, firstName, lastName);
   return successResponse.OK("user name updated", response);
+};
+
+export const actionToUpdateMap = {
+  "update-email": updateEmailAction,
+  "update-password": updatePasswordAction,
+  "update-name": updateNameAction,
 };

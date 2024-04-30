@@ -1,7 +1,7 @@
 import { UserDTO, userToUserDTO } from "@entities/user/user-entity";
-import { getUserById } from "@adapters/users/get-user";
-import { getDb } from "@adapters/db";
-import { hash } from "@utils/crypto";
+import { getUserById } from "@adapters/user/get-user";
+import { hash } from "../../../utils/crypto";
+import { updateUser } from "@adapters/user/update-user";
 
 export const updatePassword = async (
   id: string,
@@ -11,17 +11,9 @@ export const updatePassword = async (
 
   const passwordHash = await hashPassword(password, id);
 
-  await runQuery(id, passwordHash);
+  await updateUser(id, `password = ${passwordHash}`);
 
   return userToUserDTO(user);
-};
-
-const runQuery = async (id: string, password: string) => {
-  const db = getDb();
-  await db
-    .prepare("UPDATE users SET password = ? WHERE id = ?")
-    .bind(password, id)
-    .run();
 };
 
 const hashPassword = async (password: string, id: string) => {

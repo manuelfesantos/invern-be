@@ -1,7 +1,7 @@
 import { errorResponse } from "@entities/response/error-response";
 import { login } from "@apps/login-signup/login";
 import { signup } from "@apps/login-signup/signup";
-import { getGlobalPassedTime } from "@utils/timer";
+import { getGlobalPassedTime } from "../../libs/utils/timer";
 
 export const loginSignupMapper = async (
   body: unknown,

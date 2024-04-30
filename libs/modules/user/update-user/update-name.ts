@@ -1,6 +1,6 @@
-import { getUserById } from "@adapters/users/get-user";
-import { getDb } from "@adapters/db";
+import { getUserById } from "@adapters/user/get-user";
 import { User, userToUserDTO } from "@entities/user/user-entity";
+import { updateUser } from "@adapters/user/update-user";
 
 export const updateName = async (
   id: string,
@@ -11,7 +11,7 @@ export const updateName = async (
 
   const updateOptions = getUpdateOptions(firstName, lastName);
 
-  await runQuery(id, updateOptions);
+  await updateUser(id, updateOptions);
 
   return userToUserDTO(mergeUser(user, firstName, lastName));
 };
@@ -26,14 +26,6 @@ const getUpdateOptions = (firstName?: string, lastName?: string) => {
     updateOptions = `lastName = '${lastName}'`;
   }
   return updateOptions;
-};
-
-const runQuery = async (id: string, updateOptions: string) => {
-  const db = getDb();
-  await db
-    .prepare(`UPDATE users SET ${updateOptions} WHERE id = ?`)
-    .bind(id)
-    .run();
 };
 
 const mergeUser = (user: User, firstName?: string, lastName?: string) => ({
