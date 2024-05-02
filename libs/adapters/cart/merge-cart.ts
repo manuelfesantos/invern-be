@@ -5,10 +5,10 @@ export const mergeCart = async (
   cartId: string,
   items: ProductIdAndQuantity[],
 ) => {
-  const statements = items.map(({ productId, quantity }) => {
-    return prepareStatement(
-      `INSERT INTO productsCarts (cartId, productId, quantity) VALUES('${cartId}', '${productId}', ${quantity})`,
-    );
+  const productInserts = items.map(({ productId, quantity }) => {
+    return `('${cartId}', '${productId}', ${quantity})`;
   });
-  await batchStatements(statements);
+  const query = `INSERT INTO productsCarts (cartId, productId, quantity) VALUES `;
+  const statement = prepareStatement(query + productInserts.join(", "));
+  await statement.run();
 };
