@@ -1,5 +1,5 @@
 import { prepareStatement } from "@db-adapter";
-import { Product, ProductDetails } from "@product-entity";
+import { ProductDetails } from "@product-entity";
 import { errors } from "@error-handling-utils";
 
 export const getProductById = async (id: string) => {

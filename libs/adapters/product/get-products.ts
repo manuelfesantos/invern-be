@@ -7,7 +7,7 @@ export const getProducts = async (search: string | null) => {
 
 const getProductsBySearch = async (search?: string) => {
   return prepareStatement(
-    `SELECT productId, productName, price FROM products WHERE name LIKE '%${search}%' OR description LIKE '%${search}%'`,
+    `SELECT productId, productName, price FROM products WHERE productName LIKE '%${search}%' OR description LIKE '%${search}%'`,
   ).all<Product>();
 };
 
