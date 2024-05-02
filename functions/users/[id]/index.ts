@@ -2,17 +2,18 @@ import {
   getBodyFromRequest,
   HttpHeaderEnum,
   HttpMethodEnum,
-} from "@entities/http/http-request";
-import { initDb } from "@adapters/db";
-import { getUser } from "@apps/get-user";
-import { deleteUser } from "@apps/delete-user";
-import { updateUser } from "@apps/update-user";
-import { errorResponse } from "@entities/response/error-response";
+} from "@http-entity";
+import { initDb } from "@db-adapter";
+import { deleteUser, getUser, updateUser } from "@user-module";
+import { errorResponse } from "@response-entity";
+import { setGlobalTimer } from "@timer-utils";
+
 interface Env {
   INVERN_DB: D1Database;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
+  setGlobalTimer();
   const { request, params, env } = context;
   const { id } = params;
 

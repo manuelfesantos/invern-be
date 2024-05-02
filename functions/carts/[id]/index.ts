@@ -1,12 +1,36 @@
-import { getPassedTime, setTimer } from "@utils/timer";
-import { Kafka } from "@upstash/kafka";
+import { errorResponse, successResponse } from "@response-entity";
+import {
+  getBodyFromRequest,
+  HttpHeaderEnum,
+  HttpMethodEnum,
+} from "@http-entity";
+import { initDb } from "@db-adapter";
+import { updateCart } from "@cart-module";
+import { setGlobalTimer } from "@timer-utils";
 
 interface Env {
-  UPSTASH_KAFKA_REST_URL: string;
-  UPSTASH_KAFKA_REST_USERNAME: string;
-  UPSTASH_KAFKA_REST_PASSWORD: string;
+  INVERN_DB: D1Database;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
-  return Response.json({ message: "build successful!" });
+  setGlobalTimer();
+  const { request, params, env } = context;
+  const { id } = params;
+
+  if (request.method !== HttpMethodEnum.PUT) {
+    return errorResponse.METHOD_NOT_ALLOWED();
+  }
+
+  const { headers } = request;
+  const action = headers.get(HttpHeaderEnum.ACTION);
+
+  if (!action) {
+    return errorResponse.BAD_REQUEST("action is required");
+  }
+
+  const body = await request.json();
+
+  initDb(env.INVERN_DB);
+
+  return await updateCart(body, action, id);
 };

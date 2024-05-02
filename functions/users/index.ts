@@ -1,13 +1,16 @@
-import { initDb } from "@adapters/db";
-import { HttpHeaderEnum, HttpMethodEnum } from "@entities/http/http-request";
-import { errorResponse } from "@entities/response/error-response";
-import { loginSignupMapper } from "@apps/login-signup/login-signup-mapper";
+import { initDb } from "@db-adapter";
+import { loginSignupMapper } from "@user-module";
+import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
+import { errorResponse } from "@response-entity";
+import { setGlobalTimer } from "@timer-utils";
 
 interface Env {
   INVERN_DB: D1Database;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
+  setGlobalTimer();
+
   const { request, env } = context;
 
   if (request.method !== HttpMethodEnum.POST) {

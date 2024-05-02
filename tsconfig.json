@@ -13,11 +13,22 @@
     "skipLibCheck": true,
     "types": ["@cloudflare/workers-types"],
     "paths": {
-      "@apps/*": ["apps/*"],
-      "@adapters/*": ["libs/adapters/*"],
-      "@modules/*": ["libs/modules/*"],
-      "@utils/*": ["libs/utils/*"],
-      "@entities/*": ["libs/entities/*"]
+      "@cart-adapter": ["libs/adapters/cart"],
+      "@cart-entity": ["libs/entities/cart"],
+      "@cart-module": ["libs/modules/cart"],
+      "@crypto-utils": ["libs/utils/crypto"],
+      "@db-adapter": ["libs/adapters/db"],
+      "@encoding-utils": ["libs/utils/encoding"],
+      "@error-handling-utils": ["libs/utils/error-handling"],
+      "@http-entity": ["libs/entities/http"],
+      "@product-adapter": ["libs/adapters/product"],
+      "@product-entity": ["libs/entities/product"],
+      "@product-module": ["libs/modules/product"],
+      "@response-entity": ["libs/entities/response"],
+      "@timer-utils": ["libs/utils/timer"],
+      "@user-adapter": ["libs/adapters/user"],
+      "@user-entity": ["libs/entities/user"],
+      "@user-module": ["libs/modules/user"],
     }
   }
 }

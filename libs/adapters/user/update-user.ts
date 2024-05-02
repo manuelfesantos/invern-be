@@ -1,8 +1,7 @@
-import { db } from "@adapters/db";
+import { prepareStatement } from "@db-adapter";
 
 export const updateUser = async (id: string, updateOptions: string) => {
-  await db()
-    .prepare(`UPDATE users SET ${updateOptions} WHERE id = ?`)
+  await prepareStatement(`UPDATE users SET ${updateOptions} WHERE userId = ?`)
     .bind(id)
     .run();
 };

@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { RolesEnum, rolesSchema } from "@entities/user/roles";
-import { cartSchema } from "@entities/cart/cart-entity";
+import { RolesEnum, rolesSchema } from "./roles";
+import { cartSchema } from "@cart-entity";
 
 export const userSchema = z.object({
-  id: z
-    .string({ required_error: "id is required" })
+  userId: z
+    .string({ required_error: "user id is required" })
     .uuid({ message: "Invalid id" }),
   email: z
     .string({ required_error: "email is required" })
@@ -19,7 +19,7 @@ export const userSchema = z.object({
 export type User = z.infer<typeof userSchema>;
 
 export const userDTOSchema = z.object({
-  id: z.string().uuid({ message: "Invalid id" }).optional(),
+  userId: z.string().uuid({ message: "Invalid id" }).optional(),
   email: z
     .string({ required_error: "email is required" })
     .email({ message: "Invalid email" }),

@@ -1,5 +1,5 @@
-import { HttpResponseEnum } from "@entities/http/http-response";
-import { buildResponse } from "@entities/response/response";
+import { HttpResponseEnum } from "@http-entity";
+import { buildResponse } from "./response";
 
 export const successResponse = {
   OK: (message: string, data?: unknown) =>

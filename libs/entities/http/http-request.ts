@@ -27,3 +27,8 @@ export const getBodyFromRequest = async (
 };
 
 export type HttpParams = string | string[];
+
+export const getQueryFromUrl = (url: string) => {
+  const query = url.split("?")[1];
+  return query ? new URLSearchParams(query) : null;
+};

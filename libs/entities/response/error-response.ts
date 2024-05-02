@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { HttpResponseEnum } from "@entities/http/http-response";
-import { buildResponse } from "@entities/response/response";
+import { HttpResponseEnum } from "@http-entity";
+import { buildResponse } from "./response";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown) =>

@@ -1,9 +1,11 @@
-import { string, z } from "zod";
-import { productSchema } from "@entities/product/product-entity";
+import { z } from "zod";
+import { productWithQuantitySchema } from "@product-entity";
 
 export const cartSchema = z.object({
-  id: z
-    .string({ required_error: "id is required" })
+  cartId: z
+    .string({ required_error: "cart id is required" })
     .uuid({ message: "Invalid id" }),
-  products: z.array(productSchema).default([]),
+  products: z.array(productWithQuantitySchema).default([]),
 });
+
+export type Cart = z.infer<typeof cartSchema>;

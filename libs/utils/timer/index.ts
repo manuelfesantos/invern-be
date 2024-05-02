@@ -1,0 +1,19 @@
+let timer = 0;
+let globalTimer = 0;
+
+export const setTimers = () => {
+  globalTimer = Date.now();
+  setGlobalTimer();
+};
+
+export const setGlobalTimer = () => {
+  globalTimer = Date.now();
+};
+
+export const getPassedTime = () => {
+  return Date.now() - timer;
+};
+
+export const getGlobalPassedTime = () => {
+  return Date.now() - globalTimer;
+};
