@@ -15,13 +15,25 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_id ON users(userId);
 CREATE INDEX IF NOT EXISTS idx_users_cartId ON users(cartId);
 
+DROP TABLE IF EXISTS collections;
+
+CREATE TABLE IF NOT EXISTS collections(
+    collectionId varchar(100) PRIMARY KEY,
+    collectionName VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(250) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_collections_id ON collections(collectionId);
+
 DROP TABLE IF EXISTS products;
 
 CREATE TABLE IF NOT EXISTS products(
     productId VARCHAR(100) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    productName VARCHAR(50) NOT NULL,
     description VARCHAR(250) NOT NULL,
-    price INTEGER NOT NULL
+    price INTEGER NOT NULL,
+    collectionId VARCHAR(100) NOT NULL,
+    FOREIGN KEY(collectionId) REFERENCES collections(collectionId) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_products_id ON products(productId);

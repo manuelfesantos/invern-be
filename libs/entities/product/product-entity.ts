@@ -4,11 +4,10 @@ export const productSchema = z.object({
   productId: z
     .string({ required_error: "product id is required" })
     .uuid({ message: "Invalid id" }),
-  name: z.string({ required_error: "name is required" }),
+  productName: z.string({ required_error: "name is required" }),
   price: z
     .number({ required_error: "price is required" })
     .positive({ message: "Price must be a positive number" }),
-  description: z.string().optional(),
   quantity: z
     .number()
     .int({ message: "Quantity must be an integer" })
@@ -34,3 +33,10 @@ export const productIdAndQuantitySchema = z.object({
 });
 
 export type ProductIdAndQuantity = z.infer<typeof productIdAndQuantitySchema>;
+
+export const productDetailsSchema = productSchema.extend({
+  description: z.string({ required_error: "description is required" }),
+  collectionName: z.string({ required_error: "collection name is required" }),
+});
+
+export type ProductDetails = z.infer<typeof productDetailsSchema>;

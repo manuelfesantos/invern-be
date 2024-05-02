@@ -20,4 +20,6 @@ export const errors = {
     ),
   PRODUCT_NOT_FOUND: () =>
     new AdapterError("Product not found", HttpResponseEnum.NOT_FOUND),
+  COLLECTION_NOT_FOUND: () =>
+    new AdapterError("Collection not found", HttpResponseEnum.NOT_FOUND),
 };
