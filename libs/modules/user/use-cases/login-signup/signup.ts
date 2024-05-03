@@ -4,14 +4,12 @@ import {
   User,
   UserDTO,
   userDTOSchema,
-  userSchema,
   userToUserDTO,
 } from "@user-entity";
 import { hash } from "@crypto-utils";
 import { createUser, getUserByEmail } from "@user-adapter";
 import { generateErrorResponse, successResponse } from "@response-entity";
 import { errors } from "@error-handling-utils";
-import { Cart } from "@cart-entity";
 
 export const signup = async (body: unknown): Promise<Response> => {
   try {
@@ -23,17 +21,13 @@ export const signup = async (body: unknown): Promise<Response> => {
 
     const userId = crypto.randomUUID();
     const cartId = crypto.randomUUID();
-    const cart: Cart = {
-      cartId,
-      products: [],
-    };
     const passwordHash = await hash(password, userId);
     const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
 
     await createUser(user);
 
     return successResponse.CREATED("user created", userToUserDTO(user));
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

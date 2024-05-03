@@ -5,7 +5,6 @@ import {
 } from "@response-entity";
 import { mergeCartItemsBodySchema } from "../../types/update-cart";
 import { getCartById, mergeCart } from "@cart-adapter";
-import { Cart } from "@cart-entity";
 
 export const mergeCartItems = async (
   body: unknown,
@@ -22,7 +21,7 @@ export const mergeCartItems = async (
     }
     await mergeCart(cartId, products);
     return successResponse.OK("cart merged");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

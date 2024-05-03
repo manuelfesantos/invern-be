@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  integerSchema,
   positiveIntegerSchema,
   positiveNumberSchema,
   requiredStringSchema,
@@ -12,6 +13,7 @@ export const productSchema = z.object({
   productName: requiredStringSchema("product name"),
   price: positiveNumberSchema("product price"),
   productImage: imageSchema.nullable(),
+  stock: integerSchema("product stock"),
 });
 export const productWithQuantitySchema = productSchema.extend({
   quantity: positiveIntegerSchema("product quantity"),

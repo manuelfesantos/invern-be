@@ -7,7 +7,7 @@ export const getAllProducts = async (
   try {
     const products = await getProducts(search);
     return successResponse.OK("success getting all products", products);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

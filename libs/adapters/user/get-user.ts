@@ -1,11 +1,11 @@
-import { User, userSchema, userWithoutCartSchema } from "@user-entity";
+import { User, userWithoutCartSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { prepareStatement } from "@db-adapter";
 import { cartSchema } from "@cart-entity";
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
   const result = await prepareStatement(
-    `SELECT * FROM users WHERE users.email = '${email}'`,
+    `SELECT * FROM users WHERE email = '${email}'`,
   ).first();
   return getUserFromResult(result);
 };

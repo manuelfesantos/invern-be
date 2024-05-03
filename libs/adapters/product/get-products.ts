@@ -15,7 +15,7 @@ const getProductsBySearch = async (
   search?: string,
 ): Promise<Record<string, unknown>[]> => {
   const { results } = await prepareStatement(
-    `SELECT products.productId, productName, price, url as imageUrl, alt as imageAlt FROM products 
+    `SELECT products.productId, productName, price, stock, url as imageUrl, alt as imageAlt FROM products 
             JOIN images ON products.productId = images.productId
             WHERE productName LIKE '%${search}%' OR description LIKE '%${search}%'
             GROUP BY products.productId`,
@@ -25,7 +25,7 @@ const getProductsBySearch = async (
 
 const getAllProducts = async (): Promise<Record<string, unknown>[]> => {
   const { results } = await prepareStatement(
-    `SELECT products.productId, productName, price, url as imageUrl, alt as imageAlt FROM products
+    `SELECT products.productId, productName, price, stock, url as imageUrl, alt as imageAlt FROM products
             LEFT JOIN images ON products.productId = images.productId
             GROUP BY products.productId`,
   ).all();

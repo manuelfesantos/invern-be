@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { HttpResponseEnum } from "@http-entity";
 import { buildResponse } from "./response";
+import { AdapterError } from "@error-handling-utils";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown) =>
@@ -25,17 +26,26 @@ export const errorResponse = {
     ),
 } as const;
 
-export const generateErrorResponse = (error: any) => {
+export const generateErrorResponse = (error: unknown): Response => {
   if (error instanceof z.ZodError) {
     return errorResponse.BAD_REQUEST(
       error.issues.map((issue) => issue.message),
     );
   }
-  return error.code
-    ? buildErrorResponse(error.message, error.code)
-    : errorResponse.INTERNAL_SERVER_ERROR(error.message);
+
+  if (error instanceof AdapterError) {
+    return buildErrorResponse(error.message, Number(error.code));
+  }
+
+  if (error instanceof Error) {
+    return errorResponse.INTERNAL_SERVER_ERROR(error.message);
+  }
+  return errorResponse.INTERNAL_SERVER_ERROR(error);
 };
 
-export const buildErrorResponse = (error: unknown, status: number) => {
+export const buildErrorResponse = (
+  error: unknown,
+  status: number,
+): Response => {
   return buildResponse({ error }, { status });
 };

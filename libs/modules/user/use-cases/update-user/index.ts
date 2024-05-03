@@ -22,7 +22,7 @@ export const updateUser = async (
     }
     const updateUserAction = updateUserActionSchema.parse(action);
     return await actionToUpdateMap[updateUserAction](id as string, body);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

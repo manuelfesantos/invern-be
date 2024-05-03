@@ -27,6 +27,6 @@ export const userDTOSchema = z.object({
 
 export type UserDTO = z.infer<typeof userDTOSchema>;
 
-export const userToUserDTO = (user: User) => {
+export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };

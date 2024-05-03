@@ -18,6 +18,6 @@ export const updatePassword = async (
   return successResponse.OK("user password updated", userToUserDTO(user));
 };
 
-const hashPassword = async (password: string, id: string) => {
+const hashPassword = async (password: string, id: string): Promise<string> => {
   return await hash(password, id);
 };

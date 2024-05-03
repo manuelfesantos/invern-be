@@ -10,7 +10,7 @@ export const removeProductFromCart = async (
     const { productId, quantity } = productIdAndQuantitySchema.parse(body);
     await removeFromCart(cartId, productId, quantity);
     return successResponse.OK("product removed from cart");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

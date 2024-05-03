@@ -12,6 +12,7 @@ export const onRequest: PagesFunction<Env> = async (
   context,
 ): Promise<Response> => {
   setGlobalTimer();
+
   const { request, params, env } = context;
   const { id } = params;
 

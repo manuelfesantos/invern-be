@@ -1,7 +1,5 @@
-import { getGlobalPassedTime } from "@timer-utils";
-
 export const buildResponse = (
-  response: any,
+  response: unknown,
   maybeInit?: Response | ResponseInit | undefined,
 ): Response => {
   return Response.json(response, maybeInit);

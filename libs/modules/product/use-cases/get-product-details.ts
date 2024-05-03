@@ -12,7 +12,7 @@ export const getProductDetails = async (id: HttpParams): Promise<Response> => {
       "success getting product details",
       productDetailsSchema.parse({ ...product, productImages: images }),
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

@@ -7,7 +7,7 @@ export const getUser = async (id: HttpParams): Promise<Response> => {
   try {
     const user = await getUserById(id as string);
     return successResponse.OK("success getting user", userToUserDTO(user));
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

@@ -10,7 +10,7 @@ export const addProductToCart = async (
     const { productId, quantity } = productIdAndQuantitySchema.parse(body);
     await addToCart(cartId, productId, quantity);
     return successResponse.OK("product added to cart");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

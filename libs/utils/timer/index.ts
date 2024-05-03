@@ -2,7 +2,7 @@ let timer = 0;
 let globalTimer = 0;
 
 export const setTimers = (): void => {
-  globalTimer = Date.now();
+  timer = Date.now();
   setGlobalTimer();
 };
 

@@ -4,7 +4,7 @@ import { errors } from "@error-handling-utils";
 
 export const getProductById = async (id: string): Promise<ProductDetails> => {
   const product = await prepareStatement(
-    `SELECT productId, productName, products.description, price, collectionName FROM products 
+    `SELECT productId, productName, products.description, price, stock, collectionName FROM products 
             JOIN collections ON products.collectionId = collections.collectionId
             WHERE productId = '${id}'`,
   ).first<ProductDetails>();

@@ -19,7 +19,7 @@ export const login = async (body: unknown): Promise<Response> => {
     user.cart = await getCartById(user.cart.cartId);
 
     return successResponse.OK("successfully logged in", userToUserDTO(user));
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

@@ -4,6 +4,7 @@
   "description": "Invern Spirit Backend",
   "main": "index.js",
   "scripts": {
+    "lint": "npx eslint functions/** libs/**",
     "build-local-db": "npx wrangler d1 execute INVERN_DB --file=db/db.sql",
     "build-remote-db": "npx wrangler d1 execute invern-db --remote --file=db/db.sql",
     "query-local": "npx wrangler d1 execute INVERN_DB",
@@ -17,9 +18,13 @@
   "license": "ISC",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240419.0",
+    "@eslint/js": "^9.2.0",
+    "eslint": "^8.57.0",
+    "globals": "^15.1.0",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.8.0"
   },
   "dependencies": {
     "@upstash/kafka": "^1.3.5",

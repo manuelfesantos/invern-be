@@ -8,7 +8,7 @@ export const deleteUser = async (id: HttpParams): Promise<Response> => {
     const user = await getUserById(id as string);
     await deleteUserAdapter(user.userId);
     return successResponse.OK("success deleting user");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return generateErrorResponse(error);
   }
 };

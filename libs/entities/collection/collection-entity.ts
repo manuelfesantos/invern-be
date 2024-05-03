@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { productSchema } from "@product-entity";
-import { requiredStringSchema, urlSchema, uuidSchema } from "@global-entity";
+import { requiredStringSchema, uuidSchema } from "@global-entity";
 import { imageSchema } from "@image-entity";
 
 export const collectionSchema = z.object({
