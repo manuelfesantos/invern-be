@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { emailSchema, requiredStringSchema } from "@global-entity";
 
 export const updateUserActionSchema = z.enum(
   ["update-email", "update-password", "update-name"],
@@ -11,18 +12,19 @@ export type UpdateUserAction =
   (typeof UpdateUserActionEnum)[keyof typeof UpdateUserActionEnum];
 
 export const updateEmailBodySchema = z.object({
-  email: z
-    .string({ required_error: "email is required" })
-    .email({ message: "Invalid email" }),
+  email: emailSchema("user email"),
 });
 
 export const updatePasswordBodySchema = z.object({
-  password: z.string({
-    required_error: "password is required",
-  }),
+  password: requiredStringSchema("user password"),
 });
 
-export const updateNameBodySchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-});
+export const updateNameBodySchema = z
+  .object({
+    firstName: requiredStringSchema("first name").optional(),
+    lastName: requiredStringSchema("last name").optional(),
+  })
+  .refine(
+    ({ firstName, lastName }) => Boolean(firstName) || Boolean(lastName),
+    { message: "At least one field is required" },
+  );

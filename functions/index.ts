@@ -2,7 +2,7 @@ import { PagesFunction } from "@cloudflare/workers-types";
 import { errorResponse, successResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";
 
-export const onRequest: PagesFunction = async (context) => {
+export const onRequest: PagesFunction = async (context): Promise<Response> => {
   setGlobalTimer();
   const { request } = context;
   if (request.method !== "GET") {

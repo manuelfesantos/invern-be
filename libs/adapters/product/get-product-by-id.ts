@@ -2,7 +2,7 @@ import { prepareStatement } from "@db-adapter";
 import { ProductDetails } from "@product-entity";
 import { errors } from "@error-handling-utils";
 
-export const getProductById = async (id: string) => {
+export const getProductById = async (id: string): Promise<ProductDetails> => {
   const product = await prepareStatement(
     `SELECT productId, productName, products.description, price, collectionName FROM products 
             JOIN collections ON products.collectionId = collections.collectionId

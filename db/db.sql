@@ -52,14 +52,16 @@ CREATE TABLE IF NOT EXISTS productsCarts(
 DROP TABLE IF EXISTS images;
 
 CREATE TABLE IF NOT EXISTS images(
-    url VARCHAR(250) PRIMARY KEY,
+    imageId VARCHAR(100) PRIMARY KEY,
+    url VARCHAR(250),
     alt VARCHAR(250),
-    imageIndex INTEGER NOT NULL,
     productId VARCHAR(100),
-    FOREIGN KEY(productId) REFERENCES products(productId) ON DELETE CASCADE
+    collectionId VARCHAR(100) UNIQUE,
+    FOREIGN KEY(productId) REFERENCES products(productId) ON DELETE CASCADE,
+    FOREIGN KEY(collectionId) REFERENCES collections(collectionId) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_images_id ON images(url);
+CREATE INDEX IF NOT EXISTS idx_images_id ON images(imageId);
 
 DROP TABLE IF EXISTS orders;
 

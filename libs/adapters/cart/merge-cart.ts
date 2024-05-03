@@ -4,7 +4,7 @@ import { ProductIdAndQuantity } from "@product-entity";
 export const mergeCart = async (
   cartId: string,
   items: ProductIdAndQuantity[],
-) => {
+): Promise<void> => {
   const productInserts = items.map(({ productId, quantity }) => {
     return `('${cartId}', '${productId}', ${quantity})`;
   });

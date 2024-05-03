@@ -6,7 +6,7 @@ import { generateErrorResponse, successResponse } from "@response-entity";
 import { errors } from "@error-handling-utils";
 import { Cart } from "@cart-entity";
 
-export const signup = async (body: unknown) => {
+export const signup = async (body: unknown): Promise<Response> => {
   try {
     const parsedBody = signupBodySchema.parse(body);
     const userDTO = userDTOSchema.parse(parsedBody);
@@ -36,7 +36,7 @@ export const signup = async (body: unknown) => {
   }
 };
 
-const validateThatEmailIsUnique = async (email: string) => {
+const validateThatEmailIsUnique = async (email: string): Promise<void> => {
   const userExists = Boolean(await getUserByEmail(email));
   if (userExists) {
     throw errors.EMAIL_ALREADY_TAKEN();

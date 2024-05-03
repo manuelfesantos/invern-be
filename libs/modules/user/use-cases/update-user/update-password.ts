@@ -13,7 +13,7 @@ export const updatePassword = async (
 
   const passwordHash = await hashPassword(password, id);
 
-  await updateUser(id, `password = ${passwordHash}`);
+  await updateUser(id, `password = '${passwordHash}'`);
 
   return successResponse.OK("user password updated", userToUserDTO(user));
 };

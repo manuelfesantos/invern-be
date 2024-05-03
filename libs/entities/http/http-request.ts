@@ -15,7 +15,6 @@ export const HttpHeaderEnum = {
   ACTION: "action",
 } as const;
 export type HttpHeader = (typeof HttpHeaderEnum)[keyof typeof HttpHeaderEnum];
-export const httpHeaderSchema = z.nativeEnum(HttpHeaderEnum);
 
 export const getBodyFromRequest = async (
   request: Request,

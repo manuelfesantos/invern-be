@@ -5,7 +5,7 @@ export const removeFromCart = async (
   cartId: string,
   productId: string,
   quantity: number,
-) => {
+): Promise<void> => {
   const quantityInCart = (await getQuantityInCart(cartId, productId)) as number;
   if (quantity >= quantityInCart) {
     await prepareStatement(

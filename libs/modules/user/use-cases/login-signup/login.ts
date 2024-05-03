@@ -6,7 +6,7 @@ import { hash } from "@crypto-utils";
 import { loginBodySchema } from "../../types/login-signup";
 import { getCartById } from "@cart-adapter";
 
-export const login = async (body: unknown) => {
+export const login = async (body: unknown): Promise<Response> => {
   try {
     const parsedBody = loginBodySchema.parse(body);
 
@@ -24,7 +24,7 @@ export const login = async (body: unknown) => {
   }
 };
 
-const getUser = async (email: string) => {
+const getUser = async (email: string): Promise<User> => {
   const user = await getUserByEmail(email);
   if (!user) {
     throw errors.INVALID_CREDENTIALS();
@@ -32,7 +32,10 @@ const getUser = async (email: string) => {
   return user;
 };
 
-const validatePassword = async (passwordText: string, user: User) => {
+const validatePassword = async (
+  passwordText: string,
+  user: User,
+): Promise<void> => {
   const passwordHash = await hash(passwordText, user.userId);
   if (passwordHash !== user.password) {
     throw errors.INVALID_CREDENTIALS();

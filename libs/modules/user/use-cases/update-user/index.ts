@@ -15,7 +15,7 @@ export const updateUser = async (
   id: HttpParams,
   body: unknown,
   action: string | null,
-) => {
+): Promise<Response> => {
   try {
     if (!action) {
       return errorResponse.BAD_REQUEST("action is required");

@@ -1,10 +1,17 @@
 import { prepareStatement } from "@db-adapter";
 import { errors } from "@error-handling-utils";
 
-export const getQuantityInCart = async (cartId: string, productId: string) => {
+interface Quantity {
+  quantity: number;
+}
+
+export const getQuantityInCart = async (
+  cartId: string,
+  productId: string,
+): Promise<number> => {
   const result = await prepareStatement(
     `SELECT quantity FROM productsCarts WHERE cartId = '${cartId}' AND productId = '${productId}'`,
-  ).first();
+  ).first<Quantity>();
   if (!result) {
     throw errors.PRODUCT_NOT_IN_CART();
   }

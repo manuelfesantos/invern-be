@@ -5,7 +5,7 @@ import { errorResponse } from "@response-entity";
 export const loginSignupMapper = async (
   body: unknown,
   action: string | null,
-) => {
+): Promise<Response> => {
   if (!action) {
     return errorResponse.BAD_REQUEST("action is required");
   }

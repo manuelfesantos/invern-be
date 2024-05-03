@@ -1,30 +1,27 @@
 import { z } from "zod";
 import { RolesEnum, rolesSchema } from "./roles";
 import { cartSchema } from "@cart-entity";
+import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
 export const userSchema = z.object({
-  userId: z
-    .string({ required_error: "user id is required" })
-    .uuid({ message: "Invalid id" }),
-  email: z
-    .string({ required_error: "email is required" })
-    .email({ message: "Invalid email" }),
-  firstName: z.string({ required_error: "firstName is required" }),
-  lastName: z.string({ required_error: "lastName is required" }),
-  password: z.string({ required_error: "password is required" }),
+  userId: uuidSchema("user id"),
+  email: emailSchema("user email"),
+  firstName: requiredStringSchema("first name"),
+  lastName: requiredStringSchema("last name"),
+  password: requiredStringSchema("password"),
   roles: z.array(rolesSchema).default([RolesEnum.USER]),
-  cart: cartSchema.optional(),
+  cart: cartSchema,
 });
 
 export type User = z.infer<typeof userSchema>;
 
+export const userWithoutCartSchema = userSchema.omit({ cart: true });
+
 export const userDTOSchema = z.object({
-  userId: z.string().uuid({ message: "Invalid id" }).optional(),
-  email: z
-    .string({ required_error: "email is required" })
-    .email({ message: "Invalid email" }),
-  firstName: z.string({ required_error: "firstName is required" }),
-  lastName: z.string({ required_error: "lastName is required" }),
+  userId: uuidSchema("user id").optional(),
+  email: emailSchema("user email"),
+  firstName: requiredStringSchema("first name"),
+  lastName: requiredStringSchema("last name"),
   cart: cartSchema.optional(),
 });
 

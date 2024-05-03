@@ -1,10 +1,12 @@
 import { generateErrorResponse, successResponse } from "@response-entity";
 import { getProducts } from "@product-adapter";
 
-export const getAllProducts = async (search: string | null) => {
+export const getAllProducts = async (
+  search: string | null,
+): Promise<Response> => {
   try {
-    const { results } = await getProducts(search);
-    return successResponse.OK("success getting all products", results);
+    const products = await getProducts(search);
+    return successResponse.OK("success getting all products", products);
   } catch (error: any) {
     return generateErrorResponse(error);
   }

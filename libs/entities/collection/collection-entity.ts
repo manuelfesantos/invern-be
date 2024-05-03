@@ -1,18 +1,21 @@
 import { z } from "zod";
 import { productSchema } from "@product-entity";
+import { requiredStringSchema, urlSchema, uuidSchema } from "@global-entity";
+import { imageSchema } from "@image-entity";
 
 export const collectionSchema = z.object({
-  collectionId: z
-    .string({ required_error: "collection id is required" })
-    .uuid({ message: "Invalid collection id" }),
-  collectionName: z.string({ required_error: "collection name is required" }),
+  collectionId: uuidSchema("collection id"),
+  collectionName: requiredStringSchema("collection name"),
+  collectionImage: imageSchema,
 });
 
 export type Collection = z.infer<typeof collectionSchema>;
 
-export const collectionDetailsSchema = collectionSchema.extend({
-  description: z.string({ required_error: "description is required" }),
-  products: z.array(productSchema).default([]),
-});
+export const collectionDetailsSchema = collectionSchema
+  .extend({
+    description: requiredStringSchema("collection description"),
+    products: z.array(productSchema).default([]),
+  })
+  .omit({ collectionImage: true });
 
 export type CollectionDetails = z.infer<typeof collectionDetailsSchema>;

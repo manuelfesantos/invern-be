@@ -1,13 +1,12 @@
 import { z } from "zod";
 import { userDTOSchema } from "@user-entity";
+import { emailSchema, requiredStringSchema } from "@global-entity";
 
 export const loginBodySchema = z.object({
-  email: z
-    .string({ required_error: "email is required" })
-    .email({ message: "Invalid email" }),
-  password: z.string({ required_error: "password is required" }),
+  email: emailSchema("user email"),
+  password: requiredStringSchema("user password"),
 });
 
 export const signupBodySchema = userDTOSchema.extend({
-  password: z.string({ required_error: "password is required" }),
+  password: requiredStringSchema("user password"),
 });

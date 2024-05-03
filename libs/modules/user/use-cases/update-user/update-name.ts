@@ -3,7 +3,10 @@ import { getUserById, updateUser } from "@user-adapter";
 import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 
-export const updateName = async (id: string, body: unknown) => {
+export const updateName = async (
+  id: string,
+  body: unknown,
+): Promise<Response> => {
   const { firstName, lastName } = updateNameBodySchema.parse(body);
   const user = await getUserById(id);
 
@@ -17,7 +20,7 @@ export const updateName = async (id: string, body: unknown) => {
   );
 };
 
-const getUpdateOptions = (firstName?: string, lastName?: string) => {
+const getUpdateOptions = (firstName?: string, lastName?: string): string => {
   let updateOptions = "";
   if (firstName && lastName) {
     updateOptions = `firstName = '${firstName}', lastName = '${lastName}'`;
@@ -29,7 +32,11 @@ const getUpdateOptions = (firstName?: string, lastName?: string) => {
   return updateOptions;
 };
 
-const mergeUser = (user: User, firstName?: string, lastName?: string) => ({
+const mergeUser = (
+  user: User,
+  firstName?: string,
+  lastName?: string,
+): User => ({
   ...user,
   ...(firstName && {
     firstName: firstName,

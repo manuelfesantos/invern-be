@@ -7,7 +7,9 @@ interface Env {
   INVERN_DB: D1Database;
 }
 
-export const onRequest: PagesFunction<Env> = async (context) => {
+export const onRequest: PagesFunction<Env> = async (
+  context,
+): Promise<Response> => {
   setGlobalTimer();
   const { request, env } = context;
   if (request.method !== "GET") {

@@ -4,8 +4,8 @@ export const addToCart = async (
   cartId: string,
   productId: string,
   quantity: number,
-) => {
-  return prepareStatement(
+): Promise<void> => {
+  await prepareStatement(
     `INSERT INTO productsCarts (cartId, productId, quantity) VALUES('${cartId}', '${productId}', ${quantity})`,
   ).run();
 };

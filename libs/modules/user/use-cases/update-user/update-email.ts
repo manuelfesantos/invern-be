@@ -3,11 +3,14 @@ import { getUserById, updateUser } from "@user-adapter";
 import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 
-export const updateEmail = async (id: string, body: unknown) => {
+export const updateEmail = async (
+  id: string,
+  body: unknown,
+): Promise<Response> => {
   const { email } = updateEmailBodySchema.parse(body);
   const user = await getUserById(id);
 
-  await updateUser(id, `email = ${email}`);
+  await updateUser(id, `email = '${email}'`);
 
   return successResponse.OK(
     "user email updated",
@@ -15,7 +18,7 @@ export const updateEmail = async (id: string, body: unknown) => {
   );
 };
 
-const mergeUser = (user: User, email: string) => ({
+const mergeUser = (user: User, email: string): User => ({
   ...user,
   email,
 });
