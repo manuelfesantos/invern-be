@@ -1,5 +1,12 @@
 import { signupBodySchema } from "../../types/login-signup";
-import { userDTOSchema, userSchema, userToUserDTO } from "@user-entity";
+import {
+  RolesEnum,
+  User,
+  UserDTO,
+  userDTOSchema,
+  userSchema,
+  userToUserDTO,
+} from "@user-entity";
 import { hash } from "@crypto-utils";
 import { createUser, getUserByEmail } from "@user-adapter";
 import { generateErrorResponse, successResponse } from "@response-entity";
@@ -21,12 +28,7 @@ export const signup = async (body: unknown): Promise<Response> => {
       products: [],
     };
     const passwordHash = await hash(password, userId);
-    const user = userSchema.parse({
-      ...userDTO,
-      userId,
-      cart,
-      password: passwordHash,
-    });
+    const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
 
     await createUser(user);
 
@@ -42,3 +44,19 @@ const validateThatEmailIsUnique = async (email: string): Promise<void> => {
     throw errors.EMAIL_ALREADY_TAKEN();
   }
 };
+
+const buildUserFromData = (
+  userDTO: UserDTO,
+  cartId: string,
+  userId: string,
+  password: string,
+): User => ({
+  ...userDTO,
+  userId,
+  password,
+  cart: {
+    cartId,
+    products: [],
+  },
+  roles: [RolesEnum.USER],
+});
