@@ -1,27 +1,24 @@
 import { getUserByEmail } from "@user-adapter";
-import { generateErrorResponse, successResponse } from "@response-entity";
+import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
-import { loginBodySchema } from "../../types/login-signup";
+import { loginBodySchema } from "./types/login-signup";
 import { getCartById } from "@cart-adapter";
+import { Cart } from "@cart-entity";
 
 export const login = async (body: unknown): Promise<Response> => {
-  try {
-    const parsedBody = loginBodySchema.parse(body);
+  const parsedBody = loginBodySchema.parse(body);
 
-    const { email, password } = parsedBody;
+  const { email, password } = parsedBody;
 
-    const user = await getUser(email);
+  const user = await getUser(email);
 
-    await validatePassword(password, user);
+  await validatePassword(password, user);
 
-    user.cart = await getCartById(user.cart.cartId);
+  user.cart = await getCart(user.cart.cartId);
 
-    return successResponse.OK("successfully logged in", userToUserDTO(user));
-  } catch (error: unknown) {
-    return generateErrorResponse(error);
-  }
+  return successResponse.OK("successfully logged in", userToUserDTO(user));
 };
 
 const getUser = async (email: string): Promise<User> => {
@@ -30,6 +27,14 @@ const getUser = async (email: string): Promise<User> => {
     throw errors.INVALID_CREDENTIALS();
   }
   return user;
+};
+
+const getCart = async (cartId: string): Promise<Cart> => {
+  const cart = await getCartById(cartId);
+  if (!cart) {
+    throw errors.CART_NOT_FOUND();
+  }
+  return cart;
 };
 
 const validatePassword = async (

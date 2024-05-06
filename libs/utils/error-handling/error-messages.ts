@@ -32,5 +32,9 @@ export const errors = {
   PRODUCTS_ARE_REQUIRED: (): AdapterError =>
     new AdapterError("Products are required", HttpResponseEnum.BAD_REQUEST),
   CART_IS_NOT_EMPTY: (): AdapterError =>
-    new AdapterError("Cart is not empty", HttpResponseEnum.BAD_REQUEST),
+    new AdapterError("Cart is not empty", HttpResponseEnum.CONFLICT),
+  ACTION_IS_REQUIRED: (): AdapterError =>
+    new AdapterError("Action is required", HttpResponseEnum.BAD_REQUEST),
+  INVALID_ACTION: (action: string): AdapterError =>
+    new AdapterError(`Invalid action: ${action}`, HttpResponseEnum.BAD_REQUEST),
 };

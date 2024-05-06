@@ -1,9 +1,9 @@
-import { updateUserActionSchema } from "../../types/update-user";
+import { updateUserActionSchema } from "./types/update-user";
 import { updateEmail } from "./update-email";
 import { updatePassword } from "./update-password";
 import { updateName } from "./update-name";
 import { HttpParams } from "@http-entity";
-import { errorResponse } from "@response-entity";
+import { errors } from "@error-handling-utils";
 
 const actionToUpdateMap = {
   "update-email": updateEmail,
@@ -17,7 +17,7 @@ export const updateUser = async (
   action: string | null,
 ): Promise<Response> => {
   if (!action) {
-    return errorResponse.BAD_REQUEST("action is required");
+    throw errors.ACTION_IS_REQUIRED();
   }
   const updateUserAction = updateUserActionSchema.parse(action);
   return await actionToUpdateMap[updateUserAction](id as string, body);

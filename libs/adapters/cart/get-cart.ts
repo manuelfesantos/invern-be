@@ -6,7 +6,8 @@ export const getCartById = async (cartId: string): Promise<Cart> => {
     `SELECT products.*, productsCarts.quantity, url as imageUrl, alt as imageAlt FROM productsCarts 
                 JOIN products ON productsCarts.productId = products.productId
                 JOIN images ON products.productId = images.productId
-                WHERE cartId = '${cartId}'`,
+                WHERE cartId = '${cartId}'
+                GROUP BY products.productId`,
   ).all();
   return getCartFromResults(cartId, results);
 };

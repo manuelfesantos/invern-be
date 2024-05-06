@@ -70,7 +70,7 @@ describe("mergeCartItems", () => {
     await expect(
       async () => await mergeCartItems(validBody, "cartId"),
     ).rejects.toEqual(
-      expect.objectContaining({ message: "Cart is not empty", code: 400 }),
+      expect.objectContaining({ message: "Cart is not empty", code: 409 }),
     );
     expect(getCartByIdSpy).toHaveBeenCalledWith("cartId");
     expect(validateProductIdsSpy).not.toHaveBeenCalled();

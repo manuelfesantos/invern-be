@@ -1,5 +1,5 @@
 import { addProductToCart } from "./add-product-to-cart";
-import { cartActionSchema } from "../../types/update-cart";
+import { cartActionSchema } from "./types/update-cart";
 import { HttpParams } from "@http-entity";
 import { removeProductFromCart } from "./remove-product-from-cart";
 import { mergeCartItems } from "./merge-cart-items";

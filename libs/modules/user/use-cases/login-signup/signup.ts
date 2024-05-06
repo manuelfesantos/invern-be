@@ -1,4 +1,4 @@
-import { signupBodySchema } from "../../types/login-signup";
+import { signupBodySchema } from "./types/login-signup";
 import {
   RolesEnum,
   User,
@@ -6,30 +6,26 @@ import {
   userDTOSchema,
   userToUserDTO,
 } from "@user-entity";
-import { hashPassword } from "@crypto-utils";
+import { getRandomUUID, hashPassword } from "@crypto-utils";
 import { createUser, getUserByEmail } from "@user-adapter";
-import { generateErrorResponse, successResponse } from "@response-entity";
+import { successResponse } from "@response-entity";
 import { errors } from "@error-handling-utils";
 
 export const signup = async (body: unknown): Promise<Response> => {
-  try {
-    const parsedBody = signupBodySchema.parse(body);
-    const userDTO = userDTOSchema.parse(parsedBody);
-    const { password } = parsedBody;
+  const parsedBody = signupBodySchema.parse(body);
+  const userDTO = userDTOSchema.parse(parsedBody);
+  const { password } = parsedBody;
 
-    await validateThatEmailIsUnique(userDTO.email);
+  await validateThatEmailIsUnique(userDTO.email);
 
-    const userId = crypto.randomUUID();
-    const cartId = crypto.randomUUID();
-    const passwordHash = await hashPassword(password, userId);
-    const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
+  const userId = getRandomUUID();
+  const cartId = getRandomUUID();
+  const passwordHash = await hashPassword(password, userId);
+  const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
 
-    await createUser(user);
+  await createUser(user);
 
-    return successResponse.CREATED("user created", userToUserDTO(user));
-  } catch (error: unknown) {
-    return generateErrorResponse(error);
-  }
+  return successResponse.CREATED("user created", userToUserDTO(user));
 };
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {

@@ -1,5 +1,5 @@
 import { successResponse } from "@response-entity";
-import { mergeCartItemsBodySchema } from "../../types/update-cart";
+import { mergeCartItemsBodySchema } from "./types/update-cart";
 import { getCartById, mergeCart } from "@cart-adapter";
 import { validateProductIds } from "@product-adapter";
 import { errors } from "@error-handling-utils";

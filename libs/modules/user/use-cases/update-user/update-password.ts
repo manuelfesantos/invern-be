@@ -1,4 +1,4 @@
-import { updatePasswordBodySchema } from "../../types/update-user";
+import { updatePasswordBodySchema } from "./types/update-user";
 import { getUserById, updateUser } from "@user-adapter";
 import { successResponse } from "@response-entity";
 import { userToUserDTO } from "@user-entity";

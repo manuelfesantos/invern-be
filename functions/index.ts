@@ -8,5 +8,6 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
   if (request.method !== "GET") {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
+
   return successResponse.OK("Welcome to Invern Spirit!");
 };

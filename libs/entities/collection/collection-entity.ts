@@ -7,13 +7,13 @@ export const collectionSchema = z.object({
   collectionId: uuidSchema("collection id"),
   collectionName: requiredStringSchema("collection name"),
   collectionImage: imageSchema,
+  description: requiredStringSchema("collection description").optional(),
 });
 
 export type Collection = z.infer<typeof collectionSchema>;
 
 export const collectionDetailsSchema = collectionSchema
   .extend({
-    description: requiredStringSchema("collection description"),
     products: z.array(productSchema).default([]),
   })
   .omit({ collectionImage: true });

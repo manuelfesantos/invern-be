@@ -1,4 +1,4 @@
-import { getCollectionById } from "../../../adapters/collection/get-collection-by-id";
+import { getCollectionById } from "@collection-adapter";
 import { getProductsByCollectionId } from "@product-adapter";
 import { CollectionDetails, collectionDetailsSchema } from "@collection-entity";
 import { successResponse } from "@response-entity";

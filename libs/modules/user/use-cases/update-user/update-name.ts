@@ -1,4 +1,4 @@
-import { updateNameBodySchema } from "../../types/update-user";
+import { updateNameBodySchema } from "./types/update-user";
 import { getUserById, updateUser } from "@user-adapter";
 import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";

@@ -1,13 +1,13 @@
 import { login } from "./login";
 import { signup } from "./signup";
-import { errorResponse } from "@response-entity";
+import { errors } from "@error-handling-utils";
 
 export const loginSignupMapper = async (
   body: unknown,
   action: string | null,
 ): Promise<Response> => {
   if (!action) {
-    return errorResponse.BAD_REQUEST("action is required");
+    throw errors.ACTION_IS_REQUIRED();
   }
   if (action === "login") {
     return await login(body);
@@ -15,5 +15,5 @@ export const loginSignupMapper = async (
   if (action === "signup") {
     return await signup(body);
   }
-  return errorResponse.BAD_REQUEST("invalid action");
+  throw errors.INVALID_ACTION(action);
 };

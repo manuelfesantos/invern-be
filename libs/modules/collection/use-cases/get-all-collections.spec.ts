@@ -1,0 +1,32 @@
+import { getAllCollections } from "./get-all-collections";
+import { collectionsMock, compareResponses } from "@mocks-utils";
+import { successResponse } from "@response-entity";
+import * as CollectionAdapter from "@collection-adapter";
+
+jest.mock("@collection-adapter", () => ({
+  getCollections: jest.fn(),
+}));
+
+describe("getAllCollections", () => {
+  const getCollectionsSpy = jest.spyOn(CollectionAdapter, "getCollections");
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  it("should get all collections", async () => {
+    getCollectionsSpy.mockResolvedValueOnce(collectionsMock);
+    const response = await getAllCollections();
+    const expectedResponse = successResponse.OK(
+      "success getting collections",
+      collectionsMock,
+    );
+    await compareResponses(response, expectedResponse);
+    expect(getCollectionsSpy).toHaveBeenCalled();
+  });
+  it("should throw an error if getCollections throws an error", async () => {
+    getCollectionsSpy.mockRejectedValueOnce(new Error("database error"));
+    await expect(async () => await getAllCollections()).rejects.toEqual(
+      expect.objectContaining({ message: "database error" }),
+    );
+    expect(getCollectionsSpy).toHaveBeenCalled();
+  });
+});
