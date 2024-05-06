@@ -2,7 +2,7 @@ import { getUserByEmail } from "@user-adapter";
 import { generateErrorResponse, successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
-import { hash } from "@crypto-utils";
+import { hashPassword } from "@crypto-utils";
 import { loginBodySchema } from "../../types/login-signup";
 import { getCartById } from "@cart-adapter";
 
@@ -36,8 +36,9 @@ const validatePassword = async (
   passwordText: string,
   user: User,
 ): Promise<void> => {
-  const passwordHash = await hash(passwordText, user.userId);
-  if (passwordHash !== user.password) {
+  const password = await hashPassword(passwordText, user.userId);
+
+  if (password !== user.password) {
     throw errors.INVALID_CREDENTIALS();
   }
 };

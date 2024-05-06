@@ -1,11 +1,12 @@
 import { updateCart } from "@cart-module";
 import { compareResponses } from "@mocks-utils";
-import { errorResponse, successResponse } from "@response-entity";
+import { successResponse } from "@response-entity";
 import * as AddProduct from "./add-product-to-cart";
 import * as RemoveProduct from "./remove-product-from-cart";
 import * as MergeCart from "./merge-cart-items";
 import * as CartAdapter from "@cart-adapter";
 import { errors } from "@error-handling-utils";
+import { ZodError } from "zod";
 
 jest.mock("@cart-adapter", () => ({
   validateCartId: jest.fn(),
@@ -33,41 +34,50 @@ describe("updateCart", () => {
     jest.clearAllMocks();
   });
   it("should add to cart if action is add", async () => {
-    addToCartSpy.mockResolvedValue(successResponse.OK("product added to cart"));
+    addToCartSpy.mockResolvedValueOnce(
+      successResponse.OK("product added to cart"),
+    );
     const expectedResponse = successResponse.OK("product added to cart");
     const response = await updateCart({}, "add", "cartId");
     await compareResponses(response, expectedResponse);
+    expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
     expect(addToCartSpy).toHaveBeenCalledWith({}, "cartId");
   });
   it("should remove from cart if action is remove", async () => {
-    removeFromCartSpy.mockResolvedValue(
+    removeFromCartSpy.mockResolvedValueOnce(
       successResponse.OK("product removed from cart"),
     );
     const expectedResponse = successResponse.OK("product removed from cart");
     const response = await updateCart({}, "remove", "cartId");
     await compareResponses(response, expectedResponse);
+    expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
     expect(removeFromCartSpy).toHaveBeenCalledWith({}, "cartId");
   });
   it("should merge cart if action is merge", async () => {
-    mergeCartSpy.mockResolvedValue(successResponse.OK("cart merged"));
+    mergeCartSpy.mockResolvedValueOnce(successResponse.OK("cart merged"));
     const expectedResponse = successResponse.OK("cart merged");
     const response = await updateCart({}, "merge", "cartId");
     await compareResponses(response, expectedResponse);
+    expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
     expect(mergeCartSpy).toHaveBeenCalledWith({}, "cartId");
   });
   it("should throw error if action is invalid", async () => {
-    const response = await updateCart({}, "invalid", "cartId");
-    const expectedResponse = errorResponse.BAD_REQUEST(["Invalid action"]);
-    await compareResponses(response, expectedResponse);
+    await expect(
+      async () => await updateCart({}, "invalid", "cartId"),
+    ).rejects.toBeInstanceOf(ZodError);
+    expect(validateCartIdSpy).not.toHaveBeenCalled();
     expect(addToCartSpy).not.toHaveBeenCalled();
     expect(removeFromCartSpy).not.toHaveBeenCalled();
     expect(mergeCartSpy).not.toHaveBeenCalled();
   });
   it("should throw error if cart id is invalid", async () => {
-    validateCartIdSpy.mockRejectedValue(errors.CART_NOT_FOUND());
-    const response = await updateCart({}, "add", "invalid");
-    const expectedResponse = errorResponse.NOT_FOUND("Cart not found");
-    await compareResponses(response, expectedResponse);
+    validateCartIdSpy.mockRejectedValueOnce(errors.CART_NOT_FOUND());
+    await expect(
+      async () => await updateCart({}, "add", "invalid"),
+    ).rejects.toEqual(
+      expect.objectContaining({ message: "Cart not found", code: 404 }),
+    );
+    expect(validateCartIdSpy).toHaveBeenCalledWith("invalid");
     expect(addToCartSpy).not.toHaveBeenCalled();
     expect(removeFromCartSpy).not.toHaveBeenCalled();
     expect(mergeCartSpy).not.toHaveBeenCalled();

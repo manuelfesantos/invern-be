@@ -1,12 +1,18 @@
 import { removeProductFromCart } from "./remove-product-from-cart";
-import { errorResponse, successResponse } from "@response-entity";
+import { successResponse } from "@response-entity";
 import { compareResponses, productIdAndQuantityMock } from "@mocks-utils";
-import * as RemoveFromCart from "@cart-adapter";
+import * as CartAdapter from "@cart-adapter";
+import * as ProductAdapter from "@product-adapter";
+import { ZodError } from "zod";
 
 const { productId, quantity } = productIdAndQuantityMock;
 
 jest.mock("@cart-adapter", () => ({
   removeFromCart: jest.fn(),
+}));
+
+jest.mock("@product-adapter", () => ({
+  validateProductId: jest.fn(),
 }));
 
 const validBody = productIdAndQuantityMock;
@@ -22,7 +28,8 @@ const bodyWithoutProductId = {
 };
 
 describe("removeProductFromCart", () => {
-  const removeFromCartSpy = jest.spyOn(RemoveFromCart, "removeFromCart");
+  const removeFromCartSpy = jest.spyOn(CartAdapter, "removeFromCart");
+  const validateProductIdSpy = jest.spyOn(ProductAdapter, "validateProductId");
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -30,6 +37,7 @@ describe("removeProductFromCart", () => {
     const response = await removeProductFromCart(validBody, "cartId");
     const expectedResponse = successResponse.OK("product removed from cart");
     await compareResponses(response, expectedResponse);
+    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
     expect(removeFromCartSpy).toHaveBeenCalledWith(
       "cartId",
       productId,
@@ -37,30 +45,33 @@ describe("removeProductFromCart", () => {
     );
   });
   it("should not remove product from cart if quantity is missing", async () => {
-    const response = await removeProductFromCart(bodyWithoutQuantity, "cartId");
-    const expectedResponse = errorResponse.BAD_REQUEST([
-      "product quantity is required",
-    ]);
-    await compareResponses(response, expectedResponse);
+    await expect(
+      async () => await removeProductFromCart(bodyWithoutQuantity, "cartId"),
+    ).rejects.toBeInstanceOf(ZodError);
+    expect(validateProductIdSpy).not.toHaveBeenCalled();
     expect(removeFromCartSpy).not.toHaveBeenCalled();
   });
   it("should not remove product from cart if product id is missing", async () => {
-    const response = await removeProductFromCart(
-      bodyWithoutProductId,
-      "cartId",
-    );
-    const expectedResponse = errorResponse.BAD_REQUEST([
-      "product id is required",
-    ]);
-    await compareResponses(response, expectedResponse);
+    await expect(
+      async () => await removeProductFromCart(bodyWithoutProductId, "cartId"),
+    ).rejects.toBeInstanceOf(ZodError);
+    expect(validateProductIdSpy).not.toHaveBeenCalled();
     expect(removeFromCartSpy).not.toHaveBeenCalled();
   });
-  it("should return an error if database throws an error", async () => {
-    removeFromCartSpy.mockRejectedValue(new Error("database error"));
-    const response = await removeProductFromCart(validBody, "cartId");
-    const expectedResponse =
-      errorResponse.INTERNAL_SERVER_ERROR("database error");
-    await compareResponses(response, expectedResponse);
+  it("should return an error if validateProductId throws an error", async () => {
+    validateProductIdSpy.mockRejectedValueOnce(new Error("validation error"));
+    await expect(
+      async () => await removeProductFromCart(validBody, "cartId"),
+    ).rejects.toEqual(expect.objectContaining({ message: "validation error" }));
+    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
+    expect(removeFromCartSpy).not.toHaveBeenCalled();
+  });
+  it("should return an error if removeFromCart throws an error", async () => {
+    removeFromCartSpy.mockRejectedValueOnce(new Error("database error"));
+    await expect(
+      async () => await removeProductFromCart(validBody, "cartId"),
+    ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
+    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
     expect(removeFromCartSpy).toHaveBeenCalledWith(
       "cartId",
       productId,

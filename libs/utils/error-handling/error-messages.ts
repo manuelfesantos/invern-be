@@ -29,4 +29,8 @@ export const errors = {
       "The following product ids are invalid: " + ids,
       HttpResponseEnum.BAD_REQUEST,
     ),
+  PRODUCTS_ARE_REQUIRED: (): AdapterError =>
+    new AdapterError("Products are required", HttpResponseEnum.BAD_REQUEST),
+  CART_IS_NOT_EMPTY: (): AdapterError =>
+    new AdapterError("Cart is not empty", HttpResponseEnum.BAD_REQUEST),
 };

@@ -16,10 +16,8 @@ export const updateCart = async (
   action: string,
   cartId: HttpParams,
 ): Promise<Response> => {
+  const cartAction = cartActionSchema.parse(action);
   await validateCartId(cartId as string);
 
-  return await actionMapper[cartActionSchema.parse(action)](
-    body,
-    cartId as string,
-  );
+  return await actionMapper[cartAction](body, cartId as string);
 };

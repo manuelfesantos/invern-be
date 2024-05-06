@@ -6,7 +6,7 @@ import {
   userDTOSchema,
   userToUserDTO,
 } from "@user-entity";
-import { hash } from "@crypto-utils";
+import { hashPassword } from "@crypto-utils";
 import { createUser, getUserByEmail } from "@user-adapter";
 import { generateErrorResponse, successResponse } from "@response-entity";
 import { errors } from "@error-handling-utils";
@@ -21,7 +21,7 @@ export const signup = async (body: unknown): Promise<Response> => {
 
     const userId = crypto.randomUUID();
     const cartId = crypto.randomUUID();
-    const passwordHash = await hash(password, userId);
+    const passwordHash = await hashPassword(password, userId);
     const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
 
     await createUser(user);
