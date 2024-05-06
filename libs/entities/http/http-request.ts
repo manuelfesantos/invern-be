@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const QUERY_INDEX = 1;
+
 export const httpMethodsSchema = z.enum([
   "GET",
   "POST",
@@ -28,6 +30,6 @@ export const getBodyFromRequest = async (
 export type HttpParams = string | string[];
 
 export const getQueryFromUrl = (url: string): URLSearchParams | null => {
-  const query = url.split("?")[1];
+  const query = url.split("?")[QUERY_INDEX];
   return query ? new URLSearchParams(query) : null;
 };

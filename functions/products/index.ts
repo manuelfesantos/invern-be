@@ -1,4 +1,4 @@
-import { errorResponse } from "@response-entity";
+import { errorResponse, generateErrorResponse } from "@response-entity";
 import { initDb } from "@db-adapter";
 import { getAllProducts } from "@product-module";
 import { getQueryFromUrl } from "@http-entity";
@@ -17,9 +17,14 @@ export const onRequest: PagesFunction<Env> = async (
     return errorResponse.METHOD_NOT_ALLOWED();
   }
 
-  initDb(env.INVERN_DB);
+  try {
+    initDb(env.INVERN_DB);
 
-  const query = getQueryFromUrl(request.url);
-  const search = query?.get("search") ?? null;
-  return await getAllProducts(search);
+    const query = getQueryFromUrl(request.url);
+    const search = query?.get("search") ?? null;
+
+    return await getAllProducts(search);
+  } catch (error) {
+    return generateErrorResponse(error);
+  }
 };

@@ -1,4 +1,4 @@
-import { errorResponse } from "@response-entity";
+import { errorResponse, generateErrorResponse } from "@response-entity";
 import { initDb } from "@db-adapter";
 import { getCollectionDetails } from "@collection-module";
 
@@ -15,7 +15,10 @@ export const onRequest: PagesFunction<Env> = async (
 
   const { id } = params;
 
-  initDb(env.INVERN_DB);
-
-  return await getCollectionDetails(id);
+  try {
+    initDb(env.INVERN_DB);
+    return await getCollectionDetails(id);
+  } catch (error) {
+    return generateErrorResponse(error);
+  }
 };

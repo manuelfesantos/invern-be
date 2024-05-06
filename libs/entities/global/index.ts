@@ -1,11 +1,13 @@
 import { z, ZodEffects, ZodNumber, ZodString } from "zod";
 
+const ZERO_ELEMENTS = 0;
+
 export const requiredStringSchema = (
   name: string,
 ): ZodEffects<ZodString, string, string> =>
   z
     .string({ required_error: `${name} is required` })
-    .refine((value) => value.trim().length > 0, {
+    .refine((value) => value.trim().length > ZERO_ELEMENTS, {
       message: `${name} is required`,
     });
 

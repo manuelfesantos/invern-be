@@ -1,7 +1,7 @@
 import { initDb } from "@db-adapter";
 import { loginSignupMapper } from "@user-module";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
-import { errorResponse } from "@response-entity";
+import { errorResponse, generateErrorResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";
 
 interface Env {
@@ -19,11 +19,15 @@ export const onRequest: PagesFunction<Env> = async (
     return errorResponse.METHOD_NOT_ALLOWED();
   }
 
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  const action = request.headers.get(HttpHeaderEnum.ACTION);
+    const action = request.headers.get(HttpHeaderEnum.ACTION);
 
-  initDb(env.INVERN_DB);
+    initDb(env.INVERN_DB);
 
-  return await loginSignupMapper(body, action);
+    return await loginSignupMapper(body, action);
+  } catch (error: unknown) {
+    return generateErrorResponse(error);
+  }
 };

@@ -24,4 +24,9 @@ export const errors = {
     new AdapterError("Collection not found", HttpResponseEnum.NOT_FOUND),
   CART_NOT_FOUND: (): AdapterError =>
     new AdapterError("Cart not found", HttpResponseEnum.NOT_FOUND),
+  INVALID_PRODUCT_IDS: (ids: string[]): AdapterError =>
+    new AdapterError(
+      "The following product ids are invalid: " + ids,
+      HttpResponseEnum.BAD_REQUEST,
+    ),
 };

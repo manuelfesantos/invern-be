@@ -7,8 +7,11 @@ export default [
   {languageOptions: { globals: globals.browser }},
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  {rules: {
+  {
+    rules: {
     "no-console": "error",
-    "@typescript-eslint/explicit-function-return-type": "error"
-    }}
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/no-magic-numbers": "error"
+    }
+  }
 ];

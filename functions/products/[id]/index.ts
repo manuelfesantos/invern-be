@@ -1,6 +1,6 @@
 import { setGlobalTimer } from "@timer-utils";
 import { HttpMethodEnum } from "@http-entity";
-import { errorResponse } from "@response-entity";
+import { errorResponse, generateErrorResponse } from "@response-entity";
 import { getProductDetails } from "@product-module";
 import { initDb } from "@db-adapter";
 
@@ -18,7 +18,10 @@ export const onRequest: PagesFunction<Env> = async (
   }
   const { id } = params;
 
-  initDb(env.INVERN_DB);
-
-  return await getProductDetails(id);
+  try {
+    initDb(env.INVERN_DB);
+    return await getProductDetails(id);
+  } catch (error) {
+    return generateErrorResponse(error);
+  }
 };

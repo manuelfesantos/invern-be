@@ -11,8 +11,10 @@
     "lib": ["esnext"],
     "strict": true,
     "skipLibCheck": true,
-    "types": ["@cloudflare/workers-types"],
+    "types": ["@cloudflare/workers-types", "jest"],
+    "resolveJsonModule": true,
     "paths": {
+      "@mocks-utils": ["libs/utils/__mocks__"],
       "@cart-adapter": ["libs/adapters/cart"],
       "@cart-entity": ["libs/entities/cart"],
       "@cart-module": ["libs/modules/cart"],
@@ -34,7 +36,7 @@
       "@timer-utils": ["libs/utils/timer"],
       "@user-adapter": ["libs/adapters/user"],
       "@user-entity": ["libs/entities/user"],
-      "@user-module": ["libs/modules/user"],
+      "@user-module": ["libs/modules/user"]
     }
   }
 }

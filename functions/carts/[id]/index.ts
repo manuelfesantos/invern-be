@@ -1,4 +1,4 @@
-import { errorResponse } from "@response-entity";
+import { errorResponse, generateErrorResponse } from "@response-entity";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { initDb } from "@db-adapter";
 import { updateCart } from "@cart-module";
@@ -27,9 +27,18 @@ export const onRequest: PagesFunction<Env> = async (
     return errorResponse.BAD_REQUEST("action is required");
   }
 
-  const body = await request.json();
+  try {
+    const body = await request.json();
 
-  initDb(env.INVERN_DB);
+    initDb(env.INVERN_DB);
 
-  return await updateCart(body, action, id);
+    return await updateCart(body, action, id);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message.includes("JSON")) {
+        return errorResponse.BAD_REQUEST(error.message);
+      }
+    }
+    return generateErrorResponse(error);
+  }
 };
