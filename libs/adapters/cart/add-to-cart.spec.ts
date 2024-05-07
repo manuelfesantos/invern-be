@@ -1,17 +1,10 @@
 import { addToCart } from "./add-to-cart";
 import * as DbAdapter from "@db-adapter";
+import { prepareStatementMock } from "@mocks-utils";
 
 jest.mock("@db-adapter", () => ({
   prepareStatement: jest.fn(),
 }));
-
-const prepareStatementMock = {
-  run: jest.fn(),
-  bind: jest.fn(),
-  first: jest.fn(),
-  all: jest.fn(),
-  raw: jest.fn(),
-};
 
 const TIMES_STATEMENT_WAS_CALLED = 2;
 const ONE_TIME_CALLED = 1;
