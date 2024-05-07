@@ -1,6 +1,6 @@
 import { setGlobalTimer } from "@timer-utils";
 import { errorResponse, generateErrorResponse } from "@response-entity";
-import { initDb } from "@db-adapter";
+import { initDb } from "@db-utils";
 import { getAllCollections } from "@collection-module";
 
 interface Env {

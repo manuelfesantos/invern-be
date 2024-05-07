@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { ProductIdAndQuantity } from "@product-entity";
 
 export const mergeCart = async (

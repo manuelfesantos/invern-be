@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 
 export const addToCart = async (
   cartId: string,

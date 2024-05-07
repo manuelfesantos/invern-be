@@ -1,5 +1,5 @@
 import { uuidSchema } from "@global-entity";
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { errors } from "@error-handling-utils";
 
 export const validateCartId = async (cartId: string): Promise<void> => {

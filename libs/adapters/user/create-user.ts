@@ -1,5 +1,5 @@
 import { User } from "@user-entity";
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 
 export const createUser = async (user: User): Promise<void> => {
   await prepareStatement(

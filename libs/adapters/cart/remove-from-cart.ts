@@ -1,5 +1,5 @@
 import { getQuantityInCart } from "./get-quantity-in-cart";
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 
 export const removeFromCart = async (
   cartId: string,

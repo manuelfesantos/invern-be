@@ -1,6 +1,6 @@
 import { User, userWithoutCartSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { cartSchema } from "@cart-entity";
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {

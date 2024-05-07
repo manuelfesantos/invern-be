@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { errors } from "@error-handling-utils";
 
 interface Quantity {

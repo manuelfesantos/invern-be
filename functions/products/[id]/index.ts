@@ -2,7 +2,7 @@ import { setGlobalTimer } from "@timer-utils";
 import { HttpMethodEnum } from "@http-entity";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { getProductDetails } from "@product-module";
-import { initDb } from "@db-adapter";
+import { initDb } from "@db-utils";
 
 interface Env {
   INVERN_DB: D1Database;

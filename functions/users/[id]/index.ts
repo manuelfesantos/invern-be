@@ -3,7 +3,7 @@ import {
   HttpHeaderEnum,
   HttpMethodEnum,
 } from "@http-entity";
-import { initDb } from "@db-adapter";
+import { initDb } from "@db-utils";
 import { deleteUser, getUser, updateUser } from "@user-module";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";

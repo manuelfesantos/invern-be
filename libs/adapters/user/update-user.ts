@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 
 export const updateUser = async (
   id: string,

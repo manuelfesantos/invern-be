@@ -1,5 +1,5 @@
-import { initDb } from "@db-adapter";
-import { loginSignupMapper } from "@user-module";
+import { initDb } from "@db-utils";
+import { userActionMapper } from "@user-module";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";
@@ -26,7 +26,7 @@ export const onRequest: PagesFunction<Env> = async (
 
     initDb(env.INVERN_DB);
 
-    return await loginSignupMapper(body, action);
+    return await userActionMapper(body, action);
   } catch (error: unknown) {
     return generateErrorResponse(error);
   }

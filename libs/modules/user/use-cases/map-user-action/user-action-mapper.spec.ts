@@ -1,7 +1,7 @@
-import { loginSignupMapper } from "./login-signup-mapper";
-import { errors } from "@error-handling-utils";
+import { userActionMapper } from "./user-action-mapper";
 import * as Login from "./login";
 import * as Signup from "./signup";
+import { ZodError } from "zod";
 
 jest.mock("./login", () => ({
   login: jest.fn(),
@@ -18,26 +18,26 @@ describe("loginSignupMapper", () => {
     jest.clearAllMocks();
   });
   it("should throw error if action is not provided", async () => {
-    await expect(async () => await loginSignupMapper({}, null)).rejects.toEqual(
-      errors.ACTION_IS_REQUIRED(),
-    );
+    await expect(
+      async () => await userActionMapper({}, null),
+    ).rejects.toBeInstanceOf(ZodError);
     expect(loginSpy).not.toHaveBeenCalled();
     expect(signupSpy).not.toHaveBeenCalled();
   });
   it("should call login if action is login", async () => {
-    await loginSignupMapper({}, "login");
+    await userActionMapper({}, "login");
     expect(loginSpy).toHaveBeenCalled();
     expect(signupSpy).not.toHaveBeenCalled();
   });
   it("should call signup if action is signup", async () => {
-    await loginSignupMapper({}, "signup");
+    await userActionMapper({}, "signup");
     expect(loginSpy).not.toHaveBeenCalled();
     expect(signupSpy).toHaveBeenCalled();
   });
   it("should throw error if action is invalid", async () => {
     await expect(
-      async () => await loginSignupMapper({}, "invalid-action"),
-    ).rejects.toEqual(errors.INVALID_ACTION("invalid-action"));
+      async () => await userActionMapper({}, "invalid-action"),
+    ).rejects.toBeInstanceOf(ZodError);
     expect(loginSpy).not.toHaveBeenCalled();
     expect(signupSpy).not.toHaveBeenCalled();
   });

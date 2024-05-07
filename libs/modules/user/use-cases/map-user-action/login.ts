@@ -3,7 +3,7 @@ import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
-import { loginBodySchema } from "./types/login-signup";
+import { loginBodySchema } from "./types/map-user-action";
 import { getCartById } from "@cart-adapter";
 import { Cart } from "@cart-entity";
 

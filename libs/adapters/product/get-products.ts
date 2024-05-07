@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { Product } from "@product-entity";
 import { getProductsFromResults } from "./utils/get-products-from-results";
 

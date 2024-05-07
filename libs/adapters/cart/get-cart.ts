@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { Cart, CartItem, cartItemSchema } from "@cart-entity";
 
 export const getCartById = async (cartId: string): Promise<Cart> => {

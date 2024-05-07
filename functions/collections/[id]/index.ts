@@ -1,5 +1,5 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
-import { initDb } from "@db-adapter";
+import { initDb } from "@db-utils";
 import { getCollectionDetails } from "@collection-module";
 
 interface Env {

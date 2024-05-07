@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { ProductDetails } from "@product-entity";
 import { errors } from "@error-handling-utils";
 

@@ -1,4 +1,4 @@
 export { getUser } from "./get-user";
-export { loginSignupMapper } from "./login-signup";
+export { userActionMapper } from "./map-user-action";
 export { updateUser } from "./update-user";
 export { deleteUser } from "./delete-user";

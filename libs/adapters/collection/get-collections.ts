@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { Collection, collectionSchema } from "@collection-entity";
 
 export const getCollections = async (): Promise<Collection[]> => {

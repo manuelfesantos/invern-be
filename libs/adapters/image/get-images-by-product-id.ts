@@ -1,5 +1,5 @@
 import { ImageUrl } from "@image-entity";
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 
 export const getImagesByProductId = async (
   productId: string,

@@ -1,4 +1,4 @@
-import { signupBodySchema } from "./types/login-signup";
+import { signupBodySchema } from "./types/map-user-action";
 import {
   RolesEnum,
   User,

@@ -1,8 +1,8 @@
 import { getCartById } from "./get-cart";
-import * as DbAdapter from "@db-adapter";
+import * as DbAdapter from "@db-utils";
 import { prepareStatementMock } from "@mocks-utils";
 
-jest.mock("@db-adapter", () => ({
+jest.mock("@db-utils", () => ({
   prepareStatement: jest.fn(),
 }));
 

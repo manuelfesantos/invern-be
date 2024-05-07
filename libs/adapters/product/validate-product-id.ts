@@ -1,4 +1,4 @@
-import { prepareStatement } from "@db-adapter";
+import { prepareStatement } from "@db-utils";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 
