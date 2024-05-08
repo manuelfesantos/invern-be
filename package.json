@@ -8,6 +8,7 @@
     "lint": "npx eslint functions/** libs/**",
     "build-local-db": "npx wrangler d1 execute INVERN_DB --file=db/db.sql",
     "build-remote-db": "npx wrangler d1 execute invern-db --remote --file=db/db.sql",
+    "build-preview-db": "npx wrangler d1 execute invern-db-preview --remote --file=db/db.sql",
     "insert-local": "npx wrangler d1 execute INVERN_DB --file=db/add-data.sql",
     "insert-remote": "npx wrangler d1 execute invern-db --remote --file=db/add-data.sql",
     "query-local": "npx wrangler d1 execute INVERN_DB",

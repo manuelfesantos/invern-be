@@ -1,2 +1,9 @@
 npm run lint
-git rev-parse --abbrev-ref HEAD | xargs echo $1
+
+echo "$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$(git rev-parse --abbrev-ref HEAD)" = main ]]
+then
+echo "-------ERROR-------\n"
+echo "----YOU CANNOT COMMIT TO MAIN BRANCH!----\n"
+exit 1
+fi
