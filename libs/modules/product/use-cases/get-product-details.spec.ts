@@ -3,6 +3,9 @@ import { successResponse } from "@response-entity";
 import { compareResponses, productDetailsMock } from "@mocks-utils";
 import * as ProductAdapter from "@product-adapter";
 import * as ImageAdapter from "@image-adapter";
+import { ZodError } from "zod";
+
+const productId = "c7ca3352-18c0-4468-8e2c-8f30757c1c7c";
 
 jest.mock("@product-adapter", () => ({
   getProductById: jest.fn(),
@@ -24,17 +27,24 @@ describe("getProductDetails", () => {
   it("should get product details", async () => {
     getProductByIdSpy.mockResolvedValueOnce(productDetailsMock);
     getImagesByProductIdSpy.mockResolvedValueOnce([]);
-    const response = await getProductDetails("productId");
+    const response = await getProductDetails(productId);
     const expectedResponse = successResponse.OK(
       "success getting product details",
       productDetailsMock,
     );
     await compareResponses(response, expectedResponse);
   });
+  it("should throw an error if productId is invalid", async () => {
+    await expect(
+      async () => await getProductDetails("invalid"),
+    ).rejects.toBeInstanceOf(ZodError);
+    expect(getProductByIdSpy).not.toHaveBeenCalled();
+    expect(getImagesByProductIdSpy).not.toHaveBeenCalled();
+  });
   it("should throw an error if getProductById throws an error", async () => {
     getProductByIdSpy.mockRejectedValueOnce(new Error("database error"));
     await expect(
-      async () => await getProductDetails("productId"),
+      async () => await getProductDetails(productId),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
     expect(getProductByIdSpy).toHaveBeenCalled();
     expect(getImagesByProductIdSpy).not.toHaveBeenCalled();
@@ -43,7 +53,7 @@ describe("getProductDetails", () => {
     getProductByIdSpy.mockResolvedValueOnce(productDetailsMock);
     getImagesByProductIdSpy.mockRejectedValueOnce(new Error("database error"));
     await expect(
-      async () => await getProductDetails("productId"),
+      async () => await getProductDetails(productId),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
     expect(getProductByIdSpy).toHaveBeenCalled();
     expect(getImagesByProductIdSpy).toHaveBeenCalled();

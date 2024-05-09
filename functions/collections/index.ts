@@ -2,10 +2,7 @@ import { setGlobalTimer } from "@timer-utils";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { initDb } from "@db-utils";
 import { getAllCollections } from "@collection-module";
-
-interface Env {
-  INVERN_DB: D1Database;
-}
+import { Env } from "@request-entity";
 
 export const onRequest: PagesFunction<Env> = async (
   context,

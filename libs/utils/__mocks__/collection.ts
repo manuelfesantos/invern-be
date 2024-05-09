@@ -1,4 +1,5 @@
-import { Collection } from "@collection-entity";
+import { Collection, CollectionDetails } from "@collection-entity";
+import { productsMock } from "./product";
 
 export const collectionsMock: Collection[] = [
   {
@@ -29,3 +30,10 @@ export const collectionsMock: Collection[] = [
     description: "description 3",
   },
 ];
+
+export const collectionDetailsMock: CollectionDetails = {
+  collectionId: "e1947e1d-1519-4baf-91aa-52780b3840a3",
+  collectionName: "collection 1",
+  description: "description 1",
+  products: productsMock,
+};

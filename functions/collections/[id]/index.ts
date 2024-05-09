@@ -1,10 +1,8 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { initDb } from "@db-utils";
 import { getCollectionDetails } from "@collection-module";
+import { Env } from "@request-entity";
 
-interface Env {
-  INVERN_DB: D1Database;
-}
 export const onRequest: PagesFunction<Env> = async (
   context,
 ): Promise<Response> => {

@@ -3,10 +3,8 @@ import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { initDb } from "@db-utils";
 import { updateCart } from "@cart-module";
 import { setGlobalTimer } from "@timer-utils";
-
-interface Env {
-  INVERN_DB: D1Database;
-}
+import { getBodyFromRequest } from "@http-utils";
+import { Env } from "@request-entity";
 
 export const onRequest: PagesFunction<Env> = async (
   context,
@@ -28,17 +26,12 @@ export const onRequest: PagesFunction<Env> = async (
   }
 
   try {
-    const body = await request.json();
+    const body = await getBodyFromRequest(request);
 
     initDb(env.INVERN_DB);
 
     return await updateCart(body, action, id);
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      if (error.message.includes("JSON")) {
-        return errorResponse.BAD_REQUEST(error.message);
-      }
-    }
     return generateErrorResponse(error);
   }
 };

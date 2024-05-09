@@ -1,12 +1,9 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { initDb } from "@db-utils";
 import { getAllProducts } from "@product-module";
-import { getQueryFromUrl } from "@http-entity";
 import { setGlobalTimer } from "@timer-utils";
-
-interface Env {
-  INVERN_DB: D1Database;
-}
+import { getQueryFromUrl } from "@http-utils";
+import { Env } from "@request-entity";
 
 export const onRequest: PagesFunction<Env> = async (
   context,
