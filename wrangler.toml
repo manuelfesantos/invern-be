@@ -4,4 +4,3 @@ name = "invern-be"
 binding = "DB"
 database_name = "INVERN_DB"
 database_id = "e5193edd-54a6-4b15-8e67-d0bd12b9afd2"
-

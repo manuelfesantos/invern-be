@@ -1,1 +1,11 @@
 npm run test
+
+while read remote_ref
+do
+	if [[ $remote_ref = *"main"* ]]
+	then
+	echo "-------ERROR-------\n"
+	echo "----YOU CANNOT PUSH TO BRANCH MAIN!----\n"
+	exit 1
+	fi
+done

@@ -11,9 +11,11 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 };
 
 export const getUserById = async (id: string): Promise<User> => {
-  const user = await prepareStatement(
+  const result = await prepareStatement(
     `SELECT * FROM users WHERE userId = '${id}'`,
-  ).first<User>();
+  ).first();
+
+  const user = getUserFromResult(result);
 
   if (!user) {
     throw errors.USER_NOT_FOUND();
