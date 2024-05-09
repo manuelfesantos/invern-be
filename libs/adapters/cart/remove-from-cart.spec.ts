@@ -5,6 +5,7 @@ import { prepareStatementMock } from "@mocks-utils";
 
 const ONE_ITEM = 1;
 const TWO_ITEMS = 2;
+const ONE_TIME_CALLED = 1;
 jest.mock("@db-utils", () => ({
   prepareStatement: jest.fn(),
 }));
@@ -52,14 +53,17 @@ describe("removeFromCart", () => {
       removeFromCart("cartId", "productId", ONE_ITEM),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
     expect(getQuantityInCartSpy).toHaveBeenCalledWith("cartId", "productId");
+    expect(prepareStatementSpy).toHaveBeenCalledTimes(ONE_TIME_CALLED);
   });
   it("should throw error if getQuantityInCart throws error", async () => {
-    getQuantityInCartSpy.mockImplementation(() => {
-      throw new Error("database error");
+    getQuantityInCartSpy.mockImplementationOnce(() => {
+      throw new Error("getQuantityInCart error");
     });
     await expect(
       removeFromCart("cartId", "productId", ONE_ITEM),
-    ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
+    ).rejects.toEqual(
+      expect.objectContaining({ message: "getQuantityInCart error" }),
+    );
     expect(prepareStatementSpy).not.toHaveBeenCalled();
   });
   it("should throw error if run throws error", async () => {
@@ -70,7 +74,7 @@ describe("removeFromCart", () => {
     await expect(
       removeFromCart("cartId", "productId", ONE_ITEM),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
+    expect(prepareStatementSpy).toHaveBeenCalledTimes(ONE_TIME_CALLED);
     expect(getQuantityInCartSpy).toHaveBeenCalledWith("cartId", "productId");
-    expect(prepareStatementSpy).toHaveBeenCalledTimes(ONE_ITEM);
   });
 });
