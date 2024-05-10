@@ -3,10 +3,7 @@ import { HttpMethodEnum } from "@http-entity";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { getProductDetails } from "@product-module";
 import { initDb } from "@db-utils";
-
-interface Env {
-  INVERN_DB: D1Database;
-}
+import { Env } from "@request-entity";
 
 export const onRequest: PagesFunction<Env> = async (
   context,

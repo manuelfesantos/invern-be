@@ -3,10 +3,8 @@ import { userActionMapper } from "@user-module";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";
-
-interface Env {
-  INVERN_DB: D1Database;
-}
+import { getBodyFromRequest } from "@http-utils";
+import { Env } from "@request-entity";
 
 export const onRequest: PagesFunction<Env> = async (
   context,
@@ -20,7 +18,7 @@ export const onRequest: PagesFunction<Env> = async (
   }
 
   try {
-    const body = await request.json();
+    const body = await getBodyFromRequest(request);
 
     const action = request.headers.get(HttpHeaderEnum.ACTION);
 

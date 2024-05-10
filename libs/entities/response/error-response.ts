@@ -5,7 +5,7 @@ import { AdapterError } from "@error-handling-utils";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown) =>
-    buildErrorResponse(error || "bad request", HttpResponseEnum.BAD_REQUEST),
+    buildErrorResponse(error || "bad http", HttpResponseEnum.BAD_REQUEST),
   UNAUTHORIZED: (error?: unknown) =>
     buildErrorResponse(error || "unauthorized", HttpResponseEnum.UNAUTHORIZED),
   FORBIDDEN: (error?: unknown) =>
@@ -38,6 +38,9 @@ export const generateErrorResponse = (error: unknown): Response => {
   }
 
   if (error instanceof Error) {
+    if (error.message.includes("JSON")) {
+      return errorResponse.BAD_REQUEST(error.message);
+    }
     return errorResponse.INTERNAL_SERVER_ERROR(error.message);
   }
   return errorResponse.INTERNAL_SERVER_ERROR(error);
