@@ -1,0 +1,30 @@
+name: PR to Main Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-pr:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Validate PR source branch
+        id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "${{ github.event.pull_request.head.ref }}" != "Preview" ]]; then
+            echo "Error: PR must come from the 'Preview' branch."
+            gh pr close ${{ github.event.pull_request.head.ref }}
+            exit 1
+          fi
+
+      - name: Continue with your workflow
+        run: |
+          # Your workflow steps here
+          echo "PR from 'Preview' branch is valid. Proceeding with the workflow."
