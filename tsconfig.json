@@ -31,6 +31,7 @@
       "@http-utils": ["libs/utils/http"],
       "@image-adapter": ["libs/adapters/image"],
       "@image-entity": ["libs/entities/image"],
+      "@logger-utils": ["libs/utils/logger"],
       "@product-adapter": ["libs/adapters/product"],
       "@product-entity": ["libs/entities/product"],
       "@product-module": ["libs/modules/product"],

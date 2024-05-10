@@ -1,5 +1,4 @@
 import { onRequest } from "./index";
-import * as DbUtils from "@db-utils";
 import * as ProductModule from "@product-module";
 import * as HttpUtils from "@http-utils";
 import { compareResponses, GETEventMock, productsMock } from "@mocks-utils";
@@ -8,8 +7,8 @@ import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
-jest.mock("@db-utils", () => ({
-  initDb: jest.fn(),
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@product-module", () => ({
@@ -22,7 +21,6 @@ jest.mock("@http-utils", () => ({
 
 describe("onRequest", () => {
   const getAllProductsSpy = jest.spyOn(ProductModule, "getAllProducts");
-  const initDbSpy = jest.spyOn(DbUtils, "initDb");
   const getQueryFromUrlSpy = jest.spyOn(HttpUtils, "getQueryFromUrl");
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,7 +45,6 @@ describe("onRequest", () => {
     await compareResponses(response, expectedResponse);
     expect(getQueryFromUrlSpy).toHaveBeenCalledWith(event.request.url);
     expect(getAllProductsSpy).toHaveBeenCalledWith(null);
-    expect(initDbSpy).toHaveBeenCalled();
   });
   it("should call getAllProducts and return all products when search is not null", async () => {
     const event = {
@@ -71,7 +68,6 @@ describe("onRequest", () => {
     await compareResponses(response, expectedResponse);
     expect(getQueryFromUrlSpy).toHaveBeenCalledWith(event.request.url);
     expect(getAllProductsSpy).toHaveBeenCalledWith("product");
-    expect(initDbSpy).toHaveBeenCalled();
   });
   it.each([HttpMethodEnum.POST, HttpMethodEnum.DELETE, HttpMethodEnum.PUT])(
     "should return METHOD_NOT_ALLOWED if method is %s",
@@ -87,7 +83,6 @@ describe("onRequest", () => {
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
       await compareResponses(response, expectedResponse);
       expect(getAllProductsSpy).not.toHaveBeenCalled();
-      expect(initDbSpy).not.toHaveBeenCalled();
       expect(getQueryFromUrlSpy).not.toHaveBeenCalled();
     },
   );
@@ -123,7 +118,6 @@ describe("onRequest", () => {
       );
       await compareResponses(response, expectedResponse);
       expect(getAllProductsSpy).toHaveBeenCalledWith("product");
-      expect(initDbSpy).toHaveBeenCalled();
       expect(getQueryFromUrlSpy).toHaveBeenCalledWith(event.request.url);
     },
   );

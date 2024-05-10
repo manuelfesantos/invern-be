@@ -1,5 +1,4 @@
 import { onRequest } from "./index";
-import * as DbUtils from "@db-utils";
 import * as CollectionModule from "@collection-module";
 import { collectionsMock, compareResponses, GETEventMock } from "@mocks-utils";
 import { errorResponse, successResponse } from "@response-entity";
@@ -7,8 +6,8 @@ import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
-jest.mock("@db-utils", () => ({
-  initDb: jest.fn(),
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@collection-module", () => ({
@@ -20,7 +19,6 @@ describe("onRequest", () => {
     CollectionModule,
     "getAllCollections",
   );
-  const initDbSpy = jest.spyOn(DbUtils, "initDb");
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -38,7 +36,6 @@ describe("onRequest", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(getAllCollectionsSpy).toHaveBeenCalled();
-    expect(initDbSpy).toHaveBeenCalled();
   });
   it.each([HttpMethodEnum.POST, HttpMethodEnum.DELETE, HttpMethodEnum.PUT])(
     "should return METHOD_NOT_ALLOWED if method is %s",
@@ -54,7 +51,6 @@ describe("onRequest", () => {
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
       await compareResponses(response, expectedResponse);
       expect(getAllCollectionsSpy).not.toHaveBeenCalled();
-      expect(initDbSpy).not.toHaveBeenCalled();
     },
   );
   it.each([
@@ -80,7 +76,6 @@ describe("onRequest", () => {
       );
       await compareResponses(response, expectedResponse);
       expect(getAllCollectionsSpy).toHaveBeenCalled();
-      expect(initDbSpy).toHaveBeenCalled();
     },
   );
 });

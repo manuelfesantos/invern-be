@@ -6,7 +6,13 @@ const edgeRequestKeepAliveStatus: IncomingRequestCfPropertiesEdgeRequestKeepAliv
 const country: Iso3166Alpha2Code = "PT";
 
 export const GETEventMock = {
-  data: {},
+  data: {
+    honeycomb: {
+      tracer: {
+        addData: jest.fn(),
+      },
+    },
+  },
   env: {
     INVERN_DB: {
       batch: jest.fn(),
@@ -14,6 +20,8 @@ export const GETEventMock = {
       exec: jest.fn(),
       prepare: jest.fn(),
     },
+    HONEYCOMB_API_KEY: "12345",
+    HONEYCOMB_DATASET: "12345",
     ASSETS: {
       fetch: jest.fn(),
     },
@@ -114,6 +122,30 @@ export const GETEventMock = {
   waitUntil: jest.fn(),
 };
 export const POSTEventMock = {
+  data: {
+    honeycomb: {
+      tracer: {
+        addData: jest.fn(),
+      },
+    },
+  },
+  env: {
+    INVERN_DB: {
+      batch: jest.fn(),
+      dump: jest.fn(),
+      exec: jest.fn(),
+      prepare: jest.fn(),
+    },
+    HONEYCOMB_API_KEY: "12345",
+    HONEYCOMB_DATASET: "12345",
+    ASSETS: {
+      fetch: jest.fn(),
+    },
+  },
+  functionPath: "http://localhost:3000",
+  next: jest.fn(),
+  params: {},
+  passThroughOnException: jest.fn(),
   request: {
     headers: {
       get: jest.fn(),
@@ -203,10 +235,16 @@ export const POSTEventMock = {
     integrity: "",
     keepalive: false,
   },
-  functionPath: "http://localhost:3000",
   waitUntil: jest.fn(),
-  next: jest.fn(),
-  passThroughOnException: jest.fn(),
+};
+export const PUTEventMock = {
+  data: {
+    honeycomb: {
+      tracer: {
+        addData: jest.fn(),
+      },
+    },
+  },
   env: {
     INVERN_DB: {
       batch: jest.fn(),
@@ -214,14 +252,16 @@ export const POSTEventMock = {
       exec: jest.fn(),
       prepare: jest.fn(),
     },
+    HONEYCOMB_API_KEY: "12345",
+    HONEYCOMB_DATASET: "12345",
     ASSETS: {
       fetch: jest.fn(),
     },
   },
+  functionPath: "http://localhost:3000",
+  next: jest.fn(),
   params: {},
-  data: {},
-};
-export const PUTEventMock = {
+  passThroughOnException: jest.fn(),
   request: {
     headers: {
       get: jest.fn(),
@@ -311,10 +351,16 @@ export const PUTEventMock = {
     integrity: "",
     keepalive: false,
   },
-  functionPath: "http://localhost:3000",
   waitUntil: jest.fn(),
-  next: jest.fn(),
-  passThroughOnException: jest.fn(),
+};
+export const DELETEEventMock = {
+  data: {
+    honeycomb: {
+      tracer: {
+        addData: jest.fn(),
+      },
+    },
+  },
   env: {
     INVERN_DB: {
       batch: jest.fn(),
@@ -322,14 +368,16 @@ export const PUTEventMock = {
       exec: jest.fn(),
       prepare: jest.fn(),
     },
+    HONEYCOMB_API_KEY: "12345",
+    HONEYCOMB_DATASET: "12345",
     ASSETS: {
       fetch: jest.fn(),
     },
   },
+  functionPath: "http://localhost:3000",
+  next: jest.fn(),
   params: {},
-  data: {},
-};
-export const DELETEEventMock = {
+  passThroughOnException: jest.fn(),
   request: {
     headers: {
       get: jest.fn(),
@@ -419,21 +467,5 @@ export const DELETEEventMock = {
     integrity: "",
     keepalive: false,
   },
-  functionPath: "http://localhost:3000",
   waitUntil: jest.fn(),
-  next: jest.fn(),
-  passThroughOnException: jest.fn(),
-  env: {
-    INVERN_DB: {
-      batch: jest.fn(),
-      dump: jest.fn(),
-      exec: jest.fn(),
-      prepare: jest.fn(),
-    },
-    ASSETS: {
-      fetch: jest.fn(),
-    },
-  },
-  params: {},
-  data: {},
 };

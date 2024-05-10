@@ -7,6 +7,10 @@ import { ZodError } from "zod";
 
 const productId = "c7ca3352-18c0-4468-8e2c-8f30757c1c7c";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@product-adapter", () => ({
   getProductById: jest.fn(),
 }));

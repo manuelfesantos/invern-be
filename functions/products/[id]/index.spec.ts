@@ -1,5 +1,4 @@
 import { onRequest } from "./index";
-import * as DbUtils from "@db-utils";
 import * as ProductModule from "@product-module";
 import {
   compareResponses,
@@ -11,6 +10,10 @@ import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@db-utils", () => ({
   initDb: jest.fn(),
 }));
@@ -21,7 +24,6 @@ jest.mock("@product-module", () => ({
 
 describe("onRequest", () => {
   const getProductDetailsSpy = jest.spyOn(ProductModule, "getProductDetails");
-  const initDbSpy = jest.spyOn(DbUtils, "initDb");
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -42,7 +44,6 @@ describe("onRequest", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(getProductDetailsSpy).toHaveBeenCalled();
-    expect(initDbSpy).toHaveBeenCalled();
   });
   it.each([HttpMethodEnum.POST, HttpMethodEnum.DELETE, HttpMethodEnum.PUT])(
     "should return METHOD_NOT_ALLOWED if method is %s",
@@ -58,7 +59,6 @@ describe("onRequest", () => {
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
       await compareResponses(response, expectedResponse);
       expect(getProductDetailsSpy).not.toHaveBeenCalled();
-      expect(initDbSpy).not.toHaveBeenCalled();
     },
   );
   it.each([
@@ -87,7 +87,6 @@ describe("onRequest", () => {
       );
       await compareResponses(response, expectedResponse);
       expect(getProductDetailsSpy).toHaveBeenCalled();
-      expect(initDbSpy).toHaveBeenCalled();
     },
   );
 });

@@ -4,6 +4,10 @@ import * as CartAdapter from "@cart-adapter";
 import { successResponse } from "@response-entity";
 import { compareResponses, userDtoMock, userMock } from "@mocks-utils";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@user-adapter", () => ({
   getUserByEmail: jest.fn(),
 }));
