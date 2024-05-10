@@ -3,6 +3,10 @@ import { compareResponses } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 import * as ProductAdapter from "@product-adapter";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@product-adapter", () => ({
   getProducts: jest.fn(),
 }));

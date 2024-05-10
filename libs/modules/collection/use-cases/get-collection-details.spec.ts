@@ -8,6 +8,10 @@ import { ZodError } from "zod";
 const FIRST_ELEMENT = 0;
 const collectionId = "a6768fef-a5af-4968-bacc-32b1781d9280";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@collection-adapter", () => ({
   getCollectionById: jest.fn(),
 }));

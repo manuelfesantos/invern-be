@@ -4,6 +4,10 @@ import { compareResponses, userMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 import { ZodError } from "zod";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@user-adapter", () => ({
   getUserById: jest.fn(),
   updateUser: jest.fn(),

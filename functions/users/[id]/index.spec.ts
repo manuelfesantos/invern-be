@@ -1,5 +1,4 @@
 import { onRequest } from "./index";
-import * as DbUtils from "@db-utils";
 import * as UserModule from "@user-module";
 import * as HttpUtils from "@http-utils";
 import {
@@ -15,8 +14,8 @@ import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 import { HttpMethodEnum } from "@http-entity";
 
-jest.mock("@db-utils", () => ({
-  initDb: jest.fn(),
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@user-module", () => ({
@@ -33,7 +32,6 @@ describe("onRequest", () => {
   const getUserSpy = jest.spyOn(UserModule, "getUser");
   const deleteUserSpy = jest.spyOn(UserModule, "deleteUser");
   const updateUserSpy = jest.spyOn(UserModule, "updateUser");
-  const initDbSpy = jest.spyOn(DbUtils, "initDb");
   const getBodyFromRequestSpy = jest.spyOn(HttpUtils, "getBodyFromRequest");
   beforeEach(() => {
     jest.clearAllMocks();
@@ -48,7 +46,6 @@ describe("onRequest", () => {
     expect(getUserSpy).not.toHaveBeenCalled();
     expect(deleteUserSpy).not.toHaveBeenCalled();
     expect(updateUserSpy).not.toHaveBeenCalled();
-    expect(initDbSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalled();
   });
   it("should call getUser when request method is GET", async () => {
@@ -70,7 +67,6 @@ describe("onRequest", () => {
     expect(getUserSpy).toHaveBeenCalled();
     expect(deleteUserSpy).not.toHaveBeenCalled();
     expect(updateUserSpy).not.toHaveBeenCalled();
-    expect(initDbSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalledWith(event.request);
   });
   it("should call deleteUser when request method is DELETE", async () => {
@@ -89,7 +85,6 @@ describe("onRequest", () => {
     expect(getUserSpy).not.toHaveBeenCalled();
     expect(deleteUserSpy).toHaveBeenCalledWith("userId");
     expect(updateUserSpy).not.toHaveBeenCalled();
-    expect(initDbSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalledWith(event.request);
   });
   it("should call updateUser when request method is PUT", async () => {
@@ -121,7 +116,6 @@ describe("onRequest", () => {
       body,
       "update-password",
     );
-    expect(initDbSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalledWith(event.request);
   });
   it.each([
@@ -227,7 +221,6 @@ describe("onRequest", () => {
       spy === updateUserSpy
         ? expect(spy).toHaveBeenCalledWith("userId", body, "update-password")
         : expect(spy).toHaveBeenCalledWith("userId");
-      expect(initDbSpy).toHaveBeenCalled();
       expect(getBodyFromRequestSpy).toHaveBeenCalledWith(event.request);
     },
   );

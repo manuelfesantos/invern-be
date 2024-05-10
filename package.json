@@ -4,6 +4,7 @@
   "description": "Invern Spirit Backend",
   "main": "functions/index.ts",
   "scripts": {
+    "init": "npm i && husky init",
     "test": "jest",
     "lint": "npx eslint functions/** libs/**",
     "build-local-db": "npx wrangler d1 execute INVERN_DB --file=db/db.sql",
@@ -35,6 +36,7 @@
     "typescript-eslint": "^7.8.0"
   },
   "dependencies": {
+    "@cloudflare/pages-plugin-honeycomb": "^1.0.4",
     "uuid": "^9.0.1",
     "zod": "^3.23.4"
   }

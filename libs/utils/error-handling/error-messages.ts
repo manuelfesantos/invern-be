@@ -37,4 +37,9 @@ export const errors = {
     new AdapterError("Action is required", HttpResponseEnum.BAD_REQUEST),
   INVALID_ACTION: (action: string): AdapterError =>
     new AdapterError(`Invalid action: ${action}`, HttpResponseEnum.BAD_REQUEST),
+  LOGGER_NOT_INITIALIZED: (): AdapterError =>
+    new AdapterError(
+      "Logger not initialized",
+      HttpResponseEnum.INTERNAL_SERVER_ERROR,
+    ),
 };
