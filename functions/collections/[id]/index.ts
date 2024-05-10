@@ -1,12 +1,8 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
-import { initDb } from "@db-utils";
 import { getCollectionDetails } from "@collection-module";
-import { Env } from "@request-entity";
 
-export const onRequest: PagesFunction<Env> = async (
-  context,
-): Promise<Response> => {
-  const { request, params, env } = context;
+export const onRequest: PagesFunction = async (context): Promise<Response> => {
+  const { request, params } = context;
   if (request.method !== "GET") {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
@@ -14,7 +10,6 @@ export const onRequest: PagesFunction<Env> = async (
   const { id } = params;
 
   try {
-    initDb(env.INVERN_DB);
     return await getCollectionDetails(id);
   } catch (error) {
     return generateErrorResponse(error);

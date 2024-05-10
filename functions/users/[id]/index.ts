@@ -1,22 +1,20 @@
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
-import { initDb } from "@db-utils";
 import { deleteUser, getUser, updateUser } from "@user-module";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { setGlobalTimer } from "@timer-utils";
 import { getBodyFromRequest } from "@http-utils";
-import { Env } from "@request-entity";
+import { getLogger } from "@logger-utils";
 
-export const onRequest: PagesFunction<Env> = async (
-  context,
-): Promise<Response> => {
+export const onRequest: PagesFunction = async (context): Promise<Response> => {
   setGlobalTimer();
-  const { request, params, env } = context;
+  const { request, params } = context;
   const { id } = params;
 
   try {
     const body = await getBodyFromRequest(request);
 
-    initDb(env.INVERN_DB);
+    const logger = getLogger();
+    logger.addData({ body });
 
     if (request.method === HttpMethodEnum.GET) {
       return await getUser(id);

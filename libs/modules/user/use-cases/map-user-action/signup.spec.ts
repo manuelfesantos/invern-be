@@ -7,6 +7,10 @@ import { ZodError } from "zod";
 const userId = "2f35f18d-027f-4b64-bf1b-dd069c987c28";
 const cartId = "a833b7a7-151e-497e-8d5c-81974971c292";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 jest.mock("@user-adapter", () => ({
   createUser: jest.fn(),
   getUserByEmail: jest.fn(),

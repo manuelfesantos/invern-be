@@ -1,17 +1,13 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
-import { initDb } from "@db-utils";
 import { updateCart } from "@cart-module";
 import { setGlobalTimer } from "@timer-utils";
 import { getBodyFromRequest } from "@http-utils";
-import { Env } from "@request-entity";
 
-export const onRequest: PagesFunction<Env> = async (
-  context,
-): Promise<Response> => {
+export const onRequest: PagesFunction = async (context): Promise<Response> => {
   setGlobalTimer();
 
-  const { request, params, env } = context;
+  const { request, params } = context;
   const { id } = params;
 
   if (request.method !== HttpMethodEnum.PUT) {
@@ -27,8 +23,6 @@ export const onRequest: PagesFunction<Env> = async (
 
   try {
     const body = await getBodyFromRequest(request);
-
-    initDb(env.INVERN_DB);
 
     return await updateCart(body, action, id);
   } catch (error: unknown) {

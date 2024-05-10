@@ -1,6 +1,5 @@
 npm run lint
 
-echo "$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$(git rev-parse --abbrev-ref HEAD)" = main ]]
 then
 echo "-------ERROR-------\n"

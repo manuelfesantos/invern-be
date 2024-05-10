@@ -3,6 +3,10 @@ import { HttpMethodEnum } from "@http-entity";
 import { compareResponses, GETEventMock } from "@mocks-utils";
 import { errorResponse, successResponse } from "@response-entity";
 
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+}));
+
 describe("onRequest", () => {
   it.each([HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.POST])(
     "should return error if request method is not allowed",

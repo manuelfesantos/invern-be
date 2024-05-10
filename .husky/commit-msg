@@ -1,0 +1,3 @@
+if ! [[ "$(cat .git/COMMIT_EDITMSG)" =~ ^(SPIRIT)-[[:digit:]]+(:) ]];
+then echo 'Bad commit message' && exit 1;
+fi

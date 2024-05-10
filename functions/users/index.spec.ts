@@ -1,5 +1,4 @@
 import { onRequest } from "./index";
-import * as DbUtils from "@db-utils";
 import * as UserModule from "@user-module";
 import * as HttpUtils from "@http-utils";
 import { compareResponses, POSTEventMock, userMock } from "@mocks-utils";
@@ -8,8 +7,8 @@ import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
-jest.mock("@db-utils", () => ({
-  initDb: jest.fn(),
+jest.mock("@logger-utils", () => ({
+  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@user-module", () => ({
@@ -22,7 +21,6 @@ jest.mock("@http-utils", () => ({
 
 describe("onRequest", () => {
   const userActionMapperSpy = jest.spyOn(UserModule, "userActionMapper");
-  const initDbSpy = jest.spyOn(DbUtils, "initDb");
   const getBodyFromRequestSpy = jest.spyOn(HttpUtils, "getBodyFromRequest");
   beforeEach(() => {
     jest.clearAllMocks();
@@ -52,7 +50,6 @@ describe("onRequest", () => {
     );
     const response = await onRequest(event);
     await compareResponses(response, expectedResponse);
-    expect(initDbSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalled();
     expect(userActionMapperSpy).toHaveBeenCalledWith(body, "login");
   });
@@ -70,7 +67,6 @@ describe("onRequest", () => {
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
       await compareResponses(response, expectedResponse);
       expect(userActionMapperSpy).not.toHaveBeenCalled();
-      expect(initDbSpy).not.toHaveBeenCalled();
       expect(getBodyFromRequestSpy).not.toHaveBeenCalled();
     },
   );
@@ -111,7 +107,6 @@ describe("onRequest", () => {
       );
       await compareResponses(response, expectedResponse);
       expect(userActionMapperSpy).toHaveBeenCalledWith(body, "login");
-      expect(initDbSpy).toHaveBeenCalled();
       expect(getBodyFromRequestSpy).toHaveBeenCalled();
     },
   );
