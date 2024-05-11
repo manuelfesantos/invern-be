@@ -18,7 +18,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [[ "${{ github.event.pull_request.head.ref }}" != "Preview" ]]; then
+          if [[ "${{ github.event.pull_request.head.ref }}" != "preview" ]]; then
             echo "Error: PR must come from the 'Preview' branch."
             gh pr close ${{ github.event.pull_request.head.ref }}
             exit 1
