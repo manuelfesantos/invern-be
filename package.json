@@ -12,6 +12,7 @@
     "build-preview-db": "npx wrangler d1 execute invern-db-preview --remote --file=db/db.sql",
     "insert-local": "npx wrangler d1 execute INVERN_DB --file=db/add-data.sql",
     "insert-remote": "npx wrangler d1 execute invern-db --remote --file=db/add-data.sql",
+    "insert-preview": "npx wrangler d1 execute invern-db-preview --remote --file=db/add-data.sql",
     "query-local": "npx wrangler d1 execute INVERN_DB",
     "query-remote": "npx wrangler d1 execute invern-db --remote",
     "local": "rm -rf .wrangler && npm run build-local-db && npm run insert-local && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26",
