@@ -22,7 +22,6 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
     if (request.method === HttpMethodEnum.DELETE) {
       return await deleteUser(id);
     }
-
     if (request.method === HttpMethodEnum.PUT) {
       const action = request.headers.get(HttpHeaderEnum.ACTION);
       return await updateUser(id, body, action);
