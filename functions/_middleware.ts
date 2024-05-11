@@ -18,8 +18,9 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
 ) => {
   const { env, data, request } = context;
   initDb(env.INVERN_DB);
-  initLogger(data);
-  data.honeycomb.tracer.addData({ country: request.cf?.country });
+  const logger = initLogger(data);
+  logger.addData({ country: request.cf?.country });
+
   return context.next();
 };
 

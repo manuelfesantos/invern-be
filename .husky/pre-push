@@ -8,4 +8,11 @@ do
 	echo "----YOU CANNOT PUSH TO BRANCH MAIN!----\n"
 	exit 1
 	fi
+
+	if [[ $remote_ref = *"preview"* ]]
+    	then
+    	echo "-------ERROR-------\n"
+    	echo "----YOU CANNOT PUSH TO BRANCH PREVIEW!----\n"
+    	exit 1
+    	fi
 done

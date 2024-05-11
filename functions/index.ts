@@ -10,7 +10,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
 
-  getLogger().addData({ response: "Welcome to Invern Spirit!" });
+  getLogger().addData({ response: "Welcome to Invern Spirit" });
 
   return successResponse.OK("Welcome to Invern Spirit!");
 };
