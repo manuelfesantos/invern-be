@@ -9,7 +9,7 @@ export const updateEmail = async (
   body: unknown,
 ): Promise<Response> => {
   const { email } = updateEmailBodySchema.parse(body);
-  await checkIfEmailIsTaken(id);
+  await checkIfEmailIsTaken(email);
   const user = await getUserById(id);
 
   await updateUser(id, `email = '${email}'`);

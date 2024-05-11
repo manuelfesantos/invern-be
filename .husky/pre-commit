@@ -6,3 +6,10 @@ echo "-------ERROR-------\n"
 echo "----YOU CANNOT COMMIT TO MAIN BRANCH!----\n"
 exit 1
 fi
+
+if [[ "$(git rev-parse --abbrev-ref HEAD)" = preview ]]
+then
+echo "-------ERROR-------\n"
+echo "----YOU CANNOT COMMIT TO PREVIEW BRANCH!----\n"
+exit 1
+fi
