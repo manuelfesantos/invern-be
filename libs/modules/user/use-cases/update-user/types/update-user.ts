@@ -12,7 +12,7 @@ export type UpdateUserAction =
   (typeof UpdateUserActionEnum)[keyof typeof UpdateUserActionEnum];
 
 export const updateEmailBodySchema = z.object({
-  email: emailSchema("user email"),
+  email: emailSchema("user mail"),
 });
 
 export const updatePasswordBodySchema = z.object({

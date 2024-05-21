@@ -15,10 +15,16 @@ export const productSchema = z.object({
   productImage: imageSchema.nullable(),
   stock: integerSchema("product stock"),
 });
-export const productWithQuantitySchema = productSchema.extend({
-  quantity: positiveIntegerSchema("product quantity"),
-});
+
 export type Product = z.infer<typeof productSchema>;
+
+export const productWithQuantitySchema = productSchema
+  .extend({
+    quantity: positiveIntegerSchema("product quantity"),
+  })
+  .omit({ stock: true });
+
+export type ProductWithQuantity = z.infer<typeof productWithQuantitySchema>;
 
 export const productIdAndQuantitySchema = z.object({
   productId: uuidSchema("product id"),

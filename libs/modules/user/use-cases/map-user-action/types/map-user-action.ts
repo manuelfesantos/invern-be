@@ -8,7 +8,7 @@ export const userActionSchema = z.enum(["login", "signup", "authenticate"], {
 });
 
 export const loginBodySchema = z.object({
-  email: emailSchema("user email"),
+  email: emailSchema("user mail"),
   password: requiredStringSchema("user password"),
 });
 

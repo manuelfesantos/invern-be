@@ -16,7 +16,7 @@ describe("getUser", () => {
     prepareStatementSpy.mockReturnValue(prepareStatementMock);
   });
   describe("getUserByEmail", () => {
-    it("should get user by email", async () => {
+    it("should get user by mail", async () => {
       prepareStatementSpy.mockReturnValue({
         ...prepareStatementMock,
         first: jest.fn().mockResolvedValue({
@@ -39,7 +39,7 @@ describe("getUser", () => {
         roles: userMock.roles,
       });
       expect(prepareStatementSpy).toHaveBeenCalledWith(
-        `SELECT * FROM users WHERE email = '${"email"}'`,
+        `SELECT * FROM users WHERE email = '${"mail"}'`,
       );
     });
     it("should throw error if prepareStatement throws error", async () => {

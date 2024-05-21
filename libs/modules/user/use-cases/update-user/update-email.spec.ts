@@ -22,12 +22,12 @@ describe("updateEmail", () => {
     jest.clearAllMocks();
   });
 
-  it("should update email", async () => {
+  it("should update mail", async () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const email = "newEmail@example.com";
     const response = await updateEmail(id, { email });
-    const expectedResponse = successResponse.OK("user email updated", {
+    const expectedResponse = successResponse.OK("user mail updated", {
       ...userMock,
       email,
       password: undefined,
@@ -38,7 +38,7 @@ describe("updateEmail", () => {
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
     expect(updateUserSpy).toHaveBeenCalledWith(id, `email = '${email}'`);
   });
-  it("should throw error if email is invalid", async () => {
+  it("should throw error if mail is invalid", async () => {
     const id = "userId";
     const email = "invalidEmail";
     await expect(
@@ -56,7 +56,7 @@ describe("updateEmail", () => {
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
     expect(updateUserSpy).not.toHaveBeenCalled();
   });
-  it("should throw error if email already taken", async () => {
+  it("should throw error if mail already taken", async () => {
     getUserByEmailSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const email = "newEmail@example.com";
