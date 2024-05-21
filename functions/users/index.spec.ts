@@ -74,7 +74,7 @@ describe("onRequest", () => {
     [errors.DATABASE_NOT_INITIALIZED(), "INTERNAL_SERVER_ERROR" as const],
     [
       new ZodError([
-        { message: "Invalid email", code: "custom", path: ["email"] },
+        { message: "Invalid mail", code: "custom", path: ["email"] },
       ]),
       "BAD_REQUEST" as const,
     ],

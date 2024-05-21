@@ -5,7 +5,7 @@ import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
 export const userSchema = z.object({
   userId: uuidSchema("user id"),
-  email: emailSchema("user email"),
+  email: emailSchema("user mail"),
   firstName: requiredStringSchema("first name"),
   lastName: requiredStringSchema("last name"),
   password: requiredStringSchema("password"),
@@ -19,7 +19,7 @@ export const userWithoutCartSchema = userSchema.omit({ cart: true });
 
 export const userDTOSchema = z.object({
   userId: uuidSchema("user id").optional(),
-  email: emailSchema("user email"),
+  email: emailSchema("user mail"),
   firstName: requiredStringSchema("first name"),
   lastName: requiredStringSchema("last name"),
   cart: cartSchema.optional(),

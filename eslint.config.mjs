@@ -14,7 +14,7 @@ export default [
       "@typescript-eslint/no-restricted-imports": [
         "error",
         {
-          "patterns": ["../*"]
+          "patterns": ["../../*"]
         }
       ],
       "max-len": [

@@ -66,7 +66,7 @@ describe("signup", () => {
     expect(getRandomUUIDSpy).not.toHaveBeenCalled();
     expect(createUserSpy).not.toHaveBeenCalled();
   });
-  it("should throw error if email is invalid", async () => {
+  it("should throw error if mail is invalid", async () => {
     await expect(
       async () => await signup({ ...validSignupBody, email: "" }),
     ).rejects.toBeInstanceOf(ZodError);

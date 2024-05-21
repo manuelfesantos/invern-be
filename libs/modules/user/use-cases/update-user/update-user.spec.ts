@@ -29,9 +29,9 @@ describe("updateUser", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it("should update email when action is 'update-email'", async () => {
+  it("should update mail when action is 'update-mail'", async () => {
     updateEmailSpy.mockResolvedValueOnce(
-      successResponse.OK("user email updated", {
+      successResponse.OK("user mail updated", {
         ...userMock,
         email: "email",
       }),
@@ -40,7 +40,7 @@ describe("updateUser", () => {
     const body = { email: "email" };
     const action = "update-email";
     const response = await updateUser(id, body, action);
-    const expectedResponse = successResponse.OK("user email updated", {
+    const expectedResponse = successResponse.OK("user mail updated", {
       ...userMock,
       email: "email",
     });

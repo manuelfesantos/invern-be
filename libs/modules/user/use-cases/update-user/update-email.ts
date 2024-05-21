@@ -15,7 +15,7 @@ export const updateEmail = async (
   await updateUser(id, `email = '${email}'`);
 
   return successResponse.OK(
-    "user email updated",
+    "user mail updated",
     userToUserDTO(mergeUser(user, email)),
   );
 };

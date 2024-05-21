@@ -16,7 +16,7 @@ describe("getUser", () => {
     prepareStatementSpy.mockReturnValue(prepareStatementMock);
   });
   describe("getUserByEmail", () => {
-    it("should get user by email", async () => {
+    it("should get user by mail", async () => {
       prepareStatementSpy.mockReturnValue({
         ...prepareStatementMock,
         first: jest.fn().mockResolvedValue({

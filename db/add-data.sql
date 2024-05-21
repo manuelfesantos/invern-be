@@ -1,21 +1,21 @@
 INSERT INTO collections VALUES
-("726d5a39-e7a7-4306-846b-c934fb4a87d4", "Invern", "Invern collection is a very nice collection."),
-("9cfb3c41-d7f9-4a19-bd31-17657e01ab5a", "Spirit", "Spirit is a really cool and holistic collection."),
-("377a972a-3bf7-4a23-89e8-2d50b7d9a87b", "Haki", "Haki is yet another incredible collection. How amazing!");
+("726d5a39-e7a7-4306-846b-c934fb4a87d4", "Erosion", "The nature of clay will speak of the continual erosion and weathering of the land we live on, of the traces made by the passage of humans across the surface of our planet and of the tension between a container and its contents."),
+("9cfb3c41-d7f9-4a19-bd31-17657e01ab5a", "Midden", "Skye’s landscape undergoes fundamental natural changes as a result of climatic and geological processes. Changes made by human activities such as settlement and agriculture are scratched on its surface. Skye’s landscape undergoes fundamental natural changes as a result of climatic and geological processes. Changes made by human activities such as settlement and agriculture are scratched on its surface."),
+("377a972a-3bf7-4a23-89e8-2d50b7d9a87b", "Contour", "My contour collection grows from a feeling of connection to the land and the effect of people upon its surface. The forms of the land are bounded by fencing and dykes, crossed by paths and water courses, which can delineate, separate and unify.");
 
 INSERT INTO products VALUES
-("9f68d3c2-0d8e-40d4-ba8e-5c3d7efe347f", "product1", "a product", 40, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
-("e678461f-db3a-4cc5-af71-cb1c8a7e4940", "product2", "another product", 30, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
-("121b3300-2120-4b94-9251-c1e510251582", "product3", "even another product", 20, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
-("d9701689-31e9-4279-a426-8b38a01a8592", "product4", "amazing new product", 35, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
-("5d89d595-32e1-456a-97e2-b284dd015267", "product5", "look at this new product", 25, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
-("056f31f6-ae77-4e63-bd65-b6e7e6e8b9e8", "product6", "wow here's another one", 32, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
-("c53b2001-7ac9-4392-bdc8-3ce86aa9968f", "product7", "fishy product line item", 14, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
-("7997779a-0ca3-4635-8896-01a623819b87", "product8", "last product from this collection", 29, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
-("cee09773-355a-49d6-81e5-62988726cf5c", "product9", "what a cool product you have there", 42, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
-("3de7c755-e2f0-47ab-afe7-da835c0023fc", "product10", "cool product here", 12, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
-("6dd67ee7-87c1-4b6c-9c46-b5ec82d575d6", "product11", "chill out and buy this product", 50, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
-("7b43dd9a-3025-4b8f-b125-018d09eba7a3", "product12", "clean and beautiful product", 50, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b");
+("9f68d3c2-0d8e-40d4-ba8e-5c3d7efe347f", "Earth Jar", "Earth Jar 20 'riven', unglazed stoneware", 4000, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
+("e678461f-db3a-4cc5-af71-cb1c8a7e4940", "Raku Fire", "'Watershed' hand formed, raku fired ceramic", 3000, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
+("121b3300-2120-4b94-9251-c1e510251582", "Saggar Bottles", "3 erosion bottles saggar fired stoneware", 2000, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
+("d9701689-31e9-4279-a426-8b38a01a8592", "Strata Flask", "A small hand made strata flask with dark iron tenmoku glazed interior.", 3500, 10, "726d5a39-e7a7-4306-846b-c934fb4a87d4"),
+("5d89d595-32e1-456a-97e2-b284dd015267", "Erosion Cup", "A hand made erosion cup (or yunomi) with iron matt glaze interior.", 2500, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
+("056f31f6-ae77-4e63-bd65-b6e7e6e8b9e8", "Tanka Fired", "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.", 3200, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
+("c53b2001-7ac9-4392-bdc8-3ce86aa9968f", "Strata Flask", "A small hand made strata flask with dark iron tenmoku glazed interior.", 1400, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
+("7997779a-0ca3-4635-8896-01a623819b87", "Strata Vase", "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.", 2900, 10, "9cfb3c41-d7f9-4a19-bd31-17657e01ab5a"),
+("cee09773-355a-49d6-81e5-62988726cf5c", "Rolling Erosion", "Rolling erosion bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.", 4200, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
+("3de7c755-e2f0-47ab-afe7-da835c0023fc", "Strata Flask", "A small hand made strata flask with dark iron tenmoku glazed interior.", 1200, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
+("6dd67ee7-87c1-4b6c-9c46-b5ec82d575d6", "Strata Vase", "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.", 5000, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b"),
+("7b43dd9a-3025-4b8f-b125-018d09eba7a3", "Kappa Vase", "Kappa vase bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.", 5000, 10, "377a972a-3bf7-4a23-89e8-2d50b7d9a87b");
 
 INSERT INTO images VALUES
 ("50daae91-934e-4072-a8f7-2a352bdd165d", "https://images.invernspirit.com/products/ceramics-product-1-1.jpeg", "product1-1", "9f68d3c2-0d8e-40d4-ba8e-5c3d7efe347f", "726d5a39-e7a7-4306-846b-c934fb4a87d4"),

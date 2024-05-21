@@ -33,6 +33,8 @@ export const errors = {
     new AdapterError("Products are required", HttpResponseEnum.BAD_REQUEST),
   CART_IS_NOT_EMPTY: (): AdapterError =>
     new AdapterError("Cart is not empty", HttpResponseEnum.CONFLICT),
+  CART_IS_EMPTY: (): AdapterError =>
+    new AdapterError("Cart is empty", HttpResponseEnum.CONFLICT),
   ACTION_IS_REQUIRED: (): AdapterError =>
     new AdapterError("Action is required", HttpResponseEnum.BAD_REQUEST),
   INVALID_ACTION: (action: string): AdapterError =>
@@ -40,6 +42,11 @@ export const errors = {
   LOGGER_NOT_INITIALIZED: (): AdapterError =>
     new AdapterError(
       "Logger not initialized",
+      HttpResponseEnum.INTERNAL_SERVER_ERROR,
+    ),
+  CHECKOUT_SESSION_CREATION_FAILED: (): AdapterError =>
+    new AdapterError(
+      "Checkout session creation failed",
       HttpResponseEnum.INTERNAL_SERVER_ERROR,
     ),
 };
