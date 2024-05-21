@@ -39,7 +39,7 @@ describe("getUser", () => {
         roles: userMock.roles,
       });
       expect(prepareStatementSpy).toHaveBeenCalledWith(
-        `SELECT * FROM users WHERE email = '${"mail"}'`,
+        `SELECT * FROM users WHERE email = '${"email"}'`,
       );
     });
     it("should throw error if prepareStatement throws error", async () => {
