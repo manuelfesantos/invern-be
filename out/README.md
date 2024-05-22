@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "invern-be" generated at 2024-05-14T00:50:53.352Z.

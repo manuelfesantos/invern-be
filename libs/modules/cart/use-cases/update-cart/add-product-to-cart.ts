@@ -1,7 +1,7 @@
-import { addToCart } from "@cart-adapter";
+import { addToCart } from "@cart-db";
 import { successResponse } from "@response-entity";
 import { productIdAndQuantitySchema } from "@product-entity";
-import { validateProductId } from "@product-adapter";
+import { validateProductId } from "@product-db";
 
 export const addProductToCart = async (
   body: unknown,

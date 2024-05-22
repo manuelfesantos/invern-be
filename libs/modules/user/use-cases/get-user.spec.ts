@@ -1,13 +1,14 @@
 import { getUser } from "./get-user";
-import * as UserAdapter from "@user-adapter";
+import * as UserAdapter from "@user-db";
 import { compareResponses, userMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
+import { userToUserDTO } from "@user-entity";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   getUserById: jest.fn(),
 }));
 
@@ -20,11 +21,10 @@ describe("getUser", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const response = await getUser(id);
-    const expectedResponse = successResponse.OK("success getting user", {
-      ...userMock,
-      password: undefined,
-      roles: undefined,
-    });
+    const expectedResponse = successResponse.OK(
+      "success getting user",
+      userToUserDTO(userMock),
+    );
     await compareResponses(response, expectedResponse);
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
   });

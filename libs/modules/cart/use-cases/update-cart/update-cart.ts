@@ -3,7 +3,7 @@ import { cartActionSchema } from "./types/update-cart";
 import { HttpParams } from "@http-entity";
 import { removeProductFromCart } from "./remove-product-from-cart";
 import { mergeCartItems } from "./merge-cart-items";
-import { validateCartId } from "@cart-adapter";
+import { validateCartId } from "@cart-db";
 
 const actionMapper = {
   add: addProductToCart,

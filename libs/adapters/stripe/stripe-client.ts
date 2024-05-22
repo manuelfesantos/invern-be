@@ -8,7 +8,7 @@ export const initStripeClient = (apiKey: string): void => {
   });
 };
 
-export const getStripeClient = (): Stripe => {
+export const stripe = (): Stripe => {
   if (!stripeClient) {
     throw new Error("Stripe client not initialized");
   }

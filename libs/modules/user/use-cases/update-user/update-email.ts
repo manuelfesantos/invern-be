@@ -1,5 +1,5 @@
 import { updateEmailBodySchema } from "./types/update-user";
-import { getUserByEmail, getUserById, updateUser } from "@user-adapter";
+import { getUserByEmail, getUserById, updateUser } from "@user-db";
 import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
@@ -12,10 +12,10 @@ export const updateEmail = async (
   await checkIfEmailIsTaken(email);
   const user = await getUserById(id);
 
-  await updateUser(id, `email = '${email}'`);
+  await updateUser(id, { email });
 
   return successResponse.OK(
-    "user mail updated",
+    "user email updated",
     userToUserDTO(mergeUser(user, email)),
   );
 };

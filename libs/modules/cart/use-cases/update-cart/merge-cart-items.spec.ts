@@ -1,7 +1,7 @@
 import { mergeCartItems } from "./merge-cart-items";
 import { successResponse } from "@response-entity";
-import * as CartAdapter from "@cart-adapter";
-import * as ProductAdapter from "@product-adapter";
+import * as CartAdapter from "@cart-db";
+import * as ProductAdapter from "@product-db";
 import { Cart } from "@cart-entity";
 import { compareResponses } from "@mocks-utils";
 
@@ -9,12 +9,12 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@cart-adapter", () => ({
+jest.mock("@cart-db", () => ({
   mergeCart: jest.fn(),
   getCartById: jest.fn(),
 }));
 
-jest.mock("@product-adapter", () => ({
+jest.mock("@product-db", () => ({
   validateProductIds: jest.fn(),
 }));
 
@@ -29,12 +29,14 @@ const fullCartMock: Cart = {
     {
       productId: "c7ca3352-18c0-4468-8e2c-8f30757c1c7c",
       quantity: 1,
-      productImage: {
-        imageUrl: "imageUrl",
-        imageAlt: "imageAlt",
-      },
+      images: [
+        {
+          url: "imageUrl",
+          alt: "imageAlt",
+        },
+      ],
       productName: "productName",
-      price: 1,
+      priceInCents: 100,
     },
   ],
 };

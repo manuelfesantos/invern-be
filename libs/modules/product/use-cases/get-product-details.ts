@@ -1,16 +1,14 @@
 import { successResponse } from "@response-entity";
-import { getProductById } from "@product-adapter";
+import { getProductById } from "@product-db";
 import { HttpParams } from "@http-entity";
-import { productDetailsSchema } from "@product-entity";
-import { getImagesByProductId } from "@image-adapter";
 import { uuidSchema } from "@global-entity";
+import { errors } from "@error-handling-utils";
 
 export const getProductDetails = async (id: HttpParams): Promise<Response> => {
   const productId = uuidSchema("product id").parse(id);
   const product = await getProductById(productId);
-  const images = await getImagesByProductId(productId);
-  return successResponse.OK(
-    "success getting product details",
-    productDetailsSchema.parse({ ...product, productImages: images }),
-  );
+  if (!product) {
+    throw errors.PRODUCT_NOT_FOUND();
+  }
+  return successResponse.OK("success getting product details", product);
 };

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { userDTOSchema } from "@user-entity";
+import { insertUserSchema } from "@user-entity";
 import { emailSchema, requiredStringSchema } from "@global-entity";
 
 export const userActionSchema = z.enum(["login", "signup", "authenticate"], {
@@ -12,6 +12,4 @@ export const loginBodySchema = z.object({
   password: requiredStringSchema("user password"),
 });
 
-export const signupBodySchema = userDTOSchema.extend({
-  password: requiredStringSchema("user password"),
-});
+export const signupBodySchema = insertUserSchema;

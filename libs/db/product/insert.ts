@@ -1,0 +1,20 @@
+import { productsTable } from "@schema";
+import { db } from "../db-client";
+import { InsertProduct } from "@product-entity";
+import { getRandomUUID } from "@crypto-utils";
+
+export const insertProduct = async (
+  product: InsertProduct,
+): Promise<
+  {
+    productId: string;
+  }[]
+> => {
+  const insertProduct = {
+    ...product,
+    productId: getRandomUUID(),
+  };
+  return db().insert(productsTable).values(insertProduct).returning({
+    productId: productsTable.productId,
+  });
+};

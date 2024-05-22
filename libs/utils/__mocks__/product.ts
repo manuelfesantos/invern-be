@@ -13,33 +13,33 @@ export const productIdAndQuantityMock = {
 export const productDetailsMock: ProductDetails = {
   productId: "c7ca3352-18c0-4468-8e2c-8f30757c1c7c",
   productName: "product name",
-  collectionName: "collection name",
   description: "product description",
-  price: 10,
+  priceInCents: 10,
   stock: 0,
-  productImages: [],
+  images: [],
+  collectionId: "collection id",
 };
 
 export const productsMock: Product[] = [
   {
     productId: "c7ca3352-18c0-4468-8e2c-8f30757c1c7c",
     productName: "product name",
-    price: 10,
+    priceInCents: 10,
     stock: 0,
-    productImage: imagesMock[FIRST_INDEX],
+    images: [imagesMock[FIRST_INDEX]],
   },
   {
     productId: "c7ca3352-18c0-4468-8e2c-8f30757c1c7c",
     productName: "product name",
-    price: 10,
+    priceInCents: 10,
     stock: 0,
-    productImage: imagesMock[SECOND_INDEX],
+    images: [imagesMock[SECOND_INDEX]],
   },
   {
     productId: "c7ca3352-18c0-4468-8e2c-8f30757c1c7c",
     productName: "product name",
-    price: 10,
+    priceInCents: 10,
     stock: 0,
-    productImage: imagesMock[THIRD_INDEX],
+    images: [imagesMock[THIRD_INDEX]],
   },
 ];

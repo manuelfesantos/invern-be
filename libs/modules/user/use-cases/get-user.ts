@@ -1,5 +1,5 @@
 import { HttpParams } from "@http-entity";
-import { getUserById } from "@user-adapter";
+import { getUserById } from "@user-db";
 import { successResponse } from "@response-entity";
 import { userToUserDTO } from "@user-entity";
 

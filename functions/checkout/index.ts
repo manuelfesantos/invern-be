@@ -18,7 +18,7 @@ export const onRequest: PagesFunction<Env> = async (
   const cartId = request.headers.get(HttpHeaderEnum.CART_ID);
   try {
     if (cartId) {
-      return checkout(cartId);
+      return await checkout(cartId);
     }
     const body = await getBodyFromRequest(request);
     return await checkout(null, body);

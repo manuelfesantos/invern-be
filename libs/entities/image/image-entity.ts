@@ -1,8 +1,13 @@
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { imagesTable } from "@schema";
 import { z } from "zod";
-import { requiredStringSchema, urlSchema } from "@global-entity";
 
-export const imageSchema = z.object({
-  imageUrl: urlSchema("image url"),
-  imageAlt: requiredStringSchema("image alt").optional(),
+export const imageSchema = createSelectSchema(imagesTable).omit({
+  collectionId: true,
+  productId: true,
 });
-export type ImageUrl = z.infer<typeof imageSchema>;
+
+export const insertImageSchema = createInsertSchema(imagesTable);
+
+export type Image = z.infer<typeof imageSchema>;
+export type InsertImage = z.infer<typeof insertImageSchema>;

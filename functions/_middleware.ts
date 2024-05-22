@@ -3,7 +3,7 @@ import honeyCombPlugin, {
   PluginData,
   //@ts-expect-error - unable to import from @cloudflare/pages-plugin-honeycomb
 } from "@cloudflare/pages-plugin-honeycomb";
-import { initDb } from "@db-utils";
+import { initDb } from "@db";
 import { initLogger } from "@logger-utils";
 import { setGlobalTimer } from "@timer-utils";
 import { errorResponse } from "@response-entity";

@@ -1,7 +1,7 @@
 import { HttpParams } from "@http-entity";
-import { getUserById } from "@user-adapter";
+import { getUserById } from "@user-db";
 import { successResponse } from "@response-entity";
-import { deleteUser as deleteUserAdapter } from "@user-adapter";
+import { deleteUser as deleteUserAdapter } from "@user-db";
 
 export const deleteUser = async (id: HttpParams): Promise<Response> => {
   const user = await getUserById(id as string);

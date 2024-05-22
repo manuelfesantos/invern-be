@@ -1,9 +1,13 @@
 import { successResponse } from "@response-entity";
-import { getProducts } from "@product-adapter";
+import { getProducts, getProductsBySearch } from "@product-db";
 
 export const getAllProducts = async (
   search: string | null,
 ): Promise<Response> => {
-  const products = await getProducts(search);
+  if (search) {
+    const products = await getProductsBySearch(search);
+    return successResponse.OK("success getting all products", products);
+  }
+  const products = await getProducts();
   return successResponse.OK("success getting all products", products);
 };

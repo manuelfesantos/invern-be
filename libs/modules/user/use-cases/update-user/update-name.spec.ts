@@ -1,14 +1,14 @@
 import { updateName } from "./update-name";
 import { successResponse } from "@response-entity";
 import { compareResponses, userMock } from "@mocks-utils";
-import * as UserAdapter from "@user-adapter";
+import * as UserAdapter from "@user-db";
 import { ZodError } from "zod";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   updateUser: jest.fn(),
   getUserById: jest.fn(),
 }));
@@ -30,7 +30,7 @@ describe("updateName", () => {
       firstName,
       lastName,
       password: undefined,
-      roles: undefined,
+      role: undefined,
     });
     await compareResponses(response, expectedResponse);
   });
@@ -43,7 +43,7 @@ describe("updateName", () => {
       ...userMock,
       firstName,
       password: undefined,
-      roles: undefined,
+      role: undefined,
     });
     await compareResponses(response, expectedResponse);
   });
@@ -56,7 +56,7 @@ describe("updateName", () => {
       ...userMock,
       lastName,
       password: undefined,
-      roles: undefined,
+      role: undefined,
     });
     await compareResponses(response, expectedResponse);
   });
@@ -89,9 +89,9 @@ describe("updateName", () => {
       async () => await updateName(id, { firstName, lastName }),
     ).rejects.toEqual(expect.objectContaining({ message: "update failed" }));
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
-    expect(updateUserSpy).toHaveBeenCalledWith(
-      id,
-      `firstName = '${firstName}', lastName = '${lastName}'`,
-    );
+    expect(updateUserSpy).toHaveBeenCalledWith(userMock.userId, {
+      firstName,
+      lastName,
+    });
   });
 });

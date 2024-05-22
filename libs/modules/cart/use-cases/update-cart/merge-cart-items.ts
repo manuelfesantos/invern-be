@@ -1,7 +1,7 @@
 import { successResponse } from "@response-entity";
 import { mergeCartItemsBodySchema } from "./types/update-cart";
-import { getCartById, mergeCart } from "@cart-adapter";
-import { validateProductIds } from "@product-adapter";
+import { mergeCart, getCartById } from "@cart-db";
+import { validateProductIds } from "@product-db";
 import { errors } from "@error-handling-utils";
 
 export const mergeCartItems = async (
@@ -13,7 +13,7 @@ export const mergeCartItems = async (
     throw errors.PRODUCTS_ARE_REQUIRED();
   }
   const cart = await getCartById(cartId);
-  if (cart.products.length) {
+  if (cart.products?.length) {
     throw errors.CART_IS_NOT_EMPTY();
   }
   await validateProductIds(products.map((product) => product.productId));

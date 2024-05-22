@@ -1,29 +1,24 @@
 import { signupBodySchema } from "./types/map-user-action";
-import {
-  RolesEnum,
-  User,
-  UserDTO,
-  userDTOSchema,
-  userToUserDTO,
-} from "@user-entity";
-import { getRandomUUID, hashPassword } from "@crypto-utils";
-import { createUser, getUserByEmail } from "@user-adapter";
+import { insertUser, getUserByEmail, getUserById } from "@user-db";
+import { insertCart } from "@cart-db";
 import { successResponse } from "@response-entity";
 import { errors } from "@error-handling-utils";
+import { userToUserDTO } from "@user-entity";
 
 export const signup = async (body: unknown): Promise<Response> => {
   const parsedBody = signupBodySchema.parse(body);
-  const userDTO = userDTOSchema.parse(parsedBody);
-  const { password } = parsedBody;
 
-  await validateThatEmailIsUnique(userDTO.email);
+  await validateThatEmailIsUnique(parsedBody.email);
 
-  const userId = getRandomUUID();
-  const cartId = getRandomUUID();
-  const passwordHash = await hashPassword(password, userId);
-  const user = buildUserFromData(userDTO, cartId, userId, passwordHash);
+  const [userId] = await insertUser(parsedBody);
 
-  await createUser(user);
+  await insertCart(userId);
+
+  const user = await getUserById(userId.userId);
+
+  if (!user) {
+    throw errors.USER_NOT_FOUND();
+  }
 
   return successResponse.CREATED("user created", userToUserDTO(user));
 };
@@ -34,19 +29,3 @@ const validateThatEmailIsUnique = async (email: string): Promise<void> => {
     throw errors.EMAIL_ALREADY_TAKEN();
   }
 };
-
-const buildUserFromData = (
-  userDTO: UserDTO,
-  cartId: string,
-  userId: string,
-  password: string,
-): User => ({
-  ...userDTO,
-  userId,
-  password,
-  cart: {
-    cartId,
-    products: [],
-  },
-  roles: [RolesEnum.USER],
-});

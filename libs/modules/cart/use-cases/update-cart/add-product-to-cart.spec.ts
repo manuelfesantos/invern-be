@@ -1,7 +1,7 @@
 import { addProductToCart } from "./add-product-to-cart";
 import { successResponse } from "@response-entity";
-import * as CartAdapter from "@cart-adapter";
-import * as ProductAdapter from "@product-adapter";
+import * as CartAdapter from "@cart-db";
+import * as ProductAdapter from "@product-db";
 import { compareResponses, productIdAndQuantityMock } from "@mocks-utils";
 import { ZodError } from "zod";
 
@@ -11,11 +11,11 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@cart-adapter", () => ({
+jest.mock("@cart-db", () => ({
   addToCart: jest.fn(),
 }));
 
-jest.mock("@product-adapter", () => ({
+jest.mock("@product-db", () => ({
   validateProductId: jest.fn(),
 }));
 

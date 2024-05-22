@@ -1,13 +1,13 @@
 import { getAllProducts } from "./get-all-products";
 import { compareResponses } from "@mocks-utils";
 import { successResponse } from "@response-entity";
-import * as ProductAdapter from "@product-adapter";
+import * as ProductAdapter from "@product-db";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@product-adapter", () => ({
+jest.mock("@product-db", () => ({
   getProducts: jest.fn(),
 }));
 

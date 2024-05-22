@@ -1,5 +1,5 @@
 import { updatePasswordBodySchema } from "./types/update-user";
-import { getUserById, updateUser } from "@user-adapter";
+import { getUserById, updateUser } from "@user-db";
 import { successResponse } from "@response-entity";
 import { userToUserDTO } from "@user-entity";
 import { hashPassword } from "@crypto-utils";
@@ -13,7 +13,7 @@ export const updatePassword = async (
 
   const passwordHash = await hashPassword(password, id);
 
-  await updateUser(id, `password = '${passwordHash}'`);
+  await updateUser(id, { password: passwordHash });
 
   return successResponse.OK("user password updated", userToUserDTO(user));
 };
