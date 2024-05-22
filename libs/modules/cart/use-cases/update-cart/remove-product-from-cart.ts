@@ -1,7 +1,7 @@
-import { removeFromCart } from "@cart-adapter";
+import { removeFromCart } from "@cart-db";
 import { successResponse } from "@response-entity";
 import { productIdAndQuantitySchema } from "@product-entity";
-import { validateProductId } from "@product-adapter";
+import { validateProductId } from "@product-db";
 
 export const removeProductFromCart = async (
   body: unknown,

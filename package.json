@@ -15,8 +15,9 @@
     "insert-preview": "npx wrangler d1 execute invern-db-preview --remote --file=db/add-data.sql",
     "query-local": "npx wrangler d1 execute INVERN_DB",
     "query-remote": "npx wrangler d1 execute invern-db --remote",
-    "local": "rm -rf .wrangler && npm run build-local-db && npm run insert-local && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26 --show-interactive-dev-session=false",
-    "prepare": "husky"
+    "local": "npx wrangler d1 migrations apply --local INVERN_DB && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26 --show-interactive-dev-session=false",
+    "prepare": "husky",
+    "db:generate": "npx drizzle-kit generate"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "@eslint/js": "^9.2.0",
     "@types/jest": "^29.5.12",
     "@types/uuid": "^9.0.8",
+    "drizzle-kit": "^0.21.2",
     "eslint": "^8.57.0",
     "globals": "^15.1.0",
     "husky": "^9.0.11",
@@ -33,12 +35,15 @@
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.11.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.8.0"
   },
   "dependencies": {
     "@cloudflare/pages-plugin-honeycomb": "^1.0.4",
     "@types/stripe-v3": "^3.1.33",
+    "drizzle-orm": "^0.30.10",
+    "drizzle-zod": "^0.5.1",
     "stripe": "^15.6.0",
     "uuid": "^9.0.1",
     "zod": "^3.23.4"

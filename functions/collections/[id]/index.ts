@@ -10,7 +10,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
   const { id } = params;
 
   try {
-    return await getCollectionDetails(id);
+    return await getCollectionDetails(id as string);
   } catch (error) {
     return generateErrorResponse(error);
   }

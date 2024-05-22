@@ -1,14 +1,16 @@
-export const imagesMock = [
+import { Image } from "@image-entity";
+
+export const imagesMock: Image[] = [
   {
-    imageUrl: "http://url1.com",
-    imageAlt: "alt1",
+    url: "http://url1.com",
+    alt: "alt1",
   },
   {
-    imageUrl: "http://url2.com",
-    imageAlt: "alt2",
+    url: "http://url2.com",
+    alt: "alt2",
   },
   {
-    imageUrl: "http://url3.com",
-    imageAlt: "alt3",
+    url: "http://url3.com",
+    alt: "alt3",
   },
 ];

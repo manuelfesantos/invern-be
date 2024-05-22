@@ -1,13 +1,13 @@
 import { getAllCollections } from "./get-all-collections";
 import { collectionsMock, compareResponses } from "@mocks-utils";
 import { successResponse } from "@response-entity";
-import * as CollectionAdapter from "@collection-adapter";
+import * as CollectionAdapter from "@collection-db";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@collection-adapter", () => ({
+jest.mock("@collection-db", () => ({
   getCollections: jest.fn(),
 }));
 

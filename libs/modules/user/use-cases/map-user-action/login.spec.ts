@@ -1,18 +1,19 @@
 import { login } from "./login";
-import * as UserAdapter from "@user-adapter";
-import * as CartAdapter from "@cart-adapter";
+import * as UserAdapter from "@user-db";
+import * as CartAdapter from "@cart-db";
 import { successResponse } from "@response-entity";
 import { compareResponses, userDtoMock, userMock } from "@mocks-utils";
+
+jest.mock("@cart-db", () => ({
+  getCartById: jest.fn(),
+}));
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   getUserByEmail: jest.fn(),
-}));
-jest.mock("@cart-adapter", () => ({
-  getCartById: jest.fn(),
 }));
 jest.mock("@crypto-utils", () => ({
   hashPassword: jest.fn((password: string) => password),
@@ -26,7 +27,6 @@ describe("login", () => {
   });
   it("should login successfully", async () => {
     getUserByEmailSpy.mockResolvedValueOnce(userMock);
-    getCartByIdSpy.mockResolvedValueOnce(userMock.cart);
     const response = await login({
       email: "example@example.com",
       password: "password",
@@ -37,10 +37,9 @@ describe("login", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(getUserByEmailSpy).toHaveBeenCalledWith("example@example.com");
-    expect(getCartByIdSpy).toHaveBeenCalledWith(userMock.cart.cartId);
   });
   it("should throw error if user not found", async () => {
-    getUserByEmailSpy.mockResolvedValueOnce(null);
+    getUserByEmailSpy.mockResolvedValueOnce(undefined);
     await expect(
       async () =>
         await login({
@@ -58,7 +57,6 @@ describe("login", () => {
   });
   it("should throw error if password is incorrect", async () => {
     getUserByEmailSpy.mockResolvedValueOnce(userMock);
-    getCartByIdSpy.mockResolvedValueOnce(userMock.cart);
     await expect(
       async () =>
         await login({

@@ -9,12 +9,13 @@ export const userDtoMock: UserDTO = {
     cartId: "591fd975-606e-4d51-b42a-51a2f0d052a5",
     products: [],
   },
+  orders: [],
 };
 
 export const userMock: User = {
   userId: "591fd975-606e-4d51-b42a-51a2f0d052a5",
   password: "password",
-  roles: [RolesEnum.USER],
+  role: RolesEnum.USER,
   cart: {
     cartId: "591fd975-606e-4d51-b42a-51a2f0d052a5",
     products: [],
@@ -22,4 +23,5 @@ export const userMock: User = {
   email: "example@example.com",
   firstName: "example",
   lastName: "example",
+  orders: [],
 };

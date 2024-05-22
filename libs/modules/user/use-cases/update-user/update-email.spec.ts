@@ -1,6 +1,6 @@
 import { updateEmail } from "./update-email";
 import { successResponse } from "@response-entity";
-import * as UserAdapter from "@user-adapter";
+import * as UserAdapter from "@user-db";
 import { compareResponses, userMock } from "@mocks-utils";
 import { ZodError } from "zod";
 
@@ -8,7 +8,7 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   updateUser: jest.fn(),
   getUserById: jest.fn(),
   getUserByEmail: jest.fn(),
@@ -27,16 +27,16 @@ describe("updateEmail", () => {
     const id = "userId";
     const email = "newEmail@example.com";
     const response = await updateEmail(id, { email });
-    const expectedResponse = successResponse.OK("user mail updated", {
+    const expectedResponse = successResponse.OK("user email updated", {
       ...userMock,
       email,
       password: undefined,
-      roles: undefined,
+      role: undefined,
     });
     await compareResponses(response, expectedResponse);
     expect(getUserByEmailSpy).toHaveBeenCalled();
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
-    expect(updateUserSpy).toHaveBeenCalledWith(id, `email = '${email}'`);
+    expect(updateUserSpy).toHaveBeenCalledWith(id, { email });
   });
   it("should throw error if mail is invalid", async () => {
     const id = "userId";

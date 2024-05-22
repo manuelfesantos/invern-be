@@ -1,0 +1,20 @@
+import { InsertTax } from "@tax-entity";
+import { getRandomUUID } from "@crypto-utils";
+import { taxesTable } from "@schema";
+import { db } from "../db-client";
+
+export const insertTax = async (
+  tax: InsertTax,
+): Promise<
+  {
+    taxId: string;
+  }[]
+> => {
+  const insertTax = {
+    ...tax,
+    taxId: getRandomUUID(),
+  };
+  return db().insert(taxesTable).values(insertTax).returning({
+    taxId: taxesTable.taxId,
+  });
+};

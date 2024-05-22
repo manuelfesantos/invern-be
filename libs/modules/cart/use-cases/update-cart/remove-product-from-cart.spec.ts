@@ -1,8 +1,8 @@
 import { removeProductFromCart } from "./remove-product-from-cart";
 import { successResponse } from "@response-entity";
 import { compareResponses, productIdAndQuantityMock } from "@mocks-utils";
-import * as CartAdapter from "@cart-adapter";
-import * as ProductAdapter from "@product-adapter";
+import * as CartAdapter from "@cart-db";
+import * as ProductAdapter from "@product-db";
 import { ZodError } from "zod";
 
 const { productId, quantity } = productIdAndQuantityMock;
@@ -11,11 +11,11 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@cart-adapter", () => ({
+jest.mock("@cart-db", () => ({
   removeFromCart: jest.fn(),
 }));
 
-jest.mock("@product-adapter", () => ({
+jest.mock("@product-db", () => ({
   validateProductId: jest.fn(),
 }));
 

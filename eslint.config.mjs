@@ -26,7 +26,7 @@ export default [
           "ignoreTemplateLiterals": true,
           "ignoreRegExpLiterals": true
         }
-      ],
+      ]
     }
   }
-];
+]

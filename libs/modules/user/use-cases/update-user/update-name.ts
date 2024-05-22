@@ -1,5 +1,5 @@
 import { updateNameBodySchema } from "./types/update-user";
-import { getUserById, updateUser } from "@user-adapter";
+import { getUserById, updateUser } from "@user-db";
 import { successResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 
@@ -10,9 +10,7 @@ export const updateName = async (
   const { firstName, lastName } = updateNameBodySchema.parse(body);
   const user = await getUserById(id);
 
-  const updateOptions = getUpdateOptions(firstName, lastName);
-
-  await updateUser(id, updateOptions);
+  await updateUserWithOptions(user, firstName, lastName);
 
   return successResponse.OK(
     "user name updated",
@@ -20,16 +18,20 @@ export const updateName = async (
   );
 };
 
-const getUpdateOptions = (firstName?: string, lastName?: string): string => {
-  let updateOptions = "";
+const updateUserWithOptions = async (
+  user: User,
+  firstName?: string,
+  lastName?: string,
+): Promise<void> => {
   if (firstName && lastName) {
-    updateOptions = `firstName = '${firstName}', lastName = '${lastName}'`;
-  } else if (firstName) {
-    updateOptions = `firstName = '${firstName}'`;
-  } else if (lastName) {
-    updateOptions = `lastName = '${lastName}'`;
+    await updateUser(user.userId, { firstName, lastName });
   }
-  return updateOptions;
+  if (firstName) {
+    await updateUser(user.userId, { firstName });
+  }
+  if (lastName) {
+    await updateUser(user.userId, { lastName });
+  }
 };
 
 const mergeUser = (
@@ -39,9 +41,9 @@ const mergeUser = (
 ): User => ({
   ...user,
   ...(firstName && {
-    firstName: firstName,
+    firstName,
   }),
   ...(lastName && {
-    lastName: lastName,
+    lastName,
   }),
 });

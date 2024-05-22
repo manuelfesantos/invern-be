@@ -1,13 +1,13 @@
 import { deleteUser } from "./delete-user";
 import { compareResponses, userMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
-import * as UserAdapter from "@user-adapter";
+import * as UserAdapter from "@user-db";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   deleteUser: jest.fn(),
   getUserById: jest.fn(),
 }));

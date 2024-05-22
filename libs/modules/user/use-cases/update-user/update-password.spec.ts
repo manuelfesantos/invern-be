@@ -1,5 +1,5 @@
 import { updatePassword } from "./update-password";
-import * as UserAdapter from "@user-adapter";
+import * as UserAdapter from "@user-db";
 import { compareResponses, userMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 import { ZodError } from "zod";
@@ -8,7 +8,7 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@user-adapter", () => ({
+jest.mock("@user-db", () => ({
   getUserById: jest.fn(),
   updateUser: jest.fn(),
 }));
@@ -31,11 +31,11 @@ describe("updatePassword", () => {
     const expectedResponse = successResponse.OK("user password updated", {
       ...userMock,
       password: undefined,
-      roles: undefined,
+      role: undefined,
     });
     await compareResponses(response, expectedResponse);
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
-    expect(updateUserSpy).toHaveBeenCalledWith(id, `password = '${password}'`);
+    expect(updateUserSpy).toHaveBeenCalledWith(id, { password });
   });
   it("should throw error if password is invalid", async () => {
     const id = "userId";

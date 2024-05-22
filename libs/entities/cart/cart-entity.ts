@@ -1,10 +1,20 @@
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { cartsTable } from "@schema";
 import { z } from "zod";
-import { uuidSchema } from "@global-entity";
-import { cartItemSchema } from "./cart-item-entity";
+import { lineItemSchema } from "@product-entity";
 
-export const cartSchema = z.object({
-  cartId: uuidSchema("cart id"),
-  products: z.array(cartItemSchema).default([]),
+const baseCartSchema = createSelectSchema(cartsTable);
+
+export const insertCartSchema = createInsertSchema(cartsTable).omit({
+  cartId: true,
 });
 
+export const cartSchema = baseCartSchema.omit({ userId: true }).merge(
+  z.object({
+    products: z.array(lineItemSchema).optional(),
+  }),
+);
+
 export type Cart = z.infer<typeof cartSchema>;
+
+export type InsertCart = z.infer<typeof insertCartSchema>;

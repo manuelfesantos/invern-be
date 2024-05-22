@@ -1,52 +1,43 @@
 import { checkoutBodySchema } from "./types/checkout";
 import { createCheckoutSession } from "@stripe-adapter";
 import { successResponse } from "@response-entity";
-import { getProducts } from "@product-adapter";
+import { getProducts } from "@product-db";
 import { errors } from "@error-handling-utils";
-import {
-  Product,
-  ProductWithQuantity,
-  productWithQuantitySchema,
-} from "@product-entity";
-import { getCartById, validateCartId } from "@cart-adapter";
+import { Product, LineItem, lineItemSchema } from "@product-entity";
+import { getCartById, validateCartId } from "@cart-db";
 
 export const checkout = async (
   cartId: string | null,
   body?: unknown,
 ): Promise<Response> => {
-  let checkoutProducts: ProductWithQuantity[] = [];
+  let lineItems: LineItem[] = [];
   if (cartId) {
-    checkoutProducts = await getCheckoutProductsByCartId(cartId);
+    lineItems = await getLineItemsByCartId(cartId);
   } else {
     if (!body) {
       throw errors.PRODUCTS_ARE_REQUIRED();
     }
     const { products } = checkoutBodySchema.parse(body);
-    checkoutProducts = await getCheckoutProducts(products);
+    lineItems = await getLineItems(products);
   }
 
-  const session = await createCheckoutSession(checkoutProducts);
+  const session = await createCheckoutSession(lineItems);
   return buildRedirectResponse(session.url);
 };
 
-const getCheckoutProductsByCartId = async (
-  cartId: string,
-): Promise<ProductWithQuantity[]> => {
+const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
   await validateCartId(cartId);
   const cart = await getCartById(cartId);
-  if (!cart.products.length) {
+  if (!cart.products?.length) {
     throw errors.CART_IS_EMPTY();
   }
-  return cart.products.map((product) =>
-    productWithQuantitySchema.parse(product),
-  );
+  return cart.products.map((product) => lineItemSchema.parse(product));
 };
 
-const getCheckoutProducts = async (
+const getLineItems = async (
   products: { productId: string; quantity: number }[],
-): Promise<ProductWithQuantity[]> => {
+): Promise<LineItem[]> => {
   const dbProducts = await getProducts(
-    null,
     products.map((product) => product.productId),
   );
   if (dbProducts.length !== products.length) {
@@ -54,7 +45,7 @@ const getCheckoutProducts = async (
       getInvalidProductIds(products, dbProducts),
     );
   }
-  return getProductsWithQuantity(products, dbProducts);
+  return buildLineItems(products, dbProducts);
 };
 
 const getInvalidProductIds = (
@@ -71,10 +62,10 @@ const getInvalidProductIds = (
     .map((product) => product.productId);
 };
 
-const getProductsWithQuantity = (
+const buildLineItems = (
   products: { productId: string; quantity: number }[],
   dbProducts: Product[],
-): ProductWithQuantity[] => {
+): LineItem[] => {
   return products.map((product) => ({
     ...dbProducts.find(
       (dbProduct) => dbProduct.productId === product.productId,

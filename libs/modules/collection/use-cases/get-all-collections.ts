@@ -1,4 +1,4 @@
-import { getCollections } from "@collection-adapter";
+import { getCollections } from "@collection-db";
 import { successResponse } from "@response-entity";
 
 export const getAllCollections = async (): Promise<Response> => {
