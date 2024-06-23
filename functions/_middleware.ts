@@ -6,8 +6,9 @@ import honeyCombPlugin, {
 import { initDb } from "@db";
 import { initLogger } from "@logger-utils";
 import { setGlobalTimer } from "@timer-utils";
-import { errorResponse } from "@response-entity";
+import { errorResponse, successResponse } from "@response-entity";
 import { initSendgrid } from "@mail-utils";
+import { HttpMethodEnum } from "@http-entity";
 
 export const startLogger: PagesFunction<Env> = async (context) => {
   if (context.request.method === "HEAD") {
@@ -28,7 +29,14 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   initSendgrid(env.SENDGRID_API_KEY);
   const logger = initLogger(data);
   logger.addData({ country: request.cf?.country });
-
+  if (request.method === HttpMethodEnum.OPTIONS) {
+    return successResponse.OK("options", [
+      HttpMethodEnum.GET,
+      HttpMethodEnum.POST,
+      HttpMethodEnum.DELETE,
+      HttpMethodEnum.PUT,
+    ]);
+  }
   return context.next();
 };
 
