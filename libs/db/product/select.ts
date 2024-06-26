@@ -11,9 +11,7 @@ export const getProducts = async (
       description: false,
       collectionId: false,
     },
-    ...(productIds
-      ? { where: inArray(productsTable.productId, productIds) }
-      : {}),
+    ...(productIds && { where: inArray(productsTable.productId, productIds) }),
     with: {
       images: {
         limit: 1,
@@ -64,8 +62,8 @@ export const getProductsBySearch = async (
 ): Promise<Product[]> => {
   return db().query.productsTable.findMany({
     where: or(
-      like(productsTable.description, search),
-      like(productsTable.productName, search),
+      like(productsTable.description, `%${search}%`),
+      like(productsTable.productName, `%${search}%`),
     ),
     with: {
       images: {
