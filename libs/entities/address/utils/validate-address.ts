@@ -20,9 +20,6 @@ export const validateStripeAddress = (address: unknown): InsertAddress => {
   if (!address.city) throw errors.INVALID_ADDRESS("address.city is required");
   if (typeof address.city !== "string")
     throw errors.INVALID_ADDRESS("address.city must be a string");
-  if (!("state" in address))
-    throw errors.INVALID_ADDRESS("address must have a state");
-  if (!address.state) throw errors.INVALID_ADDRESS("address.state is required");
   if (!("country" in address))
     throw errors.INVALID_ADDRESS("address must have a country");
   if (!address.country)
