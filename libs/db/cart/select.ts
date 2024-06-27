@@ -1,4 +1,4 @@
-import { db } from "../db-client";
+import { db } from "@db";
 import { cartsTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { Cart, cartSchema } from "@cart-entity";
@@ -6,9 +6,6 @@ import { Cart, cartSchema } from "@cart-entity";
 export const getCartById = async (cartId: string): Promise<Cart> => {
   const cartTemplate = await db().query.cartsTable.findFirst({
     where: eq(cartsTable.cartId, cartId),
-    columns: {
-      userId: false,
-    },
     with: {
       productsToCarts: {
         with: {

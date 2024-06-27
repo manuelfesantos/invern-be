@@ -1,5 +1,5 @@
 import { InsertPayment } from "@payment-entity";
-import { db } from "../db-client";
+import { db } from "@db";
 import { paymentsTable } from "@schema";
 import { getRandomUUID } from "@crypto-utils";
 

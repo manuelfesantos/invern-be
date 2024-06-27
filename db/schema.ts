@@ -11,6 +11,10 @@ const DEFAULT_USER_VERSION = 1;
 
 //-----------------------------------SCHEMA-----------------------------------//
 
+export const cartsTable = sqliteTable("carts", {
+  cartId: text("cartId").primaryKey(),
+});
+
 export const usersTable = sqliteTable("users", {
   userId: text("userId").primaryKey(),
   email: text("email").notNull(),
@@ -21,13 +25,9 @@ export const usersTable = sqliteTable("users", {
   role: text("role", { enum: ["ADMIN", "USER"] })
     .notNull()
     .default("USER"),
-});
-
-export const cartsTable = sqliteTable("carts", {
-  cartId: text("cartId").primaryKey(),
-  userId: text("userId")
+  cartId: text("cartId")
     .notNull()
-    .references(() => usersTable.userId, {
+    .references(() => cartsTable.cartId, {
       onDelete: "cascade",
     }),
 });
@@ -175,15 +175,15 @@ export const paymentsTable = sqliteTable("payments", {
 //---------------------------------RELATIONS---------------------------------//
 
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
-  cart: one(cartsTable),
+  cart: one(cartsTable, {
+    fields: [usersTable.cartId],
+    references: [cartsTable.cartId],
+  }),
   orders: many(ordersTable),
 }));
 
 export const cartsRelations = relations(cartsTable, ({ one, many }) => ({
-  user: one(usersTable, {
-    fields: [cartsTable.userId],
-    references: [usersTable.userId],
-  }),
+  user: one(usersTable),
   productsToCarts: many(productsToCartsTable),
 }));
 

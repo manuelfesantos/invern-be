@@ -5,7 +5,6 @@ import { z } from "zod";
 const basePaymentSchema = createSelectSchema(paymentsTable);
 
 export const insertPaymentSchema = createInsertSchema(paymentsTable).omit({
-  paymentId: true,
   createdAt: true,
 });
 

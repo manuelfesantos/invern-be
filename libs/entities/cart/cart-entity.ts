@@ -9,7 +9,7 @@ export const insertCartSchema = createInsertSchema(cartsTable).omit({
   cartId: true,
 });
 
-export const cartSchema = baseCartSchema.omit({ userId: true }).merge(
+export const cartSchema = baseCartSchema.merge(
   z.object({
     products: z.array(lineItemSchema).optional(),
   }),

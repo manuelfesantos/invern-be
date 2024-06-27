@@ -5,6 +5,7 @@ import Response = Stripe.Response;
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
+  userId: string | null,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   return await stripe().checkout.sessions.create({
     shipping_address_collection: {
@@ -41,5 +42,8 @@ export const createCheckoutSession = async (
         quantity: product.quantity,
       };
     }),
+    metadata: {
+      userId,
+    },
   });
 };

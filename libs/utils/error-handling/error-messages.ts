@@ -49,4 +49,13 @@ export const errors = {
       "Checkout session creation failed",
       HttpResponseEnum.INTERNAL_SERVER_ERROR,
     ),
+  INVALID_ADDRESS: (issue: string): AdapterError =>
+    new AdapterError(`Invalid address: ${issue}`, HttpResponseEnum.BAD_REQUEST),
+  INVALID_PAYMENT: (issue: string): AdapterError =>
+    new AdapterError(`Invalid payment: ${issue}`, HttpResponseEnum.BAD_REQUEST),
+  UNABLE_TO_CREATE_ORDER: (): AdapterError =>
+    new AdapterError(
+      "Unable to create order",
+      HttpResponseEnum.INTERNAL_SERVER_ERROR,
+    ),
 };
