@@ -9,6 +9,7 @@ const baseOrderSchema = createSelectSchema(ordersTable);
 
 export const insertOrderSchema = createSelectSchema(ordersTable).omit({
   orderId: true,
+  createdAt: true,
 });
 
 export const orderSchema = baseOrderSchema

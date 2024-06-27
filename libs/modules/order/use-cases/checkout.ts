@@ -5,14 +5,17 @@ import { getProducts } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { Product, LineItem, lineItemSchema } from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
+import { getUserByCartId } from "@user-db";
 
 export const checkout = async (
   cartId: string | null,
   body?: unknown,
 ): Promise<Response> => {
   let lineItems: LineItem[] = [];
+  let userId = "";
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
+    userId = (await getUserByCartId(cartId))?.userId;
   } else {
     if (!body) {
       throw errors.PRODUCTS_ARE_REQUIRED();
@@ -21,7 +24,7 @@ export const checkout = async (
     lineItems = await getLineItems(products);
   }
 
-  const session = await createCheckoutSession(lineItems);
+  const session = await createCheckoutSession(lineItems, userId);
   return buildRedirectResponse(session.url);
 };
 

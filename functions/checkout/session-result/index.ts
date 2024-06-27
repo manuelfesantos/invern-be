@@ -3,6 +3,7 @@ import { getBodyFromRequest } from "@http-utils";
 import { getLogger } from "@logger-utils";
 import { sendEmail } from "@mail-utils";
 import { isStripeSessionCompletedEvent } from "@stripe-entity";
+import { getSessionResult } from "@order-module";
 
 const NUMBER_2 = 2;
 export const onRequest: PagesFunction = async (context) => {
@@ -22,12 +23,12 @@ export const onRequest: PagesFunction = async (context) => {
   logger.addData({
     checkoutSessionResult: JSON.stringify(body, null, NUMBER_2),
   });
-  const responsePromise = await sendEmail(
+  const order = await getSessionResult(sessionEvent);
+  await sendEmail(
     sessionEvent.customer_details?.email || "",
     "Checkout",
-    String(sessionEvent.amount_total),
+    `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
   );
-  const response = await responsePromise.json();
-  logger.addData({ emailResponse: JSON.stringify(response, null, NUMBER_2) });
-  return successResponse.OK("success getting checkout-session", response);
+  logger.addData({ createdOrder: JSON.stringify(order, null, NUMBER_2) });
+  return successResponse.OK("success getting checkout-session", order);
 };

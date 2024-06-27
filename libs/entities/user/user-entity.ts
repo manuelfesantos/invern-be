@@ -21,14 +21,19 @@ export const insertUserSchema = baseUserSchema.omit({
   userId: true,
   version: true,
   role: true,
+  cartId: true,
 });
 
-export const userSchema = baseUserSchema.merge(
-  z.object({
-    cart: cartSchema.nullable(),
-    orders: z.array(orderSchema).nullable(),
-  }),
-);
+export const userSchema = baseUserSchema
+  .omit({
+    cartId: true,
+  })
+  .merge(
+    z.object({
+      cart: cartSchema.nullable(),
+      orders: z.array(orderSchema).nullable(),
+    }),
+  );
 
 export const userDTOSchema = userSchema.omit({
   password: true,

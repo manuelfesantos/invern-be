@@ -5,16 +5,13 @@ import { User, userSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
 
 export const getUser = async (
-  where: "userId" | "email",
+  where: "userId" | "email" | "cartId",
   selection: string,
 ): Promise<User | undefined> => {
   const userTemplate = await db().query.usersTable.findFirst({
     where: eq(usersTable[where], selection),
     with: {
       cart: {
-        columns: {
-          userId: false,
-        },
         with: {
           productsToCarts: {
             columns: {
@@ -109,6 +106,14 @@ export const getUserByEmail = async (
 
 export const getUserById = async (userId: string): Promise<User> => {
   const user = await getUser("userId", userId);
+  if (!user) {
+    throw errors.USER_NOT_FOUND();
+  }
+  return user;
+};
+
+export const getUserByCartId = async (cartId: string): Promise<User> => {
+  const user = await getUser("cartId", cartId);
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
