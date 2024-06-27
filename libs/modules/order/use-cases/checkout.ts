@@ -6,6 +6,7 @@ import { errors } from "@error-handling-utils";
 import { Product, LineItem, lineItemSchema } from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
 import { getUserByCartId } from "@user-db";
+import { getLogger } from "@logger-utils";
 
 export const checkout = async (
   cartId: string | null,
@@ -25,6 +26,7 @@ export const checkout = async (
   }
 
   const session = await createCheckoutSession(lineItems, userId);
+  getLogger().addData({ sessionDetails: session });
   return buildRedirectResponse(session.url);
 };
 
