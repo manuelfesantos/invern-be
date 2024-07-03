@@ -14,7 +14,9 @@ export const insertOrder = async (
     ...order,
     orderId: getRandomUUID(),
     createdAt: new Date().toISOString(),
+    userId: order.userId ? order.userId : null,
   };
+
   return db().insert(ordersTable).values(insertOrder).returning({
     orderId: ordersTable.orderId,
   });

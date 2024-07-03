@@ -44,6 +44,12 @@ export const createCheckoutSession = async (
     }),
     metadata: {
       userId,
+      products: JSON.stringify(
+        lineItems.map(({ productId, quantity }) => ({
+          productId,
+          quantity,
+        })),
+      ),
     },
   });
 };

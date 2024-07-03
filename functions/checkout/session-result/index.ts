@@ -7,7 +7,7 @@ import { getBodyFromRequest } from "@http-utils";
 import { getLogger } from "@logger-utils";
 import { sendEmail } from "@mail-utils";
 import { isStripeSessionCompletedEvent } from "@stripe-entity";
-import { getSessionResult } from "@order-module";
+import { getOrderFromSessionResult } from "@order-module";
 
 const NUMBER_2 = 2;
 export const onRequest: PagesFunction = async (context) => {
@@ -28,7 +28,7 @@ export const onRequest: PagesFunction = async (context) => {
     logger.addData({
       checkoutSessionResult: JSON.stringify(body, null, NUMBER_2),
     });
-    const order = await getSessionResult(sessionEvent);
+    const order = await getOrderFromSessionResult(sessionEvent);
     await sendEmail(
       sessionEvent.customer_details?.email || "",
       "Checkout",

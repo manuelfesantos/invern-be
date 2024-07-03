@@ -1,6 +1,6 @@
 import { InsertUser } from "@user-entity";
 import { getRandomUUID, hashPassword } from "@crypto-utils";
-import { db } from "../db-client";
+import { db } from "@db";
 import { usersTable } from "@schema";
 
 export const insertUser = async (

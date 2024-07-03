@@ -7,5 +7,4 @@ button.addEventListener("click", async () => {
     method: "GET",
     headers,
   });
-  console.log((await result.json()).data);
 });
