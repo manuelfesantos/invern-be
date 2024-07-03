@@ -1,4 +1,8 @@
-import { errorResponse, generateErrorResponse } from "@response-entity";
+import {
+  errorResponse,
+  generateErrorResponse,
+  prepareError,
+} from "@response-entity";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { updateCart } from "@cart-module";
 import { setGlobalTimer } from "@timer-utils";
@@ -19,7 +23,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
   const action = headers.get(HttpHeaderEnum.ACTION);
 
   if (!action) {
-    return errorResponse.BAD_REQUEST("action is required");
+    return errorResponse.BAD_REQUEST(prepareError("action is required"));
   }
 
   try {

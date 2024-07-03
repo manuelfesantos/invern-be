@@ -12,7 +12,7 @@ jest.mock("@logger-utils", () => ({
 }));
 
 jest.mock("@cart-db", () => ({
-  insertCart: jest.fn(),
+  insertCart: jest.fn(() => [{ cartId: "cartId" }]),
 }));
 
 jest.mock("@user-db", () => ({
@@ -30,6 +30,7 @@ const validSignupBody = {
   password: "example-password",
   firstName: "example",
   lastName: "example",
+  cartId: "cartId",
 };
 
 describe("signup", () => {

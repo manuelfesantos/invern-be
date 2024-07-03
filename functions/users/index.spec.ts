@@ -1,8 +1,18 @@
 import { onRequest } from "./index";
 import * as UserModule from "@user-module";
 import * as HttpUtils from "@http-utils";
-import { compareResponses, POSTEventMock, userMock } from "@mocks-utils";
-import { errorResponse, successResponse } from "@response-entity";
+import {
+  compareErrorResponses,
+  compareResponses,
+  POSTEventMock,
+  userMock,
+} from "@mocks-utils";
+import {
+  errorResponse,
+  simplifyError,
+  simplifyZodError,
+  successResponse,
+} from "@response-entity";
 import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
@@ -65,7 +75,7 @@ describe("onRequest", () => {
       };
       const response = await onRequest(event);
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       expect(userActionMapperSpy).not.toHaveBeenCalled();
       expect(getBodyFromRequestSpy).not.toHaveBeenCalled();
     },
@@ -102,10 +112,10 @@ describe("onRequest", () => {
       const response = await onRequest(event);
       const expectedResponse = errorResponse[expectedCode](
         error instanceof ZodError
-          ? error.issues.map((issue) => issue.message)
-          : error.message,
+          ? simplifyZodError(error)
+          : simplifyError(error),
       );
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       expect(userActionMapperSpy).toHaveBeenCalledWith(body, "login");
       expect(getBodyFromRequestSpy).toHaveBeenCalled();
     },

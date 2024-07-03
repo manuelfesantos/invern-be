@@ -1,6 +1,7 @@
 import {
   errorResponse,
   generateErrorResponse,
+  prepareError,
   successResponse,
 } from "@response-entity";
 import { getBodyFromRequest } from "@http-utils";
@@ -19,7 +20,9 @@ export const onRequest: PagesFunction = async (context) => {
     const body = await getBodyFromRequest(request);
 
     if (!isStripeSessionCompletedEvent(body)) {
-      return errorResponse.BAD_REQUEST();
+      return errorResponse.BAD_REQUEST(
+        prepareError("Invalid checkout session result"),
+      );
     }
 
     const { object: sessionEvent } = body.data;

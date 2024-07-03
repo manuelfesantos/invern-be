@@ -1,54 +1,102 @@
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { HttpResponseEnum } from "@http-entity";
 import { buildResponse } from "./response";
 import { AdapterError } from "@error-handling-utils";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown) =>
-    buildErrorResponse(error || "bad http", HttpResponseEnum.BAD_REQUEST),
+    buildErrorResponse(
+      error || simplifyError(new Error("bad http request")),
+      HttpResponseEnum.BAD_REQUEST,
+    ),
   UNAUTHORIZED: (error?: unknown) =>
-    buildErrorResponse(error || "unauthorized", HttpResponseEnum.UNAUTHORIZED),
+    buildErrorResponse(
+      error || simplifyError(new Error("unauthorized")),
+      HttpResponseEnum.UNAUTHORIZED,
+    ),
   FORBIDDEN: (error?: unknown) =>
-    buildErrorResponse(error || "forbidden", HttpResponseEnum.FORBIDDEN),
+    buildErrorResponse(
+      error || prepareError("forbidden"),
+      HttpResponseEnum.FORBIDDEN,
+    ),
   NOT_FOUND: (error?: unknown) =>
-    buildErrorResponse(error || "not found", HttpResponseEnum.NOT_FOUND),
+    buildErrorResponse(
+      error || prepareError("not found"),
+      HttpResponseEnum.NOT_FOUND,
+    ),
   METHOD_NOT_ALLOWED: (error?: unknown) =>
     buildErrorResponse(
-      error || "method not allowed",
+      error || prepareError("method not allowed"),
       HttpResponseEnum.METHOD_NOT_ALLOWED,
     ),
   CONFLICT: (error?: unknown) =>
-    buildErrorResponse(error || "conflict", HttpResponseEnum.CONFLICT),
+    buildErrorResponse(
+      error || prepareError("conflict"),
+      HttpResponseEnum.CONFLICT,
+    ),
   INTERNAL_SERVER_ERROR: (error?: unknown) =>
     buildErrorResponse(
-      error || "internal server error",
+      error || prepareError("internal server error"),
       HttpResponseEnum.INTERNAL_SERVER_ERROR,
     ),
 } as const;
 
+export const prepareError = (message: string): SimpleError => {
+  return simplifyError(new Error(message));
+};
+
+interface SimplifiedZodError {
+  issues: z.ZodIssue[];
+  name: string;
+  cause: unknown;
+  stack?: string;
+  message: string;
+}
+
+interface SimpleError {
+  name: string;
+  cause: unknown;
+  stack?: string;
+  message: string;
+}
+
 export const generateErrorResponse = (error: unknown): Response => {
-  if (error instanceof z.ZodError) {
-    return errorResponse.BAD_REQUEST(
-      error.issues.map((issue) => issue.message),
-    );
+  if (error instanceof ZodError) {
+    return errorResponse.BAD_REQUEST(simplifyZodError(error));
   }
 
   if (error instanceof AdapterError) {
-    return buildErrorResponse(error.message, Number(error.code));
+    return buildErrorResponse(simplifyError(error), Number(error.code));
   }
 
-  if (error instanceof Error) {
-    if (error.message.includes("JSON")) {
-      return errorResponse.BAD_REQUEST(error.message);
-    }
-    return errorResponse.INTERNAL_SERVER_ERROR(error.message);
+  if (error instanceof Error && error.message.includes("JSON")) {
+    return errorResponse.BAD_REQUEST(simplifyError(error));
   }
+  if (error instanceof Error) {
+    return errorResponse.INTERNAL_SERVER_ERROR(simplifyError(error));
+  }
+
   return errorResponse.INTERNAL_SERVER_ERROR(error);
 };
 
-export const buildErrorResponse = (
-  error: unknown,
-  status: number,
-): Response => {
-  return buildResponse({ error }, { status });
+export const buildErrorResponse = (error: unknown, status: number): Response =>
+  buildResponse({ error }, { status });
+
+export const simplifyZodError = (error: ZodError): SimplifiedZodError => {
+  return {
+    issues: error.issues,
+    name: error.name,
+    cause: error.cause,
+    stack: error.stack,
+    message: error.message,
+  };
+};
+
+export const simplifyError = (error: Error): SimpleError => {
+  return {
+    name: error.name,
+    cause: error.cause,
+    stack: error.stack,
+    message: error.message,
+  };
 };
