@@ -2,6 +2,7 @@ import { onRequest } from "./index";
 import * as UserModule from "@user-module";
 import * as HttpUtils from "@http-utils";
 import {
+  compareErrorResponses,
   compareResponses,
   DELETEEventMock,
   GETEventMock,
@@ -9,7 +10,12 @@ import {
   PUTEventMock,
   userMock,
 } from "@mocks-utils";
-import { errorResponse, successResponse } from "@response-entity";
+import {
+  errorResponse,
+  simplifyError,
+  simplifyZodError,
+  successResponse,
+} from "@response-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 import { HttpMethodEnum } from "@http-entity";
@@ -42,7 +48,7 @@ describe("onRequest", () => {
     };
     const response = await onRequest(event);
     const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
-    await compareResponses(response, expectedResponse);
+    await compareErrorResponses(response, expectedResponse);
     expect(getUserSpy).not.toHaveBeenCalled();
     expect(deleteUserSpy).not.toHaveBeenCalled();
     expect(updateUserSpy).not.toHaveBeenCalled();
@@ -214,10 +220,10 @@ describe("onRequest", () => {
       const response = await onRequest(event);
       const expectedResponse = errorResponse[code](
         error instanceof ZodError
-          ? error.issues.map((issue) => issue.message)
-          : error.message,
+          ? simplifyZodError(error)
+          : simplifyError(error),
       );
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       spy === updateUserSpy
         ? expect(spy).toHaveBeenCalledWith("userId", body, "update-password")
         : expect(spy).toHaveBeenCalledWith("userId");

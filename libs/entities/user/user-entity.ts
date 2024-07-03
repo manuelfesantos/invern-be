@@ -21,7 +21,6 @@ export const insertUserSchema = baseUserSchema.omit({
   userId: true,
   version: true,
   role: true,
-  cartId: true,
 });
 
 export const userSchema = baseUserSchema

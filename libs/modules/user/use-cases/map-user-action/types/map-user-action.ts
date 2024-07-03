@@ -12,4 +12,4 @@ export const loginBodySchema = z.object({
   password: requiredStringSchema("user password"),
 });
 
-export const signupBodySchema = insertUserSchema;
+export const signupBodySchema = insertUserSchema.omit({ cartId: true });

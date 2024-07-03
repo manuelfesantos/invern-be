@@ -1,6 +1,10 @@
 import { onRequest } from "./index";
 import { HttpMethodEnum } from "@http-entity";
-import { compareResponses, GETEventMock } from "@mocks-utils";
+import {
+  compareErrorResponses,
+  compareResponses,
+  GETEventMock,
+} from "@mocks-utils";
 import { errorResponse, successResponse } from "@response-entity";
 
 jest.mock("@logger-utils", () => ({
@@ -20,7 +24,7 @@ describe("onRequest", () => {
       };
       const response = await onRequest(event);
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
     },
   );
   it("should return a message when request method is GET", async () => {

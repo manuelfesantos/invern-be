@@ -9,12 +9,9 @@ export const signup = async (body: unknown): Promise<Response> => {
   const parsedBody = signupBodySchema.parse(body);
 
   await validateThatEmailIsUnique(parsedBody.email);
-
-  const [userId] = await insertUser(parsedBody);
-
-  await insertCart(userId);
-
-  const user = await getUserById(userId.userId);
+  const [{ cartId }] = await insertCart();
+  const [{ userId }] = await insertUser({ ...parsedBody, cartId });
+  const user = await getUserById(userId);
 
   if (!user) {
     throw errors.USER_NOT_FOUND();

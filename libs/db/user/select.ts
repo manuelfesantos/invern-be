@@ -35,7 +35,8 @@ export const getUser = async (
       },
       orders: {
         columns: {
-          userId: false,
+          orderId: true,
+          createdAt: true,
         },
         with: {
           productsToOrders: {
@@ -75,7 +76,7 @@ export const getUser = async (
     },
   });
   if (!userTemplate) return undefined;
-  return userSchema.parse({
+  const user = {
     ...userTemplate,
     cart: userTemplate?.cart
       ? {
@@ -89,13 +90,15 @@ export const getUser = async (
     orders: userTemplate?.orders
       ? userTemplate.orders.map((order) => ({
           ...order,
+          productsToOrders: undefined,
           products: order.productsToOrders.map((product) => ({
             ...product.product,
             quantity: product.quantity,
           })),
         }))
       : null,
-  });
+  };
+  return userSchema.parse(user);
 };
 
 export const getUserByEmail = async (

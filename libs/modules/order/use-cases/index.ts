@@ -1,2 +1,2 @@
 export * from "./checkout";
-export * from "./get-session-result";
+export * from "./get-order-from-session-result";

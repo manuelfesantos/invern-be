@@ -1,8 +1,18 @@
 import { onRequest } from "./index";
 import * as CartModule from "@cart-module";
 import * as HttpUtils from "@http-utils";
-import { errorResponse, successResponse } from "@response-entity";
-import { userMock, PUTEventMock, compareResponses } from "@mocks-utils";
+import {
+  errorResponse,
+  prepareError,
+  simplifyError,
+  successResponse,
+} from "@response-entity";
+import {
+  userMock,
+  PUTEventMock,
+  compareResponses,
+  compareErrorResponses,
+} from "@mocks-utils";
 import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 
@@ -64,15 +74,17 @@ describe("onRequest", () => {
       };
       const response = await onRequest(event);
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       expect(updateCartSpy).not.toHaveBeenCalled();
       expect(getBodyFromRequestSpy).not.toHaveBeenCalled();
     },
   );
   it("should return BAD_REQUEST if there is no action", async () => {
     const response = await onRequest(PUTEventMock);
-    const expectedResponse = errorResponse.BAD_REQUEST("action is required");
-    await compareResponses(response, expectedResponse);
+    const expectedResponse = errorResponse.BAD_REQUEST(
+      prepareError("action is required"),
+    );
+    await compareErrorResponses(response, expectedResponse);
     expect(updateCartSpy).not.toHaveBeenCalled();
     expect(getBodyFromRequestSpy).not.toHaveBeenCalled();
   });
@@ -80,8 +92,10 @@ describe("onRequest", () => {
     getBodyFromRequestSpy.mockRejectedValueOnce(new Error("JSON error"));
     PUTEventMock.request.headers.get.mockReturnValueOnce("update-cart");
     const response = await onRequest(PUTEventMock);
-    const expectedResponse = errorResponse.BAD_REQUEST("JSON error");
-    await compareResponses(response, expectedResponse);
+    const expectedResponse = errorResponse.BAD_REQUEST(
+      prepareError("JSON error"),
+    );
+    await compareErrorResponses(response, expectedResponse);
   });
   it.each([
     [errors.EMAIL_ALREADY_TAKEN(), "CONFLICT" as const],
@@ -93,8 +107,8 @@ describe("onRequest", () => {
       updateCartSpy.mockRejectedValueOnce(error);
       PUTEventMock.request.headers.get.mockReturnValueOnce("update-cart");
       const response = await onRequest(PUTEventMock);
-      const expectedResponse = errorResponse[code](error.message);
-      await compareResponses(response, expectedResponse);
+      const expectedResponse = errorResponse[code](simplifyError(error));
+      await compareErrorResponses(response, expectedResponse);
       expect(updateCartSpy).toHaveBeenCalled();
       expect(getBodyFromRequestSpy).toHaveBeenCalled();
     },
@@ -103,9 +117,10 @@ describe("onRequest", () => {
     PUTEventMock.request.headers.get.mockReturnValueOnce("update-cart");
     updateCartSpy.mockRejectedValueOnce(new Error("Unknown error"));
     const response = await onRequest(PUTEventMock);
-    const expectedResponse =
-      errorResponse.INTERNAL_SERVER_ERROR("Unknown error");
-    await compareResponses(response, expectedResponse);
+    const expectedResponse = errorResponse.INTERNAL_SERVER_ERROR(
+      prepareError("Unknown error"),
+    );
+    await compareErrorResponses(response, expectedResponse);
     expect(updateCartSpy).toHaveBeenCalled();
     expect(getBodyFromRequestSpy).toHaveBeenCalled();
   });

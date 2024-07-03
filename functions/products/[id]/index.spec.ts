@@ -1,11 +1,17 @@
 import { onRequest } from "./index";
 import * as ProductModule from "@product-module";
 import {
+  compareErrorResponses,
   compareResponses,
   GETEventMock,
   productDetailsMock,
 } from "@mocks-utils";
-import { errorResponse, successResponse } from "@response-entity";
+import {
+  errorResponse,
+  simplifyError,
+  simplifyZodError,
+  successResponse,
+} from "@response-entity";
 import { HttpMethodEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
@@ -57,7 +63,7 @@ describe("onRequest", () => {
       };
       const response = await onRequest(event);
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       expect(getProductDetailsSpy).not.toHaveBeenCalled();
     },
   );
@@ -82,10 +88,10 @@ describe("onRequest", () => {
       const response = await onRequest(event);
       const expectedResponse = errorResponse[code](
         error instanceof ZodError
-          ? error.issues.map((issue) => issue.message)
-          : error.message,
+          ? simplifyZodError(error)
+          : simplifyError(error),
       );
-      await compareResponses(response, expectedResponse);
+      await compareErrorResponses(response, expectedResponse);
       expect(getProductDetailsSpy).toHaveBeenCalled();
     },
   );
