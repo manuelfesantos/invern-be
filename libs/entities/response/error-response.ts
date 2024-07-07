@@ -61,7 +61,7 @@ interface SimpleError {
 }
 
 export const generateErrorResponse = (error: unknown): Response => {
-  if (error instanceof ZodError) {
+  if (error instanceof z.ZodError) {
     return errorResponse.BAD_REQUEST(simplifyZodError(error));
   }
 

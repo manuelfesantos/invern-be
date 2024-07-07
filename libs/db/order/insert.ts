@@ -1,7 +1,6 @@
 import { InsertOrder } from "@order-entity";
 import { db } from "@db";
 import { ordersTable } from "@schema";
-import { getRandomUUID } from "@crypto-utils";
 
 export const insertOrder = async (
   order: InsertOrder,
@@ -12,7 +11,6 @@ export const insertOrder = async (
 > => {
   const insertOrder = {
     ...order,
-    orderId: getRandomUUID(),
     createdAt: new Date().toISOString(),
     userId: order.userId ? order.userId : null,
   };

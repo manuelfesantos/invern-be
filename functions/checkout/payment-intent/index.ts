@@ -12,5 +12,5 @@ export const onRequest: PagesFunction = async (context) => {
   logger.addData({
     checkoutPaymentIntent: JSON.stringify(body, null, NUMBER_2),
   });
-  return successResponse.OK("success getting checkout-session");
+  return successResponse.OK("success getting payment-intent");
 };
