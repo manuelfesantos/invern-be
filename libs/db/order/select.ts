@@ -59,7 +59,18 @@ export const getOrderById = async (
       createdAt: true,
     },
     with: {
-      address: true,
+      address: {
+        columns: {
+          country: false,
+        },
+        with: {
+          country: {
+            with: {
+              taxes: true,
+            },
+          },
+        },
+      },
       payment: true,
       productsToOrders: {
         columns: {

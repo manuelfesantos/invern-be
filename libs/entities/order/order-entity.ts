@@ -8,7 +8,6 @@ import { paymentSchema } from "@payment-entity";
 const baseOrderSchema = createSelectSchema(ordersTable);
 
 export const insertOrderSchema = createSelectSchema(ordersTable).omit({
-  orderId: true,
   createdAt: true,
 });
 

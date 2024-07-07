@@ -25,7 +25,7 @@ export const checkout = async (
     lineItems = await getLineItems(products);
   }
 
-  const session = await createCheckoutSession(lineItems, userId);
+  const session = await createCheckoutSession(lineItems, userId, cartId);
   getLogger().addData({ sessionDetails: session });
   return buildRedirectResponse(session.url);
 };

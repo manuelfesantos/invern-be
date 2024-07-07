@@ -58,4 +58,6 @@ export const errors = {
       "Unable to create order",
       HttpResponseEnum.INTERNAL_SERVER_ERROR,
     ),
+  ORDER_ALREADY_EXISTS: (): AdapterError =>
+    new AdapterError("Order already exists", HttpResponseEnum.CONFLICT),
 };
