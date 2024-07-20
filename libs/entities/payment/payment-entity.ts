@@ -10,5 +10,12 @@ export const insertPaymentSchema = createInsertSchema(paymentsTable).omit({
 
 export const paymentSchema = basePaymentSchema;
 
+export const paymentMethodTypeSchema = z.enum(paymentsTable.type.enumValues);
+export const PaymentMethodType = paymentMethodTypeSchema.Enum;
+
+export const paymentIntentStateSchema = z.enum(paymentsTable.state.enumValues);
+export const PaymentIntentState = paymentIntentStateSchema.Enum;
+export type PaymentIntentStateType = z.infer<typeof paymentIntentStateSchema>;
+
 export type Payment = z.infer<typeof paymentSchema>;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;

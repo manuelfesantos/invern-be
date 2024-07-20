@@ -7,7 +7,7 @@ import {
   getOrderById,
   insertOrder,
 } from "@order-db";
-import { insertPayment } from "@payment-db";
+import { getPaymentById, insertPaymentReturningId } from "@payment-db";
 import { getPaymentFromSessionResult } from "@payment-entity";
 import { Order } from "@order-entity";
 import { errors } from "@error-handling-utils";
@@ -26,9 +26,14 @@ export const getOrderFromSessionResult = async (
   const [{ addressId }] = await insertAddress({
     ...validateStripeAddress(sessionResult.customer_details?.address),
   });
-  const [{ paymentId }] = await insertPayment({
-    ...getPaymentFromSessionResult(sessionResult),
-  });
+
+  const payment = getPaymentFromSessionResult(sessionResult);
+
+  const paymentExists = Boolean(await getPaymentById(payment.paymentId));
+
+  if (!paymentExists) {
+    await insertPaymentReturningId(payment);
+  }
 
   const {
     userId,
@@ -38,7 +43,7 @@ export const getOrderFromSessionResult = async (
 
   const [{ orderId }] = await insertOrder({
     addressId,
-    paymentId,
+    paymentId: payment.paymentId,
     userId,
     orderId: sessionResult.id,
   });

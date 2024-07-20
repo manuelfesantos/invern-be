@@ -60,4 +60,13 @@ export const errors = {
     ),
   ORDER_ALREADY_EXISTS: (): AdapterError =>
     new AdapterError("Order already exists", HttpResponseEnum.CONFLICT),
+  PAYMENT_ALREADY_EXISTS: (): AdapterError =>
+    new AdapterError("Payment already exists", HttpResponseEnum.CONFLICT),
+  INVALID_EVENT_TYPE: (type: string): AdapterError =>
+    new AdapterError(
+      `Invalid event type: ${type}`,
+      HttpResponseEnum.BAD_REQUEST,
+    ),
+  INVALID_PAYLOAD: (issue: string): AdapterError =>
+    new AdapterError(`Invalid payload: ${issue}`, HttpResponseEnum.BAD_REQUEST),
 };
