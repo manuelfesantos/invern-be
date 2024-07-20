@@ -1,5 +1,11 @@
-import { StripeSessionResult } from "@stripe-entity";
-import { InsertPayment } from "@payment-entity";
+import { PaymentIntent, StripeSessionResult } from "@stripe-entity";
+import {
+  InsertPayment,
+  PaymentIntentState,
+  PaymentIntentStateType,
+  PaymentMethodType,
+  paymentMethodTypeSchema,
+} from "@payment-entity";
 import { errors } from "@error-handling-utils";
 import Stripe from "stripe";
 
@@ -8,9 +14,22 @@ export const getPaymentFromSessionResult = (
 ): InsertPayment => {
   return {
     paymentId: validatePaymentIntent(sessionResult.payment_intent),
-    type: "card",
+    type: PaymentMethodType.draft,
     amount: validateAmount(sessionResult.amount_total),
-    state: "pending",
+    state: PaymentIntentState.draft,
+  };
+};
+
+export const getPaymentFromPaymentIntent = (
+  paymentIntent: PaymentIntent,
+  type: PaymentIntentStateType,
+): InsertPayment => {
+  const [paymentMethodType] = paymentIntent.payment_method_types;
+  return {
+    paymentId: validatePaymentIntent(paymentIntent),
+    type: paymentMethodTypeSchema.parse(paymentMethodType),
+    amount: validateAmount(paymentIntent.amount),
+    state: type,
   };
 };
 

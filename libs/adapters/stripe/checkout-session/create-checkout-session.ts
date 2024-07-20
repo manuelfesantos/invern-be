@@ -9,6 +9,7 @@ export const createCheckoutSession = async (
   cartId: string | null,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   return await stripe().checkout.sessions.create({
+    customer_creation: "always",
     shipping_address_collection: {
       allowed_countries: [
         "PT",

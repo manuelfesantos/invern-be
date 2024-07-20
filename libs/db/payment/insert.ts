@@ -1,8 +1,8 @@
-import { InsertPayment } from "@payment-entity";
+import { InsertPayment, Payment } from "@payment-entity";
 import { db } from "@db";
 import { paymentsTable } from "@schema";
 
-export const insertPayment = async (
+export const insertPaymentReturningId = async (
   payment: InsertPayment,
 ): Promise<
   {
@@ -16,4 +16,14 @@ export const insertPayment = async (
   return db().insert(paymentsTable).values(insertPayment).returning({
     paymentId: paymentsTable.paymentId,
   });
+};
+
+export const insertPaymentReturningAll = async (
+  payment: InsertPayment,
+): Promise<Payment[]> => {
+  const insertPayment = {
+    ...payment,
+    createdAt: new Date().toISOString(),
+  };
+  return db().insert(paymentsTable).values(insertPayment).returning();
 };

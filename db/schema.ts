@@ -165,9 +165,9 @@ export const addressesTable = sqliteTable("addresses", {
 export const paymentsTable = sqliteTable("payments", {
   paymentId: text("paymentId").primaryKey(),
   createdAt: text("createdAt").notNull(),
-  type: text("type", { enum: ["card", "paypal"] }).notNull(),
+  type: text("type", { enum: ["draft", "card", "paypal"] }).notNull(),
   state: text("state", {
-    enum: ["successful", "unsuccessful", "pending"],
+    enum: ["draft", "succeeded", "canceled", "created", "processing", "failed"],
   }).notNull(),
   amount: int("amount").notNull(),
 });
