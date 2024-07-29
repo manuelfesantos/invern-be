@@ -1,7 +1,7 @@
 import { usersTable } from "@schema";
 import { db } from "../db-client";
 import { eq } from "drizzle-orm";
-import { User, userSchema } from "@user-entity";
+import { DEFAULT_USER_VERSION, User, userSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
 
 export const getUser = async (
@@ -121,4 +121,14 @@ export const getUserByCartId = async (cartId: string): Promise<User> => {
     throw errors.USER_NOT_FOUND();
   }
   return user;
+};
+
+export const getUserVersionById = async (userId: string): Promise<number> => {
+  const user = await db().query.usersTable.findFirst({
+    where: eq(usersTable.userId, userId),
+    columns: {
+      version: true,
+    },
+  });
+  return user?.version || DEFAULT_USER_VERSION;
 };
