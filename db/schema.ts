@@ -78,6 +78,7 @@ export const productsToCartsTable = sqliteTable(
 
 export const ordersTable = sqliteTable("orders", {
   orderId: text("orderId").primaryKey(),
+  clientOrderId: text("clientOrderId").unique().notNull(),
   createdAt: text("createdAt").notNull(),
   userId: text("cartId").references(() => usersTable.userId, {
     onDelete: "cascade",

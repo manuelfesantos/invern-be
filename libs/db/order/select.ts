@@ -106,3 +106,61 @@ export const getOrderById = async (
       })
     : undefined;
 };
+
+export const getOrderByClientId = async (
+  clientId: string,
+): Promise<Order | undefined> => {
+  const orderTemplate = await db().query.ordersTable.findFirst({
+    where: eq(ordersTable.clientOrderId, clientId),
+    columns: {
+      orderId: true,
+      createdAt: true,
+    },
+    with: {
+      address: {
+        columns: {
+          country: false,
+        },
+        with: {
+          country: {
+            with: {
+              taxes: true,
+            },
+          },
+        },
+      },
+      payment: true,
+      productsToOrders: {
+        columns: {
+          quantity: true,
+        },
+        with: {
+          product: {
+            columns: {
+              collectionId: false,
+            },
+            with: {
+              images: {
+                columns: {
+                  productId: false,
+                  collectionId: false,
+                },
+                limit: 1,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return orderTemplate
+    ? orderSchema.parse({
+        ...orderTemplate,
+        products: orderTemplate.productsToOrders.map((product) => ({
+          ...product.product,
+          quantity: product.quantity,
+        })),
+      })
+    : undefined;
+};

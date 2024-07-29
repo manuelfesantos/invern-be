@@ -42,6 +42,7 @@ export const getOrderFromSessionResult = async (
     userId,
     products: productsString,
     cartId,
+    clientOrderId,
   } = sessionResult.metadata ?? {};
 
   const [{ orderId }] = await insertOrder({
@@ -49,6 +50,7 @@ export const getOrderFromSessionResult = async (
     paymentId: payment.paymentId,
     userId,
     orderId: sessionResult.id,
+    clientOrderId,
   });
 
   await insertProductsToOrder(productsString, orderId);
