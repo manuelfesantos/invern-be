@@ -26,7 +26,7 @@ describe("updateEmail", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const email = "newEmail@example.com";
-    const response = await updateEmail(id, { email });
+    const { response } = await updateEmail(id, { email });
     const expectedResponse = successResponse.OK("user email updated", {
       ...userMock,
       email,

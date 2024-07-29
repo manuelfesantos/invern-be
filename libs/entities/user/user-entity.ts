@@ -5,12 +5,12 @@ import { cartSchema } from "@cart-entity";
 import { orderSchema } from "@order-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
-const DEFAULT_VERSION_VALUE = 1;
+export const DEFAULT_USER_VERSION = 1;
 
 export const baseUserSchema = createInsertSchema(usersTable, {
   userId: uuidSchema("user id"),
   password: requiredStringSchema("user password"),
-  version: z.number().default(DEFAULT_VERSION_VALUE),
+  version: z.number().default(DEFAULT_USER_VERSION),
   role: z.enum(["ADMIN", "USER"]).default("USER"),
   email: emailSchema("user mail"),
   firstName: requiredStringSchema("user first name"),
