@@ -2,13 +2,14 @@ import { stripe } from "../stripe-client";
 import { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
 import Response = Stripe.Response;
+import { getRandomUUID } from "@crypto-utils";
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
   userId: string | null,
   cartId: string | null,
-): Promise<Response<Stripe.Checkout.Session>> => {
-  return await stripe().checkout.sessions.create({
+): Promise<Response<Stripe.Checkout.Session>> =>
+  await stripe().checkout.sessions.create({
     customer_creation: "always",
     shipping_address_collection: {
       allowed_countries: [
@@ -53,6 +54,6 @@ export const createCheckoutSession = async (
           quantity,
         })),
       ),
+      clientOrderId: getRandomUUID(),
     },
   });
-};
