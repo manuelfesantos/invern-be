@@ -1,5 +1,5 @@
 import { updateCart } from "@cart-module";
-import { compareResponses } from "@mocks-utils";
+import { compareResponses, userMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 import * as AddProduct from "./add-product-to-cart";
 import * as RemoveProduct from "./remove-product-from-cart";
@@ -26,6 +26,11 @@ jest.mock("./remove-product-from-cart", () => ({
 
 jest.mock("./merge-cart-items", () => ({
   mergeCartItems: jest.fn(),
+}));
+
+jest.mock("@user-db", () => ({
+  getUserByCartId: jest.fn(() => userMock),
+  incrementUserVersion: jest.fn(),
 }));
 
 describe("updateCart", () => {

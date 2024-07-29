@@ -24,7 +24,7 @@ describe("updateName", () => {
     const id = "userId";
     const firstName = "newFirstName";
     const lastName = "newLastName";
-    const response = await updateName(id, { firstName, lastName });
+    const { response } = await updateName(id, { firstName, lastName });
     const expectedResponse = successResponse.OK("user name updated", {
       ...userMock,
       firstName,
@@ -38,7 +38,7 @@ describe("updateName", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const firstName = "newFirstName";
-    const response = await updateName(id, { firstName });
+    const { response } = await updateName(id, { firstName });
     const expectedResponse = successResponse.OK("user name updated", {
       ...userMock,
       firstName,
@@ -51,7 +51,7 @@ describe("updateName", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const lastName = "newLastName";
-    const response = await updateName(id, { lastName });
+    const { response } = await updateName(id, { lastName });
     const expectedResponse = successResponse.OK("user name updated", {
       ...userMock,
       lastName,

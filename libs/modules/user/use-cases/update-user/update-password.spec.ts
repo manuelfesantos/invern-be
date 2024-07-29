@@ -27,7 +27,7 @@ describe("updatePassword", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const password = "newPassword";
-    const response = await updatePassword(id, { password });
+    const { response } = await updatePassword(id, { password });
     const expectedResponse = successResponse.OK("user password updated", {
       ...userMock,
       password: undefined,

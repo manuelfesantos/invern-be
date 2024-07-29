@@ -13,6 +13,9 @@ import { Order } from "@order-entity";
 import { errors } from "@error-handling-utils";
 import { productIdAndQuantitySchema } from "@product-entity";
 import { emptyCart } from "@cart-db";
+import { getUserById, incrementUserVersion } from "@user-db";
+
+const DEFAULT_USER_VERSION = 1;
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -58,6 +61,11 @@ export const getOrderFromSessionResult = async (
 
   if (cartId) {
     await emptyCart(cartId);
+  }
+
+  if (userId) {
+    const { version } = await getUserById(userId);
+    await incrementUserVersion(userId, version || DEFAULT_USER_VERSION);
   }
 
   return order;

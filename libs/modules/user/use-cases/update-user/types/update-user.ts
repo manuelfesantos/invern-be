@@ -28,3 +28,8 @@ export const updateNameBodySchema = z
     ({ firstName, lastName }) => Boolean(firstName) || Boolean(lastName),
     { message: "At least one field is required" },
   );
+
+export type ResponseWithVersion = {
+  response: Response;
+  version: number;
+};
