@@ -37,6 +37,7 @@ export const getUser = async (
         columns: {
           orderId: true,
           createdAt: true,
+          clientOrderId: true,
         },
         with: {
           productsToOrders: {
