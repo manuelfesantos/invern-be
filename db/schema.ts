@@ -80,7 +80,7 @@ export const ordersTable = sqliteTable("orders", {
   orderId: text("orderId").primaryKey(),
   clientOrderId: text("clientOrderId").unique().notNull(),
   createdAt: text("createdAt").notNull(),
-  userId: text("cartId").references(() => usersTable.userId, {
+  userId: text("userId").references(() => usersTable.userId, {
     onDelete: "cascade",
   }),
   addressId: text("addressId").references(() => addressesTable.addressId, {

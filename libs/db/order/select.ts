@@ -55,8 +55,9 @@ export const getOrderById = async (
   const orderTemplate = await db().query.ordersTable.findFirst({
     where: eq(ordersTable.orderId, orderId),
     columns: {
-      orderId: true,
-      createdAt: true,
+      userId: false,
+      addressId: false,
+      paymentId: false,
     },
     with: {
       address: {
@@ -113,8 +114,9 @@ export const getOrderByClientId = async (
   const orderTemplate = await db().query.ordersTable.findFirst({
     where: eq(ordersTable.clientOrderId, clientId),
     columns: {
-      orderId: true,
-      createdAt: true,
+      userId: false,
+      addressId: false,
+      paymentId: false,
     },
     with: {
       address: {

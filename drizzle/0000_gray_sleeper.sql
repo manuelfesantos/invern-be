@@ -58,10 +58,11 @@ DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
 	`orderId` text PRIMARY KEY NOT NULL,
 	`createdAt` text NOT NULL,
-	`cartId` text,
+	`userId` text,
 	`addressId` text,
 	`paymentId` text,
-	FOREIGN KEY (`cartId`) REFERENCES `users`(`userId`) ON UPDATE no action ON DELETE cascade,
+	`clientOrderId` text NOT NULL,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`userId`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`addressId`) REFERENCES `addresses`(`addressId`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`paymentId`) REFERENCES `payments`(`paymentId`) ON UPDATE no action ON DELETE cascade
 );
