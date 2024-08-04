@@ -8,6 +8,7 @@ export const userDtoMock: UserDTO = {
   cart: {
     cartId: "591fd975-606e-4d51-b42a-51a2f0d052a5",
     products: [],
+    version: 1,
   },
   orders: [],
 };
@@ -18,6 +19,7 @@ export const userMock: User = {
   role: RolesEnum.USER,
   cart: {
     cartId: "591fd975-606e-4d51-b42a-51a2f0d052a5",
+    version: 1,
     products: [],
   },
   email: "example@example.com",

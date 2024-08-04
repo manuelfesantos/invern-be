@@ -7,12 +7,13 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
-const DEFAULT_USER_VERSION = 1;
+const DEFAULT_VERSION = 1;
 
 //-----------------------------------SCHEMA-----------------------------------//
 
 export const cartsTable = sqliteTable("carts", {
   cartId: text("cartId").primaryKey(),
+  version: int("version").notNull().default(DEFAULT_VERSION),
 });
 
 export const usersTable = sqliteTable("users", {
@@ -21,7 +22,7 @@ export const usersTable = sqliteTable("users", {
   firstName: text("firstName").notNull(),
   lastName: text("lastName").notNull(),
   password: text("password").notNull(),
-  version: int("version").notNull().default(DEFAULT_USER_VERSION),
+  version: int("version").notNull().default(DEFAULT_VERSION),
   role: text("role", { enum: ["ADMIN", "USER"] })
     .notNull()
     .default("USER"),
@@ -87,6 +88,9 @@ export const ordersTable = sqliteTable("orders", {
     onDelete: "cascade",
   }),
   paymentId: text("paymentId").references(() => paymentsTable.paymentId, {
+    onDelete: "cascade",
+  }),
+  countryCode: text("countryId").references(() => countriesTable.code, {
     onDelete: "cascade",
   }),
 });
