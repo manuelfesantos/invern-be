@@ -21,6 +21,7 @@ jest.mock("@product-db", () => ({
 const emptyCartMock: Cart = {
   cartId: "cartId",
   products: [],
+  version: 1,
 };
 
 const fullCartMock: Cart = {
@@ -39,6 +40,7 @@ const fullCartMock: Cart = {
       priceInCents: 100,
     },
   ],
+  version: 1,
 };
 
 const validBody = {
