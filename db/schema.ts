@@ -90,9 +90,6 @@ export const ordersTable = sqliteTable("orders", {
   paymentId: text("paymentId").references(() => paymentsTable.paymentId, {
     onDelete: "cascade",
   }),
-  countryCode: text("countryId").references(() => countriesTable.code, {
-    onDelete: "cascade",
-  }),
 });
 
 export const productsToOrdersTable = sqliteTable(
