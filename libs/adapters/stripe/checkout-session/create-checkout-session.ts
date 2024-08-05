@@ -31,7 +31,7 @@ export const createCheckoutSession = async (
     billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
-    success_url: `https://www.invernspirit.com/order/${clientOrderId}`,
+    success_url: `https://www.invernspirit.com/order?id=${clientOrderId}`,
     cancel_url: "https://www.invernspirit.com/cart",
     line_items: lineItems.map((product) => {
       return {
