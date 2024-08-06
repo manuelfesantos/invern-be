@@ -12,10 +12,19 @@ export const getCountryByCode = async (
       countriesToCurrencies: {
         columns: {},
         with: {
-          currency: true,
+          currency: {
+            columns: {
+              rateToEuro: false,
+            },
+          },
         },
       },
-      taxes: true,
+      taxes: {
+        columns: {
+          countryCode: false,
+          taxId: false,
+        },
+      },
     },
   });
 
