@@ -12,7 +12,36 @@ export const getOrdersByUserId = async (userId: string): Promise<Order[]> => {
     },
     where: eq(ordersTable.userId, userId),
     with: {
-      address: true,
+      address: {
+        columns: {
+          country: false,
+        },
+        with: {
+          country: {
+            with: {
+              taxes: {
+                columns: {
+                  countryCode: false,
+                  taxId: false,
+                },
+              },
+              countriesToCurrencies: {
+                columns: {
+                  countryCode: false,
+                  currencyCode: false,
+                },
+                with: {
+                  currency: {
+                    columns: {
+                      rateToEuro: false,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       payment: true,
       productsToOrders: {
         columns: {
@@ -45,6 +74,22 @@ export const getOrdersByUserId = async (userId: string): Promise<Order[]> => {
         ...product.product,
         quantity: product.quantity,
       })),
+      address: order.address
+        ? {
+            ...order.address,
+            country: order.address.country
+              ? {
+                  ...order.address.country,
+                  taxes: order.address.country.taxes
+                    ? order.address.country.taxes
+                    : [],
+                  currencies: order.address.country.countriesToCurrencies?.map(
+                    (c) => c.currency,
+                  ),
+                }
+              : undefined,
+          }
+        : undefined,
     }),
   );
 };
@@ -67,7 +112,25 @@ export const getOrderById = async (
         with: {
           country: {
             with: {
-              taxes: true,
+              taxes: {
+                columns: {
+                  countryCode: false,
+                  taxId: false,
+                },
+              },
+              countriesToCurrencies: {
+                columns: {
+                  countryCode: false,
+                  currencyCode: false,
+                },
+                with: {
+                  currency: {
+                    columns: {
+                      rateToEuro: false,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -104,6 +167,23 @@ export const getOrderById = async (
           ...product.product,
           quantity: product.quantity,
         })),
+        address: orderTemplate.address
+          ? {
+              ...orderTemplate.address,
+              country: orderTemplate.address.country
+                ? {
+                    ...orderTemplate.address.country,
+                    taxes: orderTemplate.address.country.taxes
+                      ? orderTemplate.address.country.taxes
+                      : [],
+                    currencies:
+                      orderTemplate.address.country.countriesToCurrencies?.map(
+                        (c) => c.currency,
+                      ),
+                  }
+                : undefined,
+            }
+          : undefined,
       })
     : undefined;
 };
@@ -126,7 +206,25 @@ export const getOrderByClientId = async (
         with: {
           country: {
             with: {
-              taxes: true,
+              taxes: {
+                columns: {
+                  countryCode: false,
+                  taxId: false,
+                },
+              },
+              countriesToCurrencies: {
+                columns: {
+                  countryCode: false,
+                  currencyCode: false,
+                },
+                with: {
+                  currency: {
+                    columns: {
+                      rateToEuro: false,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -163,6 +261,23 @@ export const getOrderByClientId = async (
           ...product.product,
           quantity: product.quantity,
         })),
+        address: orderTemplate.address
+          ? {
+              ...orderTemplate.address,
+              country: orderTemplate.address.country
+                ? {
+                    ...orderTemplate.address.country,
+                    taxes: orderTemplate.address.country.taxes
+                      ? orderTemplate.address.country.taxes
+                      : [],
+                    currencies:
+                      orderTemplate.address.country.countriesToCurrencies?.map(
+                        (c) => c.currency,
+                      ),
+                  }
+                : undefined,
+            }
+          : undefined,
       })
     : undefined;
 };

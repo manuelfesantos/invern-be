@@ -28,10 +28,15 @@ export const getCountryByCode = async (
     },
   });
 
+  if (!countryTemplate) {
+    return;
+  }
+
   return countrySchema.parse({
     ...countryTemplate,
-    currencies: countryTemplate?.countriesToCurrencies
+    currencies: countryTemplate.countriesToCurrencies
       .map((c) => c.currency)
       .filter((c) => c),
+    taxes: countryTemplate.taxes || [],
   });
 };
