@@ -9,6 +9,9 @@ export const insertTaxSchema = createInsertSchema(taxesTable).omit({
 
 export const taxSchema = baseTaxSchema.omit({ countryCode: true });
 
+export const clientTaxSchema = taxSchema.omit({
+  taxId: true,
+});
 export type Tax = z.infer<typeof taxSchema>;
 
 export type InsertTax = z.infer<typeof insertTaxSchema>;

@@ -1,5 +1,5 @@
 import { usersTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { DEFAULT_USER_VERSION, User, userSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
@@ -56,14 +56,29 @@ export const getUser = async (
               },
             },
           },
-          payment: true,
+          payment: {
+            columns: {
+              paymentId: false,
+            },
+          },
           address: {
+            columns: {
+              country: false,
+            },
             with: {
               country: {
                 with: {
-                  taxes: true,
+                  taxes: {
+                    columns: {
+                      countryCode: false,
+                      taxId: false,
+                    },
+                  },
                   countriesToCurrencies: {
-                    columns: {},
+                    columns: {
+                      currencyCode: false,
+                      countryCode: false,
+                    },
                     with: {
                       currency: true,
                     },
@@ -96,6 +111,23 @@ export const getUser = async (
             ...product.product,
             quantity: product.quantity,
           })),
+          address: order.address
+            ? {
+                ...order.address,
+                country: order.address.country
+                  ? {
+                      ...order.address.country,
+                      taxes: order.address.country.taxes
+                        ? order.address.country.taxes
+                        : [],
+                      currencies:
+                        order.address.country.countriesToCurrencies?.map(
+                          (c) => c.currency,
+                        ),
+                    }
+                  : undefined,
+              }
+            : undefined,
         }))
       : null,
   };

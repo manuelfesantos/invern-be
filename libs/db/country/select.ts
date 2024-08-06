@@ -12,17 +12,31 @@ export const getCountryByCode = async (
       countriesToCurrencies: {
         columns: {},
         with: {
-          currency: true,
+          currency: {
+            columns: {
+              rateToEuro: false,
+            },
+          },
         },
       },
-      taxes: true,
+      taxes: {
+        columns: {
+          countryCode: false,
+          taxId: false,
+        },
+      },
     },
   });
 
+  if (!countryTemplate) {
+    return;
+  }
+
   return countrySchema.parse({
     ...countryTemplate,
-    currencies: countryTemplate?.countriesToCurrencies
+    currencies: countryTemplate.countriesToCurrencies
       .map((c) => c.currency)
       .filter((c) => c),
+    taxes: countryTemplate.taxes || [],
   });
 };

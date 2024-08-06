@@ -1,8 +1,8 @@
 import { createSelectSchema } from "drizzle-zod";
 import { countriesTable } from "@schema";
 import { z } from "zod";
-import { currencySchema } from "@currency-entity";
-import { taxSchema } from "@tax-entity";
+import { clientCurrencySchema } from "@currency-entity";
+import { clientTaxSchema } from "@tax-entity";
 
 const baseCountrySchema = createSelectSchema(countriesTable);
 
@@ -10,8 +10,8 @@ export const insertCountrySchema = createSelectSchema(countriesTable);
 
 export const countrySchema = baseCountrySchema.merge(
   z.object({
-    currencies: z.array(currencySchema).optional(),
-    taxes: z.array(taxSchema),
+    currencies: z.array(clientCurrencySchema).optional(),
+    taxes: z.array(clientTaxSchema),
   }),
 );
 

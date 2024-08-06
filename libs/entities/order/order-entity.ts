@@ -3,7 +3,7 @@ import { ordersTable } from "@schema";
 import { z } from "zod";
 import { lineItemSchema } from "@product-entity";
 import { addressSchema } from "@address-entity";
-import { paymentSchema } from "@payment-entity";
+import { clientPaymentSchema } from "@payment-entity";
 
 const baseOrderSchema = createSelectSchema(ordersTable);
 
@@ -17,7 +17,7 @@ export const orderSchema = baseOrderSchema
     z.object({
       products: z.array(lineItemSchema),
       address: addressSchema.nullable(),
-      payment: paymentSchema.nullable(),
+      payment: clientPaymentSchema.nullable(),
     }),
   );
 
