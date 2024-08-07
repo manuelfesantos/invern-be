@@ -38,6 +38,7 @@ export const getUser = async (
           userId: false,
           addressId: false,
           paymentId: false,
+          orderId: false,
         },
         with: {
           productsToOrders: {

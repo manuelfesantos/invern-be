@@ -2,7 +2,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
 import { z } from "zod";
 import { cartSchema } from "@cart-entity";
-import { orderSchema } from "@order-entity";
+import { clientOrderSchema } from "@order-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
 export const DEFAULT_USER_VERSION = 1;
@@ -30,7 +30,7 @@ export const userSchema = baseUserSchema
   .merge(
     z.object({
       cart: cartSchema.nullable(),
-      orders: z.array(orderSchema).nullable(),
+      orders: z.array(clientOrderSchema).nullable(),
     }),
   );
 

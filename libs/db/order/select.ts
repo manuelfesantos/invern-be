@@ -1,14 +1,22 @@
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { ordersTable } from "@schema";
-import { Order, orderSchema } from "@order-entity";
+import {
+  ClientOrder,
+  clientOrderSchema,
+  Order,
+  orderSchema,
+} from "@order-entity";
 
-export const getOrdersByUserId = async (userId: string): Promise<Order[]> => {
+export const getOrdersByUserId = async (
+  userId: string,
+): Promise<ClientOrder[]> => {
   const ordersTemplate = await db().query.ordersTable.findMany({
     columns: {
       userId: false,
       addressId: false,
       paymentId: false,
+      orderId: false,
     },
     where: eq(ordersTable.userId, userId),
     with: {
@@ -68,7 +76,7 @@ export const getOrdersByUserId = async (userId: string): Promise<Order[]> => {
   });
 
   return ordersTemplate.map((order) =>
-    orderSchema.parse({
+    clientOrderSchema.parse({
       ...order,
       products: order.productsToOrders.map((product) => ({
         ...product.product,
@@ -190,13 +198,14 @@ export const getOrderById = async (
 
 export const getOrderByClientId = async (
   clientId: string,
-): Promise<Order | undefined> => {
+): Promise<ClientOrder | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
     where: eq(ordersTable.clientOrderId, clientId),
     columns: {
       userId: false,
       addressId: false,
       paymentId: false,
+      orderId: false,
     },
     with: {
       address: {
@@ -255,7 +264,7 @@ export const getOrderByClientId = async (
   });
 
   return orderTemplate
-    ? orderSchema.parse({
+    ? clientOrderSchema.parse({
         ...orderTemplate,
         products: orderTemplate.productsToOrders.map((product) => ({
           ...product.product,
