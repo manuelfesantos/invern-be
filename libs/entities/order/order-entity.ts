@@ -21,5 +21,10 @@ export const orderSchema = baseOrderSchema
     }),
   );
 
+export const clientOrderSchema = orderSchema.omit({
+  orderId: true,
+});
+
+export type ClientOrder = z.infer<typeof clientOrderSchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
