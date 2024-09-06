@@ -19,11 +19,14 @@ export const validateProductId = async (productId: string): Promise<void> => {
 export const validateProductIds = async (
   productIds: string[],
 ): Promise<void> => {
+  const ids = productIds.map((productId) =>
+    uuidSchema("product id").parse(productId),
+  );
   const products = await db().query.productsTable.findMany({
-    where: inArray(productsTable.productId, productIds),
+    where: inArray(productsTable.productId, ids),
   });
-  if (products.length !== productIds.length) {
-    const invalidIds = productIds.filter(
+  if (products.length !== ids.length) {
+    const invalidIds = ids.filter(
       (id) => !products.some((product) => product.productId === id),
     );
     throw errors.INVALID_PRODUCT_IDS(invalidIds);

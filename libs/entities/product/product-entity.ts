@@ -23,15 +23,11 @@ export const productSchema = baseProductSchema
     }),
   );
 
-export const lineItemSchema = productSchema
-  .merge(
-    z.object({
-      quantity: positiveIntegerSchema("line item quantity"),
-    }),
-  )
-  .omit({
-    stock: true,
-  });
+export const lineItemSchema = productSchema.merge(
+  z.object({
+    quantity: positiveIntegerSchema("line item quantity"),
+  }),
+);
 
 export const productIdAndQuantitySchema = z.object({
   productId: uuidSchema("product id"),

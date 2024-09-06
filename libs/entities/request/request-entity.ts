@@ -4,4 +4,7 @@ export interface Env {
   HONEYCOMB_DATASET: string;
   STRIPE_API_KEY: string;
   SENDGRID_API_KEY: string;
+  AUTH_KV: KVNamespace;
+  TOKEN_SECRET: string;
+  REFRESH_TOKEN_SECRET: string;
 }

@@ -1,6 +1,6 @@
 import { InsertAddress } from "@address-entity";
 import { addressesTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 import { getRandomUUID } from "@crypto-utils";
 
 export const insertAddress = async (

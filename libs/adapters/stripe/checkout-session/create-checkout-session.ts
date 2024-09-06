@@ -1,13 +1,15 @@
 import { stripe } from "../stripe-client";
 import { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
-import Response = Stripe.Response;
 import { getRandomUUID } from "@crypto-utils";
+import Response = Stripe.Response;
+
+const LAST_DIGIT = -1;
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
-  userId: string | null,
-  cartId: string | null,
+  userId?: string,
+  cartId?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   const clientOrderId = getRandomUUID();
   return await stripe().checkout.sessions.create({
@@ -47,15 +49,18 @@ export const createCheckoutSession = async (
       };
     }),
     metadata: {
-      userId,
-      cartId,
+      ...(userId && { userId }),
+      ...(cartId && { cartId }),
       clientOrderId,
-      products: JSON.stringify(
-        lineItems.map(({ productId, quantity }) => ({
-          productId,
-          quantity,
-        })),
-      ),
+      products: buildLineItemsMetadata(lineItems),
     },
   });
+};
+
+const buildLineItemsMetadata = (lineItems: LineItem[]): string => {
+  return lineItems
+    .reduce((acc, curr) => {
+      return acc + `${curr.productId}:${curr.quantity}|`;
+    }, "")
+    .slice(LAST_DIGIT);
 };

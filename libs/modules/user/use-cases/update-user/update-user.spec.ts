@@ -26,6 +26,25 @@ jest.mock("@user-db", () => ({
   incrementUserVersion: jest.fn(),
 }));
 
+jest.mock("@jwt-utils", () => ({
+  getAnonymousTokens: jest.fn(() => ({
+    token: "token",
+    refreshToken: "refreshToken",
+  })),
+  getTokenCookie: jest.fn(),
+}));
+
+jest.mock("@kv-adapter", () => ({
+  setAuthSecret: jest.fn(),
+}));
+
+const tokens = {
+  refreshToken: "refreshToken",
+  accessToken: "accessToken",
+};
+
+const remember = true;
+
 describe("updateUser", () => {
   const updateNameSpy = jest.spyOn(UpdateName, "updateName");
   const updateEmailSpy = jest.spyOn(UpdateEmail, "updateEmail");
@@ -44,7 +63,7 @@ describe("updateUser", () => {
     const id = "userId";
     const body = { email: "email" };
     const action = "update-email";
-    const response = await updateUser(id, body, action);
+    const response = await updateUser(tokens, remember, body, action, id);
     const expectedResponse = successResponse.OK("user mail updated", {
       ...userMock,
       email: "email",
@@ -66,7 +85,7 @@ describe("updateUser", () => {
     const id = "userId";
     const body = { firstName: "firstName", lastName: "lastName" };
     const action = "update-name";
-    const response = await updateUser(id, body, action);
+    const response = await updateUser(tokens, remember, body, action, id);
     const expectedResponse = successResponse.OK("user name updated", {
       ...userMock,
       firstName: "firstName",
@@ -85,7 +104,7 @@ describe("updateUser", () => {
     const id = "userId";
     const body = { password: "password" };
     const action = "update-password";
-    const response = await updateUser(id, body, action);
+    const response = await updateUser(tokens, remember, body, action, id);
     const expectedResponse = successResponse.OK(
       "user password updated",
       userMock,
@@ -100,16 +119,26 @@ describe("updateUser", () => {
     const body = { password: "password" };
     const action = "invalid-action";
     await expect(
-      async () => await updateUser(id, body, action),
+      async () => await updateUser(tokens, remember, body, action, id),
     ).rejects.toBeInstanceOf(ZodError);
     expect(updateEmailSpy).not.toHaveBeenCalled();
     expect(updateNameSpy).not.toHaveBeenCalled();
     expect(updatePasswordSpy).not.toHaveBeenCalled();
   });
+  it("should throw error if user is not logged in", async () => {
+    const body = { password: "password" };
+    const action = "update-email";
+    await expect(
+      async () => await updateUser(tokens, remember, body, action),
+    ).rejects.toEqual(expect.objectContaining({ message: "not logged in" }));
+    expect(updateEmailSpy).not.toHaveBeenCalled();
+  });
   it("should throw error if action is not provided", async () => {
     const id = "userId";
     const body = { password: "password" };
-    await expect(async () => await updateUser(id, body, null)).rejects.toEqual(
+    await expect(
+      async () => await updateUser(tokens, remember, body, null, id),
+    ).rejects.toEqual(
       expect.objectContaining({ message: "Action is required", code: 400 }),
     );
     expect(updateEmailSpy).not.toHaveBeenCalled();
@@ -122,7 +151,7 @@ describe("updateUser", () => {
     const action = "update-email";
     updateEmailSpy.mockRejectedValueOnce(new Error("Error"));
     await expect(
-      async () => await updateUser(id, body, action),
+      async () => await updateUser(tokens, remember, body, action, id),
     ).rejects.toEqual(expect.objectContaining({ message: "Error" }));
     expect(updateEmailSpy).toHaveBeenCalled();
     expect(updateNameSpy).not.toHaveBeenCalled();

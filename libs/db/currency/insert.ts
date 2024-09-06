@@ -1,6 +1,6 @@
 import { InsertCurrency } from "@currency-entity";
 import { currenciesTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 
 export const insertCurrency = async (
   currency: InsertCurrency,

@@ -29,6 +29,8 @@ jest.mock("@http-utils", () => ({
   getQueryFromUrl: jest.fn(),
 }));
 
+jest.mock("@jwt-utils", () => ({}));
+
 describe("onRequest", () => {
   const getAllProductsSpy = jest.spyOn(ProductModule, "getAllProducts");
   const getQueryFromUrlSpy = jest.spyOn(HttpUtils, "getQueryFromUrl");

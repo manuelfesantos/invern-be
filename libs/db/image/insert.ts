@@ -1,5 +1,5 @@
 import { imagesTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 import { InsertImage } from "@image-entity";
 
 export const insertImage = async (

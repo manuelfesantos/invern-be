@@ -1,6 +1,6 @@
 import { collectionsTable } from "@schema";
 import { getRandomUUID } from "@crypto-utils";
-import { db } from "../db-client";
+import { db } from "@db";
 import { InsertCollection } from "@collection-entity";
 
 export const insertCollection = async (

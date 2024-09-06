@@ -11,6 +11,8 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
+jest.mock("@jwt-utils", () => ({}));
+
 describe("onRequest", () => {
   it.each([HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.POST])(
     "should return error if request method is not allowed",

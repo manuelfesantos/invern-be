@@ -8,3 +8,4 @@ wrangler.toml
 out
 ./**/.DS_Store
 mock-frontend
+coverage

@@ -31,14 +31,16 @@ export const onRequest: PagesFunction = async (context) => {
     logger.addData({
       checkoutSessionResult: JSON.stringify(body, null, NUMBER_2),
     });
-    const order = await getOrderFromSessionResult(sessionEvent);
+    const clientOrder = await getOrderFromSessionResult(sessionEvent);
     await sendEmail(
       sessionEvent.customer_details?.email || "",
       "Checkout",
       `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
     );
-    logger.addData({ createdOrder: JSON.stringify(order, null, NUMBER_2) });
-    return successResponse.OK("success getting checkout-session", order);
+    logger.addData({
+      createdOrder: JSON.stringify(clientOrder, null, NUMBER_2),
+    });
+    return successResponse.OK("success getting checkout-session", clientOrder);
   } catch (error) {
     return generateErrorResponse(error);
   }

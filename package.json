@@ -5,7 +5,7 @@
   "main": "functions/index.ts",
   "scripts": {
     "init": "npm i && husky init",
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "npx eslint functions/** libs/**",
     "build-local-db": "npx wrangler d1 execute INVERN_DB --file=drizzle/0000_gray_sleeper.sql",
     "build-remote-db": "npx wrangler d1 execute invern-db --remote --file=drizzle/0000_gray_sleeper.sql",
@@ -16,7 +16,7 @@
     "query-local": "npx wrangler d1 execute INVERN_DB",
     "query-remote": "npx wrangler d1 execute invern-db --remote",
     "query-preview": "npx wrangler d1 execute invern-db-preview --remote",
-    "local": "npx wrangler d1 migrations apply --local INVERN_DB && npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26 --show-interactive-dev-session=false",
+    "local": "npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --kv=AUTH_KV --local-protocol=https --compatibility-date=2024-04-26 --compatibility-flag=nodejs_compat --show-interactive-dev-session=false",
     "prepare": "husky",
     "db:generate": "npx drizzle-kit generate"
   },
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240419.0",
     "@eslint/js": "^9.2.0",
+    "@types/cookie": "^0.6.0",
     "@types/jest": "^29.5.12",
     "@types/uuid": "^9.0.8",
     "drizzle-kit": "^0.21.2",
@@ -42,9 +43,12 @@
   },
   "dependencies": {
     "@cloudflare/pages-plugin-honeycomb": "^1.0.4",
+    "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "@types/stripe-v3": "^3.1.33",
+    "cookie": "^0.6.0",
     "drizzle-orm": "^0.30.10",
     "drizzle-zod": "^0.5.1",
+    "short-uuid": "^5.2.0",
     "stripe": "^15.6.0",
     "uuid": "^9.0.1",
     "zod": "^3.23.4"

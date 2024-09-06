@@ -1,7 +1,8 @@
 import { getAllProducts } from "./get-all-products";
-import { compareResponses } from "@mocks-utils";
+import { compareResponses, productsMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 import * as ProductAdapter from "@product-db";
+import * as Logger from "@logger-utils";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -9,19 +10,27 @@ jest.mock("@logger-utils", () => ({
 
 jest.mock("@product-db", () => ({
   getProducts: jest.fn(),
+  getProductsBySearch: jest.fn(),
 }));
+
+jest.mock("@jwt-utils", () => ({}));
 
 describe("getAllProducts", () => {
   const getProductsSpy = jest.spyOn(ProductAdapter, "getProducts");
+  const getProductsBySearchSpy = jest.spyOn(
+    ProductAdapter,
+    "getProductsBySearch",
+  );
+  const getLoggerSpy = jest.spyOn(Logger, "getLogger");
   beforeEach(() => {
     jest.clearAllMocks();
   });
   it("should get all products", async () => {
-    getProductsSpy.mockResolvedValueOnce([]);
+    getProductsSpy.mockResolvedValueOnce(productsMock);
     const response = await getAllProducts(null);
     const expectedResponse = successResponse.OK(
       "success getting all products",
-      [],
+      productsMock,
     );
     await compareResponses(response, expectedResponse);
   });
@@ -31,5 +40,17 @@ describe("getAllProducts", () => {
       expect.objectContaining({ message: "database error" }),
     );
     expect(getProductsSpy).toHaveBeenCalled();
+  });
+  it("should get products by search", async () => {
+    getProductsBySearchSpy.mockResolvedValueOnce(productsMock);
+    const response = await getAllProducts("search");
+    const expectedResponse = successResponse.OK(
+      "success getting all products",
+      productsMock,
+    );
+    await compareResponses(response, expectedResponse);
+    expect(getLoggerSpy).toHaveBeenCalled();
+    expect(getProductsBySearchSpy).toHaveBeenCalled();
+    expect(getProductsSpy).not.toHaveBeenCalled();
   });
 });

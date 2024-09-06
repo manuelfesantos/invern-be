@@ -73,4 +73,6 @@ export const errors = {
     new AdapterError("Order not found", HttpResponseEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): AdapterError =>
     new AdapterError("Orders not found", HttpResponseEnum.NOT_FOUND),
+  UNAUTHORIZED: (message?: string): AdapterError =>
+    new AdapterError(message || "Unauthorized", HttpResponseEnum.UNAUTHORIZED),
 };

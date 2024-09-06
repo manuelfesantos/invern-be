@@ -4,7 +4,7 @@ import * as CollectionAdapter from "@collection-db";
 import { collectionDetailsMock, compareResponses } from "@mocks-utils";
 import { ZodError } from "zod";
 
-const collectionId = "a6768fef-a5af-4968-bacc-32b1781d9280";
+const collectionId = "gqgX5N33RQwJrAjYH1JZTk";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -17,6 +17,8 @@ jest.mock("@collection-db", () => ({
 jest.mock("@product-db", () => ({
   getProductsByCollectionId: jest.fn(),
 }));
+
+jest.mock("@jwt-utils", () => ({}));
 
 describe("getCollectionDetails", () => {
   const getCollectionByIdSpy = jest.spyOn(
@@ -47,6 +49,15 @@ describe("getCollectionDetails", () => {
     await expect(
       async () => await getCollectionDetails(collectionId),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
+    expect(getCollectionByIdSpy).toHaveBeenCalled();
+  });
+  it("should throw an error if the collection is not found", async () => {
+    getCollectionByIdSpy.mockResolvedValueOnce(undefined);
+    await expect(
+      async () => await getCollectionDetails(collectionId),
+    ).rejects.toEqual(
+      expect.objectContaining({ message: "Collection not found" }),
+    );
     expect(getCollectionByIdSpy).toHaveBeenCalled();
   });
 });

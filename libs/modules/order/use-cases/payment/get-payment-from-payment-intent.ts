@@ -81,7 +81,8 @@ export const getPaymentFromPaymentIntentCanceledEvent = async (
   if (savedPayment) {
     if (
       savedPayment?.state === PaymentIntentState.succeeded ||
-      savedPayment?.state === PaymentIntentState.canceled
+      savedPayment?.state === PaymentIntentState.canceled ||
+      savedPayment?.state === PaymentIntentState.failed
     ) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }

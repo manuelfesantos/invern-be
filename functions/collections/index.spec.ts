@@ -24,6 +24,8 @@ jest.mock("@collection-module", () => ({
   getAllCollections: jest.fn(),
 }));
 
+jest.mock("@jwt-utils", () => ({}));
+
 describe("onRequest", () => {
   const getAllCollectionsSpy = jest.spyOn(
     CollectionModule,

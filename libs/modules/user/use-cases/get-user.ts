@@ -1,16 +1,24 @@
-import { HttpParams } from "@http-entity";
-import { getUserById, getUserVersionById } from "@user-db";
-import { successResponse } from "@response-entity";
+import { getUserById } from "@user-db";
+import {
+  ProtectedModuleFunction,
+  protectedSuccessResponse,
+} from "@response-entity";
 import { userToUserDTO } from "@user-entity";
+import { errors } from "@error-handling-utils";
 
-export const getUser = async (id: HttpParams): Promise<Response> => {
-  const user = await getUserById(id as string);
-  return successResponse.OK("success getting user", userToUserDTO(user));
-};
-
-export const getUserVersion = async (id: HttpParams): Promise<Response> => {
-  const version = await getUserVersionById(id as string);
-  return successResponse.OK("success getting user version", {
-    version,
-  });
+export const getUser: ProtectedModuleFunction = async (
+  tokens,
+  remember,
+  id?: string,
+): Promise<Response> => {
+  if (!id) {
+    throw errors.UNAUTHORIZED();
+  }
+  const user = await getUserById(id);
+  return protectedSuccessResponse.OK(
+    tokens,
+    "success getting user",
+    { user: userToUserDTO(user) },
+    remember,
+  );
 };

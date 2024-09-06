@@ -1,11 +1,13 @@
 import { ResponseWithVersion, updateNameBodySchema } from "./types/update-user";
 import { getUserById, updateUser } from "@user-db";
-import { successResponse } from "@response-entity";
+import { protectedSuccessResponse } from "@response-entity";
 import { DEFAULT_USER_VERSION, User, userToUserDTO } from "@user-entity";
 
 export const updateName = async (
+  tokens: { refreshToken: string; accessToken?: string },
   id: string,
   body: unknown,
+  remember?: boolean,
 ): Promise<ResponseWithVersion> => {
   const { firstName, lastName } = updateNameBodySchema.parse(body);
   const user = await getUserById(id);
@@ -13,9 +15,11 @@ export const updateName = async (
   await updateUserWithOptions(user, firstName, lastName);
 
   return {
-    response: successResponse.OK(
+    response: protectedSuccessResponse.OK(
+      tokens,
       "user name updated",
-      userToUserDTO(mergeUser(user, firstName, lastName)),
+      { user: userToUserDTO(mergeUser(user, firstName, lastName)) },
+      remember,
     ),
     version: user.version || DEFAULT_USER_VERSION,
   };
