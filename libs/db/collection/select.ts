@@ -1,4 +1,4 @@
-import { db } from "../db-client";
+import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { collectionsTable } from "@schema";
 import { Collection, CollectionDetails } from "@collection-entity";

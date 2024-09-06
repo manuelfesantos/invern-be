@@ -15,6 +15,16 @@ export const cartSchema = baseCartSchema.merge(
   }),
 );
 
+export const toCartDTO = (cart: Cart): CartDTO => {
+  return cartDTOSchema.parse(cart);
+};
+
+export const cartDTOSchema = cartSchema.omit({
+  cartId: true,
+});
+
+export type CartDTO = z.infer<typeof cartDTOSchema>;
+
 export type Cart = z.infer<typeof cartSchema>;
 
 export type InsertCart = z.infer<typeof insertCartSchema>;

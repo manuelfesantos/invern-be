@@ -4,7 +4,7 @@ import { compareResponses, productDetailsMock } from "@mocks-utils";
 import * as ProductAdapter from "@product-db";
 import { ZodError } from "zod";
 
-const productId = "c7ca3352-18c0-4468-8e2c-8f30757c1c7c";
+const productId = "x1hXShk9TrEtcHs32kAkoR";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -17,6 +17,8 @@ jest.mock("@product-db", () => ({
 jest.mock("@image-db", () => ({
   getImagesByProductId: jest.fn(),
 }));
+
+jest.mock("@jwt-utils", () => ({}));
 
 describe("getProductDetails", () => {
   const getProductByIdSpy = jest.spyOn(ProductAdapter, "getProductById");
@@ -43,6 +45,15 @@ describe("getProductDetails", () => {
     await expect(
       async () => await getProductDetails(productId),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
+    expect(getProductByIdSpy).toHaveBeenCalled();
+  });
+  it("should throw an error if the product is not found", async () => {
+    getProductByIdSpy.mockResolvedValueOnce(undefined);
+    await expect(
+      async () => await getProductDetails(productId),
+    ).rejects.toEqual(
+      expect.objectContaining({ message: "Product not found" }),
+    );
     expect(getProductByIdSpy).toHaveBeenCalled();
   });
 });

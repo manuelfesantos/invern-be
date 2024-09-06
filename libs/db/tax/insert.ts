@@ -1,7 +1,7 @@
 import { InsertTax } from "@tax-entity";
 import { getRandomUUID } from "@crypto-utils";
 import { taxesTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 
 export const insertTax = async (
   tax: InsertTax,

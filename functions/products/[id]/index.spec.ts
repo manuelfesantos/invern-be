@@ -20,13 +20,11 @@ jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
-jest.mock("@db-utils", () => ({
-  initDb: jest.fn(),
-}));
-
 jest.mock("@product-module", () => ({
   getProductDetails: jest.fn(),
 }));
+
+jest.mock("@jwt-utils", () => ({}));
 
 describe("onRequest", () => {
   const getProductDetailsSpy = jest.spyOn(ProductModule, "getProductDetails");

@@ -11,6 +11,16 @@ jest.mock("./signup", () => ({
   signup: jest.fn(),
 }));
 
+jest.mock("@jwt-utils", () => ({
+  getLoggedInRefreshToken: jest.fn(),
+  getLoggedInToken: jest.fn(),
+  getTokenCookie: jest.fn(),
+}));
+
+jest.mock("@kv-adapter", () => ({
+  setAuthSecret: jest.fn(),
+}));
+
 describe("loginSignupMapper", () => {
   const loginSpy = jest.spyOn(Login, "login");
   const signupSpy = jest.spyOn(Signup, "signup");

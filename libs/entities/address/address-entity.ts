@@ -13,6 +13,8 @@ export const addressSchema = baseAddressSchema
   .omit({ country: true })
   .merge(z.object({ country: countrySchema }));
 
+export type BaseAddress = z.infer<typeof baseAddressSchema>;
+
 export type Address = z.infer<typeof addressSchema>;
 
 export type InsertAddress = z.infer<typeof insertAddressSchema>;

@@ -11,6 +11,8 @@ jest.mock("@collection-db", () => ({
   getCollections: jest.fn(),
 }));
 
+jest.mock("@jwt-utils", () => ({}));
+
 describe("getAllCollections", () => {
   const getCollectionsSpy = jest.spyOn(CollectionAdapter, "getCollections");
   beforeEach(() => {

@@ -40,3 +40,35 @@ export const getCountryByCode = async (
     taxes: countryTemplate.taxes || [],
   });
 };
+
+export const getAllCountries = async (): Promise<Country[]> => {
+  const countriesTemplate = await db().query.countriesTable.findMany({
+    with: {
+      countriesToCurrencies: {
+        columns: {},
+        with: {
+          currency: {
+            columns: {
+              rateToEuro: false,
+            },
+          },
+        },
+      },
+      taxes: {
+        columns: {
+          countryCode: false,
+          taxId: false,
+        },
+      },
+    },
+  });
+  return countriesTemplate.map((countryTemplate) =>
+    countrySchema.parse({
+      ...countryTemplate,
+      currencies: countryTemplate.countriesToCurrencies
+        .map((c) => c.currency)
+        .filter((c) => c),
+      taxes: countryTemplate.taxes || [],
+    }),
+  );
+};

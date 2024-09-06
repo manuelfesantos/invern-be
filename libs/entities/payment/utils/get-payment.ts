@@ -9,6 +9,8 @@ import {
 import { errors } from "@error-handling-utils";
 import Stripe from "stripe";
 
+const VALUE_ZERO = 0;
+
 export const getPaymentFromSessionResult = (
   sessionResult: StripeSessionResult,
 ): InsertPayment => {
@@ -50,9 +52,9 @@ const validatePaymentIntent = (
 };
 
 const validateAmount = (amount: number | null): number => {
-  if (amount) {
+  if (amount && amount > VALUE_ZERO) {
     return amount;
   } else {
-    throw errors.INVALID_PAYMENT("amount is required");
+    throw errors.INVALID_PAYMENT("amount is either missing or invalid");
   }
 };

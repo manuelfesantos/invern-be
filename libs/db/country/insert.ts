@@ -1,4 +1,4 @@
-import { db } from "../db-client";
+import { db } from "@db";
 import { countriesTable } from "@schema";
 import { InsertCountry } from "@country-entity";
 

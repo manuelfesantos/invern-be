@@ -1,22 +1,26 @@
 import { checkoutBodySchema } from "./types/checkout";
 import { createCheckoutSession } from "@stripe-adapter";
-import { successResponse } from "@response-entity";
-import { getProducts } from "@product-db";
+import {
+  ProtectedModuleFunction,
+  protectedSuccessResponse,
+} from "@response-entity";
+import { getProductsByProductIds } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { Product, LineItem, lineItemSchema } from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
-import { getUserByCartId } from "@user-db";
 import { getLogger } from "@logger-utils";
 
-export const checkout = async (
-  cartId: string | null,
+export const checkout: ProtectedModuleFunction = async (
+  tokens,
+  remember,
+  userId?: string,
+  cartId?: string,
   body?: unknown,
 ): Promise<Response> => {
   let lineItems: LineItem[] = [];
-  let userId = "";
+
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
-    userId = (await getUserByCartId(cartId))?.userId;
   } else {
     if (!body) {
       throw errors.PRODUCTS_ARE_REQUIRED();
@@ -26,8 +30,23 @@ export const checkout = async (
   }
 
   const session = await createCheckoutSession(lineItems, userId, cartId);
+
   getLogger().addData({ sessionDetails: session });
-  return buildRedirectResponse(session.url);
+
+  const { url } = session;
+
+  if (!url) {
+    throw errors.CHECKOUT_SESSION_CREATION_FAILED();
+  }
+
+  return protectedSuccessResponse.OK(
+    tokens,
+    "checkout session created",
+    {
+      url,
+    },
+    remember,
+  );
 };
 
 const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
@@ -42,7 +61,7 @@ const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
 const getLineItems = async (
   products: { productId: string; quantity: number }[],
 ): Promise<LineItem[]> => {
-  const dbProducts = await getProducts(
+  const dbProducts = await getProductsByProductIds(
     products.map((product) => product.productId),
   );
   if (dbProducts.length !== products.length) {
@@ -77,11 +96,4 @@ const buildLineItems = (
     )!,
     quantity: product.quantity,
   }));
-};
-
-const buildRedirectResponse = (url: string | null): Response => {
-  if (!url) {
-    throw errors.CHECKOUT_SESSION_CREATION_FAILED();
-  }
-  return successResponse.OK("checkout session created", { url });
 };

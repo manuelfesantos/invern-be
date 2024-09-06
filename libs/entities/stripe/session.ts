@@ -1,9 +1,12 @@
 import Stripe from "stripe";
+import Response = Stripe.Response;
 
 export type StripeSessionCompletedEvent = Stripe.CheckoutSessionCompletedEvent;
 
 export type StripeSessionResult = StripeSessionCompletedEvent["data"]["object"];
 export type StripeCustomerDetails = StripeSessionResult["customer_details"];
+
+export type StripeCheckoutSessionResponse = Response<Stripe.Checkout.Session>;
 export const isStripeSessionCompletedEvent = (
   value: unknown,
 ): value is StripeSessionCompletedEvent => {

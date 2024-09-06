@@ -1,4 +1,5 @@
 import { z, ZodEffects, ZodNumber, ZodString } from "zod";
+import { isValidUUID } from "@crypto-utils";
 
 const ZERO_ELEMENTS = 0;
 
@@ -16,10 +17,12 @@ export const emailSchema = (name: string): ZodString =>
     .string({ required_error: `${name} is required` })
     .email({ message: `${name} is invalid` });
 
-export const uuidSchema = (name: string): ZodString =>
+export const uuidSchema = (
+  name: string,
+): ZodEffects<ZodString, string, string> =>
   z
     .string({ required_error: `${name} is required` })
-    .uuid({ message: `${name} is invalid` });
+    .refine(isValidUUID, `${name} is an invalid uuid`);
 
 export const urlSchema = (name: string): ZodString =>
   z

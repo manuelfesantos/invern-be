@@ -28,3 +28,6 @@ export const clientOrderSchema = orderSchema.omit({
 export type ClientOrder = z.infer<typeof clientOrderSchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
+
+export const toClientOrder = (order: Order): ClientOrder =>
+  clientOrderSchema.parse(order);

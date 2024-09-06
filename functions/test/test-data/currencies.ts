@@ -10,12 +10,6 @@ const currenciesList: InsertCurrency[] = [
     rateToEuro: 1,
   },
   {
-    code: "USD",
-    name: "Dollar",
-    symbol: "$",
-    rateToEuro: 0.92,
-  },
-  {
     code: "GBP",
     name: "Pound",
     symbol: "£",

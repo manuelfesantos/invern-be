@@ -1,9 +1,9 @@
 import {
-  sqliteTable,
-  text,
   int,
   primaryKey,
   real,
+  sqliteTable,
+  text,
 } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
@@ -13,7 +13,6 @@ const DEFAULT_VERSION = 1;
 
 export const cartsTable = sqliteTable("carts", {
   cartId: text("cartId").primaryKey(),
-  version: int("version").notNull().default(DEFAULT_VERSION),
 });
 
 export const usersTable = sqliteTable("users", {

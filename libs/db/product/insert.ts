@@ -1,5 +1,5 @@
 import { productsTable } from "@schema";
-import { db } from "../db-client";
+import { db } from "@db";
 import { InsertProduct } from "@product-entity";
 import { getRandomUUID } from "@crypto-utils";
 

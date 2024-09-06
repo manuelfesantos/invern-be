@@ -1,20 +1,44 @@
 import { getUserByEmail } from "@user-db";
-import { successResponse } from "@response-entity";
+import { protectedSuccessResponse } from "@response-entity";
 import { User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
 import { loginBodySchema } from "./types/map-user-action";
+import { getAuthSecret, setAuthSecret } from "@kv-adapter";
+import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 
-export const login = async (body: unknown): Promise<Response> => {
+export const login = async (body: unknown, id?: string): Promise<Response> => {
+  if (id) {
+    throw errors.UNAUTHORIZED("already logged in");
+  }
   const parsedBody = loginBodySchema.parse(body);
 
-  const { email, password } = parsedBody;
+  const { email, password, remember } = parsedBody;
 
   const user = await getUser(email);
 
   await validatePassword(password, user);
 
-  return successResponse.OK("successfully logged in", userToUserDTO(user));
+  const { userId } = user;
+  const { cartId } = user.cart ?? {};
+
+  const accessToken = await getLoggedInToken(userId, cartId, remember);
+  let refreshToken = await getAuthSecret(userId);
+
+  if (!refreshToken) {
+    refreshToken = await getLoggedInRefreshToken(userId, cartId);
+    await setAuthSecret(userId, refreshToken);
+  }
+
+  return protectedSuccessResponse.OK(
+    { refreshToken, accessToken },
+    "successfully logged in",
+    {
+      user: userToUserDTO(user),
+      accessToken: accessToken,
+    },
+    remember,
+  );
 };
 
 const getUser = async (email: string): Promise<User> => {

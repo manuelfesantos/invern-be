@@ -3,8 +3,8 @@ import { Env } from "@request-entity";
 import { initStripeClient } from "@stripe-adapter";
 import { setGlobalTimer } from "@timer-utils";
 import { getBodyFromRequest } from "@http-utils";
-import { HttpHeaderEnum } from "@http-entity";
 import { checkout } from "@order-module";
+import { getCredentials } from "@jwt-utils";
 export const onRequest: PagesFunction<Env> = async (
   context,
 ): Promise<Response> => {
@@ -15,13 +15,20 @@ export const onRequest: PagesFunction<Env> = async (
   if (request.method !== "POST") {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
-  const cartId = request.headers.get(HttpHeaderEnum.CART_ID);
+
   try {
-    if (cartId) {
-      return await checkout(cartId);
-    }
+    const { headers } = request;
+    const { cartId, userId, refreshToken, accessToken, remember } =
+      await getCredentials(headers);
+
     const body = await getBodyFromRequest(request);
-    return await checkout(null, body);
+    return await checkout(
+      { refreshToken, accessToken },
+      remember,
+      userId,
+      cartId,
+      body,
+    );
   } catch (error) {
     return generateErrorResponse(error);
   }

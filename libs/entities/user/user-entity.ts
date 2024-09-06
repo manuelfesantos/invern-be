@@ -1,8 +1,7 @@
 import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
 import { z } from "zod";
-import { cartSchema } from "@cart-entity";
-import { clientOrderSchema } from "@order-entity";
+import { cartDTOSchema, cartSchema } from "@cart-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
 export const DEFAULT_USER_VERSION = 1;
@@ -30,18 +29,19 @@ export const userSchema = baseUserSchema
   .merge(
     z.object({
       cart: cartSchema.nullable(),
-      orders: z.array(clientOrderSchema).nullable(),
     }),
   );
 
-export const userDTOSchema = userSchema.omit({
-  password: true,
-  role: true,
-});
-
-export const userWithoutCartSchema = userSchema.omit({
-  cart: true,
-});
+export const userDTOSchema = userSchema
+  .omit({
+    password: true,
+    role: true,
+    userId: true,
+  })
+  .transform((payload) => ({
+    ...payload,
+    cart: payload.cart ? cartDTOSchema.parse(payload.cart) : null,
+  }));
 
 export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);

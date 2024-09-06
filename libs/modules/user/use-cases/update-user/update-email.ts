@@ -3,13 +3,15 @@ import {
   updateEmailBodySchema,
 } from "./types/update-user";
 import { getUserByEmail, getUserById, updateUser } from "@user-db";
-import { successResponse } from "@response-entity";
+import { protectedSuccessResponse } from "@response-entity";
 import { DEFAULT_USER_VERSION, User, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 
 export const updateEmail = async (
+  tokens: { refreshToken: string; accessToken?: string },
   id: string,
   body: unknown,
+  remember?: boolean,
 ): Promise<ResponseWithVersion> => {
   const { email } = updateEmailBodySchema.parse(body);
   await checkIfEmailIsTaken(email);
@@ -18,9 +20,11 @@ export const updateEmail = async (
   await updateUser(id, { email });
 
   return {
-    response: successResponse.OK(
+    response: protectedSuccessResponse.OK(
+      tokens,
       "user email updated",
-      userToUserDTO(mergeUser(user, email)),
+      { user: userToUserDTO(mergeUser(user, email)) },
+      remember,
     ),
     version: user.version || DEFAULT_USER_VERSION,
   };

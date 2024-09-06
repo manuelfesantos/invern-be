@@ -3,15 +3,12 @@ import { eq, inArray, like, or } from "drizzle-orm";
 import { productsTable } from "@schema";
 import { Product, ProductDetails } from "@product-entity";
 
-export const getProducts = async (
-  productIds?: string[],
-): Promise<Product[]> => {
+export const getProducts = async (): Promise<Product[]> => {
   return db().query.productsTable.findMany({
     columns: {
       description: false,
       collectionId: false,
     },
-    ...(productIds && { where: inArray(productsTable.productId, productIds) }),
     with: {
       images: {
         limit: 1,
@@ -65,6 +62,23 @@ export const getProductsBySearch = async (
       like(productsTable.description, `%${search}%`),
       like(productsTable.productName, `%${search}%`),
     ),
+    with: {
+      images: {
+        limit: 1,
+        columns: {
+          productId: false,
+          collectionId: false,
+        },
+      },
+    },
+  });
+};
+
+export const getProductsByProductIds = async (
+  productIds: string[],
+): Promise<Product[]> => {
+  return db().query.productsTable.findMany({
+    where: inArray(productsTable.productId, productIds),
     with: {
       images: {
         limit: 1,

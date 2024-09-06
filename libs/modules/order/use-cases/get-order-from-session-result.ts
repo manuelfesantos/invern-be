@@ -9,7 +9,7 @@ import {
 } from "@order-db";
 import { getPaymentById, insertPaymentReturningId } from "@payment-db";
 import { getPaymentFromSessionResult } from "@payment-entity";
-import { Order } from "@order-entity";
+import { ClientOrder, toClientOrder } from "@order-entity";
 import { errors } from "@error-handling-utils";
 import { productIdAndQuantitySchema } from "@product-entity";
 import { emptyCart } from "@cart-db";
@@ -19,13 +19,12 @@ const DEFAULT_USER_VERSION = 1;
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
-): Promise<Order> => {
+): Promise<ClientOrder> => {
   const orderAlreadyExists = await checkIfOrderExists(sessionResult.id);
 
   if (orderAlreadyExists) {
     throw errors.ORDER_ALREADY_EXISTS();
   }
-
   const [{ addressId }] = await insertAddress({
     ...validateStripeAddress(sessionResult.customer_details?.address),
   });
@@ -70,7 +69,7 @@ export const getOrderFromSessionResult = async (
     await incrementUserVersion(userId, version || DEFAULT_USER_VERSION);
   }
 
-  return order;
+  return toClientOrder(order);
 };
 
 const insertProductsToOrder = async (
