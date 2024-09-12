@@ -1,4 +1,5 @@
 import { getLogger } from "@logger-utils";
+import { getFrontendHost } from "@http-utils";
 
 export const buildResponse = (
   data: unknown,
@@ -11,7 +12,7 @@ export const buildResponse = (
     ...maybeInit,
     headers: {
       ...headers,
-      "Access-Control-Allow-Origin": "https://www-local.invernspirit.com",
+      "Access-Control-Allow-Origin": getFrontendHost(),
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers":
         "cf-access-client-id, cf-access-client-secret, action, authorization",

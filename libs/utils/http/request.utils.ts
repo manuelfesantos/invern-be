@@ -15,3 +15,15 @@ export const getQueryFromUrl = (url: string): URLSearchParams | null => {
   const query = url.split("?")[QUERY_INDEX];
   return query ? new URLSearchParams(query) : null;
 };
+
+let frontendHost: string;
+
+export const setFrontendHost = (host: string): void => {
+  if (!frontendHost) {
+    frontendHost = host;
+  }
+};
+
+export const getFrontendHost = (): string => {
+  return frontendHost || "";
+};

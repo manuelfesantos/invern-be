@@ -31,6 +31,7 @@ jest.mock("@jwt-utils", () => ({
 }));
 
 jest.mock("@http-utils", () => ({
+  getFrontendHost: jest.fn(),
   getBodyFromRequest: jest.fn(),
 }));
 

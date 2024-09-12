@@ -30,6 +30,7 @@ jest.mock("@config-module", () => ({
 }));
 
 jest.mock("@http-utils", () => ({
+  getFrontendHost: jest.fn(),
   getBodyFromRequest: jest.fn(),
 }));
 

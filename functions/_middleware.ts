@@ -11,16 +11,19 @@ import { HttpMethodEnum } from "@http-entity";
 import { initAuthSecretClient } from "@kv-adapter";
 import { setSecrets } from "@jwt-utils";
 import { withLogger } from "@logger-utils";
+import { setFrontendHost } from "@http-utils";
 
 export const startLogger: PagesFunction<Env> = async (context) => {
-  if (context.request.method === "HEAD") {
+  const { env, request } = context;
+  setFrontendHost(env.FRONTEND_HOST);
+  if (request.method === "HEAD") {
     return errorResponse.METHOD_NOT_ALLOWED();
-  } else if (context.request.method === HttpMethodEnum.OPTIONS) {
+  } else if (request.method === HttpMethodEnum.OPTIONS) {
     return successResponse.OK("success");
   }
   return honeyCombPlugin({
-    apiKey: context.env.HONEYCOMB_API_KEY,
-    dataset: context.env.HONEYCOMB_DATASET,
+    apiKey: env.HONEYCOMB_API_KEY,
+    dataset: env.HONEYCOMB_DATASET,
   })(context);
 };
 

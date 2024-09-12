@@ -7,4 +7,5 @@ export interface Env {
   AUTH_KV: KVNamespace;
   TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
+  FRONTEND_HOST: string;
 }
