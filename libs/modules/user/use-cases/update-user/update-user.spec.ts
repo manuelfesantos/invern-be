@@ -53,13 +53,12 @@ describe("updateUser", () => {
     jest.clearAllMocks();
   });
   it("should update mail when action is 'update-mail'", async () => {
-    updateEmailSpy.mockResolvedValueOnce({
-      response: successResponse.OK("user mail updated", {
+    updateEmailSpy.mockResolvedValueOnce(
+      successResponse.OK("user mail updated", {
         ...userMock,
         email: "email",
       }),
-      version: 1,
-    });
+    );
     const id = "userId";
     const body = { email: "email" };
     const action = "update-email";
@@ -74,14 +73,13 @@ describe("updateUser", () => {
     expect(updatePasswordSpy).not.toHaveBeenCalled();
   });
   it("should update name when action is 'update-name'", async () => {
-    updateNameSpy.mockResolvedValueOnce({
-      response: successResponse.OK("user name updated", {
+    updateNameSpy.mockResolvedValueOnce(
+      successResponse.OK("user name updated", {
         ...userMock,
         firstName: "firstName",
         lastName: "lastName",
       }),
-      version: 1,
-    });
+    );
     const id = "userId";
     const body = { firstName: "firstName", lastName: "lastName" };
     const action = "update-name";
@@ -97,10 +95,9 @@ describe("updateUser", () => {
     expect(updatePasswordSpy).not.toHaveBeenCalled();
   });
   it("should update password when action is 'update-password'", async () => {
-    updatePasswordSpy.mockResolvedValueOnce({
-      response: successResponse.OK("user password updated", userMock),
-      version: 1,
-    });
+    updatePasswordSpy.mockResolvedValueOnce(
+      successResponse.OK("user password updated", userMock),
+    );
     const id = "userId";
     const body = { password: "password" };
     const action = "update-password";

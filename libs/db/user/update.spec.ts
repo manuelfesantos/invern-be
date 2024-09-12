@@ -1,6 +1,7 @@
 import { incrementUserVersion, updateUser } from "./update";
 import * as DB from "@db";
 import { usersTable } from "@schema";
+import { sql } from "drizzle-orm";
 
 jest.mock("@db", () => ({
   db: jest.fn().mockReturnValue({
@@ -29,10 +30,10 @@ describe("update", () => {
   describe("userVersion", () => {
     it("should increment userVersion", async () => {
       const userId = "1";
-      const userVersion = 1;
-      const newUserVersion = 2;
-      const result = await incrementUserVersion(userId, userVersion);
-      expect(setSpy).toHaveBeenCalledWith({ version: newUserVersion });
+      const result = await incrementUserVersion(userId);
+      expect(setSpy).toHaveBeenCalledWith({
+        version: sql`version + 1`,
+      });
       expect(result).toBeUndefined();
     });
   });

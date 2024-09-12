@@ -4,7 +4,7 @@ import {
   protectedSuccessResponse,
 } from "@response-entity";
 import { productIdAndQuantitySchema } from "@product-entity";
-import { validateProductId } from "@product-db";
+import { validateProductIdAndGetStock } from "@product-db";
 
 export const addProductToCart: ProtectedModuleFunction = async (
   tokens,
@@ -13,8 +13,8 @@ export const addProductToCart: ProtectedModuleFunction = async (
   cartId: string,
 ): Promise<Response> => {
   const { productId, quantity } = productIdAndQuantitySchema.parse(body);
-  await validateProductId(productId);
-  await addToCart(cartId, productId, quantity);
+  const stock = await validateProductIdAndGetStock(productId, quantity);
+  await addToCart(cartId, productId, quantity, stock);
   return protectedSuccessResponse.OK(
     tokens,
     "product added to cart",

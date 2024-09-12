@@ -4,8 +4,6 @@ import { Stripe } from "stripe";
 import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
 
-const LAST_DIGIT = -1;
-
 export const createCheckoutSession = async (
   lineItems: LineItem[],
   userId?: string,
@@ -59,8 +57,6 @@ export const createCheckoutSession = async (
 
 const buildLineItemsMetadata = (lineItems: LineItem[]): string => {
   return lineItems
-    .reduce((acc, curr) => {
-      return acc + `${curr.productId}:${curr.quantity}|`;
-    }, "")
-    .slice(LAST_DIGIT);
+    .map(({ productId, quantity }) => `${productId}:${quantity}`)
+    .join("|");
 };

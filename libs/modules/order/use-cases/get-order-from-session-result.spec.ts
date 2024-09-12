@@ -5,7 +5,6 @@ import {
   stripeAddressMock,
   stripeCheckoutSessionResultMockWithoutUserId,
   stripeCheckoutSessionResultMockWithUserId,
-  userMock,
 } from "@mocks-utils";
 import * as OrderDb from "@order-db";
 import * as AddressDb from "@address-db";
@@ -31,7 +30,6 @@ jest.mock("@order-db", () => ({
 }));
 
 jest.mock("@user-db", () => ({
-  getUserById: jest.fn(),
   incrementUserVersion: jest.fn(),
 }));
 
@@ -85,7 +83,6 @@ describe("getOrderFromSessionResult", () => {
   const insertOrderSpy = jest.spyOn(OrderDb, "insertOrder");
   const addToOrderSpy = jest.spyOn(OrderDb, "addToOrder");
   const getOrderByIdSpy = jest.spyOn(OrderDb, "getOrderById");
-  const getUserByIdSpy = jest.spyOn(UserDb, "getUserById");
   const incrementUserVersionSpy = jest.spyOn(UserDb, "incrementUserVersion");
   const emptyCartSpy = jest.spyOn(CartDb, "emptyCart");
   beforeEach(() => {
@@ -132,7 +129,6 @@ describe("getOrderFromSessionResult", () => {
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
     expect(emptyCartSpy).not.toHaveBeenCalled();
-    expect(getUserByIdSpy).not.toHaveBeenCalled();
     expect(incrementUserVersionSpy).not.toHaveBeenCalled();
   });
   it("should get order from session result with userId", async () => {
@@ -151,7 +147,6 @@ describe("getOrderFromSessionResult", () => {
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
     getOrderByIdSpy.mockResolvedValueOnce({ ...clientOrderMock, orderId });
-    getUserByIdSpy.mockResolvedValueOnce(userMock);
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithUserId,
     );
@@ -177,11 +172,7 @@ describe("getOrderFromSessionResult", () => {
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
     expect(emptyCartSpy).toHaveBeenCalledWith(cartId);
-    expect(getUserByIdSpy).toHaveBeenCalledWith(userId);
-    expect(incrementUserVersionSpy).toHaveBeenCalledWith(
-      userId,
-      userMock.version,
-    );
+    expect(incrementUserVersionSpy).toHaveBeenCalledWith(userId);
   });
   it("should not get order if order already exists", async () => {
     checkIfOrderAlreadyExistsSpy.mockResolvedValue(true);
@@ -203,7 +194,6 @@ describe("getOrderFromSessionResult", () => {
     expect(addToOrderSpy).not.toHaveBeenCalled();
     expect(getOrderByIdSpy).not.toHaveBeenCalled();
     expect(emptyCartSpy).not.toHaveBeenCalled();
-    expect(getUserByIdSpy).not.toHaveBeenCalled();
     expect(incrementUserVersionSpy).not.toHaveBeenCalled();
   });
   it("should not return order if getOrderById does not return an order", async () => {
@@ -231,7 +221,6 @@ describe("getOrderFromSessionResult", () => {
     );
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
     expect(emptyCartSpy).not.toHaveBeenCalled();
-    expect(getUserByIdSpy).not.toHaveBeenCalled();
     expect(incrementUserVersionSpy).not.toHaveBeenCalled();
   });
 });

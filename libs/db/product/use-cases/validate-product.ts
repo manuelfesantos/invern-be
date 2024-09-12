@@ -16,6 +16,24 @@ export const validateProductId = async (productId: string): Promise<void> => {
   }
 };
 
+export const validateProductIdAndGetStock = async (
+  productId: string,
+  quantity: number,
+): Promise<number> => {
+  const id = uuidSchema("product id").parse(productId);
+  const product = await db().query.productsTable.findFirst({
+    where: eq(productsTable.productId, id),
+  });
+  if (!product) {
+    throw errors.PRODUCT_NOT_FOUND();
+  }
+  if (!product.stock || quantity > product.stock) {
+    throw errors.PRODUCT_OUT_OF_STOCK(product.stock);
+  }
+
+  return product.stock;
+};
+
 export const validateProductIds = async (
   productIds: string[],
 ): Promise<void> => {

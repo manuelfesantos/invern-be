@@ -20,6 +20,20 @@ export const errors = {
     ),
   PRODUCT_NOT_FOUND: (): AdapterError =>
     new AdapterError("Product not found", HttpResponseEnum.NOT_FOUND),
+  PRODUCT_OUT_OF_STOCK: (stock: number): AdapterError =>
+    new AdapterError(
+      stock
+        ? `Not enough stock available for this product. Only ${stock} in stock`
+        : "Product out of stock",
+      HttpResponseEnum.BAD_REQUEST,
+    ),
+  PRODUCTS_OUT_OF_STOCK: (
+    products: { productId: string; stock: number }[],
+  ): AdapterError =>
+    new AdapterError(
+      `The following product ids don't have enough stock: ${products.map(({ productId, stock }) => `${productId} with stock ${stock}`).join(", ")}`,
+      HttpResponseEnum.BAD_REQUEST,
+    ),
   COLLECTION_NOT_FOUND: (): AdapterError =>
     new AdapterError("Collection not found", HttpResponseEnum.NOT_FOUND),
   CART_NOT_FOUND: (): AdapterError =>

@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 import Response = Stripe.Response;
+import { isStripeEvent } from "./event";
 
 export type StripeSessionCompletedEvent = Stripe.CheckoutSessionCompletedEvent;
+export type StripeSessionExpiredEvent = Stripe.CheckoutSessionExpiredEvent;
 
 export type StripeSessionResult = StripeSessionCompletedEvent["data"]["object"];
 export type StripeCustomerDetails = StripeSessionResult["customer_details"];
@@ -10,16 +12,11 @@ export type StripeCheckoutSessionResponse = Response<Stripe.Checkout.Session>;
 export const isStripeSessionCompletedEvent = (
   value: unknown,
 ): value is StripeSessionCompletedEvent => {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    typeof value.id === "string" &&
-    "type" in value &&
-    typeof value.type === "string" &&
-    value.type === "checkout.session.completed" &&
-    "data" in value &&
-    typeof value.data === "object" &&
-    value.data !== null
-  );
+  return isStripeEvent(value) && value.type === "checkout.session.completed";
+};
+
+export const isStripeSessionExpiredEvent = (
+  value: unknown,
+): value is StripeSessionExpiredEvent => {
+  return isStripeEvent(value) && value.type === "checkout.session.expired";
 };

@@ -11,6 +11,7 @@ import {
   draftPaymentMock,
   failedPaymentMock,
   processingPaymentMock,
+  productIdAndQuantityMock,
   stripeCheckoutPaymentIntentResultCanceledMock,
   stripeCheckoutPaymentIntentResultCreatedMock,
   stripeCheckoutPaymentIntentResultFailedMock,
@@ -22,6 +23,8 @@ import * as PaymentDb from "@payment-db";
 import * as PaymentEntity from "@payment-entity";
 import { PaymentIntentState } from "@payment-entity";
 import { errors } from "@error-handling-utils";
+import * as OrderDb from "@order-db";
+import * as ProductDb from "@product-db";
 
 jest.mock("@payment-entity", () => ({
   ...jest.requireActual("@payment-entity"),
@@ -35,6 +38,14 @@ jest.mock("@payment-db", () => ({
 }));
 
 jest.mock("@jwt-utils", () => ({}));
+
+jest.mock("@order-db", () => ({
+  getOrderProductsByPaymentId: jest.fn(),
+}));
+
+jest.mock("@product-db", () => ({
+  increaseProductsStock: jest.fn(),
+}));
 
 const insertedPaymentDraftMock = {
   ...draftPaymentMock,
@@ -71,6 +82,14 @@ describe("getPaymentFromPaymentIntent", () => {
   const getPaymentFromPaymentIntentSpy = jest.spyOn(
     PaymentEntity,
     "getPaymentFromPaymentIntent",
+  );
+  const getOrderProductsByPaymentIdSpy = jest.spyOn(
+    OrderDb,
+    "getOrderProductsByPaymentId",
+  );
+  const increaseProductsStockSpy = jest.spyOn(
+    ProductDb,
+    "increaseProductsStock",
   );
   beforeEach(() => {
     jest.clearAllMocks();
@@ -215,6 +234,7 @@ describe("getPaymentFromPaymentIntent", () => {
   });
   describe("canceledEvent", () => {
     it("should create payment if payment does not exist", async () => {
+      getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
       getPaymentFromPaymentIntentSpy.mockReturnValueOnce(canceledPaymentMock);
       getPaymentByIdSpy.mockResolvedValueOnce(undefined);
       insertPaymentReturningAllSpy.mockResolvedValueOnce([
@@ -234,6 +254,7 @@ describe("getPaymentFromPaymentIntent", () => {
     ])(
       "should throw error if created payment is in %s state",
       async (_, payment) => {
+        getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
         getPaymentFromPaymentIntentSpy.mockReturnValueOnce(canceledPaymentMock);
         getPaymentByIdSpy.mockResolvedValueOnce(payment);
         await expect(
@@ -253,6 +274,7 @@ describe("getPaymentFromPaymentIntent", () => {
     ])(
       "should update payment if payment exists and is in %s state",
       async (_, payment) => {
+        getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
         getPaymentFromPaymentIntentSpy.mockReturnValueOnce(canceledPaymentMock);
         getPaymentByIdSpy.mockResolvedValueOnce(payment);
         updatePaymentSpy.mockResolvedValueOnce([insertedPaymentCanceledMock]);
@@ -267,9 +289,26 @@ describe("getPaymentFromPaymentIntent", () => {
         expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
       },
     );
+    it("should increase products stock if order was created", async () => {
+      getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([
+        productIdAndQuantityMock,
+      ]);
+      getPaymentFromPaymentIntentSpy.mockReturnValueOnce(canceledPaymentMock);
+      getPaymentByIdSpy.mockResolvedValueOnce(undefined);
+      insertPaymentReturningAllSpy.mockResolvedValueOnce([
+        insertedPaymentCanceledMock,
+      ]);
+      await getPaymentFromPaymentIntentCanceledEvent(
+        stripeCheckoutPaymentIntentResultCanceledMock,
+      );
+      expect(increaseProductsStockSpy).toHaveBeenCalledWith([
+        productIdAndQuantityMock,
+      ]);
+    });
   });
   describe("failedEvent", () => {
     it("should create payment if payment does not exist", async () => {
+      getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
       getPaymentFromPaymentIntentSpy.mockReturnValueOnce(failedPaymentMock);
       getPaymentByIdSpy.mockResolvedValueOnce(undefined);
       insertPaymentReturningAllSpy.mockResolvedValueOnce([
@@ -292,6 +331,7 @@ describe("getPaymentFromPaymentIntent", () => {
     ])(
       "should throw error if created payment is in %s state",
       async (_, payment) => {
+        getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
         getPaymentFromPaymentIntentSpy.mockReturnValueOnce(failedPaymentMock);
         getPaymentByIdSpy.mockResolvedValueOnce(payment);
         await expect(
@@ -311,6 +351,7 @@ describe("getPaymentFromPaymentIntent", () => {
     ])(
       "should update payment if payment exists and is in %s state",
       async (_, payment) => {
+        getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([]);
         getPaymentFromPaymentIntentSpy.mockReturnValueOnce(failedPaymentMock);
         getPaymentByIdSpy.mockResolvedValueOnce(payment);
         updatePaymentSpy.mockResolvedValueOnce([insertedPaymentFailedMock]);
@@ -325,5 +366,21 @@ describe("getPaymentFromPaymentIntent", () => {
         expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
       },
     );
+    it("should increase products stock if order was created", async () => {
+      getOrderProductsByPaymentIdSpy.mockResolvedValueOnce([
+        productIdAndQuantityMock,
+      ]);
+      getPaymentFromPaymentIntentSpy.mockReturnValueOnce(failedPaymentMock);
+      getPaymentByIdSpy.mockResolvedValueOnce(undefined);
+      insertPaymentReturningAllSpy.mockResolvedValueOnce([
+        insertedPaymentFailedMock,
+      ]);
+      await getPaymentFromPaymentIntentFailedEvent(
+        stripeCheckoutPaymentIntentResultFailedMock,
+      );
+      expect(increaseProductsStockSpy).toHaveBeenCalledWith([
+        productIdAndQuantityMock,
+      ]);
+    });
   });
 });

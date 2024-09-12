@@ -67,7 +67,7 @@ export const stripeCheckoutSessionResultMockWithoutUserId: StripeSessionResult =
     livemode: false,
     locale: null,
     metadata: {
-      products: '[{"productId":"gNJ1Urm9z3ujZobZa9K8ww","quantity":1}]',
+      products: "qsZyqRnFLBGvkmVGmELc4W:2|tTGoF4LP82NZSAWPZPSZW4:1",
       clientOrderId: "rsGD4jh2VHTV91bdgK2QsY",
     },
     mode: "payment",
@@ -199,7 +199,7 @@ export const stripeCheckoutSessionResultMockWithUserId: StripeSessionResult = {
   metadata: {
     userId: "rsGD4jh2VHTV91bdgK2QsY",
     cartId: "cqnqGwCb6Us988aKw8q9ZX",
-    products: '[{"productId":"gNJ1Urm9z3ujZobZa9K8ww","quantity":1}]',
+    products: "qsZyqRnFLBGvkmVGmELc4W:2|tTGoF4LP82NZSAWPZPSZW4:1",
     clientOrderId: "rsGD4jh2VHTV91bdgK2QsY",
   },
   mode: "payment",

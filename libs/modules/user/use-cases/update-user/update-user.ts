@@ -29,14 +29,14 @@ export const updateUser: ProtectedModuleFunction = async (
     throw errors.ACTION_IS_REQUIRED();
   }
   const updateUserAction = updateUserActionSchema.parse(action);
-  const { response, version } = await actionToUpdateMap[updateUserAction](
+  const response = await actionToUpdateMap[updateUserAction](
     tokens,
+    remember,
     userId,
     body,
-    remember,
   );
   if (response.status === HttpResponseEnum.OK) {
-    await incrementUserVersion(userId, version);
+    await incrementUserVersion(userId);
   }
 
   return response;
