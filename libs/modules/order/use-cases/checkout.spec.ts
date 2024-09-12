@@ -5,6 +5,7 @@ import * as StripeAdapter from "@stripe-adapter";
 import * as CartDb from "@cart-db";
 import * as ProductDb from "@product-db";
 import { StripeCheckoutSessionResponse } from "@stripe-entity";
+import { errors } from "@error-handling-utils";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -25,10 +26,13 @@ jest.mock("@cart-db", () => ({
 
 jest.mock("@product-db", () => ({
   getProductsByProductIds: jest.fn(),
+  decreaseProductsStock: jest.fn(),
 }));
 
 const cartId = "cartId";
 const userId = "userId";
+
+const TOO_MUCH_QUANTITY = 3;
 
 const tokens = {
   refreshToken: "refreshToken",
@@ -43,6 +47,11 @@ const requestedProducts = lineItemsMock.map((item) => ({
 const products = lineItemsMock.map((item) => ({
   ...item,
   quantity: undefined,
+}));
+
+const invalidRequestedProducts = lineItemsMock.map((item) => ({
+  productId: item.productId,
+  quantity: TOO_MUCH_QUANTITY,
 }));
 
 const remember = true;
@@ -170,5 +179,24 @@ describe("checkout", () => {
       userId,
       cartId,
     );
+  });
+  it("should throw error if any line item has more quantity than stock", async () => {
+    getProductsByProductIdsSpy.mockResolvedValueOnce(products);
+    createCheckoutSessionSpy.mockResolvedValueOnce({
+      url: "123",
+    } as StripeCheckoutSessionResponse);
+    await expect(
+      async () =>
+        await checkout(tokens, remember, undefined, undefined, {
+          products: invalidRequestedProducts,
+        }),
+    ).rejects.toEqual(
+      errors.PRODUCTS_OUT_OF_STOCK(
+        lineItemsMock
+          .filter((p) => p.stock < TOO_MUCH_QUANTITY)
+          .map((p) => ({ productId: p.productId, stock: p.stock })),
+      ),
+    );
+    expect(createCheckoutSessionSpy).not.toHaveBeenCalled();
   });
 });

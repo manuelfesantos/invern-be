@@ -4,12 +4,10 @@ import { HttpResponseEnum } from "@http-entity";
 import { removeProductFromCart } from "./remove-product-from-cart";
 import { mergeCartItems } from "./merge-cart-items";
 import { validateCartId } from "@cart-db";
-import { getUserById, incrementUserVersion } from "@user-db";
+import { incrementUserVersion } from "@user-db";
 import { ProtectedModuleFunction } from "@response-entity";
 import { getCart } from "../get-cart";
 import { errors } from "@error-handling-utils";
-
-const DEFAULT_USER_VERSION = 1;
 
 const actionMapper = {
   [CartAction.add]: addProductToCart,
@@ -44,8 +42,7 @@ export const cartActionMapper: ProtectedModuleFunction = async (
   );
 
   if (response.status === HttpResponseEnum.OK) {
-    const { version } = await getUserById(userId);
-    await incrementUserVersion(userId, version || DEFAULT_USER_VERSION);
+    await incrementUserVersion(userId);
   }
 
   return response;

@@ -1,5 +1,6 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { getUserOrders } from "@order-module";
+import { getCredentials } from "@jwt-utils";
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;
@@ -9,14 +10,15 @@ export const onRequest: PagesFunction = async (context) => {
 
   const { headers } = request;
 
-  const userId = headers.get("userId");
-
-  if (!userId) {
-    return errorResponse.BAD_REQUEST("userId is required");
-  }
-
   try {
-    return getUserOrders(userId);
+    const { userId, remember, refreshToken, accessToken } =
+      await getCredentials(headers);
+
+    if (!userId) {
+      return errorResponse.UNAUTHORIZED();
+    }
+
+    return getUserOrders({ refreshToken, accessToken }, remember, userId);
   } catch (error) {
     return generateErrorResponse(error);
   }

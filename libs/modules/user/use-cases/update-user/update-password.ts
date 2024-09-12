@@ -1,18 +1,18 @@
-import {
-  ResponseWithVersion,
-  updatePasswordBodySchema,
-} from "./types/update-user";
+import { updatePasswordBodySchema } from "./types/update-user";
 import { getUserById, updateUser } from "@user-db";
-import { protectedSuccessResponse } from "@response-entity";
-import { DEFAULT_USER_VERSION, userToUserDTO } from "@user-entity";
+import {
+  ProtectedModuleFunction,
+  protectedSuccessResponse,
+} from "@response-entity";
+import { userToUserDTO } from "@user-entity";
 import { hashPassword } from "@crypto-utils";
 
-export const updatePassword = async (
+export const updatePassword: ProtectedModuleFunction = async (
   tokens: { refreshToken: string; accessToken?: string },
+  remember: boolean | undefined,
   id: string,
   body: unknown,
-  remember?: boolean,
-): Promise<ResponseWithVersion> => {
+) => {
   const { password } = updatePasswordBodySchema.parse(body);
   const user = await getUserById(id);
 
@@ -20,13 +20,10 @@ export const updatePassword = async (
 
   await updateUser(id, { password: passwordHash });
 
-  return {
-    response: protectedSuccessResponse.OK(
-      tokens,
-      "user password updated",
-      { user: userToUserDTO(user) },
-      remember,
-    ),
-    version: user.version || DEFAULT_USER_VERSION,
-  };
+  return protectedSuccessResponse.OK(
+    tokens,
+    "user password updated",
+    { user: userToUserDTO(user) },
+    remember,
+  );
 };

@@ -6,7 +6,7 @@ export const buildResponse = (
   headers?: Record<string, string>,
 ): Response => {
   const logger = getLogger();
-  logger.addData({ responseData: data });
+  logger?.addData({ responseData: data });
   return Response.json(data, {
     ...maybeInit,
     headers: {

@@ -1,4 +1,5 @@
 import { Response } from "undici-types";
+import { stringifyObject } from "@string-utils";
 
 let sendGridApiKey: string = "";
 export const initSendgrid = (apiKey: string): void => {
@@ -11,7 +12,7 @@ export const sendEmail = async (
   text: string,
 ): Promise<Response> => {
   return await fetch("https://api.sendgrid.com/v3/mail/send", {
-    body: JSON.stringify({
+    body: stringifyObject({
       personalizations: [
         {
           from: {

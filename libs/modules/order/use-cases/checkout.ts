@@ -9,6 +9,8 @@ import { errors } from "@error-handling-utils";
 import { Product, LineItem, lineItemSchema } from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
 import { getLogger } from "@logger-utils";
+import { decreaseProductsStock } from "@product-db";
+import { uuidSchema } from "@global-entity";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -28,6 +30,8 @@ export const checkout: ProtectedModuleFunction = async (
     const { products } = checkoutBodySchema.parse(body);
     lineItems = await getLineItems(products);
   }
+
+  await reserveLineItems(lineItems);
 
   const session = await createCheckoutSession(lineItems, userId, cartId);
 
@@ -55,21 +59,34 @@ const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
   if (!cart.products?.length) {
     throw errors.CART_IS_EMPTY();
   }
-  return cart.products.map((product) => lineItemSchema.parse(product));
+  const lineItems = cart.products.map((product) =>
+    lineItemSchema.parse(product),
+  );
+
+  validateLineItems(lineItems);
+
+  return lineItems;
 };
 
 const getLineItems = async (
   products: { productId: string; quantity: number }[],
 ): Promise<LineItem[]> => {
   const dbProducts = await getProductsByProductIds(
-    products.map((product) => product.productId),
+    products.map((product) =>
+      uuidSchema("product id").parse(product.productId),
+    ),
   );
   if (dbProducts.length !== products.length) {
     throw errors.INVALID_PRODUCT_IDS(
       getInvalidProductIds(products, dbProducts),
     );
   }
-  return buildLineItems(products, dbProducts);
+
+  const lineItems = buildLineItems(products, dbProducts);
+
+  validateLineItems(lineItems);
+
+  return lineItems;
 };
 
 const getInvalidProductIds = (
@@ -96,4 +113,25 @@ const buildLineItems = (
     )!,
     quantity: product.quantity,
   }));
+};
+
+const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
+  await decreaseProductsStock(lineItems);
+};
+
+const validateLineItems = (lineItems: LineItem[]): void => {
+  const productsOutOfStock: { productId: string; stock: number }[] = [];
+
+  lineItems.forEach((lineItem) => {
+    if (!lineItem.stock || lineItem.quantity > lineItem.stock) {
+      productsOutOfStock.push({
+        productId: lineItem.productId,
+        stock: lineItem.stock,
+      });
+    }
+  });
+
+  if (productsOutOfStock.length) {
+    throw errors.PRODUCTS_OUT_OF_STOCK(productsOutOfStock);
+  }
 };

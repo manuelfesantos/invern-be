@@ -5,6 +5,7 @@ import * as AddProduct from "./add-product-to-cart";
 import * as RemoveProduct from "./remove-product-from-cart";
 import * as MergeCart from "./merge-cart-items";
 import * as CartAdapter from "@cart-db";
+import * as GetCart from "../get-cart";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
@@ -26,6 +27,10 @@ jest.mock("./remove-product-from-cart", () => ({
 
 jest.mock("./merge-cart-items", () => ({
   mergeCartItems: jest.fn(),
+}));
+
+jest.mock("../get-cart", () => ({
+  getCart: jest.fn(),
 }));
 
 jest.mock("@user-db", () => ({
@@ -53,6 +58,7 @@ describe("updateCart", () => {
   const addToCartSpy = jest.spyOn(AddProduct, "addProductToCart");
   const removeFromCartSpy = jest.spyOn(RemoveProduct, "removeProductFromCart");
   const mergeCartSpy = jest.spyOn(MergeCart, "mergeCartItems");
+  const getCartSpy = jest.spyOn(GetCart, "getCart");
   const validateCartIdSpy = jest.spyOn(CartAdapter, "validateCartId");
 
   beforeEach(() => {
@@ -111,6 +117,28 @@ describe("updateCart", () => {
     await compareResponses(response, expectedResponse);
     expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
     expect(mergeCartSpy).toHaveBeenCalledWith(tokens, remember, {}, "cartId");
+  });
+  it("should get cart if action is get", async () => {
+    getCartSpy.mockResolvedValueOnce(
+      successResponse.OK("cart", { cart: { cartId: "cartId" } }),
+    );
+    const response = await cartActionMapper(
+      tokens,
+      remember,
+      {},
+      "get",
+      "cartId",
+      "userId",
+    );
+    const expectedResponse = successResponse.OK("cart", {
+      cart: { cartId: "cartId" },
+    });
+    await compareResponses(response, expectedResponse);
+    expect(getCartSpy).toHaveBeenCalledWith(tokens, remember, {}, "cartId");
+    expect(validateCartIdSpy).not.toHaveBeenCalled();
+    expect(addToCartSpy).not.toHaveBeenCalled();
+    expect(removeFromCartSpy).not.toHaveBeenCalled();
+    expect(mergeCartSpy).not.toHaveBeenCalled();
   });
   it("should throw error if action is invalid", async () => {
     await expect(

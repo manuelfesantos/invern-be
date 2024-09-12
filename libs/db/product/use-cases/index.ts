@@ -1,1 +1,2 @@
-export * from "./validate-product-id";
+export * from "./validate-product";
+export * from "./update-products-stock";

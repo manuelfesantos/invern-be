@@ -3,7 +3,7 @@ import { successResponse } from "@response-entity";
 import * as UserAdapter from "@user-db";
 import { compareResponses, userMock } from "@mocks-utils";
 import { ZodError } from "zod";
-import { DEFAULT_USER_VERSION, userToUserDTO } from "@user-entity";
+import { userToUserDTO } from "@user-entity";
 
 jest.mock("@logger-utils", () => ({
   getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -41,7 +41,7 @@ describe("updateEmail", () => {
     getUserByIdSpy.mockResolvedValueOnce(userMock);
     const id = "userId";
     const email = "newEmail@example.com";
-    const { response, version } = await updateEmail(tokens, id, { email });
+    const response = await updateEmail(tokens, undefined, id, { email });
     const expectedResponse = successResponse.OK("user email updated", {
       user: {
         ...userToUserDTO(userMock),
@@ -50,7 +50,6 @@ describe("updateEmail", () => {
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);
-    expect(version).toEqual(userMock.version);
     expect(getUserByEmailSpy).toHaveBeenCalled();
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
     expect(updateUserSpy).toHaveBeenCalledWith(id, { email });
@@ -59,7 +58,7 @@ describe("updateEmail", () => {
     const id = "userId";
     const email = "invalidEmail";
     await expect(
-      async () => await updateEmail(tokens, id, { email }),
+      async () => await updateEmail(tokens, undefined, id, { email }),
     ).rejects.toBeInstanceOf(ZodError);
   });
   it("should throw error if user not found", async () => {
@@ -67,7 +66,7 @@ describe("updateEmail", () => {
     const id = "userId";
     const email = "newEmail@example.com";
     await expect(
-      async () => await updateEmail(tokens, id, { email }),
+      async () => await updateEmail(tokens, undefined, id, { email }),
     ).rejects.toEqual(expect.objectContaining({ message: "user not found" }));
     expect(getUserByEmailSpy).toHaveBeenCalled();
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
@@ -78,7 +77,7 @@ describe("updateEmail", () => {
     const id = "userId";
     const email = "newEmail@example.com";
     await expect(
-      async () => await updateEmail(tokens, id, { email }),
+      async () => await updateEmail(tokens, undefined, id, { email }),
     ).rejects.toEqual(
       expect.objectContaining({ message: "Email already taken", code: 409 }),
     );
@@ -91,7 +90,7 @@ describe("updateEmail", () => {
     getUserByIdSpy.mockResolvedValueOnce(userWithoutVersion);
     const id = "userId";
     const email = "newEmail@example.com";
-    const { response, version } = await updateEmail(tokens, id, { email });
+    const response = await updateEmail(tokens, undefined, id, { email });
     const expectedResponse = successResponse.OK("user email updated", {
       user: {
         ...userToUserDTO(userWithoutVersion),
@@ -100,7 +99,6 @@ describe("updateEmail", () => {
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);
-    expect(version).toEqual(DEFAULT_USER_VERSION);
     expect(getUserByEmailSpy).toHaveBeenCalled();
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
     expect(updateUserSpy).toHaveBeenCalledWith(id, { email });

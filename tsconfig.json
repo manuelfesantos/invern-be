@@ -54,6 +54,7 @@
       "@request-entity": ["libs/entities/request"],
       "@response-entity": ["libs/entities/response"],
       "@schema": ["db/schema"],
+      "@string-utils": ["libs/utils/string"],
       "@stripe-adapter": ["libs/adapters/stripe"],
       "@stripe-entity": ["libs/entities/stripe"],
       "@tax-entity": ["libs/entities/tax"],

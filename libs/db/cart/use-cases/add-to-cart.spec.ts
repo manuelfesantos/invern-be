@@ -1,6 +1,7 @@
 import { addToCart } from "./add-to-cart";
 import * as CartDb from "@cart-db";
 import * as DB from "@db";
+import { errors } from "@error-handling-utils";
 
 jest.mock("./get-quantity-in-cart", () => ({
   getQuantityInCart: jest.fn(),
@@ -34,7 +35,8 @@ describe("addToCart", () => {
     const cartId = "1";
     const productId = "1";
     const quantity = 1;
-    await addToCart(cartId, productId, quantity);
+    const stock = 1;
+    await addToCart(cartId, productId, quantity, stock);
     expect(getQuantityInCartSpy).toHaveBeenCalled();
     expect(insertSpy).toHaveBeenCalled();
     expect(updateSpy).not.toHaveBeenCalled();
@@ -45,9 +47,21 @@ describe("addToCart", () => {
     const cartId = "1";
     const productId = "1";
     const quantity = 1;
-    await addToCart(cartId, productId, quantity);
+    const stock = 2;
+    await addToCart(cartId, productId, quantity, stock);
     expect(getQuantityInCartSpy).toHaveBeenCalled();
     expect(insertSpy).not.toHaveBeenCalled();
     expect(updateSpy).toHaveBeenCalled();
+  });
+
+  it("should throw error when quantity is greater than stock", async () => {
+    getQuantityInCartSpy.mockResolvedValueOnce(ONE_QUANTITY);
+    const cartId = "1";
+    const productId = "1";
+    const quantity = 1;
+    const stock = 1;
+    await expect(async () =>
+      addToCart(cartId, productId, quantity, stock),
+    ).rejects.toThrowError(errors.PRODUCT_OUT_OF_STOCK(stock));
   });
 });

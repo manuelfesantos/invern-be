@@ -1,12 +1,13 @@
 import { db } from "@db";
 import { eq } from "drizzle-orm";
-import { ordersTable } from "@schema";
+import { ordersTable, productsToOrdersTable } from "@schema";
 import {
   ClientOrder,
   clientOrderSchema,
   Order,
   orderSchema,
 } from "@order-entity";
+import { ProductIdAndQuantity } from "@product-entity";
 
 export const getOrdersByUserId = async (
   userId: string,
@@ -289,4 +290,20 @@ export const getOrderByClientId = async (
           : undefined,
       })
     : undefined;
+};
+
+export const getOrderProductsByPaymentId = async (
+  paymentId: string,
+): Promise<ProductIdAndQuantity[]> => {
+  return db()
+    .select({
+      productId: productsToOrdersTable.productId,
+      quantity: productsToOrdersTable.quantity,
+    })
+    .from(ordersTable)
+    .innerJoin(
+      productsToOrdersTable,
+      eq(productsToOrdersTable.orderId, ordersTable.orderId),
+    )
+    .where(eq(ordersTable.paymentId, paymentId));
 };

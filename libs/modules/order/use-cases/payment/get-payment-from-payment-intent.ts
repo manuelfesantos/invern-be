@@ -1,6 +1,7 @@
 import { PaymentIntent } from "@stripe-entity";
 import {
   getPaymentFromPaymentIntent,
+  InsertPayment,
   Payment,
   PaymentIntentState,
 } from "@payment-entity";
@@ -10,6 +11,8 @@ import {
   updatePayment,
 } from "@payment-db";
 import { errors } from "@error-handling-utils";
+import { getOrderProductsByPaymentId } from "@order-db";
+import { increaseProductsStock } from "@product-db";
 
 export const getPaymentFromPaymentIntentSucceededEvent = async (
   paymentIntent: PaymentIntent,
@@ -77,20 +80,7 @@ export const getPaymentFromPaymentIntentCanceledEvent = async (
     paymentIntent,
     PaymentIntentState.canceled,
   );
-  const savedPayment = await getPaymentById(payment.paymentId);
-  if (savedPayment) {
-    if (
-      savedPayment?.state === PaymentIntentState.succeeded ||
-      savedPayment?.state === PaymentIntentState.canceled ||
-      savedPayment?.state === PaymentIntentState.failed
-    ) {
-      throw errors.PAYMENT_ALREADY_EXISTS();
-    }
-    const [updatedPayment] = await updatePayment(payment.paymentId, payment);
-    return updatedPayment;
-  }
-  const [insertedPayment] = await insertPaymentReturningAll(payment);
-  return insertedPayment;
+  return await handleFailedPayment(payment);
 };
 
 export const getPaymentFromPaymentIntentFailedEvent = async (
@@ -100,6 +90,16 @@ export const getPaymentFromPaymentIntentFailedEvent = async (
     paymentIntent,
     PaymentIntentState.failed,
   );
+  return await handleFailedPayment(payment);
+};
+
+const handleFailedPayment = async (
+  payment: InsertPayment,
+): Promise<Payment> => {
+  const products = await getOrderProductsByPaymentId(payment.paymentId);
+  if (products.length) {
+    await increaseProductsStock(products);
+  }
   const savedPayment = await getPaymentById(payment.paymentId);
   if (savedPayment) {
     if (

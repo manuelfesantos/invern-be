@@ -16,7 +16,7 @@ jest.mock("@cart-db", () => ({
 }));
 
 jest.mock("@product-db", () => ({
-  validateProductId: jest.fn(),
+  validateProductIdAndGetStock: jest.fn(),
 }));
 
 jest.mock("@jwt-utils", () => ({
@@ -47,13 +47,19 @@ const bodyWithoutProductId = {
   productId: undefined,
 };
 
+const stock = 10;
+
 describe("addProductToCart", () => {
   const addToCartSpy = jest.spyOn(CartAdapter, "addToCart");
-  const validateProductIdSpy = jest.spyOn(ProductAdapter, "validateProductId");
+  const validateProductIdAndGetStockSpy = jest.spyOn(
+    ProductAdapter,
+    "validateProductIdAndGetStock",
+  );
   beforeEach(() => {
     jest.clearAllMocks();
   });
   it("should add product to cart", async () => {
+    validateProductIdAndGetStockSpy.mockResolvedValueOnce(stock);
     const response = await addProductToCart(
       tokens,
       remember,
@@ -66,7 +72,12 @@ describe("addProductToCart", () => {
 
     await compareResponses(response, expectedResponse);
 
-    expect(addToCartSpy).toHaveBeenCalledWith("cartId", productId, quantity);
+    expect(addToCartSpy).toHaveBeenCalledWith(
+      "cartId",
+      productId,
+      quantity,
+      stock,
+    );
   });
   it("should not add product to cart if quantity is missing", async () => {
     await expect(
@@ -74,7 +85,7 @@ describe("addProductToCart", () => {
         await addProductToCart(tokens, remember, bodyWithoutQuantity, "cartId"),
     ).rejects.toBeInstanceOf(ZodError);
 
-    expect(validateProductIdSpy).not.toHaveBeenCalled();
+    expect(validateProductIdAndGetStockSpy).not.toHaveBeenCalled();
     expect(addToCartSpy).not.toHaveBeenCalled();
   });
   it("should not add product to cart if product id is missing", async () => {
@@ -88,27 +99,38 @@ describe("addProductToCart", () => {
         ),
     ).rejects.toBeInstanceOf(ZodError);
 
-    expect(validateProductIdSpy).not.toHaveBeenCalled();
+    expect(validateProductIdAndGetStockSpy).not.toHaveBeenCalled();
     expect(addToCartSpy).not.toHaveBeenCalled();
   });
   it("should return an error if validateProductId throws an error", async () => {
-    validateProductIdSpy.mockRejectedValueOnce(new Error("validation error"));
+    validateProductIdAndGetStockSpy.mockRejectedValueOnce(
+      new Error("validation error"),
+    );
 
     await expect(
       async () => await addProductToCart(tokens, remember, validBody, "cartId"),
     ).rejects.toEqual(expect.objectContaining({ message: "validation error" }));
 
-    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
+    expect(validateProductIdAndGetStockSpy).toHaveBeenCalledWith(
+      productId,
+      quantity,
+    );
     expect(addToCartSpy).not.toHaveBeenCalled();
   });
   it("should return an error if addToCart throws an error", async () => {
     addToCartSpy.mockRejectedValueOnce(new Error("database error"));
+    validateProductIdAndGetStockSpy.mockResolvedValueOnce(stock);
 
     await expect(
       async () => await addProductToCart(tokens, remember, validBody, "cartId"),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
 
-    expect(validateProductIdSpy).toHaveBeenCalled();
-    expect(addToCartSpy).toHaveBeenCalledWith("cartId", productId, quantity);
+    expect(validateProductIdAndGetStockSpy).toHaveBeenCalled();
+    expect(addToCartSpy).toHaveBeenCalledWith(
+      "cartId",
+      productId,
+      quantity,
+      stock,
+    );
   });
 });

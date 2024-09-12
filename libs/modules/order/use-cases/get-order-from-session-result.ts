@@ -11,11 +11,9 @@ import { getPaymentById, insertPaymentReturningId } from "@payment-db";
 import { getPaymentFromSessionResult } from "@payment-entity";
 import { ClientOrder, toClientOrder } from "@order-entity";
 import { errors } from "@error-handling-utils";
-import { productIdAndQuantitySchema } from "@product-entity";
 import { emptyCart } from "@cart-db";
-import { getUserById, incrementUserVersion } from "@user-db";
-
-const DEFAULT_USER_VERSION = 1;
+import { incrementUserVersion } from "@user-db";
+import { getProductsFromMetadata } from "../utils/get-products-from-metadata";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -65,8 +63,7 @@ export const getOrderFromSessionResult = async (
   }
 
   if (userId) {
-    const { version } = await getUserById(userId);
-    await incrementUserVersion(userId, version || DEFAULT_USER_VERSION);
+    await incrementUserVersion(userId);
   }
 
   return toClientOrder(order);
@@ -77,12 +74,8 @@ const insertProductsToOrder = async (
   orderId: string,
 ): Promise<void> => {
   if (productsString && orderId) {
-    const products = JSON.parse(productsString);
+    const products = getProductsFromMetadata(productsString);
 
-    Array.isArray(products) &&
-      (await addToOrder(
-        products.map((product) => productIdAndQuantitySchema.parse(product)),
-        orderId,
-      ));
+    products.length && (await addToOrder(products, orderId));
   }
 };
