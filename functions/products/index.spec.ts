@@ -27,6 +27,7 @@ jest.mock("@product-module", () => ({
 
 jest.mock("@http-utils", () => ({
   getQueryFromUrl: jest.fn(),
+  getFrontendHost: jest.fn(),
 }));
 
 jest.mock("@jwt-utils", () => ({}));
