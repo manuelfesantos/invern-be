@@ -55,7 +55,7 @@ export const getTokenCookie = (
   type: "token" | "refresh",
   remember?: boolean,
 ): string =>
-  `${typeToCookie[type]}=${token}; Path=/; HttpOnly; Secure; Domain=invernspirit.com; SameSite=None; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+  `${typeToCookie[type]}=${token}; Path=/; HttpOnly; Secure; Domain=invernspirit.com; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
 
 export const getLoggedInToken = async (
   userId: string,
