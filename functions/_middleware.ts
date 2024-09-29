@@ -12,6 +12,7 @@ import { setSecrets } from "@jwt-utils";
 import { withLogger } from "@logger-utils";
 import { setHosts } from "@http-utils";
 import { initZoneId, initCacheApiKey, stockClient } from "@r2-adapter";
+import { stringifyObject } from "@string-utils";
 
 export const startLogger: PagesFunction<Env> = async (context) => {
   const { env, request } = context;
@@ -40,7 +41,7 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   initCacheApiKey(env.CACHE_API_KEY);
   stockClient.init(env.STOCK_BUCKET);
   logger.addData({
-    setupCompleteMessage: "setup complete",
+    stockBucket: stringifyObject(env.STOCK_BUCKET),
   });
   return withLogger(logger, context.next);
 };
