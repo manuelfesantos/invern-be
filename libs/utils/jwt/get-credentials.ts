@@ -9,6 +9,7 @@ import { errors } from "@error-handling-utils";
 import { getAuthSecret } from "@kv-adapter";
 import { getAnonymousToken } from "./get-anonymous-tokens";
 import { HttpHeaderEnum } from "@http-entity";
+import { logger } from "@logger-utils";
 
 export const getCredentials = async (
   headers: Headers,
@@ -30,6 +31,9 @@ export const getCredentials = async (
       const tokenPayload = decodeJwt(token);
       if ("userId" in tokenPayload) {
         const { userId, cartId, remember } = tokenPayload;
+
+        logCredentials(cartId, userId);
+
         return { userId, cartId, refreshToken, remember };
       }
       return { refreshToken };
@@ -46,6 +50,9 @@ export const getCredentials = async (
       if (!userAuth || userAuth !== refreshToken) {
         throw errors.UNAUTHORIZED();
       }
+
+      logCredentials(cartId, userId);
+
       const accessToken = await getLoggedInToken(userId, cartId, remember);
       return { userId, cartId, accessToken, refreshToken, remember };
     }
@@ -66,4 +73,11 @@ const getTokensFromHeaders = (
   const cookies = parse(headers.get(HttpHeaderEnum.COOKIE) ?? "");
   const { s_r: refreshToken } = cookies;
   return { token, refreshToken };
+};
+
+const logCredentials = (cartId?: string, userId?: string): void => {
+  logger().addData({
+    ...(cartId && { cartId }),
+    ...(userId && { userId }),
+  });
 };

@@ -1,27 +1,30 @@
-import { AdapterError } from "./adapter-error";
+import { CustomError } from "./custom-error";
 import { HttpResponseEnum } from "@http-entity";
 
 export const errors = {
-  EMAIL_ALREADY_TAKEN: (): AdapterError =>
-    new AdapterError("Email already taken", HttpResponseEnum.CONFLICT),
-  INVALID_CREDENTIALS: (): AdapterError =>
-    new AdapterError(
+  EMAIL_ALREADY_TAKEN: (): CustomError =>
+    new CustomError("Email already taken", HttpResponseEnum.CONFLICT),
+  INVALID_CREDENTIALS: (): CustomError =>
+    new CustomError(
       "Invalid username or password",
       HttpResponseEnum.UNAUTHORIZED,
     ),
-  USER_NOT_FOUND: (): AdapterError =>
-    new AdapterError("User not found", HttpResponseEnum.NOT_FOUND),
-  PRODUCT_NOT_IN_CART: (): AdapterError =>
-    new AdapterError("Product not in cart", HttpResponseEnum.BAD_REQUEST),
-  DATABASE_NOT_INITIALIZED: (): AdapterError =>
-    new AdapterError(
+  USER_NOT_FOUND: (): CustomError =>
+    new CustomError("User not found", HttpResponseEnum.NOT_FOUND),
+  PRODUCT_NOT_IN_CART: (): CustomError =>
+    new CustomError("Product not in cart", HttpResponseEnum.BAD_REQUEST),
+  DATABASE_NOT_INITIALIZED: (): CustomError =>
+    new CustomError(
       "Database not initialized",
       HttpResponseEnum.INTERNAL_SERVER_ERROR,
     ),
-  PRODUCT_NOT_FOUND: (): AdapterError =>
-    new AdapterError("Product not found", HttpResponseEnum.NOT_FOUND),
-  PRODUCT_OUT_OF_STOCK: (stock: number): AdapterError =>
-    new AdapterError(
+  PRODUCT_NOT_FOUND: (productId?: string): CustomError =>
+    new CustomError(
+      `Product ${productId ? `with id ${productId} ` : ""}not found`,
+      HttpResponseEnum.NOT_FOUND,
+    ),
+  PRODUCT_OUT_OF_STOCK: (stock: number): CustomError =>
+    new CustomError(
       stock
         ? `Not enough stock available for this product. Only ${stock} in stock`
         : "Product out of stock",
@@ -29,64 +32,49 @@ export const errors = {
     ),
   PRODUCTS_OUT_OF_STOCK: (
     products: { productId: string; stock: number }[],
-  ): AdapterError =>
-    new AdapterError(
+  ): CustomError =>
+    new CustomError(
       `The following product ids don't have enough stock: ${products.map(({ productId, stock }) => `${productId} with stock ${stock}`).join(", ")}`,
       HttpResponseEnum.BAD_REQUEST,
     ),
-  COLLECTION_NOT_FOUND: (): AdapterError =>
-    new AdapterError("Collection not found", HttpResponseEnum.NOT_FOUND),
-  CART_NOT_FOUND: (): AdapterError =>
-    new AdapterError("Cart not found", HttpResponseEnum.NOT_FOUND),
-  INVALID_PRODUCT_IDS: (ids: string[]): AdapterError =>
-    new AdapterError(
+  COLLECTION_NOT_FOUND: (): CustomError =>
+    new CustomError("Collection not found", HttpResponseEnum.NOT_FOUND),
+  CART_NOT_FOUND: (): CustomError =>
+    new CustomError("Cart not found", HttpResponseEnum.NOT_FOUND),
+  INVALID_PRODUCT_IDS: (ids: string[]): CustomError =>
+    new CustomError(
       "The following product ids are invalid: " + ids,
       HttpResponseEnum.BAD_REQUEST,
     ),
-  PRODUCTS_ARE_REQUIRED: (): AdapterError =>
-    new AdapterError("Products are required", HttpResponseEnum.BAD_REQUEST),
-  CART_IS_NOT_EMPTY: (): AdapterError =>
-    new AdapterError("Cart is not empty", HttpResponseEnum.CONFLICT),
-  CART_IS_EMPTY: (): AdapterError =>
-    new AdapterError("Cart is empty", HttpResponseEnum.CONFLICT),
-  ACTION_IS_REQUIRED: (): AdapterError =>
-    new AdapterError("Action is required", HttpResponseEnum.BAD_REQUEST),
-  INVALID_ACTION: (action: string): AdapterError =>
-    new AdapterError(`Invalid action: ${action}`, HttpResponseEnum.BAD_REQUEST),
-  LOGGER_NOT_INITIALIZED: (): AdapterError =>
-    new AdapterError(
-      "Logger not initialized",
-      HttpResponseEnum.INTERNAL_SERVER_ERROR,
-    ),
-  CHECKOUT_SESSION_CREATION_FAILED: (): AdapterError =>
-    new AdapterError(
-      "Checkout session creation failed",
-      HttpResponseEnum.INTERNAL_SERVER_ERROR,
-    ),
-  INVALID_ADDRESS: (issue: string): AdapterError =>
-    new AdapterError(`Invalid address: ${issue}`, HttpResponseEnum.BAD_REQUEST),
-  INVALID_PAYMENT: (issue: string): AdapterError =>
-    new AdapterError(`Invalid payment: ${issue}`, HttpResponseEnum.BAD_REQUEST),
-  UNABLE_TO_CREATE_ORDER: (): AdapterError =>
-    new AdapterError(
-      "Unable to create order",
-      HttpResponseEnum.INTERNAL_SERVER_ERROR,
-    ),
-  ORDER_ALREADY_EXISTS: (): AdapterError =>
-    new AdapterError("Order already exists", HttpResponseEnum.CONFLICT),
-  PAYMENT_ALREADY_EXISTS: (): AdapterError =>
-    new AdapterError("Payment already exists", HttpResponseEnum.CONFLICT),
-  INVALID_EVENT_TYPE: (type: string): AdapterError =>
-    new AdapterError(
+  PRODUCTS_ARE_REQUIRED: (): CustomError =>
+    new CustomError("Products are required", HttpResponseEnum.BAD_REQUEST),
+  CART_IS_NOT_EMPTY: (): CustomError =>
+    new CustomError("Cart is not empty", HttpResponseEnum.CONFLICT),
+  CART_IS_EMPTY: (): CustomError =>
+    new CustomError("Cart is empty", HttpResponseEnum.CONFLICT),
+  ACTION_IS_REQUIRED: (): CustomError =>
+    new CustomError("Action is required", HttpResponseEnum.BAD_REQUEST),
+  INVALID_ACTION: (action: string): CustomError =>
+    new CustomError(`Invalid action: ${action}`, HttpResponseEnum.BAD_REQUEST),
+  INVALID_ADDRESS: (issue: string): CustomError =>
+    new CustomError(`Invalid address: ${issue}`, HttpResponseEnum.BAD_REQUEST),
+  INVALID_PAYMENT: (issue: string): CustomError =>
+    new CustomError(`Invalid payment: ${issue}`, HttpResponseEnum.BAD_REQUEST),
+  ORDER_ALREADY_EXISTS: (): CustomError =>
+    new CustomError("Order already exists", HttpResponseEnum.CONFLICT),
+  PAYMENT_ALREADY_EXISTS: (): CustomError =>
+    new CustomError("Payment already exists", HttpResponseEnum.CONFLICT),
+  INVALID_EVENT_TYPE: (type: string): CustomError =>
+    new CustomError(
       `Invalid event type: ${type}`,
       HttpResponseEnum.BAD_REQUEST,
     ),
-  INVALID_PAYLOAD: (issue: string): AdapterError =>
-    new AdapterError(`Invalid payload: ${issue}`, HttpResponseEnum.BAD_REQUEST),
-  ORDER_NOT_FOUND: (): AdapterError =>
-    new AdapterError("Order not found", HttpResponseEnum.NOT_FOUND),
-  ORDERS_NOT_FOUND: (): AdapterError =>
-    new AdapterError("Orders not found", HttpResponseEnum.NOT_FOUND),
-  UNAUTHORIZED: (message?: string): AdapterError =>
-    new AdapterError(message || "Unauthorized", HttpResponseEnum.UNAUTHORIZED),
+  INVALID_PAYLOAD: (issue: string): CustomError =>
+    new CustomError(`Invalid payload: ${issue}`, HttpResponseEnum.BAD_REQUEST),
+  ORDER_NOT_FOUND: (): CustomError =>
+    new CustomError("Order not found", HttpResponseEnum.NOT_FOUND),
+  ORDERS_NOT_FOUND: (): CustomError =>
+    new CustomError("Orders not found", HttpResponseEnum.NOT_FOUND),
+  UNAUTHORIZED: (message?: string): CustomError =>
+    new CustomError(message || "Unauthorized", HttpResponseEnum.UNAUTHORIZED),
 };

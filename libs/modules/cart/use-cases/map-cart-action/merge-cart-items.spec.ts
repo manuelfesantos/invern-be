@@ -6,7 +6,7 @@ import { Cart } from "@cart-entity";
 import { compareResponses } from "@mocks-utils";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@cart-db", () => ({

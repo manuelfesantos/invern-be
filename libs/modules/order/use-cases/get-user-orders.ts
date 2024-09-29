@@ -5,15 +5,13 @@ import {
 } from "@response-entity";
 import { errors } from "@error-handling-utils";
 
-const EMPTY_ORDERS = 0;
-
 export const getUserOrders: ProtectedModuleFunction = async (
   tokens,
   remember,
   userId: string,
 ): Promise<Response> => {
   const orders = await getOrdersByUserId(userId);
-  if (!orders || orders.length === EMPTY_ORDERS) {
+  if (!orders) {
     throw errors.ORDERS_NOT_FOUND();
   }
   return protectedSuccessResponse.OK(

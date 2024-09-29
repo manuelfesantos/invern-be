@@ -12,6 +12,7 @@ import {
   failedPaymentMock,
   processingPaymentMock,
   productIdAndQuantityMock,
+  productsMock,
   stripeCheckoutPaymentIntentResultCanceledMock,
   stripeCheckoutPaymentIntentResultCreatedMock,
   stripeCheckoutPaymentIntentResultFailedMock,
@@ -44,7 +45,17 @@ jest.mock("@order-db", () => ({
 }));
 
 jest.mock("@product-db", () => ({
-  increaseProductsStock: jest.fn(),
+  increaseProductsStock: jest.fn(() => productsMock),
+}));
+
+jest.mock("@logger-utils", () => ({
+  logger: jest.fn().mockReturnValue({ info: jest.fn(), error: jest.fn() }),
+}));
+
+jest.mock("@r2-adapter", () => ({
+  stockClient: {
+    update: jest.fn(),
+  },
 }));
 
 const insertedPaymentDraftMock = {

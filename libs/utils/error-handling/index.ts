@@ -1,2 +1,2 @@
-export * from "./adapter-error";
+export * from "./custom-error";
 export * from "./error-messages";

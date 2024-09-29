@@ -6,14 +6,11 @@ import {
 } from "@user-module";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";
 import { errorResponse, generateErrorResponse } from "@response-entity";
-import { setGlobalTimer } from "@timer-utils";
 import { getBodyFromRequest } from "@http-utils";
-import { getLogger } from "@logger-utils";
 import { getCredentials } from "@jwt-utils";
+import { logger } from "@logger-utils";
 
 export const onRequest: PagesFunction = async (context): Promise<Response> => {
-  setGlobalTimer();
-
   const { request } = context;
 
   const { headers } = request;
@@ -35,8 +32,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
     const body = await getBodyFromRequest(request);
     const action = request.headers.get(HttpHeaderEnum.ACTION);
 
-    const logger = getLogger();
-    logger.addData({ body });
+    logger().addData({ body });
 
     if (request.method === HttpMethodEnum.POST) {
       return await userActionMapper(body, action, userId);

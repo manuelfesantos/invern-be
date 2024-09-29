@@ -5,7 +5,6 @@ import {
   successResponse,
 } from "@response-entity";
 import { getBodyFromRequest } from "@http-utils";
-import { getLogger } from "@logger-utils";
 import { sendEmail } from "@mail-utils";
 import {
   isStripeEvent,
@@ -17,6 +16,7 @@ import {
   handleSessionExpiredEvent,
 } from "@order-module";
 import { stringifyObject } from "@string-utils";
+import { logger } from "@logger-utils";
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;
@@ -32,12 +32,10 @@ export const onRequest: PagesFunction = async (context) => {
       );
     }
 
-    const logger = getLogger();
-
     if (isStripeSessionExpiredEvent(body)) {
       const { object: sessionEvent } = body.data;
 
-      logger.addData({
+      logger().addData({
         sessionExpired: stringifyObject(body),
       });
 
@@ -52,7 +50,7 @@ export const onRequest: PagesFunction = async (context) => {
 
     const { object: sessionEvent } = body.data;
 
-    logger.addData({
+    logger().addData({
       checkoutSessionResult: stringifyObject(body),
     });
     const clientOrder = await getOrderFromSessionResult(sessionEvent);
@@ -61,7 +59,7 @@ export const onRequest: PagesFunction = async (context) => {
       "Checkout",
       `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
     );
-    logger.addData({
+    logger().addData({
       createdOrder: stringifyObject(clientOrder),
     });
     return successResponse.OK("success getting checkout-session", clientOrder);

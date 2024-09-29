@@ -21,7 +21,7 @@ import { ZodError } from "zod";
 import * as JwtUtils from "@jwt-utils";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@user-module", () => ({
@@ -34,6 +34,7 @@ jest.mock("@user-module", () => ({
 jest.mock("@http-utils", () => ({
   getBodyFromRequest: jest.fn(),
   getFrontendHost: jest.fn(),
+  frontendHost: jest.fn(),
 }));
 
 jest.mock("@jwt-utils", () => ({

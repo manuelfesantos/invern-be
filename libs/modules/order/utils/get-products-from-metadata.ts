@@ -2,15 +2,14 @@ import {
   ProductIdAndQuantity,
   productIdAndQuantitySchema,
 } from "@product-entity";
-import { getLogger } from "@logger-utils";
+import { logger } from "@logger-utils";
 import { stringifyObject } from "@string-utils";
 
 export const getProductsFromMetadata = (
   productString: string,
 ): ProductIdAndQuantity[] => {
   if (!productString.includes("|") || !productString.includes(":")) {
-    const logger = getLogger();
-    logger.addData({
+    logger().addData({
       message: `Invalid product string: ${stringifyObject(productString)}`,
     });
     return [];

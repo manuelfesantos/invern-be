@@ -8,4 +8,8 @@ export interface Env {
   TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
   FRONTEND_HOST: string;
+  STOCK_BUCKET: R2Bucket;
+  STOCK_HOST: string;
+  CACHE_API_KEY: string;
+  ZONE_ID: string;
 }

@@ -1,14 +1,12 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { Env } from "@request-entity";
 import { initStripeClient } from "@stripe-adapter";
-import { setGlobalTimer } from "@timer-utils";
 import { getBodyFromRequest } from "@http-utils";
 import { checkout } from "@order-module";
 import { getCredentials } from "@jwt-utils";
 export const onRequest: PagesFunction<Env> = async (
   context,
 ): Promise<Response> => {
-  setGlobalTimer();
   const { request, env } = context;
 
   initStripeClient(env.STRIPE_API_KEY);

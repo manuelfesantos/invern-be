@@ -3,6 +3,8 @@ import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { User, userSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 const NO_USER_VERSION = 0;
 
@@ -74,8 +76,9 @@ export const getUserVersionById = async (userId: string): Promise<number> => {
       version: true,
     },
   });
-  if (!user) {
-    throw errors.USER_NOT_FOUND();
-  }
-  return user.version ?? NO_USER_VERSION;
+  logger().info("user version", LoggerUseCaseEnum.GET_USER, {
+    userId,
+    version: user?.version,
+  });
+  return user?.version ?? NO_USER_VERSION;
 };

@@ -1,4 +1,4 @@
-export class AdapterError extends Error {
+export class CustomError extends Error {
   code: number;
   constructor(message: string, code: number) {
     super(message);

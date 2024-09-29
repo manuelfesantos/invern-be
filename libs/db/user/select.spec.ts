@@ -94,6 +94,13 @@ jest.mock("@db", () => ({
   }),
 }));
 
+jest.mock("@logger-utils", () => ({
+  logger: jest.fn().mockReturnValue({
+    info: jest.fn(),
+    error: jest.fn(),
+  }),
+}));
+
 const NO_USER_VERSION = 0;
 
 describe("getUser", () => {
@@ -146,13 +153,6 @@ describe("getUser", () => {
       findFirstSpy.mockResolvedValueOnce(userFromDbWithoutVersion as any);
       const result = await getUserVersionById("id");
       expect(result).toEqual(NO_USER_VERSION);
-      expect(findFirstSpy).toHaveBeenCalled();
-    });
-    it("should throw error if no user is found", async () => {
-      findFirstSpy.mockResolvedValueOnce(undefined);
-      await expect(async () => getUserVersionById("id")).rejects.toThrow(
-        errors.USER_NOT_FOUND(),
-      );
       expect(findFirstSpy).toHaveBeenCalled();
     });
   });

@@ -10,7 +10,7 @@ import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@cart-db", () => ({

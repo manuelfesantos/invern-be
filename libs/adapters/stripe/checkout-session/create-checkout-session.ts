@@ -3,6 +3,7 @@ import { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
 import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
+import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
@@ -12,6 +13,7 @@ export const createCheckoutSession = async (
   const clientOrderId = getRandomUUID();
   return await stripe().checkout.sessions.create({
     customer_creation: "always",
+    expires_at: getFutureDate(SESSION_EXPIRY),
     shipping_address_collection: {
       allowed_countries: [
         "PT",

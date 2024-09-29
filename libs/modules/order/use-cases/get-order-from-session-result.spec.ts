@@ -19,7 +19,7 @@ const ONE_TIME = 1;
 jest.mock("@jwt-utils", () => ({}));
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@order-db", () => ({
@@ -217,7 +217,7 @@ describe("getOrderFromSessionResult", () => {
           stripeCheckoutSessionResultMockWithUserId,
         ),
     ).rejects.toEqual(
-      expect.objectContaining({ message: "Unable to create order", code: 500 }),
+      expect.objectContaining({ message: "Unable to create order" }),
     );
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
     expect(emptyCartSpy).not.toHaveBeenCalled();

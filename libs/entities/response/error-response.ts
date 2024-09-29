@@ -1,7 +1,7 @@
 import { z, ZodError } from "zod";
 import { HttpResponseEnum } from "@http-entity";
 import { buildResponse } from "./response";
-import { AdapterError } from "@error-handling-utils";
+import { CustomError } from "@error-handling-utils";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown, headers?: Record<string, string>) =>
@@ -75,7 +75,7 @@ export const generateErrorResponse = (
     return errorResponse.BAD_REQUEST(simplifyZodError(error), headers);
   }
 
-  if (error instanceof AdapterError) {
+  if (error instanceof CustomError) {
     return buildErrorResponse(
       simplifyError(error),
       Number(error.code),

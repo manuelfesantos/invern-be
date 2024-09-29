@@ -8,9 +8,12 @@ import { getProductsByProductIds } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { Product, LineItem, lineItemSchema } from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
-import { getLogger } from "@logger-utils";
+import { logger } from "@logger-utils";
 import { decreaseProductsStock } from "@product-db";
 import { uuidSchema } from "@global-entity";
+import { LoggerUseCaseEnum } from "@logger-entity";
+import { stockClient } from "@r2-adapter";
+import { stringifyObject } from "@string-utils";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -25,6 +28,10 @@ export const checkout: ProtectedModuleFunction = async (
     lineItems = await getLineItemsByCartId(cartId);
   } else {
     if (!body) {
+      logger().error(
+        "Checkout body not provided",
+        LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+      );
       throw errors.PRODUCTS_ARE_REQUIRED();
     }
     const { products } = checkoutBodySchema.parse(body);
@@ -35,12 +42,18 @@ export const checkout: ProtectedModuleFunction = async (
 
   const session = await createCheckoutSession(lineItems, userId, cartId);
 
-  getLogger().addData({ sessionDetails: session });
+  logger().info(
+    "Finished creating checkout session",
+    LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    {
+      sessionDetails: stringifyObject(session),
+    },
+  );
 
   const { url } = session;
 
   if (!url) {
-    throw errors.CHECKOUT_SESSION_CREATION_FAILED();
+    throw new Error("Checkout session creation failed");
   }
 
   return protectedSuccessResponse.OK(
@@ -116,7 +129,10 @@ const buildLineItems = (
 };
 
 const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
-  await decreaseProductsStock(lineItems);
+  const updatedLineItems = await decreaseProductsStock(lineItems);
+  for (const lineItem of updatedLineItems) {
+    await stockClient.update(lineItem);
+  }
 };
 
 const validateLineItems = (lineItems: LineItem[]): void => {

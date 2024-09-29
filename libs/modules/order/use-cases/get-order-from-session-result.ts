@@ -55,7 +55,7 @@ export const getOrderFromSessionResult = async (
   const order = await getOrderById(orderId);
 
   if (!order) {
-    throw errors.UNABLE_TO_CREATE_ORDER();
+    throw new Error("Unable to create order");
   }
 
   if (cartId) {

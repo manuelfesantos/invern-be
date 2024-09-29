@@ -32,10 +32,11 @@ jest.mock("@config-module", () => ({
 jest.mock("@http-utils", () => ({
   getFrontendHost: jest.fn(),
   getBodyFromRequest: jest.fn(),
+  frontendHost: jest.fn(),
 }));
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("cookie", () => ({

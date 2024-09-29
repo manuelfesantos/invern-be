@@ -4,7 +4,7 @@ import { successResponse } from "@response-entity";
 import * as UserAdapter from "@user-db";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@user-db", () => ({

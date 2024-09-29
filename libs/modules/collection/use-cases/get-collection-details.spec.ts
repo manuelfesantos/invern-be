@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 const collectionId = "gqgX5N33RQwJrAjYH1JZTk";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@collection-db", () => ({

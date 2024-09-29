@@ -1,5 +1,5 @@
 import { checkout } from "@order-module";
-import { compareResponses, lineItemsMock } from "@mocks-utils";
+import { compareResponses, lineItemsMock, productsMock } from "@mocks-utils";
 import { protectedSuccessResponse } from "@response-entity";
 import * as StripeAdapter from "@stripe-adapter";
 import * as CartDb from "@cart-db";
@@ -8,7 +8,9 @@ import { StripeCheckoutSessionResponse } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest
+    .fn()
+    .mockReturnValue({ addData: jest.fn(), info: jest.fn(), error: jest.fn() }),
 }));
 
 jest.mock("@jwt-utils", () => ({
@@ -26,7 +28,13 @@ jest.mock("@cart-db", () => ({
 
 jest.mock("@product-db", () => ({
   getProductsByProductIds: jest.fn(),
-  decreaseProductsStock: jest.fn(),
+  decreaseProductsStock: jest.fn(() => productsMock),
+}));
+
+jest.mock("@r2-adapter", () => ({
+  stockClient: {
+    update: jest.fn(),
+  },
 }));
 
 const cartId = "cartId";
