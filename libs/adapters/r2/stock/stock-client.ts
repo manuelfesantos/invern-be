@@ -1,11 +1,17 @@
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { acquireLock, getCacheKey, purgeCache, releaseLock } from "../utils";
+import { stringifyObject } from "@string-utils";
+import { z } from "zod";
 
 const STOCK_LOCK_TTL = 3000;
 const MAX_RETRIES = 3;
 
 let stockBucket: R2Bucket | null = null;
+
+const stockDataSchema = z.object({
+  data: z.number(),
+});
 
 const init = (bucket: R2Bucket): void => {
   if (!stockBucket) {
@@ -13,7 +19,9 @@ const init = (bucket: R2Bucket): void => {
   }
 };
 
-const getStock = async (productId: string): Promise<number | undefined> => {
+const getStock = async (
+  productId: string,
+): Promise<{ data: number } | undefined> => {
   if (!stockBucket) {
     logger().error(
       "Stock bucket client not initialized",
@@ -23,14 +31,17 @@ const getStock = async (productId: string): Promise<number | undefined> => {
   }
 
   const bucketObject = await stockBucket.get(productId);
-  const productStock = Number(await bucketObject?.text());
+  if (!bucketObject) {
+    return undefined;
+  }
+  const productStock = await bucketObject?.json();
 
   logger().info("Got stock from bucket", LoggerUseCaseEnum.GET_R2_STOCK, {
     productId,
     productStock,
   });
 
-  return productStock;
+  return stockDataSchema.parse(productStock);
 };
 
 const updateStock = async ({
@@ -58,7 +69,7 @@ const updateStock = async ({
     const lock = await acquireLock(stockBucket, lockKey, STOCK_LOCK_TTL);
 
     if (lock) {
-      await stockBucket.put(productId, stock.toString());
+      await stockBucket.put(productId, stringifyObject({ data: stock }));
       const cacheKey = getCacheKey(productId);
       if (cacheKey) {
         await purgeCache(cacheKey);

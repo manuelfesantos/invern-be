@@ -16,12 +16,12 @@ export const onRequest: PagesFunction<Env> = async ({ request }) => {
     if (!productId) {
       return errorResponse.BAD_REQUEST("productId is required");
     }
-    const stock = await stockClient.get(productId);
-    if (!stock) {
+    const { data } = (await stockClient.get(productId)) || {};
+    if (!data) {
       return errorResponse.NOT_FOUND("product not found");
     }
 
-    return successResponse.OK("success getting stock", stock);
+    return successResponse.OK("success getting stock", data);
   } catch (error) {
     return generateErrorResponse(error);
   }
