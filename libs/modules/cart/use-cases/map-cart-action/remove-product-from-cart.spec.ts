@@ -8,7 +8,7 @@ import { ZodError } from "zod";
 const { productId, quantity } = productIdAndQuantityMock;
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@cart-db", () => ({

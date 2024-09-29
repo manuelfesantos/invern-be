@@ -8,7 +8,7 @@ import {
 import { errorResponse, successResponse } from "@response-entity";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@jwt-utils", () => ({}));

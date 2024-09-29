@@ -18,7 +18,7 @@ import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@product-module", () => ({
@@ -28,6 +28,7 @@ jest.mock("@product-module", () => ({
 jest.mock("@http-utils", () => ({
   getQueryFromUrl: jest.fn(),
   getFrontendHost: jest.fn(),
+  frontendHost: jest.fn(),
 }));
 
 jest.mock("@jwt-utils", () => ({}));

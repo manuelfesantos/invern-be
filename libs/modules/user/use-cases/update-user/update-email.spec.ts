@@ -6,7 +6,7 @@ import { ZodError } from "zod";
 import { userToUserDTO } from "@user-entity";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@user-db", () => ({

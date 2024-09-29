@@ -6,7 +6,7 @@ import * as OrderDb from "@order-db";
 const orderId = "orderId";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@jwt-utils", () => ({}));

@@ -12,7 +12,7 @@ jest.mock("@jwt-utils", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 const accessToken = "accessToken";
@@ -36,10 +36,13 @@ describe("getUserOrders", () => {
   it("should throw error when orders not found", async () => {
     getOrdersByUserIdSpy.mockResolvedValueOnce([]);
     const userId = "userId";
-    await expect(
-      async () => await getUserOrders(tokens, remember, userId),
-    ).rejects.toEqual(expect.objectContaining({ message: "Orders not found" }));
+    const response = await getUserOrders(tokens, remember, userId);
+    const expectedResponse = successResponse.OK(
+      "success getting orders by user id",
+      { accessToken, orders: [] },
+    );
     expect(getOrdersByUserIdSpy).toHaveBeenCalledWith(userId);
+    await compareResponses(response, expectedResponse);
   });
   it("should throw error if getOrdersByUserId throws error", async () => {
     getOrdersByUserIdSpy.mockRejectedValueOnce(new Error("database error"));

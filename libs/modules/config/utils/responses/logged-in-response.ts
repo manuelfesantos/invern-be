@@ -20,7 +20,7 @@ export const loggedInResponse = async (
 
   const accessToken = await getLoggedInToken(userId, cartId, remember);
 
-  if (userVersion >= savedUserVersion) {
+  if (userVersion === savedUserVersion) {
     return protectedSuccessResponse.OK(
       { refreshToken, accessToken },
       "success getting logged in config",
@@ -29,6 +29,10 @@ export const loggedInResponse = async (
       },
       remember,
     );
+  }
+
+  if (userVersion > savedUserVersion) {
+    return loggedOutResponse(country, userVersion);
   }
 
   const user = await getUserById(userId);

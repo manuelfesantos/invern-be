@@ -5,7 +5,7 @@ import * as ProductAdapter from "@product-db";
 import * as Logger from "@logger-utils";
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@product-db", () => ({
@@ -21,7 +21,7 @@ describe("getAllProducts", () => {
     ProductAdapter,
     "getProductsBySearch",
   );
-  const getLoggerSpy = jest.spyOn(Logger, "getLogger");
+  const loggerSpy = jest.spyOn(Logger, "logger");
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -49,7 +49,7 @@ describe("getAllProducts", () => {
       productsMock,
     );
     await compareResponses(response, expectedResponse);
-    expect(getLoggerSpy).toHaveBeenCalled();
+    expect(loggerSpy).toHaveBeenCalled();
     expect(getProductsBySearchSpy).toHaveBeenCalled();
     expect(getProductsSpy).not.toHaveBeenCalled();
   });

@@ -4,9 +4,9 @@ import {
   successResponse,
 } from "@response-entity";
 import { getBodyFromRequest } from "@http-utils";
-import { getLogger } from "@logger-utils";
 import { mapPaymentIntentEvent } from "@order-module";
 import { stringifyObject } from "@string-utils";
+import { logger } from "@logger-utils";
 
 export const onRequest: PagesFunction = async (context) => {
   const { request } = context;
@@ -18,15 +18,13 @@ export const onRequest: PagesFunction = async (context) => {
   try {
     const body = await getBodyFromRequest(request);
 
-    const logger = getLogger();
-
-    logger.addData({
+    logger().addData({
       checkoutPaymentIntent: stringifyObject(body),
     });
 
     const payment = await mapPaymentIntentEvent(body);
 
-    logger.addData({ createdPayment: stringifyObject(payment) });
+    logger().addData({ createdPayment: stringifyObject(payment) });
     return successResponse.OK("success getting checkout-session");
   } catch (error) {
     return generateErrorResponse(error);

@@ -15,7 +15,7 @@ jest.mock("@kv-adapter", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 describe("logout", () => {

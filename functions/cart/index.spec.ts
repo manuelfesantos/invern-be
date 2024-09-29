@@ -23,7 +23,7 @@ jest.mock("@cart-module", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@jwt-utils", () => ({
@@ -33,6 +33,7 @@ jest.mock("@jwt-utils", () => ({
 jest.mock("@http-utils", () => ({
   getFrontendHost: jest.fn(),
   getBodyFromRequest: jest.fn(),
+  frontendHost: jest.fn(),
 }));
 
 describe("onRequest", () => {

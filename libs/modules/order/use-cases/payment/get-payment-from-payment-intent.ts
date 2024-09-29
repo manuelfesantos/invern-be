@@ -13,6 +13,7 @@ import {
 import { errors } from "@error-handling-utils";
 import { getOrderProductsByPaymentId } from "@order-db";
 import { increaseProductsStock } from "@product-db";
+import { stockClient } from "@r2-adapter";
 
 export const getPaymentFromPaymentIntentSucceededEvent = async (
   paymentIntent: PaymentIntent,
@@ -98,7 +99,10 @@ const handleFailedPayment = async (
 ): Promise<Payment> => {
   const products = await getOrderProductsByPaymentId(payment.paymentId);
   if (products.length) {
-    await increaseProductsStock(products);
+    const updatedProducts = await increaseProductsStock(products);
+    for (const product of updatedProducts) {
+      await stockClient.update(product);
+    }
   }
   const savedPayment = await getPaymentById(payment.paymentId);
   if (savedPayment) {

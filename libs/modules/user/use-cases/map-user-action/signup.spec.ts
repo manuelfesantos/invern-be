@@ -12,7 +12,7 @@ const { userId } = userMock;
 const { cartId } = userMock.cart as Cart;
 
 jest.mock("@logger-utils", () => ({
-  getLogger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
 }));
 
 jest.mock("@cart-db", () => ({
