@@ -4,6 +4,7 @@ import { Stripe } from "stripe";
 import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
+import { frontendHost } from "@http-utils";
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
@@ -33,8 +34,8 @@ export const createCheckoutSession = async (
     billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
-    success_url: `https://www.invernspirit.com/order?id=${clientOrderId}`,
-    cancel_url: "https://www.invernspirit.com/cart",
+    success_url: `${frontendHost()}/order?id=${clientOrderId}`,
+    cancel_url: `${frontendHost()}/cart`,
     line_items: lineItems.map((product) => {
       return {
         price_data: {
