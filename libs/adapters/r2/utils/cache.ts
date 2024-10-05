@@ -35,7 +35,7 @@ export const purgeCache = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${cacheApiKey}`,
+        "X-Auth-Key": cacheApiKey,
       },
       body: JSON.stringify({
         files: Array.isArray(cacheKey) ? cacheKey : [cacheKey],
