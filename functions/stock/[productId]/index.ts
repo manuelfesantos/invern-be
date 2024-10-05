@@ -12,7 +12,11 @@ const bodySchema = z.object({
   secretKey: z.string(),
 });
 
-export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequest: PagesFunction<Env> = async ({
+  request,
+  env,
+  params,
+}) => {
   const isAdminRequest =
     env.ENV !== "local" &&
     request.method === "POST" &&
@@ -24,11 +28,11 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
-    const productId = new URL(request.url).searchParams.get("productId");
+    const { productId } = params;
     if (!productId) {
       return errorResponse.BAD_REQUEST("productId is required");
     }
-    const response = await stockClient.get(productId);
+    const response = await stockClient.get(productId as string);
     if (!response) {
       return errorResponse.NOT_FOUND("product not found");
     }
