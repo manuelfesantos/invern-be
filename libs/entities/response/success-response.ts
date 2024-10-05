@@ -23,6 +23,7 @@ export const protectedSuccessResponse = {
     message: string,
     data?: unknown,
     remember?: boolean,
+    headers?: Record<string, string>,
   ): Response => {
     const { refreshToken, accessToken } = tokens;
     const response = successResponse.OK(message, {
@@ -33,6 +34,9 @@ export const protectedSuccessResponse = {
       "Set-Cookie",
       getTokenCookie(refreshToken, "refresh", remember),
     );
+    for (const header in headers) {
+      response.headers.append(header, headers[header]);
+    }
     return response;
   },
   CREATED: (
@@ -40,6 +44,7 @@ export const protectedSuccessResponse = {
     message: string,
     data?: unknown,
     remember?: boolean,
+    headers?: Record<string, string>,
   ): Response => {
     const { refreshToken, accessToken } = tokens;
     const response = successResponse.CREATED(message, {
@@ -50,6 +55,9 @@ export const protectedSuccessResponse = {
       "Set-Cookie",
       getTokenCookie(refreshToken, "refresh", remember),
     );
+    for (const header in headers) {
+      response.headers.append(header, headers[header]);
+    }
     return response;
   },
 };

@@ -5,3 +5,4 @@ export * from "./payment";
 export * from "./get-order";
 export * from "./get-user-orders";
 export * from "./handle-session-expired-event";
+export * from "./invalidate-checkout-session";

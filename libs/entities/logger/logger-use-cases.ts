@@ -46,7 +46,10 @@ const r2BucketUseCasesSchema = [
 
 const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
 
-const checkoutUseCasesSchema = ["CREATE_CHECKOUT_SESSION"] as const;
+const checkoutUseCasesSchema = [
+  "CREATE_CHECKOUT_SESSION",
+  "GET_PRODUCTS_FROM_METADATA",
+] as const;
 
 const loggerUseCasesSchema = z.enum([
   ...cartUseCasesSchema,
