@@ -5,9 +5,21 @@ import {
 } from "@response-entity";
 import { Env } from "@request-entity";
 import { stockClient } from "@r2-adapter";
+import { z } from "zod";
+import { getBodyFromRequest } from "@http-utils";
+
+const bodySchema = z.object({
+  secretKey: z.string(),
+});
 
 export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
-  if (request.method !== "GET" || env.ENV !== "local") {
+  const isAdminRequest =
+    env.ENV !== "local" &&
+    request.method === "POST" &&
+    secretKeyIsValid(await getBodyFromRequest(request), env);
+  const isLocalRequest = env.ENV === "local" && request.method === "GET";
+
+  if (!isAdminRequest && !isLocalRequest) {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
 
@@ -25,4 +37,9 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
   } catch (error) {
     return generateErrorResponse(error);
   }
+};
+
+const secretKeyIsValid = (body: unknown, env: Env): boolean => {
+  const { secretKey } = bodySchema.parse(body);
+  return secretKey ? secretKey === env.SETUP_STOCK_SECRET : false;
 };

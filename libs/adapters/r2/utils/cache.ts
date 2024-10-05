@@ -1,4 +1,6 @@
 import { stockHost } from "@http-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 let cacheApiKey: string | null = null;
 let zoneId: string | null = null;
@@ -38,6 +40,10 @@ export const purgeCache = async (
         files: Array.isArray(cacheKey) ? cacheKey : [cacheKey],
       }),
     },
+  );
+  logger().info(
+    `purged cache for ${cacheKey}`,
+    LoggerUseCaseEnum.PURGE_STOCK_CACHE,
   );
 };
 
