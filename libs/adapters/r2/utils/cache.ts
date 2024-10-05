@@ -1,4 +1,4 @@
-import { stockHost } from "@http-utils";
+import { frontendHost, stockHost } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { HttpStatusEnum } from "@http-entity";
@@ -50,7 +50,7 @@ export const purgeCache = async (
         "X-Auth-Email": cacheApiEmail,
       },
       body: JSON.stringify({
-        files: Array.isArray(cacheKey) ? cacheKey : [cacheKey],
+        files: getFiles(cacheKey),
       }),
     },
   );
@@ -77,3 +77,16 @@ export const purgeCache = async (
 
 export const getCacheKey = (productId: string): string | undefined =>
   stockHost() ? `${stockHost()}/${productId}` : undefined;
+
+export const getFiles = (
+  cacheKey: string | string[],
+): { url: string; headers: Record<string, string> }[] => {
+  if (Array.isArray(cacheKey)) {
+    return cacheKey.map((key) => ({
+      url: key,
+      headers: { origin: frontendHost() },
+    }));
+  }
+
+  return [{ url: cacheKey, headers: { origin: frontendHost() } }];
+};
