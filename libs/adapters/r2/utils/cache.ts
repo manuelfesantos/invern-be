@@ -5,10 +5,17 @@ import { HttpStatusEnum } from "@http-entity";
 
 let cacheApiKey: string | null = null;
 let zoneId: string | null = null;
+let cacheApiEmail: string | null = null;
 
 export const initCacheApiKey = (apiKey: string): void => {
   if (!cacheApiKey) {
     cacheApiKey = apiKey;
+  }
+};
+
+export const initCacheApiEmail = (email: string): void => {
+  if (!cacheApiEmail) {
+    cacheApiEmail = email;
   }
 };
 
@@ -29,6 +36,10 @@ export const purgeCache = async (
     throw new Error("Zone ID not set");
   }
 
+  if (!cacheApiEmail) {
+    throw new Error("Cache API email not set");
+  }
+
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
     {
@@ -36,6 +47,7 @@ export const purgeCache = async (
       headers: {
         "Content-Type": "application/json",
         "X-Auth-Key": cacheApiKey,
+        "X-Auth-Email": cacheApiEmail,
       },
       body: JSON.stringify({
         files: Array.isArray(cacheKey) ? cacheKey : [cacheKey],

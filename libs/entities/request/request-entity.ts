@@ -11,6 +11,7 @@ export interface Env {
   STOCK_BUCKET: R2Bucket;
   STOCK_HOST: string;
   CACHE_API_KEY: string;
+  CACHE_API_EMAIL: string;
   ZONE_ID: string;
   ENV: string;
   SETUP_STOCK_SECRET: string;
