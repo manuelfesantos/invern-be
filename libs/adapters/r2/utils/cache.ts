@@ -1,6 +1,7 @@
 import { stockHost } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { HttpStatusEnum } from "@http-entity";
 
 let cacheApiKey: string | null = null;
 let zoneId: string | null = null;
@@ -28,7 +29,7 @@ export const purgeCache = async (
     throw new Error("Zone ID not set");
   }
 
-  await fetch(
+  const response = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
     {
       method: "POST",
@@ -41,9 +42,24 @@ export const purgeCache = async (
       }),
     },
   );
+  if (response.status !== HttpStatusEnum.OK) {
+    logger().error(
+      "Failed to purge cache",
+      LoggerUseCaseEnum.PURGE_STOCK_CACHE,
+      {
+        responseStatus: response.status,
+      },
+    );
+    throw new Error(`Failed to purge cache for ${cacheKey}`);
+  }
+  const responseBody = await response.json();
   logger().info(
     `purged cache for ${cacheKey}`,
     LoggerUseCaseEnum.PURGE_STOCK_CACHE,
+    {
+      responseStatus: response.status,
+      responseBody,
+    },
   );
 };
 

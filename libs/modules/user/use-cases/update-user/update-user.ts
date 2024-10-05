@@ -2,7 +2,7 @@ import { updateUserActionSchema } from "./types/update-user";
 import { updateEmail } from "./update-email";
 import { updatePassword } from "./update-password";
 import { updateName } from "./update-name";
-import { HttpResponseEnum } from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { incrementUserVersion } from "@user-db";
 import { ProtectedModuleFunction } from "@response-entity";
@@ -35,7 +35,7 @@ export const updateUser: ProtectedModuleFunction = async (
     userId,
     body,
   );
-  if (response.status === HttpResponseEnum.OK) {
+  if (response.status === HttpStatusEnum.OK) {
     await incrementUserVersion(userId);
   }
 
