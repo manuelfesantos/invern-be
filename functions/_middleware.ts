@@ -13,6 +13,7 @@ import { withLogger } from "@logger-utils";
 import { setHosts } from "@http-utils";
 import { initZoneId, initCacheApiKey, stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
+import { initCacheApiEmail } from "../libs/adapters/r2/utils";
 
 export const startLogger: PagesFunction<Env> = async (context) => {
   const { env, request } = context;
@@ -44,6 +45,7 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   setSecrets(env.TOKEN_SECRET, env.REFRESH_TOKEN_SECRET);
   initZoneId(env.ZONE_ID);
   initCacheApiKey(env.CACHE_API_KEY);
+  initCacheApiEmail(env.CACHE_API_EMAIL);
   stockClient.init(env.STOCK_BUCKET);
   logger.addData({
     stockBucket: stringifyObject(env.STOCK_BUCKET),
