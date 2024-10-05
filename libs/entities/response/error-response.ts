@@ -1,5 +1,5 @@
 import { z, ZodError } from "zod";
-import { HttpResponseEnum } from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 import { CustomError } from "@error-handling-utils";
 
@@ -7,43 +7,43 @@ export const errorResponse = {
   BAD_REQUEST: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || simplifyError(new Error("bad http request")),
-      HttpResponseEnum.BAD_REQUEST,
+      HttpStatusEnum.BAD_REQUEST,
       headers,
     ),
   UNAUTHORIZED: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || simplifyError(new Error("unauthorized")),
-      HttpResponseEnum.UNAUTHORIZED,
+      HttpStatusEnum.UNAUTHORIZED,
       headers,
     ),
   FORBIDDEN: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("forbidden"),
-      HttpResponseEnum.FORBIDDEN,
+      HttpStatusEnum.FORBIDDEN,
       headers,
     ),
   NOT_FOUND: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("not found"),
-      HttpResponseEnum.NOT_FOUND,
+      HttpStatusEnum.NOT_FOUND,
       headers,
     ),
   METHOD_NOT_ALLOWED: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("method not allowed"),
-      HttpResponseEnum.METHOD_NOT_ALLOWED,
+      HttpStatusEnum.METHOD_NOT_ALLOWED,
       headers,
     ),
   CONFLICT: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("conflict"),
-      HttpResponseEnum.CONFLICT,
+      HttpStatusEnum.CONFLICT,
       headers,
     ),
   INTERNAL_SERVER_ERROR: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("internal server error"),
-      HttpResponseEnum.INTERNAL_SERVER_ERROR,
+      HttpStatusEnum.INTERNAL_SERVER_ERROR,
       headers,
     ),
 } as const;

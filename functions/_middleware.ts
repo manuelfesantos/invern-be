@@ -31,8 +31,13 @@ export const startLogger: PagesFunction<Env> = async (context) => {
 export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   context,
 ) => {
-  const { env, data } = context;
+  const { env, data, request } = context;
   const { tracer: logger } = data.honeycomb;
+
+  logger.addData({
+    country: request.cf?.country,
+  });
+
   initDb(env.INVERN_DB);
   initAuthSecretClient(env.AUTH_KV);
   initSendgrid(env.SENDGRID_API_KEY);

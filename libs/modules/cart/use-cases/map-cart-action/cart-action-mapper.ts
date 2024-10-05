@@ -1,6 +1,6 @@
 import { addProductToCart } from "./add-product-to-cart";
 import { CartAction, cartActionSchema } from "./types/update-cart";
-import { HttpResponseEnum } from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
 import { removeProductFromCart } from "./remove-product-from-cart";
 import { mergeCartItems } from "./merge-cart-items";
 import { validateCartId } from "@cart-db";
@@ -41,7 +41,7 @@ export const cartActionMapper: ProtectedModuleFunction = async (
     cartId,
   );
 
-  if (response.status === HttpResponseEnum.OK) {
+  if (response.status === HttpStatusEnum.OK) {
     await incrementUserVersion(userId);
   }
 

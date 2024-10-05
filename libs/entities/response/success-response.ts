@@ -1,4 +1,4 @@
-import { HttpResponseEnum } from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 import { getTokenCookie } from "@jwt-utils";
 
@@ -8,13 +8,13 @@ export const successResponse = {
     data?: unknown,
     headers?: Record<string, string>,
   ): Response =>
-    buildSuccessResponse(message, HttpResponseEnum.OK, data, headers),
+    buildSuccessResponse(message, HttpStatusEnum.OK, data, headers),
   CREATED: (
     message: string,
     data?: unknown,
     headers?: Record<string, string>,
   ): Response =>
-    buildSuccessResponse(message, HttpResponseEnum.CREATED, data, headers),
+    buildSuccessResponse(message, HttpStatusEnum.CREATED, data, headers),
 };
 
 export const protectedSuccessResponse = {
