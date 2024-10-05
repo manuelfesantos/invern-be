@@ -42,6 +42,7 @@ const r2BucketUseCasesSchema = [
   "PUT_R2_STOCK",
   "DELETE_R2_STOCK",
   "INIT_R2_BUCKET",
+  "PURGE_STOCK_CACHE",
 ] as const;
 
 const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
