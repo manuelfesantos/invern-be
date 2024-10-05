@@ -14,6 +14,9 @@ import { uuidSchema } from "@global-entity";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
+import { base64Encode } from "@crypto-utils";
+import { getCookieHeader } from "@http-utils";
+import { SESSION_EXPIRY } from "@timer-utils";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -50,11 +53,21 @@ export const checkout: ProtectedModuleFunction = async (
     },
   );
 
-  const { url } = session;
+  const { url, expires_at, id } = session;
 
   if (!url) {
     throw new Error("Checkout session creation failed");
   }
+
+  const checkoutSessionToken = base64Encode(
+    stringifyObject({ expires_at, id }),
+  );
+
+  const checkoutSessionCookie = getCookieHeader(
+    "c_s",
+    checkoutSessionToken,
+    SESSION_EXPIRY,
+  );
 
   return protectedSuccessResponse.OK(
     tokens,
@@ -63,6 +76,9 @@ export const checkout: ProtectedModuleFunction = async (
       url,
     },
     remember,
+    {
+      "Set-Cookie": checkoutSessionCookie,
+    },
   );
 };
 

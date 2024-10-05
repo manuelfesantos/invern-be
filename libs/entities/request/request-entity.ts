@@ -12,4 +12,6 @@ export interface Env {
   STOCK_HOST: string;
   CACHE_API_KEY: string;
   ZONE_ID: string;
+  ENV: string;
+  SETUP_STOCK_SECRET: string;
 }

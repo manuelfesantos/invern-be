@@ -31,3 +31,8 @@ export type InsertOrder = z.infer<typeof insertOrderSchema>;
 
 export const toClientOrder = (order: Order): ClientOrder =>
   clientOrderSchema.parse(order);
+
+export const invalidateCheckoutCookiePayloadSchema = z.object({
+  checkoutSessionId: z.string(),
+  expiresAt: z.number(),
+});

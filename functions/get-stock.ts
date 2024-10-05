@@ -6,8 +6,8 @@ import {
 import { Env } from "@request-entity";
 import { stockClient } from "@r2-adapter";
 
-export const onRequest: PagesFunction<Env> = async ({ request }) => {
-  if (request.method !== "GET") {
+export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
+  if (request.method !== "GET" || env.ENV !== "local") {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
 
@@ -16,12 +16,12 @@ export const onRequest: PagesFunction<Env> = async ({ request }) => {
     if (!productId) {
       return errorResponse.BAD_REQUEST("productId is required");
     }
-    const { data } = (await stockClient.get(productId)) || {};
-    if (!data) {
+    const response = await stockClient.get(productId);
+    if (!response) {
       return errorResponse.NOT_FOUND("product not found");
     }
 
-    return successResponse.OK("success getting stock", data);
+    return successResponse.OK("success getting stock", response.data);
   } catch (error) {
     return generateErrorResponse(error);
   }
