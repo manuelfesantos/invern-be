@@ -1,8 +1,11 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { parse } from "cookie";
 import { getBodyFromRequest } from "@http-utils";
 import { configPayloadSchema, getConfig } from "@config-module";
+import { invalidateCheckoutSession } from "@order-module";
+import { base64Decode } from "@crypto-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const onRequest: PagesFunction = async (context): Promise<Response> => {
   let country: string | undefined = undefined;
@@ -25,9 +28,27 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
 
     const cookies = parse(request.headers.get("Cookie") ?? "");
 
-    const { s_r: refreshToken } = cookies;
+    const { s_r: refreshToken, c_s: checkoutSessionCookie } = cookies;
 
-    return await getConfig(refreshToken, country, userVersion, remember);
+    let deleteCheckoutSessionCookie: string | undefined = undefined;
+
+    if (checkoutSessionCookie) {
+      logger().info(
+        "deleting checkout session cookie",
+        LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      );
+      deleteCheckoutSessionCookie = await invalidateCheckoutSession(
+        base64Decode(checkoutSessionCookie),
+      );
+    }
+
+    return await getConfig(
+      refreshToken,
+      country,
+      userVersion,
+      remember,
+      deleteCheckoutSessionCookie,
+    );
   } catch (error) {
     return generateErrorResponse(error);
   }

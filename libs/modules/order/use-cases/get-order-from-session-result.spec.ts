@@ -29,6 +29,16 @@ jest.mock("@order-db", () => ({
   getOrderById: jest.fn(),
 }));
 
+jest.mock("@checkout-session-db", () => ({
+  popCheckoutSessionById: jest.fn(() => [
+    {
+      products: '[{"productId": "4hiuURKg6ajRFTD5YSrd6F", "quantity": 2}]',
+      userId: "qsRTdjB1g5nKTa8tb6JGmC",
+      cartId: "bL7HQaCXkhwDQXEyuzrzig",
+    },
+  ]),
+}));
+
 jest.mock("@user-db", () => ({
   incrementUserVersion: jest.fn(),
 }));
@@ -58,8 +68,6 @@ jest.mock("@address-entity", () => ({
 
 const paymentId = "1";
 const orderId = stripeCheckoutSessionResultMockWithoutUserId.id;
-const userId = stripeCheckoutSessionResultMockWithUserId.metadata?.userId;
-const cartId = stripeCheckoutSessionResultMockWithUserId.metadata?.cartId;
 
 describe("getOrderFromSessionResult", () => {
   const checkIfOrderAlreadyExistsSpy = jest.spyOn(
@@ -121,15 +129,17 @@ describe("getOrderFromSessionResult", () => {
     expect(insertOrderSpy).toHaveBeenCalledWith({
       addressId: addressMock.addressId,
       paymentId,
-      userId: stripeCheckoutSessionResultMockWithoutUserId.metadata?.userId,
+      userId: "qsRTdjB1g5nKTa8tb6JGmC",
       orderId,
       clientOrderId:
         stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientOrderId,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
-    expect(emptyCartSpy).not.toHaveBeenCalled();
-    expect(incrementUserVersionSpy).not.toHaveBeenCalled();
+    expect(emptyCartSpy).toHaveBeenCalledWith("bL7HQaCXkhwDQXEyuzrzig");
+    expect(incrementUserVersionSpy).toHaveBeenCalledWith(
+      "qsRTdjB1g5nKTa8tb6JGmC",
+    );
   });
   it("should get order from session result with userId", async () => {
     const paymentDraft = {
@@ -164,15 +174,17 @@ describe("getOrderFromSessionResult", () => {
     expect(insertOrderSpy).toHaveBeenCalledWith({
       addressId: addressMock.addressId,
       paymentId,
-      userId: stripeCheckoutSessionResultMockWithUserId.metadata?.userId,
+      userId: "qsRTdjB1g5nKTa8tb6JGmC",
       orderId,
       clientOrderId:
         stripeCheckoutSessionResultMockWithUserId.metadata?.clientOrderId,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
-    expect(emptyCartSpy).toHaveBeenCalledWith(cartId);
-    expect(incrementUserVersionSpy).toHaveBeenCalledWith(userId);
+    expect(emptyCartSpy).toHaveBeenCalledWith("bL7HQaCXkhwDQXEyuzrzig");
+    expect(incrementUserVersionSpy).toHaveBeenCalledWith(
+      "qsRTdjB1g5nKTa8tb6JGmC",
+    );
   });
   it("should not get order if order already exists", async () => {
     checkIfOrderAlreadyExistsSpy.mockResolvedValue(true);

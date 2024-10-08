@@ -70,6 +70,7 @@ describe("onRequest", () => {
       undefined,
       undefined,
       undefined,
+      undefined,
     );
   });
   it("should return logged out config with country if country is not provided", async () => {
@@ -98,6 +99,7 @@ describe("onRequest", () => {
     expect(getConfigSpy).toHaveBeenCalledWith(
       undefined,
       "PT",
+      undefined,
       undefined,
       undefined,
     );
@@ -134,6 +136,7 @@ describe("onRequest", () => {
       "refreshToken",
       undefined,
       userVersion,
+      undefined,
       undefined,
     );
   });
@@ -173,6 +176,7 @@ describe("onRequest", () => {
       undefined,
       userVersion,
       true,
+      undefined,
     );
   });
   it.each([
@@ -204,6 +208,7 @@ describe("onRequest", () => {
       );
       await compareErrorResponses(response, expectedResponse);
       expect(getConfigSpy).toHaveBeenCalledWith(
+        undefined,
         undefined,
         undefined,
         undefined,

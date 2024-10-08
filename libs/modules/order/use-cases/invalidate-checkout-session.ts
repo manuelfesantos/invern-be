@@ -1,35 +1,46 @@
-import { increaseProductsStock } from "@product-db";
-import {
-  ProtectedModuleFunction,
-  protectedSuccessResponse,
-} from "@response-entity";
 import { expireCheckoutSession } from "@stripe-adapter";
-import { getProductsFromMetadata } from "../utils/get-products-from-metadata";
-import { stockClient } from "@r2-adapter";
 import { getCookieHeader } from "@http-utils";
+import { selectCheckoutSessionById } from "@checkout-session-db";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
+import { errors } from "@error-handling-utils";
+import { getCurrentTime } from "@timer-utils";
 
 const NO_MAX_AGE = 0;
 
-export const invalidateCheckoutSession: ProtectedModuleFunction = async (
-  tokens,
-  remember,
+export const invalidateCheckoutSession = async (
   checkoutSessionId: string,
-) => {
-  const session = await expireCheckoutSession(checkoutSessionId);
-  const { products: productsString } = session.metadata || {};
-  const products = getProductsFromMetadata(productsString || "");
-  const updatedProducts = await increaseProductsStock(products);
-  for (const product of updatedProducts) {
-    await stockClient.update(product);
+): Promise<string> => {
+  const checkoutSession = await selectCheckoutSessionById(checkoutSessionId);
+
+  if (!checkoutSession) {
+    logger().info(
+      `checkout session with id ${checkoutSessionId} not found`,
+      LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    );
+    return getCookieHeader("c_s", "", NO_MAX_AGE);
   }
-  const deletedSessionCookie = getCookieHeader("c_s", "", NO_MAX_AGE);
-  return protectedSuccessResponse.OK(
-    tokens,
-    "checkout session invalidated",
-    undefined,
-    remember,
-    {
-      "Set-Cookie": deletedSessionCookie,
-    },
+  if (checkoutSession.expiresAt < getCurrentTime()) {
+    logger().info(
+      `checkout session with id ${checkoutSessionId} already expired`,
+      LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    );
+    return getCookieHeader("c_s", "", NO_MAX_AGE);
+  }
+
+  const productsString = checkoutSession.products;
+
+  if (!productsString) {
+    throw errors.PRODUCTS_ARE_REQUIRED();
+  }
+
+  await expireCheckoutSession(checkoutSessionId);
+
+  logger().info(
+    "successfully expired checkout session",
+    LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    { checkoutSessionId },
   );
+
+  return getCookieHeader("c_s", "", NO_MAX_AGE);
 };

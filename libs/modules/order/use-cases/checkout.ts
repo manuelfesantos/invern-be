@@ -4,9 +4,14 @@ import {
   ProtectedModuleFunction,
   protectedSuccessResponse,
 } from "@response-entity";
-import { getProductsByProductIds } from "@product-db";
+import { getProductsByProductIds, increaseProductsStock } from "@product-db";
 import { errors } from "@error-handling-utils";
-import { Product, LineItem, lineItemSchema } from "@product-entity";
+import {
+  Product,
+  LineItem,
+  lineItemSchema,
+  productIdAndQuantityArraySchema,
+} from "@product-entity";
 import { getCartById, validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
 import { decreaseProductsStock } from "@product-db";
@@ -16,7 +21,8 @@ import { stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
 import { base64Encode } from "@crypto-utils";
 import { getCookieHeader } from "@http-utils";
-import { SESSION_EXPIRY } from "@timer-utils";
+import { MILLISECONDS_IN_SECOND, SESSION_EXPIRY } from "@timer-utils";
+import { insertCheckoutSession } from "@checkout-session-db";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -43,7 +49,38 @@ export const checkout: ProtectedModuleFunction = async (
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(lineItems, userId, cartId);
+  const session = await createCheckoutSession(lineItems);
+
+  const { url, expires_at, id, created } = session;
+
+  if (!url) {
+    throw new Error("Checkout session creation failed");
+  }
+
+  const [checkoutSession] = await insertCheckoutSession({
+    checkoutSessionId: id,
+    userId: userId ?? null,
+    cartId: cartId ?? null,
+    expiresAt: expires_at,
+    createdAt: new Date(
+      (created || Date.now()) / MILLISECONDS_IN_SECOND,
+    ).toISOString(),
+    products: productIdAndQuantityArraySchema.parse(lineItems),
+  });
+
+  logger().info(
+    "checkout session created",
+    LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    { checkoutSession },
+  );
+
+  const checkoutSessionToken = base64Encode(id);
+
+  const checkoutSessionCookie = getCookieHeader(
+    "c_s",
+    checkoutSessionToken,
+    SESSION_EXPIRY,
+  );
 
   logger().info(
     "Finished creating checkout session",
@@ -51,22 +88,6 @@ export const checkout: ProtectedModuleFunction = async (
     {
       sessionDetails: stringifyObject(session),
     },
-  );
-
-  const { url, expires_at, id } = session;
-
-  if (!url) {
-    throw new Error("Checkout session creation failed");
-  }
-
-  const checkoutSessionToken = base64Encode(
-    stringifyObject({ expires_at, id }),
-  );
-
-  const checkoutSessionCookie = getCookieHeader(
-    "c_s",
-    checkoutSessionToken,
-    SESSION_EXPIRY,
   );
 
   return protectedSuccessResponse.OK(
@@ -146,8 +167,15 @@ const buildLineItems = (
 
 const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
   const updatedLineItems = await decreaseProductsStock(lineItems);
-  for (const lineItem of updatedLineItems) {
-    await stockClient.update(lineItem);
+  try {
+    for (const lineItem of updatedLineItems) {
+      await stockClient.update(lineItem);
+    }
+  } catch (error) {
+    const updatedProducts = await increaseProductsStock(lineItems);
+    for (const product of updatedProducts) {
+      await stockClient.update(product);
+    }
   }
 };
 

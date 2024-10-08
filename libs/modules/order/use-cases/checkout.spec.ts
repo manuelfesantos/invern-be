@@ -37,6 +37,15 @@ jest.mock("@r2-adapter", () => ({
   },
 }));
 
+jest.mock("@checkout-session-db", () => ({
+  insertCheckoutSession: jest.fn(() => [
+    {
+      products: '[{"productId": "4hiuURKg6ajRFTD5YSrd6F", "quantity": 2}]',
+      userId: "qsRTdjB1g5nKTa8tb6JGmC",
+    },
+  ]),
+}));
+
 const cartId = "cartId";
 const userId = "userId";
 
@@ -97,11 +106,7 @@ describe("checkout", () => {
     expect(getProductsByProductIdsSpy).toHaveBeenCalledWith(
       requestedProducts.map((p) => p.productId),
     );
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
-      lineItemsMock,
-      undefined,
-      undefined,
-    );
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
   });
   it("should create checkout session from logged in user", async () => {
     getCartByIdSpy.mockResolvedValueOnce({ cartId, products: lineItemsMock });
@@ -122,11 +127,7 @@ describe("checkout", () => {
     await compareResponses(response, expectedResponse);
     expect(getCartByIdSpy).toHaveBeenCalledWith(cartId);
     expect(validateCartIdSpy).toHaveBeenCalledWith(cartId);
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
-      lineItemsMock,
-      userId,
-      cartId,
-    );
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
   });
   it("should throw error if cart id is invalid", async () => {
     validateCartIdSpy.mockRejectedValueOnce(new Error("cart not valid"));
@@ -182,11 +183,7 @@ describe("checkout", () => {
     ).rejects.toEqual(
       expect.objectContaining({ message: "Checkout session creation failed" }),
     );
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
-      lineItemsMock,
-      userId,
-      cartId,
-    );
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
   });
   it("should throw error if any line item has more quantity than stock", async () => {
     getProductsByProductIdsSpy.mockResolvedValueOnce(products);

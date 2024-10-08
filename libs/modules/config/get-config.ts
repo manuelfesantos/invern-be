@@ -14,24 +14,34 @@ export const getConfig = async (
   country?: string,
   userVersion?: number,
   remember?: boolean,
+  deleteCheckoutSessionCookie?: string,
 ): Promise<Response> => {
+  let response: Response;
   try {
     if (!refreshToken) {
-      return loggedOutResponse(country, userVersion);
+      response = await loggedOutResponse(country, userVersion);
+    } else {
+      const tokenIsValid = await verifyRefreshToken(refreshToken);
+      const tokenPayload = decodeJwt(refreshToken);
+      if ("userId" in tokenPayload && tokenIsValid) {
+        response = await getLoggedInConfig(
+          refreshToken,
+          tokenPayload,
+          country,
+          userVersion,
+          remember,
+        );
+      } else {
+        response = await loggedOutResponse(country, userVersion);
+      }
     }
-    const tokenIsValid = await verifyRefreshToken(refreshToken);
-    const tokenPayload = decodeJwt(refreshToken);
-    if ("userId" in tokenPayload && tokenIsValid) {
-      return getLoggedInConfig(
-        refreshToken,
-        tokenPayload,
-        country,
-        userVersion,
-        remember,
-      );
-    }
-    return loggedOutResponse(country, userVersion);
   } catch (error) {
-    return loggedOutResponse(country, userVersion);
+    response = await loggedOutResponse(country, userVersion);
   }
+
+  if (deleteCheckoutSessionCookie) {
+    response.headers.set("Set-Cookie", deleteCheckoutSessionCookie);
+  }
+
+  return response;
 };

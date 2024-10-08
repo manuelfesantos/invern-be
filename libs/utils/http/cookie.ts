@@ -8,4 +8,4 @@ export const getCookieHeader = (
   domain: string = "invernspirit.com",
   path: string = "/",
 ): string =>
-  `${name}=${value}; Max-Age=${maxAge}; ${isSecure ? "Secure" : ""}; ${isHttpOnly ? "HttpOnly" : ""}; ${isSameSite ? "SameSite=Strict" : ""}; ${domain ? `Domain=${domain}` : ""} ${path ? `Path=${path}` : ""}`;
+  `${name}=${value}; Max-Age=${maxAge}; ${isSecure ? "Secure" : ""}; ${isHttpOnly ? "HttpOnly" : ""}; ${isSameSite ? "SameSite=Strict" : ""}; ${domain ? `Domain=${domain}` : ""}; ${path ? `Path=${path}` : ""}`;

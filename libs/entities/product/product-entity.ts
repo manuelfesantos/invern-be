@@ -34,6 +34,10 @@ export const productIdAndQuantitySchema = z.object({
   quantity: positiveIntegerSchema("line item quantity"),
 });
 
+export const productIdAndQuantityArraySchema = z.array(
+  productIdAndQuantitySchema,
+);
+
 export type ProductDetails = z.infer<typeof productDetailsSchema>;
 
 export type Product = z.infer<typeof productSchema>;

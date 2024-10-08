@@ -9,11 +9,12 @@ import {
 } from "@order-db";
 import { getPaymentById, insertPaymentReturningId } from "@payment-db";
 import { getPaymentFromSessionResult } from "@payment-entity";
-import { ClientOrder, toClientOrder } from "@order-entity";
+import { ClientOrder, clientOrderSchema } from "@order-entity";
 import { errors } from "@error-handling-utils";
 import { emptyCart } from "@cart-db";
 import { incrementUserVersion } from "@user-db";
-import { getProductsFromMetadata } from "../utils/get-products-from-metadata";
+import { popCheckoutSessionById } from "@checkout-session-db";
+import { getProductsFromString } from "../utils/get-products-from-string";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -35,17 +36,24 @@ export const getOrderFromSessionResult = async (
     await insertPaymentReturningId(payment);
   }
 
-  const {
-    userId,
-    products: productsString,
-    cartId,
-    clientOrderId,
-  } = sessionResult.metadata ?? {};
+  const { clientOrderId } = sessionResult.metadata ?? {};
+
+  const [checkoutSession] = await popCheckoutSessionById(sessionResult.id);
+
+  if (!checkoutSession) {
+    throw new Error("Checkout session not found");
+  }
+
+  const { products: productsString, userId, cartId } = checkoutSession;
+
+  if (!productsString) {
+    throw new Error("No products found in checkout session");
+  }
 
   const [{ orderId }] = await insertOrder({
     addressId,
     paymentId: payment.paymentId,
-    userId,
+    userId: userId ?? null,
     orderId: sessionResult.id,
     clientOrderId,
   });
@@ -66,15 +74,15 @@ export const getOrderFromSessionResult = async (
     await incrementUserVersion(userId);
   }
 
-  return toClientOrder(order);
+  return clientOrderSchema.parse(order);
 };
 
 const insertProductsToOrder = async (
   productsString: string,
   orderId: string,
 ): Promise<void> => {
-  if (productsString && orderId) {
-    const products = getProductsFromMetadata(productsString);
+  if (orderId) {
+    const products = getProductsFromString(productsString);
 
     products.length && (await addToOrder(products, orderId));
   }

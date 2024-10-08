@@ -2,7 +2,7 @@ const TWO_WEEKS = 2;
 const THIRTY_MINUTES = 30;
 const FIFTEEN_MINUTES = 15;
 
-const MILISECONDS_IN_SECOND = 1000;
+export const MILLISECONDS_IN_SECOND = 1000;
 
 const NO_FRACTION_DIGITS = 0;
 
@@ -19,5 +19,9 @@ export const TOKEN_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 export const SESSION_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;
 
 export const getFutureDate = (time: number): number =>
-  Number((Date.now() / MILISECONDS_IN_SECOND).toFixed(NO_FRACTION_DIGITS)) +
+  Number((Date.now() / MILLISECONDS_IN_SECOND).toFixed(NO_FRACTION_DIGITS)) +
   time;
+
+export const getCurrentTime = (): number => {
+  return Date.now() / MILLISECONDS_IN_SECOND;
+};
