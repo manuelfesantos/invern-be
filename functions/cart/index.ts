@@ -1,4 +1,3 @@
-import { PagesFunction } from "@cloudflare/workers-types";
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { getBodyFromRequest } from "@http-utils";
 import { HttpHeaderEnum, HttpMethodEnum } from "@http-entity";

@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "520c1b1b-8fbf-4f05-806d-14e33721b117",
-  "prevId": "a0dd17b4-bef5-43c5-b60a-f9f0fb57f860",
+  "id": "386c7d7d-e020-4b2c-8cda-79a0e5070ded",
+  "prevId": "2d0cc2ec-07d3-421b-9fe3-47672d1ce0dc",
   "tables": {
     "addresses": {
       "name": "addresses",
@@ -82,6 +82,84 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "checkoutSessions": {
+      "name": "checkoutSessions",
+      "columns": {
+        "checkoutSessionId": {
+          "name": "checkoutSessionId",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "products": {
+          "name": "products",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cartId": {
+          "name": "cartId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "checkoutSessions_userId_users_userId_fk": {
+          "name": "checkoutSessions_userId_users_userId_fk",
+          "tableFrom": "checkoutSessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "checkoutSessions_cartId_carts_cartId_fk": {
+          "name": "checkoutSessions_cartId_carts_cartId_fk",
+          "tableFrom": "checkoutSessions",
+          "tableTo": "carts",
+          "columnsFrom": [
+            "cartId"
+          ],
+          "columnsTo": [
+            "cartId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -329,8 +407,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "cartId": {
-          "name": "cartId",
+        "userId": {
+          "name": "userId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -351,14 +429,22 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "orders_clientOrderId_unique": {
+          "name": "orders_clientOrderId_unique",
+          "columns": [
+            "clientOrderId"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
-        "orders_cartId_users_userId_fk": {
-          "name": "orders_cartId_users_userId_fk",
+        "orders_userId_users_userId_fk": {
+          "name": "orders_userId_users_userId_fk",
           "tableFrom": "orders",
           "tableTo": "users",
           "columnsFrom": [
-            "cartId"
+            "userId"
           ],
           "columnsTo": [
             "userId"

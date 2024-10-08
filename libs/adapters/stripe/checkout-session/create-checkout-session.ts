@@ -8,8 +8,6 @@ import { frontendHost } from "@http-utils";
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
-  userId?: string,
-  cartId?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   const clientOrderId = getRandomUUID();
   return await stripe().checkout.sessions.create({
@@ -50,16 +48,7 @@ export const createCheckoutSession = async (
       };
     }),
     metadata: {
-      ...(userId && { userId }),
-      ...(cartId && { cartId }),
       clientOrderId,
-      products: buildLineItemsMetadata(lineItems),
     },
   });
-};
-
-const buildLineItemsMetadata = (lineItems: LineItem[]): string => {
-  return lineItems
-    .map(({ productId, quantity }) => `${productId}:${quantity}`)
-    .join("|");
 };

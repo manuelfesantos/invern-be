@@ -173,6 +173,19 @@ export const paymentsTable = sqliteTable("payments", {
   amount: int("amount").notNull(),
 });
 
+export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
+  checkoutSessionId: text("checkoutSessionId").primaryKey(),
+  products: text("products").notNull(),
+  createdAt: text("createdAt").notNull(),
+  expiresAt: int("expiresAt").notNull(),
+  userId: text("userId").references(() => usersTable.userId, {
+    onDelete: "cascade",
+  }),
+  cartId: text("cartId").references(() => cartsTable.cartId, {
+    onDelete: "cascade",
+  }),
+});
+
 //---------------------------------RELATIONS---------------------------------//
 
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
@@ -302,3 +315,17 @@ export const addressesRelations = relations(addressesTable, ({ one }) => ({
 export const paymentsRelations = relations(paymentsTable, ({ one }) => ({
   orders: one(ordersTable),
 }));
+
+export const checkoutSessionsRelations = relations(
+  checkoutSessionsTable,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [checkoutSessionsTable.userId],
+      references: [usersTable.userId],
+    }),
+    cart: one(cartsTable, {
+      fields: [checkoutSessionsTable.cartId],
+      references: [cartsTable.cartId],
+    }),
+  }),
+);

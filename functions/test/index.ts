@@ -1,4 +1,3 @@
-import { PagesFunction } from "@cloudflare/workers-types";
 import {
   errorResponse,
   generateErrorResponse,

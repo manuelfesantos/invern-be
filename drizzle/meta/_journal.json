@@ -43,6 +43,13 @@
       "when": 1722809237088,
       "tag": "0005_youthful_peter_quill",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1728252487261,
+      "tag": "0006_large_skin",
+      "breakpoints": true
     }
   ]
 }

@@ -50,6 +50,9 @@ const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
 const checkoutUseCasesSchema = [
   "CREATE_CHECKOUT_SESSION",
   "GET_PRODUCTS_FROM_METADATA",
+  "INVALIDATE_CHECKOUT_SESSION",
+  "HANDLE_CHECKOUT_SESSION",
+  "CHECK_EXPIRED_SESSIONS",
 ] as const;
 
 const loggerUseCasesSchema = z.enum([
