@@ -14,7 +14,7 @@ jest.mock("@db", () => ({
 }));
 describe("updateCountry", () => {
   const setSpy = jest.spyOn(DB.db().update(countriesTable), "set");
-  it("should update a country", async () => {
+  it("should update a countries", async () => {
     const countryCode = "1";
     const changes = {
       name: "newName",

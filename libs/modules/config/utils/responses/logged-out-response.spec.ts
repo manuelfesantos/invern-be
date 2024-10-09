@@ -42,7 +42,7 @@ describe("loggedOutResponse", () => {
 
     await compareResponses(response, expectedResponse);
   });
-  it("should return country if country is provided", async () => {
+  it("should return countries if countries is provided", async () => {
     const country = "country";
     const response = await loggedOutResponse(country);
     const expectedResponse = successResponse.OK(
@@ -55,7 +55,7 @@ describe("loggedOutResponse", () => {
 
     await compareResponses(response, expectedResponse);
   });
-  it("should return country and deleteUser if userVersion and country are provided", async () => {
+  it("should return countries and deleteUser if userVersion and countries are provided", async () => {
     const userVersion = 1;
     const country = "country";
     const response = await loggedOutResponse(country, userVersion);

@@ -137,7 +137,7 @@ describe("validateStripeAddress", () => {
     }).toThrow(errors.INVALID_ADDRESS("address.city must be a string"));
   });
 
-  it("should throw error if address.country is missing", () => {
+  it("should throw error if address.countries is missing", () => {
     expect(() => {
       validateStripeAddress({
         line1: "123 Main Street",
@@ -145,10 +145,10 @@ describe("validateStripeAddress", () => {
         city: "San Francisco",
         postal_code: "94105",
       });
-    }).toThrow(errors.INVALID_ADDRESS("address must have a country"));
+    }).toThrow(errors.INVALID_ADDRESS("address must have a countries"));
   });
 
-  it("should throw error if address.country is invalid", () => {
+  it("should throw error if address.countries is invalid", () => {
     expect(() => {
       validateStripeAddress({
         line1: "123 Main Street",
@@ -157,10 +157,10 @@ describe("validateStripeAddress", () => {
         country: null,
         postal_code: "94105",
       });
-    }).toThrow(errors.INVALID_ADDRESS("address.country is required"));
+    }).toThrow(errors.INVALID_ADDRESS("address.countries is required"));
   });
 
-  it("should throw error if address.country is not a string", () => {
+  it("should throw error if address.countries is not a string", () => {
     expect(() => {
       validateStripeAddress({
         line1: "123 Main Street",
@@ -169,7 +169,7 @@ describe("validateStripeAddress", () => {
         country: 123,
         postal_code: "94105",
       });
-    }).toThrow(errors.INVALID_ADDRESS("address.country must be a string"));
+    }).toThrow(errors.INVALID_ADDRESS("address.countries must be a string"));
   });
 
   it("should throw error if address.postal_code is missing", () => {

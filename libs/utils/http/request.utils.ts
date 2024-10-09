@@ -18,14 +18,23 @@ export const getQueryFromUrl = (url: string): URLSearchParams | null => {
 
 let feHost: string;
 let stHost: string;
+let ctHost: string;
 
-export const setHosts = (frontendHost: string, stockHost: string): void => {
+export const setHosts = (
+  frontendHost: string,
+  stockHost: string,
+  countriesHost: string,
+): void => {
   if (!feHost) {
     feHost = frontendHost;
   }
 
   if (!stHost) {
     stHost = stockHost;
+  }
+
+  if (!ctHost) {
+    ctHost = countriesHost;
   }
 };
 
@@ -35,4 +44,8 @@ export const frontendHost = (): string => {
 
 export const stockHost = (): string => {
   return stHost || "";
+};
+
+export const countriesHost = (): string => {
+  return ctHost || "";
 };

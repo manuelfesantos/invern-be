@@ -11,13 +11,18 @@ import { initAuthSecretClient } from "@kv-adapter";
 import { setSecrets } from "@jwt-utils";
 import { withLogger } from "@logger-utils";
 import { setHosts } from "@http-utils";
-import { initZoneId, initCacheApiKey, stockClient } from "@r2-adapter";
+import {
+  initZoneId,
+  initCacheApiKey,
+  stockClient,
+  countriesClient,
+} from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
 import { initCacheApiEmail } from "../libs/adapters/r2/utils";
 
 export const startLogger: PagesFunction<Env> = async (context) => {
   const { env, request } = context;
-  setHosts(env.FRONTEND_HOST, env.STOCK_HOST);
+  setHosts(env.FRONTEND_HOST, env.STOCK_HOST, env.COUNTRIES_HOST);
   if (request.method === "HEAD") {
     return errorResponse.METHOD_NOT_ALLOWED();
   } else if (request.method === HttpMethodEnum.OPTIONS) {
@@ -47,6 +52,7 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   initCacheApiKey(env.CACHE_API_KEY);
   initCacheApiEmail(env.CACHE_API_EMAIL);
   stockClient.init(env.STOCK_BUCKET);
+  countriesClient.init(env.COUNTRIES_BUCKET);
   logger.addData({
     stockBucket: stringifyObject(env.STOCK_BUCKET),
   });

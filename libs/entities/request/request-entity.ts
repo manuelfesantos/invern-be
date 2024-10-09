@@ -9,10 +9,13 @@ export interface Env {
   REFRESH_TOKEN_SECRET: string;
   FRONTEND_HOST: string;
   STOCK_BUCKET: R2Bucket;
+  COUNTRIES_BUCKET: R2Bucket;
   STOCK_HOST: string;
+  COUNTRIES_HOST: string;
   CACHE_API_KEY: string;
   CACHE_API_EMAIL: string;
   ZONE_ID: string;
   ENV: string;
   SETUP_STOCK_SECRET: string;
+  SETUP_COUNTRIES_SECRET: string;
 }

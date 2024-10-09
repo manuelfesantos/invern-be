@@ -1,4 +1,4 @@
-import { getAllCountries, getCountryByCode } from "./select";
+import { selectAllCountries, getCountryByCode } from "./select";
 
 import * as DB from "@db";
 import { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
@@ -64,7 +64,7 @@ describe("get", () => {
   describe("all countries", () => {
     const findManySpy = jest.spyOn(DB.db().query.countriesTable, "findMany");
     it("should get all countries", async () => {
-      const result = await getAllCountries();
+      const result = await selectAllCountries();
       expect(result).toHaveLength(ONE_ELEMENT);
       expect(result[FIRST_ELEMENT]).toEqual({
         code: "1",
@@ -117,15 +117,15 @@ describe("get", () => {
         taxes: [],
       };
       findManySpy.mockReturnValue(countryTemplate);
-      const result = await getAllCountries();
+      const result = await selectAllCountries();
       expect(result).toHaveLength(ONE_ELEMENT);
       expect(result[FIRST_ELEMENT]).toEqual(country);
     });
   });
 
-  describe("country by code", () => {
+  describe("countries by code", () => {
     const findFirstSpy = jest.spyOn(DB.db().query.countriesTable, "findFirst");
-    it("should get country by countryCode", async () => {
+    it("should get countries by countryCode", async () => {
       const countryCode = "1";
       const result = await getCountryByCode(countryCode);
       expect(result).toEqual({
@@ -149,7 +149,7 @@ describe("get", () => {
       expect(findFirstSpy).toHaveBeenCalled();
     });
 
-    it("should return undefined if country not found", async () => {
+    it("should return undefined if countries not found", async () => {
       const countryCode = "2";
       findFirstSpy.mockReturnValue(
         undefined as unknown as SQLiteRelationalQuery<"async", undefined>,
@@ -158,7 +158,7 @@ describe("get", () => {
       expect(result).toBeUndefined();
     });
 
-    it("should return taxes as empty array if country has no taxes", async () => {
+    it("should return taxes as empty array if countries has no taxes", async () => {
       const countryTemplate = {
         code: "1",
         name: "name",

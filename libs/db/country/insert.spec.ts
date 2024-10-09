@@ -21,7 +21,7 @@ jest.mock("@db", () => ({
 describe("insertCountry", () => {
   const insertSpy = jest.spyOn(DB.db(), "insert");
   const valuesSpy = jest.spyOn(DB.db().insert(countriesTable), "values");
-  it("should insert a country", async () => {
+  it("should insert a countries", async () => {
     const country: InsertCountry = {
       code: "1",
       name: "name",

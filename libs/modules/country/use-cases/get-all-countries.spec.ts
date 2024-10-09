@@ -4,7 +4,7 @@ import { compareResponses, countriesMock } from "@mocks-utils";
 import { successResponse } from "@response-entity";
 
 jest.mock("@country-db", () => ({
-  getAllCountries: jest.fn(),
+  selectAllCountries: jest.fn(),
 }));
 
 jest.mock("@logger-utils", () => ({
@@ -14,7 +14,7 @@ jest.mock("@logger-utils", () => ({
 jest.mock("@jwt-utils", () => ({}));
 
 describe("getAllCountries", () => {
-  const getAllCountriesSpy = jest.spyOn(CountryDb, "getAllCountries");
+  const getAllCountriesSpy = jest.spyOn(CountryDb, "selectAllCountries");
   it("should return all countries", async () => {
     getAllCountriesSpy.mockResolvedValue(countriesMock);
     const response = await getAllCountries();

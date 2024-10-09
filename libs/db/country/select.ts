@@ -41,7 +41,7 @@ export const getCountryByCode = async (
   });
 };
 
-export const getAllCountries = async (): Promise<Country[]> => {
+export const selectAllCountries = async (): Promise<Country[]> => {
   const countriesTemplate = await db().query.countriesTable.findMany({
     with: {
       countriesToCurrencies: {
