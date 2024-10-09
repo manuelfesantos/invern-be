@@ -1,4 +1,4 @@
-import { frontendHost, stockHost } from "@http-utils";
+import { frontendHost } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { HttpStatusEnum } from "@http-entity";
@@ -55,28 +55,20 @@ export const purgeCache = async (
     },
   );
   if (response.status !== HttpStatusEnum.OK) {
-    logger().error(
-      "Failed to purge cache",
-      LoggerUseCaseEnum.PURGE_STOCK_CACHE,
-      {
-        responseStatus: response.status,
-      },
-    );
+    logger().error("Failed to purge cache", LoggerUseCaseEnum.PURGE_CACHE, {
+      responseStatus: response.status,
+    });
     throw new Error(`Failed to purge cache for ${cacheKey}`);
   }
   const responseBody = await response.json();
-  logger().info(
-    `purged cache for ${cacheKey}`,
-    LoggerUseCaseEnum.PURGE_STOCK_CACHE,
-    {
-      responseStatus: response.status,
-      responseBody,
-    },
-  );
+  logger().info(`purged cache for ${cacheKey}`, LoggerUseCaseEnum.PURGE_CACHE, {
+    responseStatus: response.status,
+    responseBody,
+  });
 };
 
-export const getCacheKey = (productId: string): string | undefined =>
-  stockHost() ? `${stockHost()}/${productId}` : undefined;
+export const getCacheKey = (host: string, key: string): string | undefined =>
+  host ? `${host}/${key}` : undefined;
 
 export const getFiles = (
   cacheKey: string | string[],

@@ -4,6 +4,7 @@ import { insertImages } from "./images";
 import { insertCountries } from "./countries";
 import { insertCurrencies } from "./currencies";
 import { insertTaxes } from "./taxes";
+import { insertCurrenciesToCountries } from "./currencies-to-countries";
 
 export const insertData = async (): Promise<void> => {
   const collectionsResult = await insertCollections();
@@ -12,4 +13,5 @@ export const insertData = async (): Promise<void> => {
   await insertCountries();
   await insertCurrencies();
   await insertTaxes();
+  await insertCurrenciesToCountries();
 };

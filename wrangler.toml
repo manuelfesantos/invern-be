@@ -9,3 +9,7 @@ database_id = "e5193edd-54a6-4b15-8e67-d0bd12b9afd2"
 [[r2_buckets]]
 binding = "STOCK_BUCKET"
 bucket_name = "stock-local"
+
+[[r2_buckets]]
+binding = "COUNTRIES_BUCKET"
+bucket_name = "countries-local"

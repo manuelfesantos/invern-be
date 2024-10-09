@@ -51,7 +51,7 @@ describe("onRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it("should return logged out config with no country if country is provided", async () => {
+  it("should return logged out config with no countries if countries is provided", async () => {
     parseSchemaSpy.mockReturnValueOnce({
       country: "country",
     });
@@ -73,7 +73,7 @@ describe("onRequest", () => {
       undefined,
     );
   });
-  it("should return logged out config with country if country is not provided", async () => {
+  it("should return logged out config with countries if countries is not provided", async () => {
     const event = {
       ...POSTEventMock,
       request: {

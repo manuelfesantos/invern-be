@@ -3,6 +3,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { acquireLock, getCacheKey, purgeCache, releaseLock } from "../utils";
 import { stringifyObject } from "@string-utils";
 import { z } from "zod";
+import { stockHost } from "@http-utils";
 
 const STOCK_LOCK_TTL = 3000;
 const MAX_RETRIES = 3;
@@ -70,7 +71,7 @@ const updateStock = async ({
 
     if (lock) {
       await stockBucket.put(productId, stringifyObject({ data: stock }));
-      const cacheKey = getCacheKey(productId);
+      const cacheKey = getCacheKey(stockHost(), productId);
       if (cacheKey) {
         await purgeCache(cacheKey);
       }

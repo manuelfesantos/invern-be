@@ -9,12 +9,6 @@ const currenciesList: InsertCurrency[] = [
     symbol: "€",
     rateToEuro: 1,
   },
-  {
-    code: "GBP",
-    name: "Pound",
-    symbol: "£",
-    rateToEuro: 1.17,
-  },
 ];
 
 export const insertCurrencies = async (): Promise<{ code: string }[]> => {

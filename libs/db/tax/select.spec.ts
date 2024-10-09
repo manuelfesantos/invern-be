@@ -40,7 +40,7 @@ describe("get", () => {
       });
     });
   });
-  describe("taxes by country code", () => {
+  describe("taxes by countries code", () => {
     const findManySpy = jest.spyOn(DB.db().query.taxesTable, "findMany");
     it("should get taxes", async () => {
       const countryCode = "1";

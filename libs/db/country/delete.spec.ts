@@ -15,7 +15,7 @@ describe("deleteCountry", () => {
   beforeEach(() => {
     deleteSpy.mockClear();
   });
-  it("should delete a country", async () => {
+  it("should delete a countries", async () => {
     const countryCode = "1";
     const result = await deleteCountry(countryCode);
     expect(result).toBeUndefined();

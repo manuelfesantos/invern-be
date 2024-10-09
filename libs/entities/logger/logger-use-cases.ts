@@ -39,10 +39,14 @@ const orderUseCasesSchema = [
 
 const r2BucketUseCasesSchema = [
   "GET_R2_STOCK",
+  "GET_R2_COUNTRIES",
   "PUT_R2_STOCK",
+  "PUT_R2_COUNTRIES",
   "DELETE_R2_STOCK",
-  "INIT_R2_BUCKET",
-  "PURGE_STOCK_CACHE",
+  "DELETE_R2_COUNTRIES",
+  "INIT_R2_STOCK_BUCKET",
+  "INIT_R2_COUNTRIES_BUCKET",
+  "PURGE_CACHE",
 ] as const;
 
 const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
