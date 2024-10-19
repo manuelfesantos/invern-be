@@ -59,6 +59,7 @@ describe("onRequest", () => {
       successResponse.OK("success getting config", loggedOutconfigMock),
     );
     parseCookieSpy.mockReturnValueOnce({});
+    // @ts-expect-error issue with typescript
     const response = await onRequest(POSTEventMock);
     const expectedResponse = successResponse.OK(
       "success getting config",
@@ -90,6 +91,7 @@ describe("onRequest", () => {
       successResponse.OK("success getting config", loggedOutconfigMock),
     );
     parseCookieSpy.mockReturnValueOnce({});
+    // @ts-expect-error issue with typescript
     const response = await onRequest(event);
     const expectedResponse = successResponse.OK(
       "success getting config",
@@ -109,6 +111,7 @@ describe("onRequest", () => {
     getBodyFromRequestSpy.mockRejectedValueOnce(
       new Error("invalid JSON payload"),
     );
+    // @ts-expect-error issue with typescript
     const response = await onRequest(POSTEventMock);
     const expectedResponse = errorResponse.BAD_REQUEST(
       prepareError("invalid JSON payload"),
@@ -126,6 +129,7 @@ describe("onRequest", () => {
     getConfigSpy.mockResolvedValueOnce(
       successResponse.OK("success getting config", loggedInConfigMock),
     );
+    // @ts-expect-error issue with typescript
     const response = await onRequest(POSTEventMock);
     const expectedResponse = successResponse.OK(
       "success getting config",
@@ -150,6 +154,7 @@ describe("onRequest", () => {
           method,
         },
       };
+      // @ts-expect-error issue with typescript
       const response = await onRequest(event);
       const expectedResponse = errorResponse.METHOD_NOT_ALLOWED();
       await compareErrorResponses(response, expectedResponse);
@@ -165,6 +170,7 @@ describe("onRequest", () => {
     getConfigSpy.mockResolvedValueOnce(
       successResponse.OK("success getting config", loggedInConfigMock),
     );
+    // @ts-expect-error issue with typescript
     const response = await onRequest(POSTEventMock);
     const expectedResponse = successResponse.OK(
       "success getting config",
@@ -200,6 +206,7 @@ describe("onRequest", () => {
       getBodyFromRequestSpy.mockResolvedValueOnce(body);
       parseCookieSpy.mockReturnValueOnce({});
       parseSchemaSpy.mockReturnValueOnce({ country: "country" });
+      // @ts-expect-error issue with typescript
       const response = await onRequest(POSTEventMock);
       const expectedResponse = errorResponse[code](
         error instanceof ZodError

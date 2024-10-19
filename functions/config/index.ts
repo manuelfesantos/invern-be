@@ -6,10 +6,14 @@ import { invalidateCheckoutSession } from "@order-module";
 import { base64Decode } from "@crypto-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { Env } from "@request-entity";
+import { initStripeClient } from "@stripe-adapter";
 
-export const onRequest: PagesFunction = async (context): Promise<Response> => {
+export const onRequest: PagesFunction<Env> = async (
+  context,
+): Promise<Response> => {
   let country: string | undefined = undefined;
-  const { request } = context;
+  const { request, env } = context;
   if (request.method !== "POST") {
     return errorResponse.METHOD_NOT_ALLOWED();
   }
@@ -37,6 +41,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
         "deleting checkout session cookie",
         LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
       );
+      initStripeClient(env.STRIPE_API_KEY);
       deleteCheckoutSessionCookie = await invalidateCheckoutSession(
         base64Decode(checkoutSessionCookie),
       );
