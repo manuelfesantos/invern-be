@@ -79,9 +79,9 @@ describe("onRequest", () => {
       ...POSTEventMock,
       request: {
         ...POSTEventMock.request,
-        cf: {
-          ...POSTEventMock.request.cf,
-          country: "PT" as Iso3166Alpha2Code,
+        headers: {
+          ...POSTEventMock.request.headers,
+          get: jest.fn(() => "PT"),
         },
       },
     };

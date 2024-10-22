@@ -12,7 +12,7 @@ import { initStripeClient } from "@stripe-adapter";
 export const onRequest: PagesFunction<Env> = async (
   context,
 ): Promise<Response> => {
-  let country: string | undefined = undefined;
+  let country: string | null = null;
   const { request, env } = context;
   if (request.method !== "POST") {
     return errorResponse.METHOD_NOT_ALLOWED();
@@ -27,7 +27,7 @@ export const onRequest: PagesFunction<Env> = async (
     } = configPayloadSchema.parse(body);
 
     if (!payloadCountry) {
-      country = request.cf?.country;
+      country = request.headers.get("country");
     }
 
     const cookies = parse(request.headers.get("Cookie") ?? "");
@@ -49,7 +49,7 @@ export const onRequest: PagesFunction<Env> = async (
 
     return await getConfig(
       refreshToken,
-      country,
+      country || undefined,
       userVersion,
       remember,
       deleteCheckoutSessionCookie,
