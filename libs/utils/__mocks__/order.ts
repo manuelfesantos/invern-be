@@ -15,7 +15,7 @@ export const clientOrdersMock: ClientOrder[] = [
       country: {
         taxes: [] as Tax[],
         currencies: [] as Currency[],
-        code: "1",
+        code: "PT",
         name: "1",
       },
       line1: "1",
@@ -39,7 +39,7 @@ export const clientOrdersMock: ClientOrder[] = [
       country: {
         taxes: [] as Tax[],
         currencies: [] as Currency[],
-        code: "2",
+        code: "ES",
         name: "2",
       },
       line1: "2",

@@ -2,6 +2,7 @@ import { updateCountry } from "./update";
 
 import * as DB from "@db";
 import { countriesTable } from "@schema";
+import { CountryEnum } from "@country-entity";
 
 jest.mock("@db", () => ({
   db: jest.fn().mockReturnValue({
@@ -15,7 +16,7 @@ jest.mock("@db", () => ({
 describe("updateCountry", () => {
   const setSpy = jest.spyOn(DB.db().update(countriesTable), "set");
   it("should update a countries", async () => {
-    const countryCode = "1";
+    const countryCode = CountryEnum.PT;
     const changes = {
       name: "newName",
     };

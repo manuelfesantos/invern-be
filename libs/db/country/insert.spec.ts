@@ -1,4 +1,4 @@
-import { InsertCountry } from "@country-entity";
+import { CountryEnum, InsertCountry } from "@country-entity";
 import * as DB from "@db";
 
 import { insertCountry } from "./insert";
@@ -10,7 +10,7 @@ jest.mock("@db", () => ({
       values: jest.fn().mockReturnValue({
         returning: jest.fn().mockReturnValue([
           {
-            code: "1",
+            code: "PT",
           },
         ]),
       }),
@@ -23,13 +23,13 @@ describe("insertCountry", () => {
   const valuesSpy = jest.spyOn(DB.db().insert(countriesTable), "values");
   it("should insert a countries", async () => {
     const country: InsertCountry = {
-      code: "1",
+      code: CountryEnum.PT,
       name: "name",
     };
     const result = await insertCountry(country);
     expect(result).toEqual([
       {
-        code: "1",
+        code: CountryEnum.PT,
       },
     ]);
     expect(insertSpy).toHaveBeenCalledWith(countriesTable);

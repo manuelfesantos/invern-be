@@ -117,7 +117,6 @@ export const currenciesTable = sqliteTable("currencies", {
 export const taxesTable = sqliteTable("taxes", {
   taxId: text("taxId").primaryKey(),
   name: text("name").notNull(),
-  rate: int("amount"),
   amount: int("amount"),
   countryCode: text("countryId")
     .notNull()
@@ -128,7 +127,9 @@ export const taxesTable = sqliteTable("taxes", {
 
 export const countriesTable = sqliteTable("countries", {
   name: text("name").notNull(),
-  code: text("code").notNull().primaryKey(),
+  code: text("code", { enum: ["PT", "ES"] })
+    .notNull()
+    .primaryKey(),
 });
 
 export const countriesToCurrenciesTable = sqliteTable(

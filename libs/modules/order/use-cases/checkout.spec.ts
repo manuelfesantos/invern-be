@@ -6,6 +6,7 @@ import * as CartDb from "@cart-db";
 import * as ProductDb from "@product-db";
 import { StripeCheckoutSessionResponse } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
+import { CountryEnum } from "@country-entity";
 
 jest.mock("@logger-utils", () => ({
   logger: jest
@@ -29,6 +30,17 @@ jest.mock("@cart-db", () => ({
 jest.mock("@product-db", () => ({
   getProductsByProductIds: jest.fn(),
   decreaseProductsStock: jest.fn(() => productsMock),
+}));
+
+jest.mock("@country-db", () => ({
+  getCountryByCode: jest.fn(() => ({
+    code: "PT",
+    taxes: [
+      {
+        taxId: "1",
+      },
+    ],
+  })),
 }));
 
 jest.mock("@r2-adapter", () => ({
@@ -56,6 +68,14 @@ const tokens = {
   accessToken: "accessToken",
 };
 
+const countryMock = {
+  code: "PT",
+  taxes: [
+    {
+      taxId: "1",
+    },
+  ],
+};
 const requestedProducts = lineItemsMock.map((item) => ({
   quantity: item.quantity,
   productId: item.productId,
@@ -94,6 +114,7 @@ describe("checkout", () => {
     } as StripeCheckoutSessionResponse);
     const response = await checkout(tokens, remember, undefined, undefined, {
       products: requestedProducts,
+      countryCode: CountryEnum.PT,
     });
     const expectedResponse = protectedSuccessResponse.OK(
       tokens,
@@ -106,7 +127,10 @@ describe("checkout", () => {
     expect(getProductsByProductIdsSpy).toHaveBeenCalledWith(
       requestedProducts.map((p) => p.productId),
     );
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
+      lineItemsMock,
+      countryMock,
+    );
   });
   it("should create checkout session from logged in user", async () => {
     getCartByIdSpy.mockResolvedValueOnce({ cartId, products: lineItemsMock });
@@ -116,6 +140,7 @@ describe("checkout", () => {
     } as StripeCheckoutSessionResponse);
     const response = await checkout(tokens, remember, userId, cartId, {
       products: requestedProducts,
+      countryCode: CountryEnum.PT,
     });
     const expectedResponse = protectedSuccessResponse.OK(
       tokens,
@@ -127,7 +152,10 @@ describe("checkout", () => {
     await compareResponses(response, expectedResponse);
     expect(getCartByIdSpy).toHaveBeenCalledWith(cartId);
     expect(validateCartIdSpy).toHaveBeenCalledWith(cartId);
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
+      lineItemsMock,
+      countryMock,
+    );
   });
   it("should throw error if cart id is invalid", async () => {
     validateCartIdSpy.mockRejectedValueOnce(new Error("cart not valid"));
@@ -154,6 +182,7 @@ describe("checkout", () => {
       async () =>
         await checkout(tokens, remember, undefined, undefined, {
           products: requestedProducts,
+          countryCode: CountryEnum.PT,
         }),
     ).rejects.toEqual(
       expect.objectContaining({
@@ -179,11 +208,15 @@ describe("checkout", () => {
       async () =>
         await checkout(tokens, remember, userId, cartId, {
           products: requestedProducts,
+          countryCode: CountryEnum.PT,
         }),
     ).rejects.toEqual(
       expect.objectContaining({ message: "Checkout session creation failed" }),
     );
-    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(lineItemsMock);
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
+      lineItemsMock,
+      countryMock,
+    );
   });
   it("should throw error if any line item has more quantity than stock", async () => {
     getProductsByProductIdsSpy.mockResolvedValueOnce(products);
@@ -194,6 +227,7 @@ describe("checkout", () => {
       async () =>
         await checkout(tokens, remember, undefined, undefined, {
           products: invalidRequestedProducts,
+          countryCode: CountryEnum.PT,
         }),
     ).rejects.toEqual(
       errors.PRODUCTS_OUT_OF_STOCK(

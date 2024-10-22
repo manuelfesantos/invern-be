@@ -23,6 +23,8 @@ import { base64Encode } from "@crypto-utils";
 import { getCookieHeader } from "@http-utils";
 import { MILLISECONDS_IN_SECOND, SESSION_EXPIRY } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
+import { getCountryByCode } from "@country-db";
+import { CountryEnumType } from "@country-entity";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -32,9 +34,11 @@ export const checkout: ProtectedModuleFunction = async (
   body?: unknown,
 ): Promise<Response> => {
   let lineItems: LineItem[] = [];
+  let countryCode: CountryEnumType;
 
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
+    countryCode = checkoutBodySchema.parse(body).countryCode;
   } else {
     if (!body) {
       logger().error(
@@ -43,13 +47,23 @@ export const checkout: ProtectedModuleFunction = async (
       );
       throw errors.PRODUCTS_ARE_REQUIRED();
     }
-    const { products } = checkoutBodySchema.parse(body);
+    const { products, countryCode: requestedCountryCode } =
+      checkoutBodySchema.parse(body);
+
+    countryCode = requestedCountryCode;
+
     lineItems = await getLineItems(products);
+  }
+
+  const country = await getCountryByCode(countryCode);
+
+  if (!country) {
+    throw errors.INVALID_COUNTRY_CODE(countryCode);
   }
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(lineItems);
+  const session = await createCheckoutSession(lineItems, country);
 
   const { url, expires_at, id, created } = session;
 

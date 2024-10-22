@@ -3,7 +3,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { acquireLock, getCacheKey, purgeCache, releaseLock } from "../utils";
 import { stringifyObject } from "@string-utils";
 import { z } from "zod";
-import { Country, countrySchema } from "@country-entity";
+import { ClientCountry, clientCountrySchema } from "@country-entity";
 import { countriesHost } from "@http-utils";
 
 const COUNTRY_LOCK_TTL = 3000;
@@ -14,7 +14,7 @@ const countriesLockKey = "countries-lock";
 let countriesBucket: R2Bucket | null = null;
 
 const countryDataSchema = z.object({
-  data: z.array(countrySchema),
+  data: z.array(clientCountrySchema),
 });
 
 const init = (bucket: R2Bucket): void => {
@@ -23,7 +23,9 @@ const init = (bucket: R2Bucket): void => {
   }
 };
 
-const getCountries = async (): Promise<{ data: Country[] } | undefined> => {
+const getCountries = async (): Promise<
+  { data: ClientCountry[] } | undefined
+> => {
   if (!countriesBucket) {
     logger().error(
       "Countries bucket client not initialized",
@@ -49,7 +51,7 @@ const getCountries = async (): Promise<{ data: Country[] } | undefined> => {
   return countryDataSchema.parse(countries);
 };
 
-const updateCountries = async (countries: Country[]): Promise<void> => {
+const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
   if (!countriesBucket) {
     logger().error(
       "Countries bucket client not initialized",

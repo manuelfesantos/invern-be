@@ -1,10 +1,10 @@
-import { InsertCountry } from "@country-entity";
+import { CountryEnumType, InsertCountry } from "@country-entity";
 import { countriesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";
 
 export const updateCountry = async (
-  countryCode: string,
+  countryCode: CountryEnumType,
   changes: Partial<InsertCountry>,
 ): Promise<void> => {
   await db()

@@ -68,6 +68,11 @@ export const errors = {
     new CustomError(`Invalid event type: ${type}`, HttpStatusEnum.BAD_REQUEST),
   INVALID_PAYLOAD: (issue: string): CustomError =>
     new CustomError(`Invalid payload: ${issue}`, HttpStatusEnum.BAD_REQUEST),
+  INVALID_COUNTRY_CODE: (code: string): CustomError =>
+    new CustomError(
+      `Invalid country code: ${code}`,
+      HttpStatusEnum.BAD_REQUEST,
+    ),
   ORDER_NOT_FOUND: (): CustomError =>
     new CustomError("Order not found", HttpStatusEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): CustomError =>
