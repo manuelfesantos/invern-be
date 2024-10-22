@@ -46,6 +46,7 @@
       "@logger-utils": ["libs/utils/logger"],
       "@mail-utils": ["libs/utils/mail"],
       "@mocks-utils": ["libs/utils/__mocks__"],
+      "@number-utils": ["libs/utils/number"],
       "@order-db": ["libs/db/order"],
       "@order-entity": ["libs/entities/order"],
       "@order-module": ["libs/modules/order"],

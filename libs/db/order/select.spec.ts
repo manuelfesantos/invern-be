@@ -15,12 +15,12 @@ const foundOrder = {
     city: "1",
     postalCode: "1",
     country: {
-      code: "1",
+      code: "PT",
       name: "1",
       taxes: [
         {
+          taxId: "1",
           name: "1",
-          rate: 1,
           amount: 1,
         },
       ],
@@ -94,12 +94,12 @@ const returnedOrder = {
     city: "1",
     postalCode: "1",
     country: {
-      code: "1",
+      code: "PT",
       name: "1",
       taxes: [
         {
+          taxId: "1",
           name: "1",
-          rate: 1,
           amount: 1,
         },
       ],

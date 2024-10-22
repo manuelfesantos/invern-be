@@ -1,6 +1,7 @@
 import { deleteCountry } from "./delete";
 import * as DB from "@db";
 import { countriesTable } from "@schema";
+import { CountryEnum } from "@country-entity";
 
 jest.mock("@db", () => ({
   db: jest.fn().mockReturnValue({
@@ -16,7 +17,7 @@ describe("deleteCountry", () => {
     deleteSpy.mockClear();
   });
   it("should delete a countries", async () => {
-    const countryCode = "1";
+    const countryCode = CountryEnum.PT;
     const result = await deleteCountry(countryCode);
     expect(result).toBeUndefined();
     expect(deleteSpy).toHaveBeenCalledWith(countriesTable);

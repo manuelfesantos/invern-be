@@ -1,29 +1,19 @@
 import { taxesTable } from "@schema";
 import { db } from "@db";
-import { getRandomUUID } from "@crypto-utils";
-import { InsertTax } from "@tax-entity";
-
-const getTaxesList = (): InsertTax[] => [
-  {
-    name: "VAT",
-    rate: 0.15,
-    countryCode: "PT",
-  },
-  {
-    name: "VAT",
-    rate: 0.15,
-    countryCode: "ES",
-  },
-];
+import { getStripeTaxes } from "@stripe-adapter";
+import { percentageToRate } from "@number-utils";
 
 export const insertTaxes = async (): Promise<void> => {
-  const taxesList = getTaxesList();
+  const taxesList = await getStripeTaxes();
   for (const tax of taxesList) {
+    const { country, id, percentage, display_name } = tax;
     await db()
       .insert(taxesTable)
       .values({
-        ...tax,
-        taxId: getRandomUUID(),
+        name: display_name,
+        taxId: id,
+        countryCode: country || "PT",
+        amount: percentageToRate(percentage),
       });
   }
 };

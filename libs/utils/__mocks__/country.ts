@@ -2,56 +2,38 @@ import { Country } from "@country-entity";
 
 export const countriesMock: Country[] = [
   {
-    name: "United States",
-    code: "US",
+    name: "Portugal",
+    code: "PT",
     currencies: [
       {
-        code: "USD",
-        name: "US Dollar",
-        symbol: "$",
+        code: "EUR",
+        name: "Euro",
+        symbol: "@",
       },
     ],
     taxes: [
       {
+        taxId: "1",
         name: "VAT",
         amount: 0.15,
-        rate: 0.15,
       },
     ],
   },
   {
-    name: "Canada",
-    code: "CA",
+    name: "Spain",
+    code: "ES",
     currencies: [
       {
-        code: "CAD",
-        name: "Canadian Dollar",
-        symbol: "$",
+        code: "EUR",
+        name: "Euro",
+        symbol: "€",
       },
     ],
     taxes: [
       {
+        taxId: "2",
         name: "VAT",
         amount: 0.15,
-        rate: 0.15,
-      },
-    ],
-  },
-  {
-    name: "United Kingdom",
-    code: "UK",
-    currencies: [
-      {
-        code: "GBP",
-        name: "Pound Sterling",
-        symbol: "£",
-      },
-    ],
-    taxes: [
-      {
-        name: "VAT",
-        amount: 0.15,
-        rate: 0.15,
       },
     ],
   },

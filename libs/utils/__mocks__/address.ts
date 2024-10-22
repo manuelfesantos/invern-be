@@ -6,7 +6,7 @@ export const addressMock: Address = {
   country: {
     taxes: [],
     currencies: [],
-    code: "1",
+    code: "PT",
     name: "1",
   },
   line1: "1",

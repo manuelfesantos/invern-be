@@ -2,6 +2,7 @@ import { selectAllCountries, getCountryByCode } from "./select";
 
 import * as DB from "@db";
 import { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
+import { CountryEnum } from "@country-entity";
 
 const ONE_ELEMENT = 1;
 const FIRST_ELEMENT = 0;
@@ -12,7 +13,7 @@ jest.mock("@db", () => ({
       countriesTable: {
         findMany: jest.fn().mockReturnValue([
           {
-            code: "1",
+            code: "PT",
             name: "name",
             countriesToCurrencies: [
               {
@@ -25,15 +26,15 @@ jest.mock("@db", () => ({
             ],
             taxes: [
               {
+                taxId: "1",
                 name: "name",
-                rate: 15,
                 amount: 15,
               },
             ],
           },
         ]),
         findFirst: jest.fn().mockReturnValue({
-          code: "1",
+          code: "PT",
           name: "name",
           countriesToCurrencies: [
             {
@@ -46,8 +47,8 @@ jest.mock("@db", () => ({
           ],
           taxes: [
             {
+              taxId: "2",
               name: "name",
-              rate: 15,
               amount: 15,
             },
           ],
@@ -67,7 +68,7 @@ describe("get", () => {
       const result = await selectAllCountries();
       expect(result).toHaveLength(ONE_ELEMENT);
       expect(result[FIRST_ELEMENT]).toEqual({
-        code: "1",
+        code: CountryEnum.PT,
         name: "name",
         currencies: [
           {
@@ -78,8 +79,8 @@ describe("get", () => {
         ],
         taxes: [
           {
+            taxId: "1",
             name: "name",
-            rate: 15,
             amount: 15,
           },
         ],
@@ -90,7 +91,7 @@ describe("get", () => {
     it("should return taxes as empty array if countries do not have taxes", async () => {
       const countryTemplate = [
         {
-          code: "1",
+          code: CountryEnum.PT,
           name: "name",
           countriesToCurrencies: [
             {
@@ -105,7 +106,7 @@ describe("get", () => {
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
       ] as any;
       const country = {
-        code: "1",
+        code: CountryEnum.PT,
         name: "name",
         currencies: [
           {
@@ -126,10 +127,10 @@ describe("get", () => {
   describe("countries by code", () => {
     const findFirstSpy = jest.spyOn(DB.db().query.countriesTable, "findFirst");
     it("should get countries by countryCode", async () => {
-      const countryCode = "1";
+      const countryCode = CountryEnum.PT;
       const result = await getCountryByCode(countryCode);
       expect(result).toEqual({
-        code: "1",
+        code: CountryEnum.PT,
         name: "name",
         currencies: [
           {
@@ -140,8 +141,8 @@ describe("get", () => {
         ],
         taxes: [
           {
+            taxId: "2",
             name: "name",
-            rate: 15,
             amount: 15,
           },
         ],
@@ -150,7 +151,7 @@ describe("get", () => {
     });
 
     it("should return undefined if countries not found", async () => {
-      const countryCode = "2";
+      const countryCode = CountryEnum.ES;
       findFirstSpy.mockReturnValue(
         undefined as unknown as SQLiteRelationalQuery<"async", undefined>,
       );
@@ -160,7 +161,7 @@ describe("get", () => {
 
     it("should return taxes as empty array if countries has no taxes", async () => {
       const countryTemplate = {
-        code: "1",
+        code: CountryEnum.ES,
         name: "name",
         countriesToCurrencies: [
           {
@@ -174,7 +175,7 @@ describe("get", () => {
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
       const country = {
-        code: "1",
+        code: CountryEnum.ES,
         name: "name",
         currencies: [
           {
@@ -187,7 +188,7 @@ describe("get", () => {
       };
 
       findFirstSpy.mockReturnValue(countryTemplate);
-      const result = await getCountryByCode("1");
+      const result = await getCountryByCode(CountryEnum.ES);
       expect(result).toEqual(country);
     });
   });
