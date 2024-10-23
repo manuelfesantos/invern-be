@@ -40,8 +40,10 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   const { env, data, request } = context;
   const { tracer: logger } = data.honeycomb;
 
+  const country = request.headers.get("country");
+
   logger.addData({
-    country: request.cf?.country,
+    country: country || request.cf?.country,
   });
 
   initDb(env.INVERN_DB);
