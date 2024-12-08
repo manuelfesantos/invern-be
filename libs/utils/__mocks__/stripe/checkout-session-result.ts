@@ -89,6 +89,7 @@ export const stripeCheckoutSessionResultMockWithoutUserId: StripeSessionResult =
     saved_payment_method_options: {
       allow_redisplay_filters: ["always"],
       payment_method_save: null,
+      payment_method_remove: null,
     },
     setup_intent: null,
     shipping_address_collection: {
@@ -221,6 +222,7 @@ export const stripeCheckoutSessionResultMockWithUserId: StripeSessionResult = {
   saved_payment_method_options: {
     allow_redisplay_filters: ["always"],
     payment_method_save: null,
+    payment_method_remove: null,
   },
   setup_intent: null,
   shipping_address_collection: {
@@ -359,6 +361,7 @@ export const stripeCheckoutSessionResultEventmock: StripeSessionCompletedEvent =
         saved_payment_method_options: {
           allow_redisplay_filters: ["always"],
           payment_method_save: null,
+          payment_method_remove: null,
         },
         setup_intent: null,
         shipping_address_collection: {

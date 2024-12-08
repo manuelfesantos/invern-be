@@ -60,6 +60,7 @@ const foundOrder = {
       },
     },
   ],
+  snapshot: null,
 };
 
 const returnedOrder = {
@@ -112,6 +113,7 @@ const returnedOrder = {
       ],
     },
   },
+  snapshot: null,
 };
 
 jest.mock("@db", () => ({

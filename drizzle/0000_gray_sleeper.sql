@@ -1,3 +1,9 @@
+DROP TABLE IF EXISTS `countries`;
+CREATE TABLE `countries` (
+     `name` text NOT NULL,
+     `code` text PRIMARY KEY NOT NULL
+);
+--> statement-breakpoint
 DROP TABLE IF EXISTS `addresses`;
 CREATE TABLE `addresses` (
 	`addressId` text PRIMARY KEY NOT NULL,
@@ -19,12 +25,6 @@ CREATE TABLE `collections` (
 	`collectionId` text PRIMARY KEY NOT NULL,
 	`collectionName` text NOT NULL,
 	`description` text NOT NULL
-);
---> statement-breakpoint
-DROP TABLE IF EXISTS `countries`;
-CREATE TABLE `countries` (
-	`name` text NOT NULL,
-	`code` text PRIMARY KEY NOT NULL
 );
 --> statement-breakpoint
 DROP TABLE IF EXISTS `countriesToCurrencies`;

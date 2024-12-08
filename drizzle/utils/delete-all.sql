@@ -5,3 +5,4 @@ DELETE FROM `addresses`;
 DELETE FROM `carts`;
 DELETE FROM `productsToOrders`;
 DELETE FROM `productsOnCarts`;
+DELETE FROM `checkoutSessions`;

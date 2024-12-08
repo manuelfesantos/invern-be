@@ -49,6 +49,7 @@ export const GETEventMock = {
     clone: jest.fn(),
     method: HttpMethodEnum.GET,
     url: "http://localhost:3000",
+    bytes: undefined as unknown as () => Promise<Uint8Array>,
     redirect: "false",
     fetcher: {
       fetch: jest.fn(),
@@ -165,6 +166,7 @@ export const POSTEventMock = {
     clone: jest.fn(),
     method: HttpMethodEnum.POST,
     url: "http://localhost:3000",
+    bytes: undefined as unknown as () => Promise<Uint8Array>,
     redirect: "false",
     fetcher: {
       fetch: jest.fn(),
@@ -281,6 +283,7 @@ export const PUTEventMock = {
     clone: jest.fn(),
     method: HttpMethodEnum.PUT,
     url: "http://localhost:3000",
+    bytes: undefined as unknown as () => Promise<Uint8Array>,
     redirect: "false",
     fetcher: {
       fetch: jest.fn(),
@@ -397,6 +400,7 @@ export const DELETEEventMock = {
     clone: jest.fn(),
     method: HttpMethodEnum.DELETE,
     url: "http://localhost:3000",
+    bytes: undefined as unknown as () => Promise<Uint8Array>,
     redirect: "false",
     fetcher: {
       fetch: jest.fn(),

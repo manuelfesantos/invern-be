@@ -89,6 +89,7 @@ export const ordersTable = sqliteTable("orders", {
   paymentId: text("paymentId").references(() => paymentsTable.paymentId, {
     onDelete: "cascade",
   }),
+  snapshot: text("snapshot"),
 });
 
 export const productsToOrdersTable = sqliteTable(
