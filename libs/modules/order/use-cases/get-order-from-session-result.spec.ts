@@ -133,6 +133,7 @@ describe("getOrderFromSessionResult", () => {
       orderId,
       clientOrderId:
         stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientOrderId,
+      snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);
@@ -178,6 +179,7 @@ describe("getOrderFromSessionResult", () => {
       orderId,
       clientOrderId:
         stripeCheckoutSessionResultMockWithUserId.metadata?.clientOrderId,
+      snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
     expect(getOrderByIdSpy).toHaveBeenCalledWith(orderId);

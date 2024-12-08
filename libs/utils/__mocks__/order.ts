@@ -28,6 +28,7 @@ export const clientOrdersMock: ClientOrder[] = [
       state: "succeeded",
       type: "card",
     },
+    snapshot: null,
   },
   {
     clientOrderId: "2",
@@ -52,6 +53,7 @@ export const clientOrdersMock: ClientOrder[] = [
       state: "succeeded",
       type: "card",
     },
+    snapshot: null,
   },
 ];
 

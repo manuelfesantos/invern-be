@@ -2,7 +2,7 @@ import { selectAllCountries, getCountryByCode } from "./select";
 
 import * as DB from "@db";
 import { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
-import { CountryEnum } from "@country-entity";
+import { CountryEnum, CountryEnumType } from "@country-entity";
 
 const ONE_ELEMENT = 1;
 const FIRST_ELEMENT = 0;
@@ -153,7 +153,10 @@ describe("get", () => {
     it("should return undefined if countries not found", async () => {
       const countryCode = CountryEnum.ES;
       findFirstSpy.mockReturnValue(
-        undefined as unknown as SQLiteRelationalQuery<"async", undefined>,
+        undefined as unknown as SQLiteRelationalQuery<
+          "async",
+          { name: string; code: CountryEnumType }
+        >,
       );
       const result = await getCountryByCode(countryCode);
       expect(result).toBeUndefined();

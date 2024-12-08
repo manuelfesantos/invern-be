@@ -28,6 +28,7 @@ describe("insertOrder", () => {
       userId: "1",
       addressId: "1",
       paymentId: "1",
+      snapshot: null,
     };
     const result = await insertOrder(order);
     expect(result).toHaveLength(ONE_ELEMENT);

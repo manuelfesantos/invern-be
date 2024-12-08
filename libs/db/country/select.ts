@@ -56,7 +56,6 @@ export const selectAllCountries = async (): Promise<Country[]> => {
       taxes: {
         columns: {
           countryCode: false,
-          taxId: false,
         },
       },
     },

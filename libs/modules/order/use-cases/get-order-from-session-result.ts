@@ -56,6 +56,7 @@ export const getOrderFromSessionResult = async (
     userId: userId ?? null,
     orderId: sessionResult.id,
     clientOrderId,
+    snapshot: null,
   });
 
   await insertProductsToOrder(productsString, orderId);
