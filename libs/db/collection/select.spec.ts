@@ -41,6 +41,7 @@ describe("get", () => {
       expect(result[FIRST_ELEMENT]).toEqual({
         collectionId: "1",
         collectionName: "collectionName",
+        images: null,
       });
     });
   });

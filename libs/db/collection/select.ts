@@ -4,7 +4,7 @@ import { collectionsTable } from "@schema";
 import { Collection, CollectionDetails } from "@collection-entity";
 
 export const getCollections = async (): Promise<Collection[]> => {
-  return db().query.collectionsTable.findMany({
+  const collections = await db().query.collectionsTable.findMany({
     with: {
       images: {
         columns: {
@@ -14,6 +14,11 @@ export const getCollections = async (): Promise<Collection[]> => {
       },
     },
   });
+
+  return collections.map((collection) => ({
+    ...collection,
+    images: collection.images ? [collection.images] : null,
+  }));
 };
 
 export const getCollectionByName = async (
