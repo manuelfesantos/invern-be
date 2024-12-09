@@ -33,8 +33,9 @@ const userUseCasesSchema = [
 
 const orderUseCasesSchema = [
   "GET_ORDER",
-  "GREATE_ORDER",
+  "CREATE_ORDER",
   "UPDATE_ORDER",
+  "GET_PAYMENT_INTENT",
 ] as const;
 
 const r2BucketUseCasesSchema = [

@@ -9,6 +9,8 @@ import {
 import { isStripeEvent, isStripePaymentIntent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { z } from "zod";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 const paymentIntentEventMap = {
   "payment_intent.created": getPaymentFromPaymentIntentCreatedEvent,
@@ -48,6 +50,11 @@ export const mapPaymentIntentEvent = async (
   }
 
   const paymentIntentType = paymentIntentTypeSchema.parse(event.type);
+
+  logger().info(
+    `Payment Intent Type: ${paymentIntentType}`,
+    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+  );
 
   return await paymentIntentEventMap[paymentIntentType](paymentIntent);
 };

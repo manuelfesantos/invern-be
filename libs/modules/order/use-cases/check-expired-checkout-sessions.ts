@@ -15,7 +15,7 @@ export const checkExpiredCheckoutSessions = async (): Promise<Response> => {
   }
 
   logger().info(
-    "Exiting expired sessions",
+    "Existing expired sessions",
     LoggerUseCaseEnum.CHECK_EXPIRED_SESSIONS,
     {
       sessions: stringifyObject(expiredSessions),
@@ -37,4 +37,12 @@ const retrieveProductsStockFromSession = async (
   for (const product of updatedProducts) {
     await stockClient.update(product);
   }
+
+  logger().info(
+    "Success retrieving products Stock",
+    LoggerUseCaseEnum.RELEASE_PRODUCTS,
+    {
+      releasedProducts: products,
+    },
+  );
 };

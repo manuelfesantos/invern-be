@@ -16,6 +16,12 @@ jest.mock("@db", () => ({
   }),
 }));
 
+jest.mock("@logger-utils", () => ({
+  logger: jest.fn(() => ({
+    info: jest.fn(),
+  })),
+}));
+
 const ONE_ELEMENT = 1;
 const FIRST_ELEMENT = 0;
 
