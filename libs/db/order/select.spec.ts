@@ -116,6 +116,57 @@ const returnedOrder = {
   snapshot: null,
 };
 
+const returnedClientOrder = {
+  clientOrderId: "1",
+  createdAt: "1",
+  products: [
+    {
+      quantity: 1,
+      productId: "1",
+      productName: "1",
+      stock: 1,
+      priceInCents: 1,
+      images: [
+        {
+          url: "1",
+          alt: "1",
+        },
+      ],
+    },
+  ],
+  payment: {
+    createdAt: "1",
+    type: "card",
+    state: "succeeded",
+    amount: 1,
+  },
+  address: {
+    addressId: "1",
+    line1: "1",
+    line2: "1",
+    city: "1",
+    postalCode: "1",
+    country: {
+      code: "PT",
+      name: "1",
+      taxes: [
+        {
+          name: "1",
+          amount: 1,
+        },
+      ],
+      currencies: [
+        {
+          code: "1",
+          name: "1",
+          symbol: "1",
+        },
+      ],
+    },
+  },
+  snapshot: null,
+};
+
 jest.mock("@db", () => ({
   db: jest.fn().mockReturnValue({
     query: {
@@ -143,8 +194,7 @@ describe("get", () => {
       expect(findManySpy).toHaveBeenCalled();
       expect(result).toHaveLength(ONE_ELEMENT);
       expect(result[FIRST_ELEMENT]).toEqual({
-        ...returnedOrder,
-        orderId: undefined,
+        ...returnedClientOrder,
       });
     });
   });
@@ -166,7 +216,7 @@ describe("get", () => {
       const clientOrderId = "1";
       const result = await getOrderByClientId(clientOrderId);
       expect(findFirstSpy).toHaveBeenCalled();
-      expect(result).toEqual({ ...returnedOrder, orderId: undefined });
+      expect(result).toEqual({ ...returnedClientOrder });
     });
   });
 });

@@ -2,6 +2,7 @@ import { getOrderFromSessionResult } from "@order-module";
 import {
   addressMock,
   clientOrderMock,
+  orderMock,
   stripeAddressMock,
   stripeCheckoutSessionResultMockWithoutUserId,
   stripeCheckoutSessionResultMockWithUserId,
@@ -111,7 +112,7 @@ describe("getOrderFromSessionResult", () => {
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...clientOrderMock, orderId });
+    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, orderId });
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithoutUserId,
     );
@@ -157,7 +158,7 @@ describe("getOrderFromSessionResult", () => {
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...clientOrderMock, orderId });
+    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, orderId });
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithUserId,
     );

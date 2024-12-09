@@ -2,7 +2,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { ordersTable } from "@schema";
 import { z } from "zod";
 import { lineItemSchema } from "@product-entity";
-import { addressSchema } from "@address-entity";
+import { addressSchema, clientAddressSchema } from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
 
 const baseOrderSchema = createSelectSchema(ordersTable);
@@ -21,9 +21,16 @@ export const orderSchema = baseOrderSchema
     }),
   );
 
-export const clientOrderSchema = orderSchema.omit({
-  orderId: true,
-});
+export const clientOrderSchema = orderSchema
+  .omit({
+    orderId: true,
+    address: true,
+  })
+  .merge(
+    z.object({
+      address: clientAddressSchema,
+    }),
+  );
 
 export type ClientOrder = z.infer<typeof clientOrderSchema>;
 export type Order = z.infer<typeof orderSchema>;
