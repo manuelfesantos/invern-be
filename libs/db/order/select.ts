@@ -124,7 +124,6 @@ export const getOrderById = async (
               taxes: {
                 columns: {
                   countryCode: false,
-                  taxId: false,
                 },
               },
               countriesToCurrencies: {
