@@ -56,5 +56,7 @@ export const mapPaymentIntentEvent = async (
     LoggerUseCaseEnum.GET_PAYMENT_INTENT,
   );
 
+  logger().addData({ paymentId: paymentIntent.id });
+
   return await paymentIntentEventMap[paymentIntentType](paymentIntent);
 };
