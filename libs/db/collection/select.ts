@@ -17,7 +17,7 @@ export const getCollections = async (): Promise<Collection[]> => {
 
   return collections.map((collection) => ({
     ...collection,
-    images: collection.images ? [collection.images] : null,
+    image: collection.images,
   }));
 };
 
