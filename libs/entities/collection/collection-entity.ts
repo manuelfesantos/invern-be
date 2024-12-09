@@ -21,7 +21,7 @@ export const collectionSchema = baseCollectionSchema
   .omit({ description: true })
   .merge(
     z.object({
-      images: imageSchema.array().nullable(),
+      image: imageSchema.nullable(),
     }),
   );
 
