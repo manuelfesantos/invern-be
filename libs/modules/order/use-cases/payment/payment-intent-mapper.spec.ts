@@ -21,7 +21,7 @@ jest.mock("./get-payment-from-payment-intent", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  logger: jest.fn().mockReturnValue({ addData: jest.fn(), info: jest.fn() }),
 }));
 
 jest.mock("@jwt-utils", () => ({}));

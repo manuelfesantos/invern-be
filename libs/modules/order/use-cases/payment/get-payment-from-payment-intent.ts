@@ -14,6 +14,8 @@ import { errors } from "@error-handling-utils";
 import { getOrderProductsByPaymentId } from "@order-db";
 import { increaseProductsStock } from "@product-db";
 import { stockClient } from "@r2-adapter";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const getPaymentFromPaymentIntentSucceededEvent = async (
   paymentIntent: PaymentIntent,
@@ -23,6 +25,16 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
     PaymentIntentState.succeeded,
   );
   const { paymentId } = (await getPaymentById(payment.paymentId)) ?? {};
+
+  logger().info(
+    "Processing PaymentIntentSucceeded Event",
+    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    {
+      payment,
+      paymentId,
+    },
+  );
+
   if (paymentId) {
     const [updatedPayment] = await updatePayment(paymentId, payment);
     return updatedPayment;
@@ -39,6 +51,16 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
     PaymentIntentState.created,
   );
   const savedPayment = await getPaymentById(payment.paymentId);
+
+  logger().info(
+    "Processing PaymentIntentCreated Event",
+    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    {
+      payment,
+      savedPayment,
+    },
+  );
+
   if (savedPayment) {
     if (savedPayment?.state !== PaymentIntentState.draft) {
       throw errors.PAYMENT_ALREADY_EXISTS();
@@ -59,6 +81,15 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
   );
 
   const savedPayment = await getPaymentById(payment.paymentId);
+
+  logger().info(
+    "Processing PaymentIntentProcessing Event",
+    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    {
+      payment,
+      savedPayment,
+    },
+  );
 
   if (savedPayment) {
     if (
@@ -81,6 +112,7 @@ export const getPaymentFromPaymentIntentCanceledEvent = async (
     paymentIntent,
     PaymentIntentState.canceled,
   );
+
   return await handleFailedPayment(payment);
 };
 
@@ -105,6 +137,16 @@ const handleFailedPayment = async (
     }
   }
   const savedPayment = await getPaymentById(payment.paymentId);
+
+  logger().info(
+    "Processing Failed Payment Event",
+    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    {
+      payment,
+      savedPayment,
+    },
+  );
+
   if (savedPayment) {
     if (
       savedPayment?.state === PaymentIntentState.succeeded ||
