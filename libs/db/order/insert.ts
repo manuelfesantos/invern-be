@@ -22,6 +22,6 @@ export const insertOrder = async (
   });
 
   return db().insert(ordersTable).values(insertOrder).returning({
-    orderId: ordersTable.orderId,
+    orderId: ordersTable.id,
   });
 };

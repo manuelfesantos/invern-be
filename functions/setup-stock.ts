@@ -21,8 +21,8 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
     return errorResponse.UNAUTHORIZED();
   }
 
-  const products = (await getProducts()).map(({ productId, stock }) => ({
-    productId,
+  const products = (await getProducts()).map(({ id, stock }) => ({
+    id,
     stock: stock || NO_STOCK,
   }));
 

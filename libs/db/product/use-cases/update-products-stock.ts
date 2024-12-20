@@ -7,11 +7,11 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const decreaseProductsStock = async (
   products: ProductIdAndQuantity[],
-): Promise<{ stock: number; productId: string }[]> => {
+): Promise<{ stock: number; id: string }[]> => {
   const setQuery = sql`CASE ${products
     .map(
       (product) =>
-        sql`WHEN productId = ${product.productId} THEN stock - ${product.quantity}`,
+        sql`WHEN id = ${product.id} THEN stock - ${product.quantity}`,
     )
     .reduce((acc, curr) => sql`${acc} ${curr}`)} ELSE stock END`;
 
@@ -26,13 +26,13 @@ export const decreaseProductsStock = async (
     })
     .where(
       inArray(
-        productsTable.productId,
-        products.map((p) => p.productId),
+        productsTable.id,
+        products.map((p) => p.id),
       ),
     )
     .returning({
       stock: productsTable.stock,
-      productId: productsTable.productId,
+      id: productsTable.id,
     });
 
   logger().info("products reserved", LoggerUseCaseEnum.RESERVE_PRODUCTS, {
@@ -44,12 +44,12 @@ export const decreaseProductsStock = async (
 
 export const increaseProductsStock = async (
   products: ProductIdAndQuantity[],
-): Promise<{ stock: number; productId: string }[]> => {
+): Promise<{ stock: number; id: string }[]> => {
   if (!products.length) return [];
   const setQuery = sql`CASE ${products
     .map(
       (product) =>
-        sql`WHEN productId = ${product.productId} THEN stock + ${product.quantity}`,
+        sql`WHEN id = ${product.id} THEN stock + ${product.quantity}`,
     )
     .reduce((acc, curr) => sql`${acc} ${curr}`)} ELSE stock END`;
 
@@ -64,12 +64,12 @@ export const increaseProductsStock = async (
     })
     .where(
       inArray(
-        productsTable.productId,
-        products.map((p) => p.productId),
+        productsTable.id,
+        products.map((p) => p.id),
       ),
     )
     .returning({
       stock: productsTable.stock,
-      productId: productsTable.productId,
+      id: productsTable.id,
     });
 };

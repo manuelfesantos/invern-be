@@ -61,9 +61,7 @@ const mapProductsToLineItems = (
   lineItems: ProductIdAndQuantity[],
 ): LineItem[] =>
   products.reduce((acc: LineItem[], curr: Product) => {
-    const lineItem = lineItems.find(
-      (item) => item.productId === curr.productId,
-    );
+    const lineItem = lineItems.find((item) => item.id === curr.id);
     return lineItem
       ? [...acc, { ...curr, quantity: lineItem.quantity || NO_QUANTITY }]
       : acc;
@@ -71,4 +69,4 @@ const mapProductsToLineItems = (
 
 const getProductIdsFromLineItems = (
   lineItems: ProductIdAndQuantity[],
-): string[] => lineItems.map((lineItem) => lineItem.productId);
+): string[] => lineItems.map((lineItem) => lineItem.id);

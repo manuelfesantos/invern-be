@@ -68,7 +68,7 @@ export const stripeCheckoutSessionResultMockWithoutUserId: StripeSessionResult =
     locale: null,
     metadata: {
       products: "qsZyqRnFLBGvkmVGmELc4W:2|tTGoF4LP82NZSAWPZPSZW4:1",
-      clientOrderId: "rsGD4jh2VHTV91bdgK2QsY",
+      clientId: "rsGD4jh2VHTV91bdgK2QsY",
     },
     mode: "payment",
     payment_intent: "pi_3PtUmyBqKEpmI70R3vATTu1b",
@@ -201,7 +201,7 @@ export const stripeCheckoutSessionResultMockWithUserId: StripeSessionResult = {
     userId: "rsGD4jh2VHTV91bdgK2QsY",
     cartId: "cqnqGwCb6Us988aKw8q9ZX",
     products: "qsZyqRnFLBGvkmVGmELc4W:2|tTGoF4LP82NZSAWPZPSZW4:1",
-    clientOrderId: "rsGD4jh2VHTV91bdgK2QsY",
+    clientId: "rsGD4jh2VHTV91bdgK2QsY",
   },
   mode: "payment",
   payment_intent: "pi_3PtUmyBqKEpmI70R3vATTu1b",

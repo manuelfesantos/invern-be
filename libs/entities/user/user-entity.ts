@@ -7,7 +7,7 @@ import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 export const DEFAULT_USER_VERSION = 1;
 
 export const baseUserSchema = createInsertSchema(usersTable, {
-  userId: uuidSchema("user id"),
+  id: uuidSchema("user id"),
   password: requiredStringSchema("user password"),
   version: z.number().default(DEFAULT_USER_VERSION),
   role: z.enum(["ADMIN", "USER"]).default("USER"),
@@ -17,7 +17,7 @@ export const baseUserSchema = createInsertSchema(usersTable, {
 });
 
 export const insertUserSchema = baseUserSchema.omit({
-  userId: true,
+  id: true,
   version: true,
   role: true,
 });
@@ -36,7 +36,7 @@ export const userDTOSchema = userSchema
   .omit({
     password: true,
     role: true,
-    userId: true,
+    id: true,
   })
   .transform((payload) => ({
     ...payload,

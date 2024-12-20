@@ -7,6 +7,6 @@ export const getPaymentById = async (
   paymentId: string,
 ): Promise<Payment | undefined> => {
   return db().query.paymentsTable.findFirst({
-    where: eq(paymentsTable.paymentId, paymentId),
+    where: eq(paymentsTable.id, paymentId),
   });
 };

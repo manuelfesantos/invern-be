@@ -2,14 +2,14 @@ import * as DB from "@db";
 import { getOrderByClientId, getOrderById, getOrdersByUserId } from "./select";
 
 const foundOrder = {
-  clientOrderId: "1",
-  orderId: "1",
+  clientId: "1",
+  id: "1",
   createdAt: "1",
   userId: "1",
   paymentId: "1",
   addressId: "1",
   address: {
-    addressId: "1",
+    id: "1",
     line1: "1",
     line2: "1",
     city: "1",
@@ -19,7 +19,7 @@ const foundOrder = {
       name: "1",
       taxes: [
         {
-          taxId: "1",
+          id: "1",
           name: "1",
           rate: 1,
         },
@@ -36,7 +36,7 @@ const foundOrder = {
     },
   },
   payment: {
-    paymentId: "1",
+    id: "1",
     createdAt: "1",
     type: "card",
     state: "succeeded",
@@ -47,8 +47,8 @@ const foundOrder = {
     {
       quantity: 1,
       product: {
-        productId: "1",
-        productName: "1",
+        id: "1",
+        name: "1",
         description: "1",
         stock: 1,
         priceInCents: 1,
@@ -65,14 +65,14 @@ const foundOrder = {
 };
 
 const returnedOrder = {
-  clientOrderId: "1",
+  clientId: "1",
   createdAt: "1",
-  orderId: "1",
+  id: "1",
   products: [
     {
       quantity: 1,
-      productId: "1",
-      productName: "1",
+      id: "1",
+      name: "1",
       stock: 1,
       priceInCents: 1,
       images: [
@@ -91,7 +91,7 @@ const returnedOrder = {
     netAmount: 1,
   },
   address: {
-    addressId: "1",
+    id: "1",
     line1: "1",
     line2: "1",
     city: "1",
@@ -101,7 +101,7 @@ const returnedOrder = {
       name: "1",
       taxes: [
         {
-          taxId: "1",
+          id: "1",
           name: "1",
           rate: 1,
         },
@@ -119,13 +119,13 @@ const returnedOrder = {
 };
 
 const returnedClientOrder = {
-  clientOrderId: "1",
+  clientId: "1",
   createdAt: "1",
   products: [
     {
       quantity: 1,
-      productId: "1",
-      productName: "1",
+      id: "1",
+      name: "1",
       stock: 1,
       priceInCents: 1,
       images: [
@@ -144,7 +144,7 @@ const returnedClientOrder = {
     grossAmount: 2,
   },
   address: {
-    addressId: "1",
+    id: "1",
     line1: "1",
     line2: "1",
     city: "1",

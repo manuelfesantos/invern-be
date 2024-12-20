@@ -9,9 +9,9 @@ export const addToOrder = async (
   await db()
     .insert(productsToOrdersTable)
     .values(
-      products.map(({ productId, quantity }) => ({
+      products.map(({ id, quantity }) => ({
         orderId,
-        productId,
+        productId: id,
         quantity,
       })),
     );

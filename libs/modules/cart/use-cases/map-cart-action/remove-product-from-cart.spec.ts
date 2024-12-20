@@ -5,7 +5,7 @@ import * as CartAdapter from "@cart-db";
 import * as ProductAdapter from "@product-db";
 import { ZodError } from "zod";
 
-const { productId, quantity } = productIdAndQuantityMock;
+const { id, quantity } = productIdAndQuantityMock;
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -43,7 +43,7 @@ const bodyWithoutQuantity = {
 
 const bodyWithoutProductId = {
   ...validBody,
-  productId: undefined,
+  id: undefined,
 };
 
 describe("removeProductFromCart", () => {
@@ -63,12 +63,8 @@ describe("removeProductFromCart", () => {
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);
-    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
-    expect(removeFromCartSpy).toHaveBeenCalledWith(
-      "cartId",
-      productId,
-      quantity,
-    );
+    expect(validateProductIdSpy).toHaveBeenCalledWith(id);
+    expect(removeFromCartSpy).toHaveBeenCalledWith("cartId", id, quantity);
   });
   it("should not remove product from cart if quantity is missing", async () => {
     await expect(
@@ -102,7 +98,7 @@ describe("removeProductFromCart", () => {
       async () =>
         await removeProductFromCart(tokens, remember, validBody, "cartId"),
     ).rejects.toEqual(expect.objectContaining({ message: "validation error" }));
-    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
+    expect(validateProductIdSpy).toHaveBeenCalledWith(id);
     expect(removeFromCartSpy).not.toHaveBeenCalled();
   });
   it("should return an error if removeFromCart throws an error", async () => {
@@ -111,11 +107,7 @@ describe("removeProductFromCart", () => {
       async () =>
         await removeProductFromCart(tokens, remember, validBody, "cartId"),
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
-    expect(validateProductIdSpy).toHaveBeenCalledWith(productId);
-    expect(removeFromCartSpy).toHaveBeenCalledWith(
-      "cartId",
-      productId,
-      quantity,
-    );
+    expect(validateProductIdSpy).toHaveBeenCalledWith(id);
+    expect(removeFromCartSpy).toHaveBeenCalledWith("cartId", id, quantity);
   });
 });

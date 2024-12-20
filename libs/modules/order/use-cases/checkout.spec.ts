@@ -37,7 +37,7 @@ jest.mock("@country-db", () => ({
     code: "PT",
     taxes: [
       {
-        taxId: "1",
+        id: "1",
       },
     ],
   })),
@@ -72,13 +72,13 @@ const countryMock = {
   code: "PT",
   taxes: [
     {
-      taxId: "1",
+      id: "1",
     },
   ],
 };
 const requestedProducts = lineItemsMock.map((item) => ({
   quantity: item.quantity,
-  productId: item.productId,
+  id: item.id,
 }));
 
 const products = lineItemsMock.map((item) => ({
@@ -87,7 +87,7 @@ const products = lineItemsMock.map((item) => ({
 }));
 
 const invalidRequestedProducts = lineItemsMock.map((item) => ({
-  productId: item.productId,
+  id: item.id,
   quantity: TOO_MUCH_QUANTITY,
 }));
 
@@ -125,7 +125,7 @@ describe("checkout", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(getProductsByProductIdsSpy).toHaveBeenCalledWith(
-      requestedProducts.map((p) => p.productId),
+      requestedProducts.map((p) => p.id),
     );
     expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
       lineItemsMock,
@@ -133,7 +133,10 @@ describe("checkout", () => {
     );
   });
   it("should create checkout session from logged in user", async () => {
-    getCartByIdSpy.mockResolvedValueOnce({ cartId, products: lineItemsMock });
+    getCartByIdSpy.mockResolvedValueOnce({
+      id: cartId,
+      products: lineItemsMock,
+    });
     validateCartIdSpy.mockResolvedValueOnce();
     createCheckoutSessionSpy.mockResolvedValueOnce({
       url: "123",
@@ -167,7 +170,7 @@ describe("checkout", () => {
   });
   it("should throw error if cart is empty", async () => {
     validateCartIdSpy.mockResolvedValueOnce();
-    getCartByIdSpy.mockResolvedValueOnce({ cartId, products: [] });
+    getCartByIdSpy.mockResolvedValueOnce({ id: cartId, products: [] });
     await expect(
       async () => await checkout(tokens, remember, userId, cartId),
     ).rejects.toEqual(
@@ -186,7 +189,7 @@ describe("checkout", () => {
         }),
     ).rejects.toEqual(
       expect.objectContaining({
-        message: `The following product ids are invalid: ${requestedProducts.map((p) => p.productId)}`,
+        message: `The following product ids are invalid: ${requestedProducts.map((p) => p.id)}`,
         code: 400,
       }),
     );
@@ -203,7 +206,10 @@ describe("checkout", () => {
       {} as StripeCheckoutSessionResponse,
     );
     validateCartIdSpy.mockResolvedValueOnce();
-    getCartByIdSpy.mockResolvedValueOnce({ cartId, products: lineItemsMock });
+    getCartByIdSpy.mockResolvedValueOnce({
+      id: cartId,
+      products: lineItemsMock,
+    });
     await expect(
       async () =>
         await checkout(tokens, remember, userId, cartId, {
@@ -233,7 +239,7 @@ describe("checkout", () => {
       errors.PRODUCTS_OUT_OF_STOCK(
         lineItemsMock
           .filter((p) => p.stock < TOO_MUCH_QUANTITY)
-          .map((p) => ({ productId: p.productId, stock: p.stock })),
+          .map((p) => ({ productId: p.id, stock: p.stock })),
       ),
     );
     expect(createCheckoutSessionSpy).not.toHaveBeenCalled();

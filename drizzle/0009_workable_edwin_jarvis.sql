@@ -1,1 +1,0 @@
-ALTER TABLE `taxes` RENAME COLUMN `amount` TO `rate`;

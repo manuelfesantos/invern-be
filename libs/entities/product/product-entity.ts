@@ -6,7 +6,7 @@ import { positiveIntegerSchema, uuidSchema } from "@global-entity";
 
 const baseProductSchema = createSelectSchema(productsTable);
 export const insertProductSchema = createInsertSchema(productsTable).omit({
-  productId: true,
+  id: true,
 });
 
 export const productDetailsSchema = baseProductSchema.merge(
@@ -30,7 +30,7 @@ export const lineItemSchema = productSchema.merge(
 );
 
 export const productIdAndQuantitySchema = z.object({
-  productId: uuidSchema("product id"),
+  id: uuidSchema("product id"),
   quantity: positiveIntegerSchema("line item quantity"),
 });
 

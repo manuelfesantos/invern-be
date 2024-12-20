@@ -33,7 +33,7 @@ jest.mock("@order-db", () => ({
 jest.mock("@checkout-session-db", () => ({
   popCheckoutSessionById: jest.fn(() => [
     {
-      products: '[{"productId": "4hiuURKg6ajRFTD5YSrd6F", "quantity": 2}]',
+      products: '[{"id": "4hiuURKg6ajRFTD5YSrd6F", "quantity": 2}]',
       userId: "qsRTdjB1g5nKTa8tb6JGmC",
       cartId: "bL7HQaCXkhwDQXEyuzrzig",
     },
@@ -99,7 +99,7 @@ describe("getOrderFromSessionResult", () => {
   });
   it("should get order from session result without userId", async () => {
     const paymentDraft = {
-      paymentId,
+      id: paymentId,
       grossAmount: 1,
       netAmount: 2,
       state: "draft" as const,
@@ -108,12 +108,12 @@ describe("getOrderFromSessionResult", () => {
 
     checkIfOrderAlreadyExistsSpy.mockResolvedValue(false);
     validateStripeAddressSpy.mockReturnValueOnce(stripeAddressMock);
-    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.addressId }]);
+    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.id }]);
     getPaymentFromSessionResultSpy.mockReturnValueOnce(paymentDraft);
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, orderId });
+    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, id: orderId });
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithoutUserId,
     );
@@ -129,12 +129,11 @@ describe("getOrderFromSessionResult", () => {
     expect(getPaymentByIdSpy).toHaveBeenCalledWith(paymentId);
     expect(insertPaymentReturningIdSpy).toHaveBeenCalledWith(paymentDraft);
     expect(insertOrderSpy).toHaveBeenCalledWith({
-      addressId: addressMock.addressId,
+      addressId: addressMock.id,
       paymentId,
       userId: "qsRTdjB1g5nKTa8tb6JGmC",
-      orderId,
-      clientOrderId:
-        stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientOrderId,
+      id: orderId,
+      clientId: stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientId,
       snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
@@ -146,7 +145,7 @@ describe("getOrderFromSessionResult", () => {
   });
   it("should get order from session result with userId", async () => {
     const paymentDraft = {
-      paymentId,
+      id: paymentId,
       grossAmount: 1,
       state: "draft" as const,
       type: "draft" as const,
@@ -154,12 +153,12 @@ describe("getOrderFromSessionResult", () => {
 
     checkIfOrderAlreadyExistsSpy.mockResolvedValue(false);
     validateStripeAddressSpy.mockReturnValueOnce(stripeAddressMock);
-    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.addressId }]);
+    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.id }]);
     getPaymentFromSessionResultSpy.mockReturnValueOnce(paymentDraft);
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, orderId });
+    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, id: orderId });
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithUserId,
     );
@@ -175,12 +174,11 @@ describe("getOrderFromSessionResult", () => {
     expect(getPaymentByIdSpy).toHaveBeenCalledWith(paymentId);
     expect(insertPaymentReturningIdSpy).toHaveBeenCalledWith(paymentDraft);
     expect(insertOrderSpy).toHaveBeenCalledWith({
-      addressId: addressMock.addressId,
+      addressId: addressMock.id,
       paymentId,
       userId: "qsRTdjB1g5nKTa8tb6JGmC",
-      orderId,
-      clientOrderId:
-        stripeCheckoutSessionResultMockWithUserId.metadata?.clientOrderId,
+      id: orderId,
+      clientId: stripeCheckoutSessionResultMockWithUserId.metadata?.clientId,
       snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
@@ -214,14 +212,14 @@ describe("getOrderFromSessionResult", () => {
   });
   it("should not return order if getOrderById does not return an order", async () => {
     const paymentDraft = {
-      paymentId,
+      id: paymentId,
       grossAmount: 1,
       state: "draft" as const,
       type: "draft" as const,
     };
     checkIfOrderAlreadyExistsSpy.mockResolvedValue(false);
     validateStripeAddressSpy.mockReturnValueOnce(stripeAddressMock);
-    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.addressId }]);
+    insertAddressSpy.mockResolvedValue([{ addressId: addressMock.id }]);
     getPaymentFromSessionResultSpy.mockReturnValueOnce(paymentDraft);
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);

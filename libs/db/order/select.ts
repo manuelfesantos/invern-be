@@ -17,7 +17,7 @@ export const getOrdersByUserId = async (
       userId: false,
       addressId: false,
       paymentId: false,
-      orderId: false,
+      id: false,
     },
     where: eq(ordersTable.userId, userId),
     with: {
@@ -31,7 +31,7 @@ export const getOrdersByUserId = async (
               taxes: {
                 columns: {
                   countryCode: false,
-                  taxId: false,
+                  id: false,
                 },
               },
               countriesToCurrencies: {
@@ -107,7 +107,7 @@ export const getOrderById = async (
   orderId: string,
 ): Promise<Order | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
-    where: eq(ordersTable.orderId, orderId),
+    where: eq(ordersTable.id, orderId),
     columns: {
       userId: false,
       addressId: false,
@@ -200,12 +200,12 @@ export const getOrderByClientId = async (
   clientId: string,
 ): Promise<ClientOrder | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
-    where: eq(ordersTable.clientOrderId, clientId),
+    where: eq(ordersTable.clientId, clientId),
     columns: {
       userId: false,
       addressId: false,
       paymentId: false,
-      orderId: false,
+      id: false,
     },
     with: {
       address: {
@@ -218,7 +218,7 @@ export const getOrderByClientId = async (
               taxes: {
                 columns: {
                   countryCode: false,
-                  taxId: false,
+                  id: false,
                 },
               },
               countriesToCurrencies: {
@@ -296,13 +296,13 @@ export const getOrderProductsByPaymentId = async (
 ): Promise<ProductIdAndQuantity[]> => {
   return db()
     .select({
-      productId: productsToOrdersTable.productId,
+      id: productsToOrdersTable.productId,
       quantity: productsToOrdersTable.quantity,
     })
     .from(ordersTable)
     .innerJoin(
       productsToOrdersTable,
-      eq(productsToOrdersTable.orderId, ordersTable.orderId),
+      eq(productsToOrdersTable.orderId, ordersTable.id),
     )
     .where(eq(ordersTable.paymentId, paymentId));
 };

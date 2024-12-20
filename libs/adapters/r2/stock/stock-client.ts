@@ -46,10 +46,10 @@ const getStock = async (
 };
 
 const updateStock = async ({
-  productId,
+  id: productId,
   stock,
 }: {
-  productId: string;
+  id: string;
   stock: number;
 }): Promise<void> => {
   if (!stockBucket) {

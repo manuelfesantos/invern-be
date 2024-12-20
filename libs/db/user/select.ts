@@ -9,7 +9,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 const NO_USER_VERSION = 0;
 
 const getUser = async (
-  where: "userId" | "email" | "cartId",
+  where: "id" | "email" | "cartId",
   selection: string,
 ): Promise<User | undefined> => {
   const userTemplate = await db().query.usersTable.findFirst({
@@ -62,7 +62,7 @@ export const getUserByEmail = async (
 };
 
 export const getUserById = async (userId: string): Promise<User> => {
-  const user = await getUser("userId", userId);
+  const user = await getUser("id", userId);
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
@@ -71,7 +71,7 @@ export const getUserById = async (userId: string): Promise<User> => {
 
 export const getUserVersionById = async (userId: string): Promise<number> => {
   const user = await db().query.usersTable.findFirst({
-    where: eq(usersTable.userId, userId),
+    where: eq(usersTable.id, userId),
     columns: {
       version: true,
     },

@@ -4,13 +4,13 @@ import { z } from "zod";
 
 const baseTaxSchema = createSelectSchema(taxesTable);
 export const insertTaxSchema = createInsertSchema(taxesTable).omit({
-  taxId: true,
+  id: true,
 });
 
 export const taxSchema = baseTaxSchema.omit({ countryCode: true });
 
 export const clientTaxSchema = taxSchema.omit({
-  taxId: true,
+  id: true,
 });
 export type Tax = z.infer<typeof taxSchema>;
 

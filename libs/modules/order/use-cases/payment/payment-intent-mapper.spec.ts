@@ -83,7 +83,7 @@ describe("paymentIntentMapper", () => {
     async (state, event, spy) => {
       const payment: Payment = {
         createdAt: "2022-01-01T00:00:00.000Z",
-        paymentId: "paymentIntentId",
+        id: "paymentIntentId",
         grossAmount: 1000,
         netAmount: 800,
         state: PaymentIntentState[state as keyof typeof PaymentIntentState],

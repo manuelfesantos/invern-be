@@ -20,9 +20,9 @@ export const insertAddress = async (
 
   const insertAddress = {
     ...address,
-    addressId,
+    id: addressId,
   };
   return db().insert(addressesTable).values(insertAddress).returning({
-    addressId: addressesTable.addressId,
+    addressId: addressesTable.id,
   });
 };

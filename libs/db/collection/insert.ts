@@ -8,9 +8,9 @@ export const insertCollection = async (
 ): Promise<{ collectionId: string }[]> => {
   const insertCollection = {
     ...collection,
-    collectionId: getRandomUUID(),
+    id: getRandomUUID(),
   };
   return db().insert(collectionsTable).values(insertCollection).returning({
-    collectionId: collectionsTable.collectionId,
+    collectionId: collectionsTable.id,
   });
 };

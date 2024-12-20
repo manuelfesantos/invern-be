@@ -7,10 +7,7 @@ export const updateUser = async (
   userId: string,
   changes: Partial<User>,
 ): Promise<void> => {
-  await db()
-    .update(usersTable)
-    .set(changes)
-    .where(eq(usersTable.userId, userId));
+  await db().update(usersTable).set(changes).where(eq(usersTable.id, userId));
 };
 
 export const incrementUserVersion = async (userId: string): Promise<void> => {
@@ -19,5 +16,5 @@ export const incrementUserVersion = async (userId: string): Promise<void> => {
     .set({
       version: sql`version + 1`,
     })
-    .where(eq(usersTable.userId, userId));
+    .where(eq(usersTable.id, userId));
 };

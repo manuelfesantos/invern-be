@@ -12,9 +12,9 @@ export const insertTax = async (
 > => {
   const insertTax = {
     ...tax,
-    taxId: getRandomUUID(),
+    id: getRandomUUID(),
   };
   return db().insert(taxesTable).values(insertTax).returning({
-    taxId: taxesTable.taxId,
+    taxId: taxesTable.id,
   });
 };

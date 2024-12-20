@@ -42,7 +42,7 @@ describe("deleteUser", () => {
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);
-    expect(deleteUserSpy).toHaveBeenCalledWith(userMock.userId);
+    expect(deleteUserSpy).toHaveBeenCalledWith(userMock.id);
   });
   it("should throw error when user not found", async () => {
     getUserByIdSpy.mockRejectedValueOnce(new Error("user not found"));

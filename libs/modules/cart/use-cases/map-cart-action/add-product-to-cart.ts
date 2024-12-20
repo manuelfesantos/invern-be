@@ -12,9 +12,9 @@ export const addProductToCart: ProtectedModuleFunction = async (
   body: unknown,
   cartId: string,
 ): Promise<Response> => {
-  const { productId, quantity } = productIdAndQuantitySchema.parse(body);
-  const stock = await validateProductIdAndGetStock(productId, quantity);
-  await addToCart(cartId, productId, quantity, stock);
+  const { id, quantity } = productIdAndQuantitySchema.parse(body);
+  const stock = await validateProductIdAndGetStock(id, quantity);
+  await addToCart(cartId, id, quantity, stock);
   return protectedSuccessResponse.OK(
     tokens,
     "product added to cart",

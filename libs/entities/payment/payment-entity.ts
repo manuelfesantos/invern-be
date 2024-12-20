@@ -11,7 +11,7 @@ export const insertPaymentSchema = createInsertSchema(paymentsTable).omit({
 export const paymentSchema = basePaymentSchema;
 
 export const clientPaymentSchema = paymentSchema.omit({
-  paymentId: true,
+  id: true,
 });
 
 export const paymentMethodTypeSchema = z.enum(paymentsTable.type.enumValues);

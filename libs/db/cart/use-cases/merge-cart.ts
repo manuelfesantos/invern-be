@@ -8,5 +8,7 @@ export const mergeCart = async (
 ): Promise<void> => {
   await db()
     .insert(productsToCartsTable)
-    .values(items.map((item) => ({ ...item, cartId })));
+    .values(
+      items.map(({ id, quantity }) => ({ quantity, productId: id, cartId })),
+    );
 };

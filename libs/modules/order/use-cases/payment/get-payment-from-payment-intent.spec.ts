@@ -128,7 +128,7 @@ describe("getPaymentFromPaymentIntent", () => {
       );
       expect(payment).toEqual(insertedPaymentSucceededMock);
       expect(updatePaymentSpy).toHaveBeenCalledWith(
-        insertedPaymentSucceededMock.paymentId,
+        insertedPaymentSucceededMock.id,
         succeededPaymentMock,
       );
       expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
@@ -158,7 +158,7 @@ describe("getPaymentFromPaymentIntent", () => {
       );
       expect(payment).toEqual(insertedPaymentCreatedMock);
       expect(updatePaymentSpy).toHaveBeenCalledWith(
-        insertedPaymentCreatedMock.paymentId,
+        insertedPaymentCreatedMock.id,
         createdPaymentMock,
       );
       expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
@@ -236,7 +236,7 @@ describe("getPaymentFromPaymentIntent", () => {
         );
         expect(result).toEqual(insertedPaymentProcessingMock);
         expect(updatePaymentSpy).toHaveBeenCalledWith(
-          insertedPaymentProcessingMock.paymentId,
+          insertedPaymentProcessingMock.id,
           processingPaymentMock,
         );
         expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
@@ -294,7 +294,7 @@ describe("getPaymentFromPaymentIntent", () => {
         );
         expect(result).toEqual(insertedPaymentCanceledMock);
         expect(updatePaymentSpy).toHaveBeenCalledWith(
-          insertedPaymentCanceledMock.paymentId,
+          insertedPaymentCanceledMock.id,
           canceledPaymentMock,
         );
         expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();
@@ -371,7 +371,7 @@ describe("getPaymentFromPaymentIntent", () => {
         );
         expect(result).toEqual(insertedPaymentFailedMock);
         expect(updatePaymentSpy).toHaveBeenCalledWith(
-          insertedPaymentFailedMock.paymentId,
+          insertedPaymentFailedMock.id,
           failedPaymentMock,
         );
         expect(insertPaymentReturningAllSpy).not.toHaveBeenCalled();

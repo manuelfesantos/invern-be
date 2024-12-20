@@ -7,8 +7,5 @@ export const updateCart = async (
   cartId: string,
   changes: Partial<InsertCart>,
 ): Promise<void> => {
-  await db()
-    .update(cartsTable)
-    .set(changes)
-    .where(eq(cartsTable.cartId, cartId));
+  await db().update(cartsTable).set(changes).where(eq(cartsTable.id, cartId));
 };

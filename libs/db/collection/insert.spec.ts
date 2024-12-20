@@ -29,7 +29,7 @@ describe("insertCollection", () => {
   const getRandomUUIDSpy = jest.spyOn(Crypto, "getRandomUUID");
   it("should insert a collection", async () => {
     const collection = {
-      collectionName: "test",
+      name: "test",
       description: "test",
     };
     const result = await insertCollection(collection);
@@ -38,7 +38,7 @@ describe("insertCollection", () => {
     expect(getRandomUUIDSpy).toHaveBeenCalled();
     expect(valuesSpy).toHaveBeenCalledWith({
       ...collection,
-      collectionId: "collectionId",
+      id: "collectionId",
     });
   });
 });

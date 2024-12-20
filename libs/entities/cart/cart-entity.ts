@@ -6,7 +6,7 @@ import { lineItemSchema } from "@product-entity";
 const baseCartSchema = createSelectSchema(cartsTable);
 
 export const insertCartSchema = createInsertSchema(cartsTable).omit({
-  cartId: true,
+  id: true,
 });
 
 export const cartSchema = baseCartSchema.merge(
@@ -20,7 +20,7 @@ export const toCartDTO = (cart: Cart): CartDTO => {
 };
 
 export const cartDTOSchema = cartSchema.omit({
-  cartId: true,
+  id: true,
 });
 
 export type CartDTO = z.infer<typeof cartDTOSchema>;

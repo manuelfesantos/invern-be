@@ -17,7 +17,7 @@ describe("updateCollection", () => {
   it("should update a collection", async () => {
     const collectionId = "1";
     const changes = {
-      collectionName: "newName",
+      name: "newName",
     };
     const result = await updateCollection(collectionId, changes);
     expect(result).toBeUndefined();

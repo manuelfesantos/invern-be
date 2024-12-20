@@ -5,7 +5,7 @@ import { Cart, cartSchema } from "@cart-entity";
 
 export const getCartById = async (cartId: string): Promise<Cart> => {
   const cartTemplate = await db().query.cartsTable.findFirst({
-    where: eq(cartsTable.cartId, cartId),
+    where: eq(cartsTable.id, cartId),
     with: {
       productsToCarts: {
         with: {

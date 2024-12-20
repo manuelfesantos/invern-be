@@ -11,8 +11,8 @@ const lineItemsMock = productsMock.map((product) => ({
   quantity: 1,
 }));
 
-const requestedProductsMock = lineItemsMock.map(({ productId, quantity }) => ({
-  productId,
+const requestedProductsMock = lineItemsMock.map(({ id, quantity }) => ({
+  id,
   quantity,
 }));
 
@@ -79,7 +79,7 @@ describe("getCart", () => {
           remember,
           [
             {
-              productId: productsMock[FIRST_INDEX].productId,
+              productId: productsMock[FIRST_INDEX].id,
               quantity: 1,
             },
           ],

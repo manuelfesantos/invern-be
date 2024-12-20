@@ -1,14 +1,14 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1ab1ba97-86f5-4ff5-b60a-4169c02dc46b",
-  "prevId": "aeca3ee1-0735-4263-bd7b-536053c119b2",
+  "id": "d3a1c1be-4bd4-4a5b-9609-c4680fa1d64a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
       "name": "addresses",
       "columns": {
-        "addressId": {
-          "name": "addressId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -72,8 +72,8 @@
     "carts": {
       "name": "carts",
       "columns": {
-        "cartId": {
-          "name": "cartId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -88,8 +88,8 @@
     "checkoutSessions": {
       "name": "checkoutSessions",
       "columns": {
-        "checkoutSessionId": {
-          "name": "checkoutSessionId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -133,28 +133,28 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "checkoutSessions_userId_users_userId_fk": {
-          "name": "checkoutSessions_userId_users_userId_fk",
+        "checkoutSessions_userId_users_id_fk": {
+          "name": "checkoutSessions_userId_users_id_fk",
           "tableFrom": "checkoutSessions",
           "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
-            "userId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "checkoutSessions_cartId_carts_cartId_fk": {
-          "name": "checkoutSessions_cartId_carts_cartId_fk",
+        "checkoutSessions_cartId_carts_id_fk": {
+          "name": "checkoutSessions_cartId_carts_id_fk",
           "tableFrom": "checkoutSessions",
           "tableTo": "carts",
           "columnsFrom": [
             "cartId"
           ],
           "columnsTo": [
-            "cartId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -166,15 +166,15 @@
     "collections": {
       "name": "collections",
       "columns": {
-        "collectionId": {
-          "name": "collectionId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "collectionName": {
-          "name": "collectionName",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -353,28 +353,28 @@
         }
       },
       "foreignKeys": {
-        "images_productId_products_productId_fk": {
-          "name": "images_productId_products_productId_fk",
+        "images_productId_products_id_fk": {
+          "name": "images_productId_products_id_fk",
           "tableFrom": "images",
           "tableTo": "products",
           "columnsFrom": [
             "productId"
           ],
           "columnsTo": [
-            "productId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "images_collectionId_collections_collectionId_fk": {
-          "name": "images_collectionId_collections_collectionId_fk",
+        "images_collectionId_collections_id_fk": {
+          "name": "images_collectionId_collections_id_fk",
           "tableFrom": "images",
           "tableTo": "collections",
           "columnsFrom": [
             "collectionId"
           ],
           "columnsTo": [
-            "collectionId"
+            "id"
           ],
           "onDelete": "set null",
           "onUpdate": "no action"
@@ -386,15 +386,15 @@
     "orders": {
       "name": "orders",
       "columns": {
-        "orderId": {
-          "name": "orderId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "clientOrderId": {
-          "name": "clientOrderId",
+        "clientId": {
+          "name": "clientId",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -437,50 +437,50 @@
         }
       },
       "indexes": {
-        "orders_clientOrderId_unique": {
-          "name": "orders_clientOrderId_unique",
+        "orders_clientId_unique": {
+          "name": "orders_clientId_unique",
           "columns": [
-            "clientOrderId"
+            "clientId"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "orders_userId_users_userId_fk": {
-          "name": "orders_userId_users_userId_fk",
+        "orders_userId_users_id_fk": {
+          "name": "orders_userId_users_id_fk",
           "tableFrom": "orders",
           "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
-            "userId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "orders_addressId_addresses_addressId_fk": {
-          "name": "orders_addressId_addresses_addressId_fk",
+        "orders_addressId_addresses_id_fk": {
+          "name": "orders_addressId_addresses_id_fk",
           "tableFrom": "orders",
           "tableTo": "addresses",
           "columnsFrom": [
             "addressId"
           ],
           "columnsTo": [
-            "addressId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "orders_paymentId_payments_paymentId_fk": {
-          "name": "orders_paymentId_payments_paymentId_fk",
+        "orders_paymentId_payments_id_fk": {
+          "name": "orders_paymentId_payments_id_fk",
           "tableFrom": "orders",
           "tableTo": "payments",
           "columnsFrom": [
             "paymentId"
           ],
           "columnsTo": [
-            "paymentId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -492,8 +492,8 @@
     "payments": {
       "name": "payments",
       "columns": {
-        "paymentId": {
-          "name": "paymentId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -544,15 +544,15 @@
     "products": {
       "name": "products",
       "columns": {
-        "productId": {
-          "name": "productId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "productName": {
-          "name": "productName",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -589,15 +589,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "products_collectionId_collections_collectionId_fk": {
-          "name": "products_collectionId_collections_collectionId_fk",
+        "products_collectionId_collections_id_fk": {
+          "name": "products_collectionId_collections_id_fk",
           "tableFrom": "products",
           "tableTo": "collections",
           "columnsFrom": [
             "collectionId"
           ],
           "columnsTo": [
-            "collectionId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -633,28 +633,28 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "productsOnCarts_cartId_carts_cartId_fk": {
-          "name": "productsOnCarts_cartId_carts_cartId_fk",
+        "productsOnCarts_cartId_carts_id_fk": {
+          "name": "productsOnCarts_cartId_carts_id_fk",
           "tableFrom": "productsOnCarts",
           "tableTo": "carts",
           "columnsFrom": [
             "cartId"
           ],
           "columnsTo": [
-            "cartId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "productsOnCarts_productId_products_productId_fk": {
-          "name": "productsOnCarts_productId_products_productId_fk",
+        "productsOnCarts_productId_products_id_fk": {
+          "name": "productsOnCarts_productId_products_id_fk",
           "tableFrom": "productsOnCarts",
           "tableTo": "products",
           "columnsFrom": [
             "productId"
           ],
           "columnsTo": [
-            "productId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -698,28 +698,28 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "productsToOrders_orderId_orders_orderId_fk": {
-          "name": "productsToOrders_orderId_orders_orderId_fk",
+        "productsToOrders_orderId_orders_id_fk": {
+          "name": "productsToOrders_orderId_orders_id_fk",
           "tableFrom": "productsToOrders",
           "tableTo": "orders",
           "columnsFrom": [
             "orderId"
           ],
           "columnsTo": [
-            "orderId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "productsToOrders_productId_products_productId_fk": {
-          "name": "productsToOrders_productId_products_productId_fk",
+        "productsToOrders_productId_products_id_fk": {
+          "name": "productsToOrders_productId_products_id_fk",
           "tableFrom": "productsToOrders",
           "tableTo": "products",
           "columnsFrom": [
             "productId"
           ],
           "columnsTo": [
-            "productId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -739,8 +739,8 @@
     "taxes": {
       "name": "taxes",
       "columns": {
-        "taxId": {
-          "name": "taxId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -790,8 +790,8 @@
     "users": {
       "name": "users",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -851,15 +851,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "users_cartId_carts_cartId_fk": {
-          "name": "users_cartId_carts_cartId_fk",
+        "users_cartId_carts_id_fk": {
+          "name": "users_cartId_carts_id_fk",
           "tableFrom": "users",
           "tableTo": "carts",
           "columnsFrom": [
             "cartId"
           ],
           "columnsTo": [
-            "cartId"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -873,8 +873,6 @@
   "_meta": {
     "schemas": {},
     "tables": {},
-    "columns": {
-      "\"taxes\".\"amount\"": "\"taxes\".\"rate\""
-    }
+    "columns": {}
   }
 }

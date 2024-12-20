@@ -35,15 +35,15 @@ const tokens = { refreshToken: "refreshToken", accessToken: "token" };
 const remember = true;
 
 const emptyCartMock: Cart = {
-  cartId: "cartId",
+  id: "cartId",
   products: [],
 };
 
 const fullCartMock: Cart = {
-  cartId: "cartId",
+  id: "cartId",
   products: [
     {
-      productId: "oT1LPqQ2kaEVjjsZZT11R8",
+      id: "oT1LPqQ2kaEVjjsZZT11R8",
       quantity: 1,
       images: [
         {
@@ -51,7 +51,7 @@ const fullCartMock: Cart = {
           alt: "imageAlt",
         },
       ],
-      productName: "productName",
+      name: "productName",
       priceInCents: 100,
       stock: 10,
     },
@@ -61,7 +61,7 @@ const fullCartMock: Cart = {
 const validBody = {
   products: [
     {
-      productId: "5ry4Xn2dpYJvQhonuNLt1M",
+      id: "5ry4Xn2dpYJvQhonuNLt1M",
       quantity: 1,
     },
   ],
@@ -91,7 +91,7 @@ describe("mergeCartItems", () => {
     await compareResponses(response, expectedResponse);
     expect(getCartByIdSpy).toHaveBeenCalledWith("cartId");
     expect(validateProductIdsSpy).toHaveBeenCalledWith(
-      validBody.products.map((product) => product.productId),
+      validBody.products.map((product) => product.id),
     );
     expect(mergeCartSpy).toHaveBeenCalledWith("cartId", validBody.products);
   });

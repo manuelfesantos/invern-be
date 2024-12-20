@@ -8,7 +8,7 @@ export const validateProductId = async (productId: string): Promise<void> => {
   const id = uuidSchema("product id").parse(productId);
   const productIsValid = Boolean(
     await db().query.productsTable.findFirst({
-      where: eq(productsTable.productId, id),
+      where: eq(productsTable.id, id),
     }),
   );
   if (!productIsValid) {
@@ -22,7 +22,7 @@ export const validateProductIdAndGetStock = async (
 ): Promise<number> => {
   const id = uuidSchema("product id").parse(productId);
   const product = await db().query.productsTable.findFirst({
-    where: eq(productsTable.productId, id),
+    where: eq(productsTable.id, id),
   });
   if (!product) {
     throw errors.PRODUCT_NOT_FOUND();
@@ -41,11 +41,11 @@ export const validateProductIds = async (
     uuidSchema("product id").parse(productId),
   );
   const products = await db().query.productsTable.findMany({
-    where: inArray(productsTable.productId, ids),
+    where: inArray(productsTable.id, ids),
   });
   if (products.length !== ids.length) {
     const invalidIds = ids.filter(
-      (id) => !products.some((product) => product.productId === id),
+      (id) => !products.some((product) => product.id === id),
     );
     throw errors.INVALID_PRODUCT_IDS(invalidIds);
   }

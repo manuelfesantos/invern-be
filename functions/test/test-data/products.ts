@@ -5,28 +5,28 @@ import { InsertProduct } from "@product-entity";
 
 const getProductsList = (): InsertProduct[] => [
   {
-    productName: "Earth Jar",
+    name: "Earth Jar",
     collectionId: "Erosion",
     description: "Earth Jar 20 'riven', unglazed stoneware",
     priceInCents: 500,
     stock: 2,
   },
   {
-    productName: "Raku Fire",
+    name: "Raku Fire",
     collectionId: "Erosion",
     description: "Watershed' hand formed, raku fired ceramic",
     priceInCents: 500,
     stock: 2,
   },
   {
-    productName: "Saggar Bottle",
+    name: "Saggar Bottle",
     collectionId: "Erosion",
     description: "Erosion bottle of saggar fired stoneware",
     priceInCents: 500,
     stock: 2,
   },
   {
-    productName: "Strata Flask",
+    name: "Strata Flask",
     collectionId: "Erosion",
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
@@ -34,7 +34,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Erosion Cup",
+    name: "Erosion Cup",
     collectionId: "Midden",
     description:
       "A hand made erosion cup (or yunomi) with iron matt glaze interior.",
@@ -42,7 +42,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Tanka Fired",
+    name: "Tanka Fired",
     collectionId: "Midden",
     description:
       "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
@@ -50,7 +50,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Strata Flask",
+    name: "Strata Flask",
     collectionId: "Midden",
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
@@ -58,7 +58,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Strata Vase",
+    name: "Strata Vase",
     collectionId: "Midden",
     description:
       "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
@@ -66,7 +66,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Rolling Erosion",
+    name: "Rolling Erosion",
     collectionId: "Contour",
     description:
       "Rolling erosion bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.",
@@ -74,7 +74,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Contour Vase",
+    name: "Contour Vase",
     collectionId: "Contour",
     description:
       "Contour vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
@@ -82,7 +82,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Strata Flask",
+    name: "Strata Flask",
     collectionId: "Contour",
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
@@ -90,7 +90,7 @@ const getProductsList = (): InsertProduct[] => [
     stock: 2,
   },
   {
-    productName: "Kappa Vase",
+    name: "Kappa Vase",
     collectionId: "Contour",
     description:
       "Kappa vase bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.",
@@ -102,9 +102,9 @@ const getProductsList = (): InsertProduct[] => [
 export const insertProducts = async (
   collections: {
     collectionId: string;
-    collectionName: string;
+    name: string;
   }[],
-): Promise<{ productId: string; productName: string }[]> => {
+): Promise<{ productId: string; name: string }[]> => {
   const productsList = getProductsList();
   return db()
     .insert(productsTable)
@@ -112,21 +112,21 @@ export const insertProducts = async (
       productsList.map((product) => ({
         ...product,
         collectionId: getCollectionId(collections, product.collectionId),
-        productId: getRandomUUID(),
+        id: getRandomUUID(),
       })),
     )
     .returning({
-      productId: productsTable.productId,
-      productName: productsTable.productName,
+      productId: productsTable.id,
+      name: productsTable.name,
     });
 };
 
 const getCollectionId = (
-  collections: { collectionId: string; collectionName: string }[],
+  collections: { collectionId: string; name: string }[],
   name: string,
 ): string => {
   const collectionId = collections.find(
-    (collection) => collection.collectionName === name,
+    (collection) => collection.name === name,
   )?.collectionId;
   if (!collectionId) {
     throw new Error("Collection not found");

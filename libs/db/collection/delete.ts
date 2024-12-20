@@ -5,5 +5,5 @@ import { db } from "@db";
 export const deleteCollection = async (collectionId: string): Promise<void> => {
   await db()
     .delete(collectionsTable)
-    .where(eq(collectionsTable.collectionId, collectionId));
+    .where(eq(collectionsTable.id, collectionId));
 };
