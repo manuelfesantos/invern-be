@@ -26,9 +26,9 @@ export const onRequest: PagesFunction<Env> = async ({ request, env }) => {
     stock: stock || NO_STOCK,
   }));
 
-  for (const product of products) {
-    await stockClient.update(product);
-  }
+  const productUpdates = products.map((product) => stockClient.update(product));
+
+  await Promise.all(productUpdates);
 
   return successResponse.OK("success setting up stock in bucket");
 };
