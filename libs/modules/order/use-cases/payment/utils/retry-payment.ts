@@ -1,7 +1,7 @@
 import { PaymentIntent } from "@stripe-entity";
 import { Payment } from "@payment-entity";
 
-const MAX_RETRIES = 1;
+const MAX_RETRIES = 3;
 const ONE_INCREMENT = 1;
 const MIN_RETRIES = 0;
 export const withRetry = async (
@@ -10,7 +10,7 @@ export const withRetry = async (
   retries: number = MIN_RETRIES,
 ): Promise<Payment> => {
   try {
-    return callBack(paymentIntent);
+    return await callBack(paymentIntent);
   } catch (error) {
     if (retries < MAX_RETRIES) {
       return withRetry(paymentIntent, callBack, retries + ONE_INCREMENT);
