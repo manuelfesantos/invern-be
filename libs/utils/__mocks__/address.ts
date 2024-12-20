@@ -1,7 +1,7 @@
 import { Address } from "@address-entity";
 
 export const addressMock: Address = {
-  addressId: "1",
+  id: "1",
   city: "1",
   country: {
     taxes: [],

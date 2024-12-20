@@ -72,7 +72,7 @@ export const checkout: ProtectedModuleFunction = async (
   }
 
   const [checkoutSession] = await insertCheckoutSession({
-    checkoutSessionId: id,
+    id,
     userId: userId ?? null,
     cartId: cartId ?? null,
     expiresAt: expires_at,
@@ -133,12 +133,10 @@ const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
 };
 
 const getLineItems = async (
-  products: { productId: string; quantity: number }[],
+  products: { id: string; quantity: number }[],
 ): Promise<LineItem[]> => {
   const dbProducts = await getProductsByProductIds(
-    products.map((product) =>
-      uuidSchema("product id").parse(product.productId),
-    ),
+    products.map((product) => uuidSchema("product id").parse(product.id)),
   );
   if (dbProducts.length !== products.length) {
     throw errors.INVALID_PRODUCT_IDS(
@@ -154,27 +152,22 @@ const getLineItems = async (
 };
 
 const getInvalidProductIds = (
-  products: { productId: string; quantity: number }[],
+  products: { id: string; quantity: number }[],
   dbProducts: Product[],
 ): string[] => {
   return products
     .filter(
-      (product) =>
-        !dbProducts.find(
-          (dbProduct) => dbProduct.productId === product.productId,
-        ),
+      (product) => !dbProducts.find((dbProduct) => dbProduct.id === product.id),
     )
-    .map((product) => product.productId);
+    .map((product) => product.id);
 };
 
 const buildLineItems = (
-  products: { productId: string; quantity: number }[],
+  products: { id: string; quantity: number }[],
   dbProducts: Product[],
 ): LineItem[] => {
   return products.map((product) => ({
-    ...dbProducts.find(
-      (dbProduct) => dbProduct.productId === product.productId,
-    )!,
+    ...dbProducts.find((dbProduct) => dbProduct.id === product.id)!,
     quantity: product.quantity,
   }));
 };
@@ -199,7 +192,7 @@ const validateLineItems = (lineItems: LineItem[]): void => {
   lineItems.forEach((lineItem) => {
     if (!lineItem.stock || lineItem.quantity > lineItem.stock) {
       productsOutOfStock.push({
-        productId: lineItem.productId,
+        productId: lineItem.id,
         stock: lineItem.stock,
       });
     }

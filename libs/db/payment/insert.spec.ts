@@ -5,7 +5,7 @@ import { paymentsTable } from "@schema";
 import { InsertPayment } from "@payment-entity";
 
 const insertPayment: InsertPayment = {
-  paymentId: "1",
+  id: "1",
   state: "succeeded",
   type: "card",
   grossAmount: 100,

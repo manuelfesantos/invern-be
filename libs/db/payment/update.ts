@@ -10,5 +10,5 @@ export const updatePayment = async (
   await db()
     .update(paymentsTable)
     .set(changes)
-    .where(eq(paymentsTable.paymentId, paymentId))
+    .where(eq(paymentsTable.id, paymentId))
     .returning();

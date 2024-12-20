@@ -12,9 +12,9 @@ export const removeProductFromCart: ProtectedModuleFunction = async (
   body: unknown,
   cartId: string,
 ): Promise<Response> => {
-  const { productId, quantity } = productIdAndQuantitySchema.parse(body);
-  await validateProductId(productId);
-  await removeFromCart(cartId, productId, quantity);
+  const { id, quantity } = productIdAndQuantitySchema.parse(body);
+  await validateProductId(id);
+  await removeFromCart(cartId, id, quantity);
   return protectedSuccessResponse.OK(
     tokens,
     "product removed from cart",

@@ -10,5 +10,5 @@ export const updateCollection = async (
   await db()
     .update(collectionsTable)
     .set(changes)
-    .where(eq(collectionsTable.collectionId, collectionId));
+    .where(eq(collectionsTable.id, collectionId));
 };

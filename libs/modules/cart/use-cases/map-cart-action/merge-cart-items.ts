@@ -21,7 +21,7 @@ export const mergeCartItems: ProtectedModuleFunction = async (
   if (cart.products?.length) {
     throw errors.CART_IS_NOT_EMPTY();
   }
-  await validateProductIds(products.map((product) => product.productId));
+  await validateProductIds(products.map((product) => product.id));
   await mergeCart(cartId, products);
   return protectedSuccessResponse.OK(
     tokens,

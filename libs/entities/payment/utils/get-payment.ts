@@ -15,7 +15,7 @@ export const getPaymentFromSessionResult = (
   sessionResult: StripeSessionResult,
 ): InsertPayment => {
   return {
-    paymentId: validatePaymentIntent(sessionResult.payment_intent),
+    id: validatePaymentIntent(sessionResult.payment_intent),
     type: PaymentMethodType.draft,
     grossAmount: validateAmount(sessionResult.amount_total),
     netAmount: validateAmount(sessionResult.amount_subtotal),
@@ -29,7 +29,7 @@ export const getPaymentFromPaymentIntent = (
 ): InsertPayment => {
   const [paymentMethodType] = paymentIntent.payment_method_types;
   return {
-    paymentId: validatePaymentIntent(paymentIntent),
+    id: validatePaymentIntent(paymentIntent),
     type: paymentMethodTypeSchema.parse(paymentMethodType),
     grossAmount: validateAmount(paymentIntent.amount),
     state: type,

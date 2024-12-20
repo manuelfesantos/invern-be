@@ -25,7 +25,7 @@ export const getProductById = async (
   productId: string,
 ): Promise<ProductDetails | undefined> => {
   return db().query.productsTable.findFirst({
-    where: eq(productsTable.productId, productId),
+    where: eq(productsTable.id, productId),
     with: {
       images: {
         columns: {
@@ -60,7 +60,7 @@ export const getProductsBySearch = async (
   return db().query.productsTable.findMany({
     where: or(
       like(productsTable.description, `%${search}%`),
-      like(productsTable.productName, `%${search}%`),
+      like(productsTable.name, `%${search}%`),
     ),
     with: {
       images: {
@@ -78,7 +78,7 @@ export const getProductsByProductIds = async (
   productIds: string[],
 ): Promise<Product[]> => {
   return db().query.productsTable.findMany({
-    where: inArray(productsTable.productId, productIds),
+    where: inArray(productsTable.id, productIds),
     with: {
       images: {
         limit: 1,

@@ -16,7 +16,7 @@ describe("addToOrder", () => {
   it("should add to order", async () => {
     const products = [
       {
-        productId: "1",
+        id: "1",
         quantity: 1,
       },
     ];

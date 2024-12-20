@@ -15,8 +15,8 @@ jest.mock("@db", () => ({
 }));
 
 const product = {
-  productId: "pGnFzJ177Yeh4sTz1wDMRM",
-  productName: "product name",
+  id: "pGnFzJ177Yeh4sTz1wDMRM",
+  name: "product name",
   description: "product description",
   stock: 1,
   priceInCents: 1,
@@ -31,9 +31,7 @@ describe("validate", () => {
     const findFirstSpy = jest.spyOn(DB.db().query.productsTable, "findFirst");
     it("should validate product id", async () => {
       findFirstSpy.mockResolvedValue(product);
-      expect(
-        async () => await validateProductId(product.productId),
-      ).not.toThrow();
+      expect(async () => await validateProductId(product.id)).not.toThrow();
     });
 
     it("should throw error if product id is invalid", async () => {
@@ -46,7 +44,7 @@ describe("validate", () => {
     it("should throw error if product is not found", async () => {
       findFirstSpy.mockResolvedValue(undefined);
       await expect(
-        async () => await validateProductId(product.productId),
+        async () => await validateProductId(product.id),
       ).rejects.toEqual(errors.PRODUCT_NOT_FOUND());
     });
   });
@@ -54,9 +52,7 @@ describe("validate", () => {
     const findManySpy = jest.spyOn(DB.db().query.productsTable, "findMany");
     it("should validate product ids", async () => {
       findManySpy.mockResolvedValue([product]);
-      expect(
-        async () => await validateProductIds([product.productId]),
-      ).not.toThrow();
+      expect(async () => await validateProductIds([product.id])).not.toThrow();
     });
 
     it("should throw error if product ids are invalid", async () => {
@@ -69,20 +65,17 @@ describe("validate", () => {
     it("should throw error if product is not found", async () => {
       findManySpy.mockResolvedValue([]);
       await expect(
-        async () => await validateProductIds([product.productId]),
-      ).rejects.toEqual(errors.INVALID_PRODUCT_IDS([product.productId]));
+        async () => await validateProductIds([product.id]),
+      ).rejects.toEqual(errors.INVALID_PRODUCT_IDS([product.id]));
     });
     it("should throw error if productId is not equal to saved productId", async () => {
       findManySpy.mockResolvedValue([
-        { ...product, productId: "a5UiXLP6yGHtbDg8wwaJbe" },
+        { ...product, id: "a5UiXLP6yGHtbDg8wwaJbe" },
       ]);
       await expect(
         async () =>
-          await validateProductIds([
-            product.productId,
-            "a5UiXLP6yGHtbDg8wwaJbe",
-          ]),
-      ).rejects.toEqual(errors.INVALID_PRODUCT_IDS([product.productId]));
+          await validateProductIds([product.id, "a5UiXLP6yGHtbDg8wwaJbe"]),
+      ).rejects.toEqual(errors.INVALID_PRODUCT_IDS([product.id]));
     });
   });
 });

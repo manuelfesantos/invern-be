@@ -24,19 +24,19 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
     paymentIntent,
     PaymentIntentState.succeeded,
   );
-  const { paymentId } = (await getPaymentById(payment.paymentId)) ?? {};
+  const { id } = (await getPaymentById(payment.id)) ?? {};
 
   logger().info(
     "Processing PaymentIntentSucceeded Event",
     LoggerUseCaseEnum.GET_PAYMENT_INTENT,
     {
       payment,
-      paymentId,
+      id,
     },
   );
 
-  if (paymentId) {
-    const [updatedPayment] = await updatePayment(paymentId, payment);
+  if (id) {
+    const [updatedPayment] = await updatePayment(id, payment);
     return updatedPayment;
   }
   const [insertedPayment] = await insertPaymentReturningAll(payment);
@@ -50,7 +50,7 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
     paymentIntent,
     PaymentIntentState.created,
   );
-  const savedPayment = await getPaymentById(payment.paymentId);
+  const savedPayment = await getPaymentById(payment.id);
 
   logger().info(
     "Processing PaymentIntentCreated Event",
@@ -65,7 +65,7 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
     if (savedPayment?.state !== PaymentIntentState.draft) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.paymentId, payment);
+    const [updatedPayment] = await updatePayment(payment.id, payment);
     return updatedPayment;
   }
   const [insertedPayment] = await insertPaymentReturningAll(payment);
@@ -80,7 +80,7 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
     PaymentIntentState.processing,
   );
 
-  const savedPayment = await getPaymentById(payment.paymentId);
+  const savedPayment = await getPaymentById(payment.id);
 
   logger().info(
     "Processing PaymentIntentProcessing Event",
@@ -98,7 +98,7 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
     ) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.paymentId, payment);
+    const [updatedPayment] = await updatePayment(payment.id, payment);
     return updatedPayment;
   }
   const [insertedPayment] = await insertPaymentReturningAll(payment);
@@ -129,14 +129,14 @@ export const getPaymentFromPaymentIntentFailedEvent = async (
 const handleFailedPayment = async (
   payment: InsertPayment,
 ): Promise<Payment> => {
-  const products = await getOrderProductsByPaymentId(payment.paymentId);
+  const products = await getOrderProductsByPaymentId(payment.id);
   if (products.length) {
     const updatedProducts = await increaseProductsStock(products);
     for (const product of updatedProducts) {
       await stockClient.update(product);
     }
   }
-  const savedPayment = await getPaymentById(payment.paymentId);
+  const savedPayment = await getPaymentById(payment.id);
 
   logger().info(
     "Processing Failed Payment Event",
@@ -155,7 +155,7 @@ const handleFailedPayment = async (
     ) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.paymentId, payment);
+    const [updatedPayment] = await updatePayment(payment.id, payment);
     return updatedPayment;
   }
   const [insertedPayment] = await insertPaymentReturningAll(payment);

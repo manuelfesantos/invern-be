@@ -38,15 +38,15 @@ export const getOrderFromSessionResult = async (
 
   const payment = getPaymentFromSessionResult(sessionResult);
 
-  const paymentExists = Boolean(await getPaymentById(payment.paymentId));
+  const paymentExists = Boolean(await getPaymentById(payment.id));
 
   if (!paymentExists) {
     await insertPaymentReturningId(payment);
   } else {
-    await updatePayment(payment.paymentId, { netAmount: payment.netAmount });
+    await updatePayment(payment.id, { netAmount: payment.netAmount });
   }
 
-  const { clientOrderId } = sessionResult.metadata ?? {};
+  const { clientId } = sessionResult.metadata ?? {};
 
   const [checkoutSession] = await popCheckoutSessionById(sessionResult.id);
 
@@ -62,10 +62,10 @@ export const getOrderFromSessionResult = async (
 
   const [{ orderId }] = await insertOrder({
     addressId,
-    paymentId: payment.paymentId,
+    paymentId: payment.id,
     userId: userId ?? null,
-    orderId: sessionResult.id,
-    clientOrderId,
+    id: sessionResult.id,
+    clientId,
     snapshot: null,
   });
 

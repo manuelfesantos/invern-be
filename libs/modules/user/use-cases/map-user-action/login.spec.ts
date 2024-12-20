@@ -34,8 +34,8 @@ jest.mock("@kv-adapter", () => ({
   setAuthSecret: jest.fn(),
 }));
 
-const { userId } = userMock;
-const { cartId } = userMock.cart as Cart;
+const { id: userId } = userMock;
+const { id: cartId } = userMock.cart as Cart;
 
 describe("login", () => {
   const getUserByEmailSpy = jest.spyOn(UserAdapter, "getUserByEmail");

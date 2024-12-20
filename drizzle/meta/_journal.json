@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1716767349858,
-      "tag": "0000_gray_sleeper",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1719519087071,
-      "tag": "0001_old_mongu",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1722252079672,
-      "tag": "0002_clumsy_starbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1722806395211,
-      "tag": "0003_peaceful_firebrand",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1722806803190,
-      "tag": "0004_crazy_marten_broadcloak",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1722809237088,
-      "tag": "0005_youthful_peter_quill",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1728252487261,
-      "tag": "0006_large_skin",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1733676176590,
-      "tag": "0007_colorful_sphinx",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1733762498199,
-      "tag": "0008_colossal_shockwave",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1733765138640,
-      "tag": "0009_workable_edwin_jarvis",
+      "when": 1734662414592,
+      "tag": "0000_confused_captain_universe",
       "breakpoints": true
     }
   ]

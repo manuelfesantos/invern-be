@@ -27,14 +27,13 @@ describe("insertTax", () => {
   const valuesSpy = jest.spyOn(DB.db().insert(taxesTable), "values");
   it("should insert tax", async () => {
     const taxInsert = {
-      amount: 10,
       countryCode: "Pt",
       name: "1",
       rate: 10,
     };
     const tax = await insertTax(taxInsert);
 
-    expect(valuesSpy).toHaveBeenCalledWith({ ...taxInsert, taxId: "1" });
+    expect(valuesSpy).toHaveBeenCalledWith({ ...taxInsert, id: "1" });
 
     expect(tax.length).toEqual(ONE_ELEMENT);
 

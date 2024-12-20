@@ -3,7 +3,7 @@ import * as DB from "@db";
 import { errors } from "@error-handling-utils";
 
 const userFromDbWithCart = {
-  userId: "167tu3uY9Kc94huumc197K",
+  id: "167tu3uY9Kc94huumc197K",
   email: "email@example.com",
   version: 0,
   firstName: "firstName",
@@ -12,13 +12,13 @@ const userFromDbWithCart = {
   role: "ADMIN" as const,
   cartId: "gsreRxngDngQV5eJFjfGD5",
   cart: {
-    cartId: "gsreRxngDngQV5eJFjfGD5",
+    id: "gsreRxngDngQV5eJFjfGD5",
     productsToCarts: [
       {
         product: {
-          productId: "productId",
+          id: "productId",
           images: [],
-          productName: "productName",
+          name: "productName",
           stock: 1,
           priceInCents: 1,
         },
@@ -29,7 +29,7 @@ const userFromDbWithCart = {
 };
 
 const userFromDbWithoutCart = {
-  userId: "167tu3uY9Kc94huumc197K",
+  id: "167tu3uY9Kc94huumc197K",
   email: "email@example.com",
   version: 0,
   firstName: "firstName",
@@ -40,7 +40,7 @@ const userFromDbWithoutCart = {
 };
 
 const userFromDbWithoutVersion = {
-  userId: "167tu3uY9Kc94huumc197K",
+  id: "167tu3uY9Kc94huumc197K",
   email: "email@example.com",
   firstName: "firstName",
   lastName: "lastName",
@@ -51,7 +51,7 @@ const userFromDbWithoutVersion = {
 };
 
 const userWithCart = {
-  userId: "167tu3uY9Kc94huumc197K",
+  id: "167tu3uY9Kc94huumc197K",
   email: "email@example.com",
   version: 0,
   firstName: "firstName",
@@ -59,12 +59,12 @@ const userWithCart = {
   password: "hashedPassword",
   role: "ADMIN" as const,
   cart: {
-    cartId: "gsreRxngDngQV5eJFjfGD5",
+    id: "gsreRxngDngQV5eJFjfGD5",
     products: [
       {
-        productId: "productId",
+        id: "productId",
         images: [],
-        productName: "productName",
+        name: "productName",
         stock: 1,
         priceInCents: 1,
         quantity: 1,
@@ -74,7 +74,7 @@ const userWithCart = {
 };
 
 const userWithoutCart = {
-  userId: "167tu3uY9Kc94huumc197K",
+  id: "167tu3uY9Kc94huumc197K",
   email: "email@example.com",
   version: 0,
   firstName: "firstName",

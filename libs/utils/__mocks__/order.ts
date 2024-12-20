@@ -6,11 +6,11 @@ const FIRST_ELEMENT = 0;
 
 export const clientOrdersMock: ClientOrder[] = [
   {
-    clientOrderId: "1",
+    clientId: "1",
     products: [],
     createdAt: "1",
     address: {
-      addressId: "1",
+      id: "1",
       city: "1",
       country: {
         taxes: [] as Tax[],
@@ -32,11 +32,11 @@ export const clientOrdersMock: ClientOrder[] = [
     snapshot: null,
   },
   {
-    clientOrderId: "2",
+    clientId: "2",
     products: [],
     createdAt: "2",
     address: {
-      addressId: "2",
+      id: "2",
       city: "2",
       country: {
         taxes: [] as Tax[],
@@ -61,12 +61,12 @@ export const clientOrdersMock: ClientOrder[] = [
 
 export const ordersMock: Order[] = [
   {
-    clientOrderId: "1",
-    orderId: "1",
+    clientId: "1",
+    id: "1",
     products: [],
     createdAt: "1",
     address: {
-      addressId: "1",
+      id: "1",
       city: "1",
       country: {
         taxes: [] as Tax[],
@@ -88,12 +88,12 @@ export const ordersMock: Order[] = [
     snapshot: null,
   },
   {
-    clientOrderId: "2",
-    orderId: "2",
+    clientId: "2",
+    id: "2",
     products: [],
     createdAt: "2",
     address: {
-      addressId: "2",
+      id: "2",
       city: "2",
       country: {
         taxes: [] as Tax[],

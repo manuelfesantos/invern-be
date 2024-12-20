@@ -5,7 +5,7 @@ import * as ProductAdapter from "@product-db";
 import { compareResponses, productIdAndQuantityMock } from "@mocks-utils";
 import { ZodError } from "zod";
 
-const { productId, quantity } = productIdAndQuantityMock;
+const { id, quantity } = productIdAndQuantityMock;
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
@@ -44,7 +44,7 @@ const bodyWithoutQuantity = {
 
 const bodyWithoutProductId = {
   ...validBody,
-  productId: undefined,
+  id: undefined,
 };
 
 const stock = 10;
@@ -72,12 +72,7 @@ describe("addProductToCart", () => {
 
     await compareResponses(response, expectedResponse);
 
-    expect(addToCartSpy).toHaveBeenCalledWith(
-      "cartId",
-      productId,
-      quantity,
-      stock,
-    );
+    expect(addToCartSpy).toHaveBeenCalledWith("cartId", id, quantity, stock);
   });
   it("should not add product to cart if quantity is missing", async () => {
     await expect(
@@ -111,10 +106,7 @@ describe("addProductToCart", () => {
       async () => await addProductToCart(tokens, remember, validBody, "cartId"),
     ).rejects.toEqual(expect.objectContaining({ message: "validation error" }));
 
-    expect(validateProductIdAndGetStockSpy).toHaveBeenCalledWith(
-      productId,
-      quantity,
-    );
+    expect(validateProductIdAndGetStockSpy).toHaveBeenCalledWith(id, quantity);
     expect(addToCartSpy).not.toHaveBeenCalled();
   });
   it("should return an error if addToCart throws an error", async () => {
@@ -126,11 +118,6 @@ describe("addProductToCart", () => {
     ).rejects.toEqual(expect.objectContaining({ message: "database error" }));
 
     expect(validateProductIdAndGetStockSpy).toHaveBeenCalled();
-    expect(addToCartSpy).toHaveBeenCalledWith(
-      "cartId",
-      productId,
-      quantity,
-      stock,
-    );
+    expect(addToCartSpy).toHaveBeenCalledWith("cartId", id, quantity, stock);
   });
 });

@@ -26,7 +26,7 @@ export const getCollectionByName = async (
   collectionName: string,
 ): Promise<CollectionDetails | undefined> => {
   return db().query.collectionsTable.findFirst({
-    where: eq(collectionsTable.collectionName, collectionName),
+    where: eq(collectionsTable.name, collectionName),
     with: {
       products: {
         columns: {
@@ -51,7 +51,7 @@ export const getCollectionById = async (
   collectionId: string,
 ): Promise<CollectionDetails | undefined> => {
   return db().query.collectionsTable.findFirst({
-    where: eq(collectionsTable.collectionId, collectionId),
+    where: eq(collectionsTable.id, collectionId),
     with: {
       products: {
         with: {

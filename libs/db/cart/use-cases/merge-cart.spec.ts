@@ -15,8 +15,8 @@ describe("mergeCart", () => {
   it("should merge cart", async () => {
     const cartId = "1";
     const items = [
-      { productId: "1", quantity: 1 },
-      { productId: "2", quantity: 2 },
+      { id: "1", quantity: 1 },
+      { id: "2", quantity: 2 },
     ];
     await mergeCart(cartId, items);
     expect(valuesSpy).toHaveBeenCalledWith([

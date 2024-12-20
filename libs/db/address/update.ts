@@ -10,5 +10,5 @@ export const updateAddress = async (
   await db()
     .update(addressesTable)
     .set(changes)
-    .where(eq(addressesTable.addressId, addressId));
+    .where(eq(addressesTable.id, addressId));
 };

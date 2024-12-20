@@ -9,9 +9,9 @@ export const deleteCheckoutSessionById = async (
 ): Promise<{ checkoutSessionId: string }[]> => {
   return db()
     .delete(checkoutSessionsTable)
-    .where(eq(checkoutSessionsTable.checkoutSessionId, id))
+    .where(eq(checkoutSessionsTable.id, id))
     .returning({
-      checkoutSessionId: checkoutSessionsTable.checkoutSessionId,
+      checkoutSessionId: checkoutSessionsTable.id,
     });
 };
 
@@ -20,7 +20,7 @@ export const popCheckoutSessionById = async (
 ): Promise<CheckoutSession[]> => {
   return db()
     .delete(checkoutSessionsTable)
-    .where(eq(checkoutSessionsTable.checkoutSessionId, id))
+    .where(eq(checkoutSessionsTable.id, id))
     .returning();
 };
 

@@ -9,9 +9,9 @@ export const lineItemsMock: LineItem[] = [
         url: "1",
       },
     ],
-    productName: "1",
+    name: "1",
     priceInCents: 1,
-    productId: "k8Ehw7AmHMMTzpg727ucTw",
+    id: "k8Ehw7AmHMMTzpg727ucTw",
     quantity: 1,
     stock: 1,
   },
@@ -22,9 +22,9 @@ export const lineItemsMock: LineItem[] = [
         url: "2",
       },
     ],
-    productName: "2",
+    name: "2",
     priceInCents: 2,
-    productId: "x3mExy9k6hXhLUnHDN4kns",
+    id: "x3mExy9k6hXhLUnHDN4kns",
     quantity: 2,
     stock: 2,
   },
@@ -35,16 +35,16 @@ export const lineItemsMock: LineItem[] = [
         url: "3",
       },
     ],
-    productName: "3",
+    name: "3",
     priceInCents: 3,
-    productId: "q2kzsdpexXjH5sskRX5Y3e",
+    id: "q2kzsdpexXjH5sskRX5Y3e",
     quantity: 3,
     stock: 3,
   },
 ];
 
 export const cartMock: Cart = {
-  cartId: "",
+  id: "",
   products: lineItemsMock,
 };
 

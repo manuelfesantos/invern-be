@@ -3,7 +3,5 @@ import { addressesTable } from "@schema";
 import { eq } from "drizzle-orm";
 
 export const deleteAddress = async (addressId: string): Promise<void> => {
-  await db()
-    .delete(addressesTable)
-    .where(eq(addressesTable.addressId, addressId));
+  await db().delete(addressesTable).where(eq(addressesTable.id, addressId));
 };

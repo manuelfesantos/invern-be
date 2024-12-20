@@ -37,7 +37,7 @@ describe("insertUser", () => {
     const result = await insertUser(userInsert);
     expect(valuesSpy).toHaveBeenCalledWith({
       ...userInsert,
-      userId: "1",
+      id: "1",
       password: "hashedPassword",
     });
 

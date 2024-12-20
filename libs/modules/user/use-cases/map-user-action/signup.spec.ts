@@ -8,8 +8,8 @@ import * as JwtUtils from "@jwt-utils";
 import * as KvAdapter from "@kv-adapter";
 import { Cart } from "@cart-entity";
 
-const { userId } = userMock;
-const { cartId } = userMock.cart as Cart;
+const { id: userId } = userMock;
+const { id: cartId } = userMock.cart as Cart;
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),

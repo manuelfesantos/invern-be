@@ -6,7 +6,7 @@ import { clientCountrySchema, countrySchema } from "@country-entity";
 const baseAddressSchema = createSelectSchema(addressesTable);
 
 export const insertAddressSchema = createInsertSchema(addressesTable).omit({
-  addressId: true,
+  id: true,
 });
 
 export const addressSchema = baseAddressSchema

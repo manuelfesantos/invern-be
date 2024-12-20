@@ -10,5 +10,5 @@ export const updateProduct = async (
   await db()
     .update(productsTable)
     .set(changes)
-    .where(eq(productsTable.productId, productId));
+    .where(eq(productsTable.id, productId));
 };

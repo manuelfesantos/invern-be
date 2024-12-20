@@ -12,7 +12,7 @@ export const selectCheckoutSessionById = async (
 ): Promise<CheckoutSession | undefined> => {
   return z.optional(checkoutSessionSchema).parse(
     await db().query.checkoutSessionsTable.findFirst({
-      where: eq(checkoutSessionsTable.checkoutSessionId, id),
+      where: eq(checkoutSessionsTable.id, id),
     }),
   );
 };

@@ -8,8 +8,8 @@ const SECOND_COLLECTION_IMAGE_INDEX = 16;
 const THIRD_COLLECTION_IMAGE_INDEX = 32;
 const INDEX_TO_PRODUCT_NUMBER = 1;
 export const insertImages = async (
-  products: { productId: string; productName: string }[],
-  collections: { collectionId: string; collectionName: string }[],
+  products: { productId: string; name: string }[],
+  collections: { collectionId: string; name: string }[],
 ): Promise<void> => {
   const insertImageSchema = createInsertSchema(imagesTable);
   type InsertImage = z.infer<typeof insertImageSchema>;
@@ -18,25 +18,25 @@ export const insertImages = async (
       {
         productId: product.productId,
         url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-1.jpeg`,
-        alt: product.productName,
+        alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
         url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-2.jpeg`,
-        alt: product.productName,
+        alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
         url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-3.jpeg`,
-        alt: product.productName,
+        alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
         url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-4.jpeg`,
-        alt: product.productName,
+        alt: product.name,
         collectionId: undefined,
       },
     ])
@@ -65,8 +65,8 @@ const indexToProductNumber = (index: number): number =>
 const imagesBaseUrl = "https://images.invernspirit.com/products";
 
 const getCollectionId = (
-  collections: { collectionId: string; collectionName: string }[],
+  collections: { collectionId: string; name: string }[],
   collectionName: string,
 ): string | undefined =>
-  collections.find((collection) => collection.collectionName === collectionName)
+  collections.find((collection) => collection.name === collectionName)
     ?.collectionId;

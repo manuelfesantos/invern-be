@@ -12,9 +12,9 @@ export const insertProduct = async (
 > => {
   const insertProduct = {
     ...product,
-    productId: getRandomUUID(),
+    id: getRandomUUID(),
   };
   return db().insert(productsTable).values(insertProduct).returning({
-    productId: productsTable.productId,
+    productId: productsTable.id,
   });
 };

@@ -29,8 +29,8 @@ describe("insertOrder", () => {
   const valuesSpy = jest.spyOn(DB.db().insert(ordersTable), "values");
   it("should insert order", async () => {
     const order = {
-      orderId: "orderId",
-      clientOrderId: "1",
+      id: "orderId",
+      clientId: "1",
       userId: "1",
       addressId: "1",
       paymentId: "1",

@@ -7,7 +7,7 @@ import { imageSchema } from "@image-entity";
 const baseCollectionSchema = createSelectSchema(collectionsTable);
 export const insertCollectionSchema = createSelectSchema(collectionsTable).omit(
   {
-    collectionId: true,
+    id: true,
   },
 );
 

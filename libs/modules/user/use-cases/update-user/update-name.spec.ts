@@ -115,7 +115,7 @@ describe("updateName", () => {
         await updateName(tokens, undefined, id, { firstName, lastName }),
     ).rejects.toEqual(expect.objectContaining({ message: "update failed" }));
     expect(getUserByIdSpy).toHaveBeenCalledWith(id);
-    expect(updateUserSpy).toHaveBeenCalledWith(userMock.userId, {
+    expect(updateUserSpy).toHaveBeenCalledWith(userMock.id, {
       firstName,
       lastName,
     });

@@ -19,8 +19,8 @@ export const login = async (body: unknown, id?: string): Promise<Response> => {
 
   await validatePassword(password, user);
 
-  const { userId } = user;
-  const { cartId } = user.cart ?? {};
+  const { id: userId } = user;
+  const { id: cartId } = user.cart ?? {};
 
   const accessToken = await getLoggedInToken(userId, cartId, remember);
   let refreshToken = await getAuthSecret(userId);
@@ -53,7 +53,7 @@ const validatePassword = async (
   passwordText: string,
   user: User,
 ): Promise<void> => {
-  const password = await hashPassword(passwordText, user.userId);
+  const password = await hashPassword(passwordText, user.id);
 
   if (password !== user.password) {
     throw errors.INVALID_CREDENTIALS();

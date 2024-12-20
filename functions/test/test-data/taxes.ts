@@ -11,9 +11,9 @@ export const insertTaxes = async (): Promise<void> => {
       .insert(taxesTable)
       .values({
         name: display_name,
-        taxId: id,
+        id,
         countryCode: country || "PT",
-        amount: percentageToRate(percentage),
+        rate: percentageToRate(percentage),
       });
   }
 };

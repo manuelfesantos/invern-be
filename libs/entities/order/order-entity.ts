@@ -23,7 +23,7 @@ export const orderSchema = baseOrderSchema
 
 export const clientOrderSchema = orderSchema
   .omit({
-    orderId: true,
+    id: true,
     address: true,
   })
   .merge(

@@ -11,7 +11,7 @@ export const createCheckoutSession = async (
   lineItems: LineItem[],
   country: Country,
 ): Promise<Response<Stripe.Checkout.Session>> => {
-  const clientOrderId = getRandomUUID();
+  const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
     customer_creation: "always",
     expires_at: getFutureDate(SESSION_EXPIRY),
@@ -21,24 +21,24 @@ export const createCheckoutSession = async (
     billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
-    success_url: `${frontendHost()}/order?id=${clientOrderId}`,
+    success_url: `${frontendHost()}/order?id=${clientId}`,
     cancel_url: `${frontendHost()}/cart`,
     line_items: lineItems.map((product) => {
       return {
         price_data: {
           currency: "eur",
           product_data: {
-            name: product.productName,
+            name: product.name,
             images: product.images.map((image) => image.url),
           },
           unit_amount: product.priceInCents,
         },
-        tax_rates: country.taxes.map((tax) => tax.taxId),
+        tax_rates: country.taxes.map((tax) => tax.id),
         quantity: product.quantity,
       };
     }),
     metadata: {
-      clientOrderId,
+      clientId,
     },
   });
 };

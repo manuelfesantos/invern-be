@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm";
 
 export const checkIfOrderExists = async (orderId: string): Promise<boolean> => {
   const order = await db().query.ordersTable.findFirst({
-    where: eq(ordersTable.orderId, orderId),
+    where: eq(ordersTable.id, orderId),
     columns: {
-      orderId: true,
+      id: true,
     },
   });
 

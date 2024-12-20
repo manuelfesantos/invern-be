@@ -14,7 +14,7 @@ export const deleteUser: ProtectedModuleFunction = async (
     throw errors.UNAUTHORIZED();
   }
   const user = await getUserById(id);
-  await deleteUserAdapter(user.userId);
+  await deleteUserAdapter(user.id);
   return protectedSuccessResponse.OK(
     tokens,
     "success deleting user",

@@ -5,7 +5,7 @@ import { Tax } from "@tax-entity";
 
 export const getTaxById = async (id: string): Promise<Tax | undefined> => {
   return db().query.taxesTable.findFirst({
-    where: eq(taxesTable.taxId, id),
+    where: eq(taxesTable.id, id),
     columns: {
       countryCode: false,
     },

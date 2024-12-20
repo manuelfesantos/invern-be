@@ -6,13 +6,13 @@ jest.mock("@db", () => ({
     query: {
       cartsTable: {
         findFirst: jest.fn().mockReturnValue({
-          cartId: "1",
+          id: "1",
           productsToCarts: [
             {
               product: {
-                productId: "productId",
+                id: "productId",
                 images: [],
-                productName: "productName",
+                name: "productName",
                 stock: 1,
                 priceInCents: 1,
               },
@@ -34,13 +34,13 @@ describe("getCartById", () => {
     const cartId = "1";
     const cart = await getCartById(cartId);
     expect(cart).toEqual({
-      cartId: "1",
+      id: "1",
       products: [
         {
-          productId: "productId",
+          id: "productId",
           images: [],
           quantity: 1,
-          productName: "productName",
+          name: "productName",
           stock: 1,
           priceInCents: 1,
         },

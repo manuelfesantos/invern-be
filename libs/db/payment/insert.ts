@@ -14,7 +14,7 @@ export const insertPaymentReturningId = async (
     createdAt: new Date().toISOString(),
   };
   return db().insert(paymentsTable).values(insertPayment).returning({
-    paymentId: paymentsTable.paymentId,
+    paymentId: paymentsTable.id,
   });
 };
 

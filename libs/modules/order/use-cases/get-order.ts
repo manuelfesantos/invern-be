@@ -10,7 +10,7 @@ export const getOrder = async (orderId: HttpParams): Promise<Response> => {
   }
 
   logger().addData({
-    orderId: order.clientOrderId,
+    orderId: order.clientId,
   });
   return successResponse.OK("success getting order", order);
 };

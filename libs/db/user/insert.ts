@@ -12,15 +12,12 @@ export const insertUser = async (
 > => {
   const insertUser = {
     ...user,
-    userId: getRandomUUID(),
+    id: getRandomUUID(),
   };
 
-  insertUser.password = await hashPassword(
-    insertUser.password,
-    insertUser.userId,
-  );
+  insertUser.password = await hashPassword(insertUser.password, insertUser.id);
 
   return db().insert(usersTable).values(insertUser).returning({
-    userId: usersTable.userId,
+    userId: usersTable.id,
   });
 };

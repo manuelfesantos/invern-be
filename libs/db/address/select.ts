@@ -7,7 +7,7 @@ export const getAddressById = async (
   id: string,
 ): Promise<BaseAddress | undefined> => {
   return db().query.addressesTable.findFirst({
-    where: eq(addressesTable.addressId, id),
+    where: eq(addressesTable.id, id),
   });
 };
 

@@ -21,7 +21,7 @@ describe("getPayment", () => {
       );
 
       expect(payment).toEqual({
-        paymentId: stripeCheckoutSessionResultMockWithoutUserId.payment_intent,
+        id: stripeCheckoutSessionResultMockWithoutUserId.payment_intent,
         type: PaymentMethodType.draft,
         grossAmount: stripeCheckoutSessionResultMockWithoutUserId.amount_total,
         netAmount: stripeCheckoutSessionResultMockWithoutUserId.amount_subtotal,
@@ -66,7 +66,7 @@ describe("getPayment", () => {
       );
 
       expect(payment).toEqual({
-        paymentId: stripeCheckoutPaymentIntentResultSucceededMock.id,
+        id: stripeCheckoutPaymentIntentResultSucceededMock.id,
         type: PaymentMethodType.card,
         grossAmount: stripeCheckoutPaymentIntentResultSucceededMock.amount,
         state: PaymentIntentState.succeeded,

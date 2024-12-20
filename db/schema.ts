@@ -13,11 +13,11 @@ const VALUE_ZERO = 0;
 //-----------------------------------SCHEMA-----------------------------------//
 
 export const cartsTable = sqliteTable("carts", {
-  cartId: text("cartId").primaryKey(),
+  id: text("id").primaryKey(),
 });
 
 export const usersTable = sqliteTable("users", {
-  userId: text("userId").primaryKey(),
+  id: text("id").primaryKey(),
   email: text("email").notNull(),
   firstName: text("firstName").notNull(),
   lastName: text("lastName").notNull(),
@@ -28,25 +28,25 @@ export const usersTable = sqliteTable("users", {
     .default("USER"),
   cartId: text("cartId")
     .notNull()
-    .references(() => cartsTable.cartId, {
+    .references(() => cartsTable.id, {
       onDelete: "cascade",
     }),
 });
 
 export const collectionsTable = sqliteTable("collections", {
-  collectionId: text("collectionId").primaryKey(),
-  collectionName: text("collectionName").notNull(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
   description: text("description").notNull(),
 });
 
 export const productsTable = sqliteTable("products", {
-  productId: text("productId").primaryKey(),
-  productName: text("productName").notNull(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
   description: text("description").notNull(),
   stock: int("stock").notNull(),
   collectionId: text("collectionId")
     .notNull()
-    .references(() => collectionsTable.collectionId, { onDelete: "cascade" }),
+    .references(() => collectionsTable.id, { onDelete: "cascade" }),
   priceInCents: int("priceInCents").notNull(),
 });
 
@@ -55,10 +55,10 @@ export const imagesTable = sqliteTable("images", {
   alt: text("alt").notNull(),
   productId: text("productId")
     .notNull()
-    .references(() => productsTable.productId, { onDelete: "cascade" }),
+    .references(() => productsTable.id, { onDelete: "cascade" }),
   collectionId: text("collectionId")
     .unique()
-    .references(() => collectionsTable.collectionId, { onDelete: "set null" }),
+    .references(() => collectionsTable.id, { onDelete: "set null" }),
 });
 
 export const productsToCartsTable = sqliteTable(
@@ -66,10 +66,10 @@ export const productsToCartsTable = sqliteTable(
   {
     cartId: text("cartId")
       .notNull()
-      .references(() => cartsTable.cartId, { onDelete: "cascade" }),
+      .references(() => cartsTable.id, { onDelete: "cascade" }),
     productId: text("productId")
       .notNull()
-      .references(() => productsTable.productId, { onDelete: "cascade" }),
+      .references(() => productsTable.id, { onDelete: "cascade" }),
     quantity: int("quantity").notNull(),
   },
   (t) => ({
@@ -78,16 +78,16 @@ export const productsToCartsTable = sqliteTable(
 );
 
 export const ordersTable = sqliteTable("orders", {
-  orderId: text("orderId").primaryKey(),
-  clientOrderId: text("clientOrderId").unique().notNull(),
+  id: text("id").primaryKey(),
+  clientId: text("clientId").unique().notNull(),
   createdAt: text("createdAt").notNull(),
-  userId: text("userId").references(() => usersTable.userId, {
+  userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
-  addressId: text("addressId").references(() => addressesTable.addressId, {
+  addressId: text("addressId").references(() => addressesTable.id, {
     onDelete: "cascade",
   }),
-  paymentId: text("paymentId").references(() => paymentsTable.paymentId, {
+  paymentId: text("paymentId").references(() => paymentsTable.id, {
     onDelete: "cascade",
   }),
   snapshot: text("snapshot"),
@@ -98,10 +98,10 @@ export const productsToOrdersTable = sqliteTable(
   {
     orderId: text("orderId")
       .notNull()
-      .references(() => ordersTable.orderId, { onDelete: "cascade" }),
+      .references(() => ordersTable.id, { onDelete: "cascade" }),
     productId: text("productId")
       .notNull()
-      .references(() => productsTable.productId, { onDelete: "cascade" }),
+      .references(() => productsTable.id, { onDelete: "cascade" }),
     quantity: int("quantity").notNull(),
   },
   (t) => ({
@@ -117,7 +117,7 @@ export const currenciesTable = sqliteTable("currencies", {
 });
 
 export const taxesTable = sqliteTable("taxes", {
-  taxId: text("taxId").primaryKey(),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   rate: int("rate"),
   countryCode: text("countryId")
@@ -154,7 +154,7 @@ export const countriesToCurrenciesTable = sqliteTable(
 );
 
 export const addressesTable = sqliteTable("addresses", {
-  addressId: text("addressId").primaryKey(),
+  id: text("id").primaryKey(),
   line1: text("line1").notNull(),
   line2: text("line2").notNull(),
   postalCode: text("postalCode").notNull(),
@@ -167,7 +167,7 @@ export const addressesTable = sqliteTable("addresses", {
 });
 
 export const paymentsTable = sqliteTable("payments", {
-  paymentId: text("paymentId").primaryKey(),
+  id: text("id").primaryKey(),
   createdAt: text("createdAt").notNull(),
   type: text("type", { enum: ["draft", "card", "paypal"] }).notNull(),
   state: text("state", {
@@ -178,14 +178,14 @@ export const paymentsTable = sqliteTable("payments", {
 });
 
 export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
-  checkoutSessionId: text("checkoutSessionId").primaryKey(),
+  id: text("id").primaryKey(),
   products: text("products").notNull(),
   createdAt: text("createdAt").notNull(),
   expiresAt: int("expiresAt").notNull(),
-  userId: text("userId").references(() => usersTable.userId, {
+  userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
-  cartId: text("cartId").references(() => cartsTable.cartId, {
+  cartId: text("cartId").references(() => cartsTable.id, {
     onDelete: "cascade",
   }),
 });
@@ -195,7 +195,7 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
 export const usersRelations = relations(usersTable, ({ one, many }) => ({
   cart: one(cartsTable, {
     fields: [usersTable.cartId],
-    references: [cartsTable.cartId],
+    references: [cartsTable.id],
   }),
   orders: many(ordersTable),
 }));
@@ -217,7 +217,7 @@ export const productsRelations = relations(productsTable, ({ many, one }) => ({
   images: many(imagesTable),
   collection: one(collectionsTable, {
     fields: [productsTable.collectionId],
-    references: [collectionsTable.collectionId],
+    references: [collectionsTable.id],
   }),
   productsToCarts: many(productsToCartsTable),
   productsToOrders: many(productsToOrdersTable),
@@ -226,11 +226,11 @@ export const productsRelations = relations(productsTable, ({ many, one }) => ({
 export const imagesRelations = relations(imagesTable, ({ one }) => ({
   product: one(productsTable, {
     fields: [imagesTable.productId],
-    references: [productsTable.productId],
+    references: [productsTable.id],
   }),
   collection: one(collectionsTable, {
     fields: [imagesTable.collectionId],
-    references: [collectionsTable.collectionId],
+    references: [collectionsTable.id],
   }),
 }));
 
@@ -239,11 +239,11 @@ export const productsToCartsRelations = relations(
   ({ one }) => ({
     product: one(productsTable, {
       fields: [productsToCartsTable.productId],
-      references: [productsTable.productId],
+      references: [productsTable.id],
     }),
     cart: one(cartsTable, {
       fields: [productsToCartsTable.cartId],
-      references: [cartsTable.cartId],
+      references: [cartsTable.id],
     }),
   }),
 );
@@ -251,16 +251,16 @@ export const productsToCartsRelations = relations(
 export const ordersRelations = relations(ordersTable, ({ one, many }) => ({
   user: one(usersTable, {
     fields: [ordersTable.userId],
-    references: [usersTable.userId],
+    references: [usersTable.id],
   }),
   address: one(addressesTable, {
     fields: [ordersTable.addressId],
-    references: [addressesTable.addressId],
+    references: [addressesTable.id],
   }),
   productsToOrders: many(productsToOrdersTable),
   payment: one(paymentsTable, {
     fields: [ordersTable.paymentId],
-    references: [paymentsTable.paymentId],
+    references: [paymentsTable.id],
   }),
 }));
 
@@ -269,11 +269,11 @@ export const productsToOrdersRelations = relations(
   ({ one }) => ({
     order: one(ordersTable, {
       fields: [productsToOrdersTable.orderId],
-      references: [ordersTable.orderId],
+      references: [ordersTable.id],
     }),
     product: one(productsTable, {
       fields: [productsToOrdersTable.productId],
-      references: [productsTable.productId],
+      references: [productsTable.id],
     }),
   }),
 );
@@ -325,11 +325,11 @@ export const checkoutSessionsRelations = relations(
   ({ one }) => ({
     user: one(usersTable, {
       fields: [checkoutSessionsTable.userId],
-      references: [usersTable.userId],
+      references: [usersTable.id],
     }),
     cart: one(cartsTable, {
       fields: [checkoutSessionsTable.cartId],
-      references: [cartsTable.cartId],
+      references: [cartsTable.id],
     }),
   }),
 );

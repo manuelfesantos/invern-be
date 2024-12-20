@@ -31,13 +31,13 @@ const updateUserWithOptions = async (
   lastName?: string,
 ): Promise<void> => {
   if (firstName && lastName) {
-    await updateUser(user.userId, { firstName, lastName });
+    await updateUser(user.id, { firstName, lastName });
   }
   if (firstName) {
-    await updateUser(user.userId, { firstName });
+    await updateUser(user.id, { firstName });
   }
   if (lastName) {
-    await updateUser(user.userId, { lastName });
+    await updateUser(user.id, { lastName });
   }
 };
 

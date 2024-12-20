@@ -35,7 +35,7 @@ describe("insertProduct", () => {
   it("should insert a product", async () => {
     const productInsert: InsertProduct = {
       collectionId: "test",
-      productName: "test",
+      name: "test",
       description: "test",
       stock: 1,
       priceInCents: 1,
@@ -48,7 +48,7 @@ describe("insertProduct", () => {
     expect(result[FIRST_ELEMENT].productId).toEqual("1");
     expect(valuesSpy).toHaveBeenCalledWith({
       ...productInsert,
-      productId: "productId",
+      id: "productId",
     });
   });
 });
