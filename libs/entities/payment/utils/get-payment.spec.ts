@@ -23,7 +23,8 @@ describe("getPayment", () => {
       expect(payment).toEqual({
         paymentId: stripeCheckoutSessionResultMockWithoutUserId.payment_intent,
         type: PaymentMethodType.draft,
-        amount: stripeCheckoutSessionResultMockWithoutUserId.amount_total,
+        grossAmount: stripeCheckoutSessionResultMockWithoutUserId.amount_total,
+        netAmount: stripeCheckoutSessionResultMockWithoutUserId.amount_subtotal,
         state: PaymentIntentState.draft,
       });
     });
@@ -67,7 +68,7 @@ describe("getPayment", () => {
       expect(payment).toEqual({
         paymentId: stripeCheckoutPaymentIntentResultSucceededMock.id,
         type: PaymentMethodType.card,
-        amount: stripeCheckoutPaymentIntentResultSucceededMock.amount,
+        grossAmount: stripeCheckoutPaymentIntentResultSucceededMock.amount,
         state: PaymentIntentState.succeeded,
       });
     });

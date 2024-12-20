@@ -21,7 +21,7 @@ const foundOrder = {
         {
           taxId: "1",
           name: "1",
-          amount: 1,
+          rate: 1,
         },
       ],
       countriesToCurrencies: [
@@ -40,7 +40,8 @@ const foundOrder = {
     createdAt: "1",
     type: "card",
     state: "succeeded",
-    amount: 1,
+    grossAmount: 2,
+    netAmount: 1,
   },
   productsToOrders: [
     {
@@ -86,7 +87,8 @@ const returnedOrder = {
     createdAt: "1",
     type: "card",
     state: "succeeded",
-    amount: 1,
+    grossAmount: 2,
+    netAmount: 1,
   },
   address: {
     addressId: "1",
@@ -101,7 +103,7 @@ const returnedOrder = {
         {
           taxId: "1",
           name: "1",
-          amount: 1,
+          rate: 1,
         },
       ],
       currencies: [
@@ -138,7 +140,8 @@ const returnedClientOrder = {
     createdAt: "1",
     type: "card",
     state: "succeeded",
-    amount: 1,
+    netAmount: 1,
+    grossAmount: 2,
   },
   address: {
     addressId: "1",
@@ -152,7 +155,7 @@ const returnedClientOrder = {
       taxes: [
         {
           name: "1",
-          amount: 1,
+          rate: 1,
         },
       ],
       currencies: [

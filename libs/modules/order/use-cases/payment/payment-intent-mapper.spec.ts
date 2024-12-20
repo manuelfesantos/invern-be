@@ -84,7 +84,8 @@ describe("paymentIntentMapper", () => {
       const payment: Payment = {
         createdAt: "2022-01-01T00:00:00.000Z",
         paymentId: "paymentIntentId",
-        amount: 1000,
+        grossAmount: 1000,
+        netAmount: 800,
         state: PaymentIntentState[state as keyof typeof PaymentIntentState],
         type: "card" as const,
       };

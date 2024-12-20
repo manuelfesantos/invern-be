@@ -17,7 +17,8 @@ export const getPaymentFromSessionResult = (
   return {
     paymentId: validatePaymentIntent(sessionResult.payment_intent),
     type: PaymentMethodType.draft,
-    amount: validateAmount(sessionResult.amount_total),
+    grossAmount: validateAmount(sessionResult.amount_total),
+    netAmount: validateAmount(sessionResult.amount_subtotal),
     state: PaymentIntentState.draft,
   };
 };
@@ -30,7 +31,7 @@ export const getPaymentFromPaymentIntent = (
   return {
     paymentId: validatePaymentIntent(paymentIntent),
     type: paymentMethodTypeSchema.parse(paymentMethodType),
-    amount: validateAmount(paymentIntent.amount),
+    grossAmount: validateAmount(paymentIntent.amount),
     state: type,
   };
 };

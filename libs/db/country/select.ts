@@ -1,5 +1,11 @@
 import { countriesTable } from "@schema";
-import { Country, CountryEnumType, countrySchema } from "@country-entity";
+import {
+  ClientCountry,
+  clientCountrySchema,
+  Country,
+  CountryEnumType,
+  countrySchema,
+} from "@country-entity";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 
@@ -40,7 +46,7 @@ export const getCountryByCode = async (
   });
 };
 
-export const selectAllCountries = async (): Promise<Country[]> => {
+export const selectAllCountries = async (): Promise<ClientCountry[]> => {
   const countriesTemplate = await db().query.countriesTable.findMany({
     with: {
       countriesToCurrencies: {
@@ -61,7 +67,7 @@ export const selectAllCountries = async (): Promise<Country[]> => {
     },
   });
   return countriesTemplate.map((countryTemplate) =>
-    countrySchema.parse({
+    clientCountrySchema.parse({
       ...countryTemplate,
       currencies: countryTemplate.countriesToCurrencies
         .map((c) => c.currency)

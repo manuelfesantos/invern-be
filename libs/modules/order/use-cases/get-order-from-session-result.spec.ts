@@ -100,7 +100,8 @@ describe("getOrderFromSessionResult", () => {
   it("should get order from session result without userId", async () => {
     const paymentDraft = {
       paymentId,
-      amount: 1,
+      grossAmount: 1,
+      netAmount: 2,
       state: "draft" as const,
       type: "draft" as const,
     };
@@ -146,7 +147,7 @@ describe("getOrderFromSessionResult", () => {
   it("should get order from session result with userId", async () => {
     const paymentDraft = {
       paymentId,
-      amount: 1,
+      grossAmount: 1,
       state: "draft" as const,
       type: "draft" as const,
     };
@@ -214,7 +215,7 @@ describe("getOrderFromSessionResult", () => {
   it("should not return order if getOrderById does not return an order", async () => {
     const paymentDraft = {
       paymentId,
-      amount: 1,
+      grossAmount: 1,
       state: "draft" as const,
       type: "draft" as const,
     };

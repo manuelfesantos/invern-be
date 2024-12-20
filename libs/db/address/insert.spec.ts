@@ -1,9 +1,13 @@
 import { insertAddress } from "./insert";
 import * as DB from "@db";
-import * as Crypto from "@crypto-utils";
+import * as Select from "./select";
 
 jest.mock("@crypto-utils", () => ({
-  getRandomUUID: jest.fn().mockReturnValue("addressId"),
+  encryptAddress: jest.fn().mockReturnValue("existingAddressId"),
+}));
+
+jest.mock("./select", () => ({
+  addressExists: jest.fn(),
 }));
 
 jest.mock("@db", () => ({
@@ -12,7 +16,7 @@ jest.mock("@db", () => ({
       values: jest.fn().mockReturnValue({
         returning: jest.fn().mockReturnValue([
           {
-            addressId: "addressId",
+            addressId: "newAddressId",
           },
         ]),
       }),
@@ -33,16 +37,24 @@ const FIRST_ELEMENT = 0;
 
 describe("insertAddress", () => {
   const dbSpy = jest.spyOn(DB, "db");
-  const getRandomUUIDSpy = jest.spyOn(Crypto, "getRandomUUID");
+  const addressExistsSpy = jest.spyOn(Select, "addressExists");
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it("should insert an address", async () => {
+  it("should insert an address if address does not exist yet", async () => {
+    addressExistsSpy.mockResolvedValueOnce(false);
     const result = await insertAddress(address);
     expect(result).toHaveLength(ONE_ELEMENT);
     expect(result[FIRST_ELEMENT]).toHaveProperty("addressId");
-    expect(result[FIRST_ELEMENT].addressId).toEqual("addressId");
+    expect(result[FIRST_ELEMENT].addressId).toEqual("newAddressId");
     expect(dbSpy).toHaveBeenCalled();
-    expect(getRandomUUIDSpy).toHaveBeenCalled();
+  });
+  it("should return the existing addressId if the address already exists", async () => {
+    addressExistsSpy.mockResolvedValueOnce(true);
+    const result = await insertAddress(address);
+    expect(result).toHaveLength(ONE_ELEMENT);
+    expect(result[FIRST_ELEMENT]).toHaveProperty("addressId");
+    expect(result[FIRST_ELEMENT].addressId).toEqual("existingAddressId");
+    expect(dbSpy).not.toHaveBeenCalled();
   });
 });

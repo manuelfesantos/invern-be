@@ -8,6 +8,7 @@ import {
 import { relations } from "drizzle-orm";
 
 const DEFAULT_VERSION = 1;
+const VALUE_ZERO = 0;
 
 //-----------------------------------SCHEMA-----------------------------------//
 
@@ -118,7 +119,7 @@ export const currenciesTable = sqliteTable("currencies", {
 export const taxesTable = sqliteTable("taxes", {
   taxId: text("taxId").primaryKey(),
   name: text("name").notNull(),
-  amount: int("amount"),
+  rate: int("rate"),
   countryCode: text("countryId")
     .notNull()
     .references(() => countriesTable.code, {
@@ -172,7 +173,8 @@ export const paymentsTable = sqliteTable("payments", {
   state: text("state", {
     enum: ["draft", "succeeded", "canceled", "created", "processing", "failed"],
   }).notNull(),
-  amount: int("amount").notNull(),
+  netAmount: int("netAmount").notNull().default(VALUE_ZERO),
+  grossAmount: int("grossAmount").notNull(),
 });
 
 export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
