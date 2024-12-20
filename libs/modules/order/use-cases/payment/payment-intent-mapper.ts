@@ -11,6 +11,7 @@ import { errors } from "@error-handling-utils";
 import { z } from "zod";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { withRetry } from "./utils/retry-payment";
 
 const paymentIntentEventMap = {
   "payment_intent.created": getPaymentFromPaymentIntentCreatedEvent,
@@ -58,5 +59,8 @@ export const mapPaymentIntentEvent = async (
 
   logger().addData({ paymentId: paymentIntent.id });
 
-  return await paymentIntentEventMap[paymentIntentType](paymentIntent);
+  return await withRetry(
+    paymentIntent,
+    paymentIntentEventMap[paymentIntentType],
+  );
 };
