@@ -13,7 +13,7 @@ jest.mock("@db", () => ({
               paymentId: "1",
               state: "succeeded",
               type: "card",
-              amount: 100,
+              grossAmount: 100,
             },
           ]),
         }),
@@ -22,7 +22,7 @@ jest.mock("@db", () => ({
   }),
 }));
 
-describe("upadatePayment", () => {
+describe("updatePayment", () => {
   const setSpy = jest.spyOn(DB.db().update(paymentsTable), "set");
   beforeEach(() => {
     jest.clearAllMocks();
@@ -32,20 +32,20 @@ describe("upadatePayment", () => {
     const paymentId = "1";
     const state = "succeeded";
     const type = "card";
-    const amount = 100;
-    const result = await updatePayment(paymentId, { state, type, amount });
+    const grossAmount = 100;
+    const result = await updatePayment(paymentId, { state, type, grossAmount });
     expect(result).toEqual([
       {
         paymentId: "1",
         state: "succeeded",
         type: "card",
-        amount: 100,
+        grossAmount: 100,
       },
     ]);
     expect(setSpy).toHaveBeenCalledWith({
       state: "succeeded",
       type: "card",
-      amount: 100,
+      grossAmount: 100,
     });
   });
 });

@@ -7,7 +7,11 @@ import {
   getOrderById,
   insertOrder,
 } from "@order-db";
-import { getPaymentById, insertPaymentReturningId } from "@payment-db";
+import {
+  getPaymentById,
+  insertPaymentReturningId,
+  updatePayment,
+} from "@payment-db";
 import { getPaymentFromSessionResult } from "@payment-entity";
 import { ClientOrder, clientOrderSchema } from "@order-entity";
 import { errors } from "@error-handling-utils";
@@ -27,9 +31,10 @@ export const getOrderFromSessionResult = async (
   if (orderAlreadyExists) {
     throw errors.ORDER_ALREADY_EXISTS();
   }
-  const [{ addressId }] = await insertAddress({
-    ...validateStripeAddress(sessionResult.customer_details?.address),
-  });
+
+  const [{ addressId }] = await insertAddress(
+    validateStripeAddress(sessionResult.customer_details?.address),
+  );
 
   const payment = getPaymentFromSessionResult(sessionResult);
 
@@ -37,6 +42,8 @@ export const getOrderFromSessionResult = async (
 
   if (!paymentExists) {
     await insertPaymentReturningId(payment);
+  } else {
+    await updatePayment(payment.paymentId, { netAmount: payment.netAmount });
   }
 
   const { clientOrderId } = sessionResult.metadata ?? {};

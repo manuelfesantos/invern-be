@@ -8,7 +8,7 @@ const insertPayment: InsertPayment = {
   paymentId: "1",
   state: "succeeded",
   type: "card",
-  amount: 100,
+  grossAmount: 100,
 };
 
 const payment = {

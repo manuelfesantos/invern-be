@@ -10,3 +10,7 @@ export const getAddressById = async (
     where: eq(addressesTable.addressId, id),
   });
 };
+
+export const addressExists = async (id: string): Promise<boolean> => {
+  return Boolean(await getAddressById(id));
+};

@@ -23,7 +23,8 @@ export const clientOrdersMock: ClientOrder[] = [
       postalCode: "1",
     },
     payment: {
-      amount: 1,
+      grossAmount: 1,
+      netAmount: 2,
       createdAt: "1",
       state: "succeeded",
       type: "card",
@@ -48,7 +49,8 @@ export const clientOrdersMock: ClientOrder[] = [
       postalCode: "2",
     },
     payment: {
-      amount: 2,
+      grossAmount: 3,
+      netAmount: 4,
       createdAt: "2",
       state: "succeeded",
       type: "card",
@@ -77,7 +79,8 @@ export const ordersMock: Order[] = [
       postalCode: "1",
     },
     payment: {
-      amount: 1,
+      grossAmount: 1,
+      netAmount: 2,
       createdAt: "1",
       state: "succeeded",
       type: "card",
@@ -103,7 +106,8 @@ export const ordersMock: Order[] = [
       postalCode: "2",
     },
     payment: {
-      amount: 2,
+      grossAmount: 2,
+      netAmount: 3,
       createdAt: "2",
       state: "succeeded",
       type: "card",

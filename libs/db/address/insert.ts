@@ -1,7 +1,8 @@
 import { InsertAddress } from "@address-entity";
 import { addressesTable } from "@schema";
 import { db } from "@db";
-import { getRandomUUID } from "@crypto-utils";
+import { encryptAddress } from "@crypto-utils";
+import { addressExists } from "./select";
 
 export const insertAddress = async (
   address: InsertAddress,
@@ -10,9 +11,16 @@ export const insertAddress = async (
     addressId: string;
   }[]
 > => {
+  const addressId = encryptAddress(address);
+  const addressAlreadyExists = await addressExists(addressId);
+
+  if (addressAlreadyExists) {
+    return [{ addressId }];
+  }
+
   const insertAddress = {
     ...address,
-    addressId: getRandomUUID(),
+    addressId,
   };
   return db().insert(addressesTable).values(insertAddress).returning({
     addressId: addressesTable.addressId,

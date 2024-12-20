@@ -28,7 +28,7 @@ jest.mock("@db", () => ({
               {
                 taxId: "1",
                 name: "name",
-                amount: 15,
+                rate: 15,
               },
             ],
           },
@@ -49,7 +49,7 @@ jest.mock("@db", () => ({
             {
               taxId: "2",
               name: "name",
-              amount: 15,
+              rate: 15,
             },
           ],
         }),
@@ -79,9 +79,8 @@ describe("get", () => {
         ],
         taxes: [
           {
-            taxId: "1",
             name: "name",
-            amount: 15,
+            rate: 15,
           },
         ],
       });
@@ -143,7 +142,7 @@ describe("get", () => {
           {
             taxId: "2",
             name: "name",
-            amount: 15,
+            rate: 15,
           },
         ],
       });
@@ -155,7 +154,7 @@ describe("get", () => {
       findFirstSpy.mockReturnValue(
         undefined as unknown as SQLiteRelationalQuery<
           "async",
-          { name: string; code: CountryEnumType }
+          { name: string; code: CountryEnumType } | undefined
         >,
       );
       const result = await getCountryByCode(countryCode);
