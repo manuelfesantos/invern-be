@@ -32,6 +32,7 @@ export const checkout: ProtectedModuleFunction = async (
   userId?: string,
   cartId?: string,
   body?: unknown,
+  origin?: string,
 ): Promise<Response> => {
   let lineItems: LineItem[] = [];
   let countryCode: CountryEnumType;
@@ -63,7 +64,7 @@ export const checkout: ProtectedModuleFunction = async (
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(lineItems, country);
+  const session = await createCheckoutSession(lineItems, country, origin);
 
   const { url, expires_at, id, created } = session;
 

@@ -53,7 +53,7 @@ describe("getCart", () => {
     getCartByIdSpy.mockResolvedValue(userMock.cart as Cart);
     const response = await getCart(tokens, remember, {}, "cartId");
     const expectedResponse = successResponse.OK("success getting cart", {
-      cart: toCartDTO(userMock.cart as Cart),
+      ...toCartDTO(userMock.cart as Cart),
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);
@@ -62,9 +62,7 @@ describe("getCart", () => {
   it("should get cart from line items", async () => {
     const response = await getCart(tokens, remember, requestedProductsMock);
     const expectedResponse = successResponse.OK("success getting cart", {
-      cart: {
-        products: lineItemsMock,
-      },
+      products: lineItemsMock,
       accessToken: tokens.accessToken,
     });
     await compareResponses(response, expectedResponse);

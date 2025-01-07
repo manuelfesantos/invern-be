@@ -31,9 +31,7 @@ export const getCart: ProtectedModuleFunction = async (
     return protectedSuccessResponse.OK(
       tokens,
       "success getting cart",
-      {
-        cart: toCartDTO(cart),
-      },
+      toCartDTO(cart),
       remember,
     );
   }
@@ -48,9 +46,7 @@ export const getCart: ProtectedModuleFunction = async (
     tokens,
     "success getting cart",
     {
-      cart: {
-        products: mapProductsToLineItems(products, lineItems),
-      },
+      products: mapProductsToLineItems(products, lineItems),
     },
     remember,
   );

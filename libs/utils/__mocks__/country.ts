@@ -13,7 +13,7 @@ export const countriesMock: Country[] = [
     ],
     taxes: [
       {
-        taxId: "1",
+        id: "1",
         name: "VAT",
         rate: 0.15,
       },
@@ -31,7 +31,7 @@ export const countriesMock: Country[] = [
     ],
     taxes: [
       {
-        taxId: "2",
+        id: "2",
         name: "VAT",
         rate: 0.15,
       },

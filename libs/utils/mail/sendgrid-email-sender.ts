@@ -1,4 +1,3 @@
-import { Response } from "undici-types";
 import { stringifyObject } from "@string-utils";
 
 let sendGridApiKey: string = "";

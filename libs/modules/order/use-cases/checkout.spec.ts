@@ -130,6 +130,7 @@ describe("checkout", () => {
     expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
       lineItemsMock,
       countryMock,
+      undefined,
     );
   });
   it("should create checkout session from logged in user", async () => {
@@ -158,6 +159,43 @@ describe("checkout", () => {
     expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
       lineItemsMock,
       countryMock,
+      undefined,
+    );
+  });
+  it("should create checkout session with redirect host as origin if origin header is provided", async () => {
+    getCartByIdSpy.mockResolvedValueOnce({
+      id: cartId,
+      products: lineItemsMock,
+    });
+    validateCartIdSpy.mockResolvedValueOnce();
+    createCheckoutSessionSpy.mockResolvedValueOnce({
+      url: "123",
+    } as StripeCheckoutSessionResponse);
+    const response = await checkout(
+      tokens,
+      remember,
+      userId,
+      cartId,
+      {
+        products: requestedProducts,
+        countryCode: CountryEnum.PT,
+      },
+      "origin",
+    );
+    const expectedResponse = protectedSuccessResponse.OK(
+      tokens,
+      "checkout session created",
+      {
+        url: "123",
+      },
+    );
+    await compareResponses(response, expectedResponse);
+    expect(getCartByIdSpy).toHaveBeenCalledWith(cartId);
+    expect(validateCartIdSpy).toHaveBeenCalledWith(cartId);
+    expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
+      lineItemsMock,
+      countryMock,
+      "origin",
     );
   });
   it("should throw error if cart id is invalid", async () => {
@@ -222,6 +260,7 @@ describe("checkout", () => {
     expect(createCheckoutSessionSpy).toHaveBeenCalledWith(
       lineItemsMock,
       countryMock,
+      undefined,
     );
   });
   it("should throw error if any line item has more quantity than stock", async () => {

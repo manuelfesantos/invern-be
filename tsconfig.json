@@ -16,6 +16,7 @@
     "paths": {
       "@address-db": ["libs/db/address"],
       "@address-entity": ["libs/entities/address"],
+      "@address-module": ["libs/modules/address"],
       "@auth-utils": ["libs/utils/auth"],
       "@cart-db": ["libs/db/cart"],
       "@cart-entity": ["libs/entities/cart"],
