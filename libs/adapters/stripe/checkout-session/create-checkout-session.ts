@@ -4,7 +4,7 @@ import { Stripe } from "stripe";
 import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
-import { frontendHost } from "@http-utils";
+import { frontendHost, getStripeEnv } from "@http-utils";
 import { Country } from "@country-entity";
 
 export const createCheckoutSession = async (
@@ -22,6 +22,11 @@ export const createCheckoutSession = async (
     billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
+    payment_intent_data: {
+      metadata: {
+        stripeEnv: getStripeEnv(),
+      },
+    },
     success_url: `${origin || frontendHost()}/order?id=${clientId}`,
     cancel_url: `${origin || frontendHost()}/cart`,
     line_items: lineItems.map((product) => {
@@ -39,6 +44,7 @@ export const createCheckoutSession = async (
       };
     }),
     metadata: {
+      stripeEnv: getStripeEnv(),
       clientId,
     },
   });

@@ -10,7 +10,7 @@ import { HttpMethodEnum } from "@http-entity";
 import { initAuthSecretClient } from "@kv-adapter";
 import { setSecrets } from "@jwt-utils";
 import { withLogger } from "@logger-utils";
-import { setHosts } from "@http-utils";
+import { setHosts, setStripeEnv } from "@http-utils";
 import {
   initZoneId,
   initCacheApiKey,
@@ -53,6 +53,7 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   initZoneId(env.ZONE_ID);
   initCacheApiKey(env.CACHE_API_KEY);
   initCacheApiEmail(env.CACHE_API_EMAIL);
+  setStripeEnv(env.STRIPE_ENV);
   stockClient.init(env.STOCK_BUCKET);
   countriesClient.init(env.COUNTRIES_BUCKET);
   logger.addData({

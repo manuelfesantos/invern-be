@@ -6,12 +6,11 @@ import {
   getPaymentFromPaymentIntentProcessingEvent,
   getPaymentFromPaymentIntentSucceededEvent,
 } from "@order-module";
-import { isStripeEvent, isStripePaymentIntent } from "@stripe-entity";
-import { errors } from "@error-handling-utils";
 import { z } from "zod";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { withRetry } from "./utils/retry-payment";
+import Stripe from "stripe";
 
 const paymentIntentEventMap = {
   "payment_intent.created": getPaymentFromPaymentIntentCreatedEvent,
@@ -36,21 +35,10 @@ const paymentIntentTypeSchema = z.enum(
 );
 
 export const mapPaymentIntentEvent = async (
-  event: unknown,
+  paymentIntent: Stripe.PaymentIntent,
+  eventType: Stripe.Event.Type,
 ): Promise<Payment> => {
-  if (!isStripeEvent(event)) {
-    throw errors.INVALID_PAYLOAD("Payload is not a Stripe Event");
-  }
-
-  const paymentIntent = event.data.object;
-
-  if (!isStripePaymentIntent(paymentIntent)) {
-    throw errors.INVALID_PAYLOAD(
-      "Payload is not a Stripe Payment Intent Event",
-    );
-  }
-
-  const paymentIntentType = paymentIntentTypeSchema.parse(event.type);
+  const paymentIntentType = paymentIntentTypeSchema.parse(eventType);
 
   logger().info(
     `Payment Intent Type: ${paymentIntentType}`,

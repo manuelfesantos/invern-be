@@ -6,11 +6,9 @@ import {
   stripeCheckoutPaymentIntentResultFailedEventMock,
   stripeCheckoutPaymentIntentResultProcessingEventMock,
   stripeCheckoutPaymentIntentResultSucceededEventMock,
-  stripeCheckoutPaymentIntentResultSucceededMock,
-  stripeCheckoutSessionResultEventmock,
 } from "@mocks-utils";
 import { Payment, PaymentIntentState } from "@payment-entity";
-import { errors } from "@error-handling-utils";
+import { PaymentIntent } from "@stripe-entity";
 
 jest.mock("./get-payment-from-payment-intent", () => ({
   getPaymentFromPaymentIntentSucceededEvent: jest.fn(),
@@ -90,25 +88,12 @@ describe("paymentIntentMapper", () => {
         type: "card" as const,
       };
       spy.mockResolvedValueOnce(payment);
-      const result = await mapPaymentIntentEvent(event);
+      const result = await mapPaymentIntentEvent(
+        event.data.object as PaymentIntent,
+        event.type,
+      );
 
       expect(result).toEqual(payment);
     },
   );
-  it("should throw error if event is not a stripe event", async () => {
-    await expect(
-      async () =>
-        await mapPaymentIntentEvent(
-          stripeCheckoutPaymentIntentResultSucceededMock,
-        ),
-    ).rejects.toEqual(errors.INVALID_PAYLOAD("Payload is not a Stripe Event"));
-  });
-  it("should throw error if event is not a stripe payment intent event", async () => {
-    await expect(
-      async () =>
-        await mapPaymentIntentEvent(stripeCheckoutSessionResultEventmock),
-    ).rejects.toEqual(
-      errors.INVALID_PAYLOAD("Payload is not a Stripe Payment Intent Event"),
-    );
-  });
 });
