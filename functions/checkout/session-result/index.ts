@@ -4,7 +4,7 @@ import {
   prepareError,
   successResponse,
 } from "@response-entity";
-import { getBodyFromRequest } from "@http-utils";
+import { getBodyFromRequest, isStripeEnvValid } from "@http-utils";
 import { sendEmail } from "@mail-utils";
 import {
   isStripeEvent,
@@ -35,6 +35,10 @@ export const onRequest: PagesFunction = async (context) => {
     if (isStripeSessionExpiredEvent(body)) {
       const { object: sessionEvent } = body.data;
 
+      if (!isStripeEnvValid(sessionEvent)) {
+        return successResponse.OK("Unsupported event, ignoring request");
+      }
+
       logger().addData({
         sessionExpired: stringifyObject(body),
       });
@@ -49,6 +53,10 @@ export const onRequest: PagesFunction = async (context) => {
     }
 
     const { object: sessionEvent } = body.data;
+
+    if (!isStripeEnvValid(sessionEvent)) {
+      return successResponse.OK("Unsupported event, ignoring request");
+    }
 
     logger().addData({
       checkoutSessionResult: stringifyObject(body),
