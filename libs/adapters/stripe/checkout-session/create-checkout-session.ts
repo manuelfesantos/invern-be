@@ -10,6 +10,7 @@ import { Country } from "@country-entity";
 export const createCheckoutSession = async (
   lineItems: LineItem[],
   country: Country,
+  origin?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
@@ -21,8 +22,8 @@ export const createCheckoutSession = async (
     billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
-    success_url: `${frontendHost()}/order?id=${clientId}`,
-    cancel_url: `${frontendHost()}/cart`,
+    success_url: `${origin || frontendHost()}/order?id=${clientId}`,
+    cancel_url: `${origin || frontendHost()}/cart`,
     line_items: lineItems.map((product) => {
       return {
         price_data: {

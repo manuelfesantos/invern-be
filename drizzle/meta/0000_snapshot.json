@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d3a1c1be-4bd4-4a5b-9609-c4680fa1d64a",
+  "id": "58481a1e-2330-429a-b211-01c663be440e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
@@ -25,7 +25,7 @@
           "name": "line2",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "postalCode": {

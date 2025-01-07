@@ -37,7 +37,9 @@ export const onRequest: PagesFunction<Env> = async ({
       return errorResponse.NOT_FOUND("product not found");
     }
 
-    return successResponse.OK("success getting stock", response.data);
+    return successResponse.OK("success getting stock", response.data, {
+      "Access-Control-Allow-Origin": env.FRONTEND_HOST,
+    });
   } catch (error) {
     return generateErrorResponse(error);
   }

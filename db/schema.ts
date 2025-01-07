@@ -156,7 +156,7 @@ export const countriesToCurrenciesTable = sqliteTable(
 export const addressesTable = sqliteTable("addresses", {
   id: text("id").primaryKey(),
   line1: text("line1").notNull(),
-  line2: text("line2").notNull(),
+  line2: text("line2"),
   postalCode: text("postalCode").notNull(),
   city: text("city").notNull(),
   country: text("countryId")

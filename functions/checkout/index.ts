@@ -20,12 +20,14 @@ export const onRequest: PagesFunction<Env> = async (
       await getCredentials(headers);
 
     const body = await getBodyFromRequest(request);
+    const origin = request.headers.get("origin") || undefined;
     return await checkout(
       { refreshToken, accessToken },
       remember,
       userId,
       cartId,
       body,
+      origin,
     );
   } catch (error) {
     return generateErrorResponse(error);
