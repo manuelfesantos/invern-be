@@ -10,8 +10,13 @@ export const insertAddressSchema = createInsertSchema(addressesTable).omit({
 });
 
 export const addressSchema = baseAddressSchema
-  .omit({ country: true })
-  .merge(z.object({ country: countrySchema }));
+  .omit({ country: true, line2: true })
+  .merge(
+    z.object({
+      country: countrySchema,
+      line2: z.string().optional().nullable(),
+    }),
+  );
 
 export const clientAddressSchema = addressSchema.omit({ country: true }).merge(
   z.object({
