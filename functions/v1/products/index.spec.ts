@@ -19,6 +19,12 @@ import { ZodError } from "zod";
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  localLogger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
 jest.mock("@product-module", () => ({

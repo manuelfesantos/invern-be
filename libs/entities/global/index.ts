@@ -32,13 +32,13 @@ export const urlSchema = (name: string): ZodString =>
 export const positiveNumberSchema = (name: string): ZodNumber =>
   z
     .number({ required_error: `${name} is required` })
-    .positive({ message: `${name} must be a positive number` });
+    .nonnegative({ message: `${name} must not be a negative number` });
 
 export const positiveIntegerSchema = (name: string): ZodNumber =>
   z
     .number({ required_error: `${name} is required` })
     .int({ message: `${name} must be an integer` })
-    .positive({ message: `${name} must be a positive number` });
+    .nonnegative({ message: `${name} must be a positive number` });
 
 export const integerSchema = (name: string): ZodNumber =>
   z

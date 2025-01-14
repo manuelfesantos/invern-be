@@ -37,6 +37,12 @@ jest.mock("@http-utils", () => ({
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  localLogger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
 jest.mock("cookie", () => ({
@@ -106,12 +112,12 @@ describe("onRequest", () => {
   });
 
   it("should return error if body is invalid", async () => {
-    getBodyFromRequestSpy.mockRejectedValueOnce(
-      new Error("invalid JSON payload"),
-    );
+    const error = new Error("invalid JSON payload");
+    Object.assign(error, { cause: "UNABLE_TO_PARSE_BODY" });
+    getBodyFromRequestSpy.mockRejectedValueOnce(error);
     const response = await onRequest(POSTEventMock);
     const expectedResponse = errorResponse.BAD_REQUEST(
-      prepareError("invalid JSON payload"),
+      prepareError("invalid JSON payload", "UNABLE_TO_PARSE_BODY"),
     );
     expect(getConfigSpy).not.toHaveBeenCalled();
     await compareErrorResponses(response, expectedResponse);

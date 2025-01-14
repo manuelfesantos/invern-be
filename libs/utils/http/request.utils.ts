@@ -6,10 +6,19 @@ const QUERY_INDEX = 1;
 export const getBodyFromRequest = async (
   request: Request,
 ): Promise<unknown> => {
-  return request.method === HttpMethodEnum.POST ||
-    request.method === HttpMethodEnum.PUT
-    ? request.json()
-    : undefined;
+  try {
+    return request.method === HttpMethodEnum.POST ||
+      request.method === HttpMethodEnum.PUT
+      ? request.json()
+      : undefined;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw {
+        ...error,
+        cause: "UNABLE_TO_PARSE_BODY",
+      };
+    }
+  }
 };
 
 export const getQueryFromUrl = (url: string): URLSearchParams | null => {
@@ -21,6 +30,7 @@ let feHost: string;
 let stHost: string;
 let ctHost: string;
 let stripeEnv: string;
+let env: string;
 
 export const setHosts = (
   frontendHost: string,
@@ -61,6 +71,24 @@ export const getStripeEnv = (): string => {
     throw new Error("Stripe Environment variable not setup!");
   }
   return stripeEnv;
+};
+
+export const setEnv = (newEnv: string): void => {
+  env = newEnv;
+};
+
+export const getEnv = (): string => {
+  if (!env) {
+    throw new Error("Env is not defined!");
+  }
+  return env;
+};
+
+export const isLocalEnv = (): boolean => {
+  if (!env) {
+    throw new Error("Env is not defined!");
+  }
+  return env === "local";
 };
 
 export const isStripeEnvValid = (

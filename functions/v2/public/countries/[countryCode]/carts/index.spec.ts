@@ -25,6 +25,12 @@ jest.mock("@cart-module", () => ({
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  localLogger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
 jest.mock("@http-utils", () => ({
@@ -134,10 +140,12 @@ describe("onRequest", () => {
         },
       },
     };
-    getBodyFromRequestSpy.mockRejectedValueOnce(new Error("invalid JSON"));
+    const error = new Error("invalid JSON");
+    Object.assign(error, { cause: "UNABLE_TO_PARSE_BODY" });
+    getBodyFromRequestSpy.mockRejectedValueOnce(error);
     const response = await onRequest(event);
     const expectedResponse = errorResponse.BAD_REQUEST(
-      prepareError("invalid JSON"),
+      prepareError("invalid JSON", "UNABLE_TO_PARSE_BODY"),
     );
     await compareErrorResponses(response, expectedResponse);
   });

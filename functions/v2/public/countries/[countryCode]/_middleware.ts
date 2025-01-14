@@ -15,14 +15,7 @@ const protectedEndpoints = [
   "users",
 ];
 
-const getContext: PagesFunction<Env> = async ({
-  request,
-  params,
-  next,
-  data,
-}) => {
-  const { countryCode } = params;
-
+const getContext: PagesFunction<Env> = async ({ request, next, data }) => {
   const path = request.url
     .split("invernspirit.com/v2/public/countries/")
     .at(SECOND_INDEX)
@@ -31,7 +24,7 @@ const getContext: PagesFunction<Env> = async ({
   if (!path) {
     return errorResponse.BAD_REQUEST("No endpoint provided after countries");
   }
-  const [, endpoint] = path;
+  const [countryCode, endpoint] = path;
 
   if (protectedEndpoints.includes(endpoint)) {
     const { headers } = request;
@@ -42,7 +35,9 @@ const getContext: PagesFunction<Env> = async ({
   }
 
   try {
-    data.country = await getCountryByCode(countryEnumSchema.parse(countryCode));
+    data.country = await getCountryByCode(
+      countryEnumSchema.parse(countryCode.toUpperCase()),
+    );
     return next();
   } catch (error) {
     return generateErrorResponse(error);
