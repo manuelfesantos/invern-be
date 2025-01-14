@@ -22,13 +22,14 @@ export const getCredentials = async (
 }> => {
   try {
     const { token, refreshToken } = getTokensFromHeaders(headers);
+
     if (!refreshToken || !token) {
       throw errors.UNAUTHORIZED();
     }
 
     const tokenIsValid = await verifyAccessToken(token);
     if (tokenIsValid) {
-      const tokenPayload = decodeJwt(token);
+      const tokenPayload = await decodeJwt(token);
       if ("userId" in tokenPayload) {
         const { userId, cartId, remember } = tokenPayload;
 
@@ -42,7 +43,7 @@ export const getCredentials = async (
     if (!refreshTokenIsValid) {
       throw errors.UNAUTHORIZED();
     }
-    const refreshTokenPayload = decodeJwt(refreshToken);
+    const refreshTokenPayload = await decodeJwt(refreshToken);
     if ("userId" in refreshTokenPayload) {
       const { userId, cartId, remember } = refreshTokenPayload;
       const userAuth = await getAuthSecret(userId);

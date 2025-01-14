@@ -13,10 +13,11 @@ import {
 } from "@response-entity";
 import { onRequest } from "./index";
 import * as CartModule from "@cart-module";
-import * as JwtUtils from "@jwt-utils";
 import * as HttpUtils from "@http-utils";
 import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
+
+jest.mock("@jwt-utils");
 
 jest.mock("@cart-module", () => ({
   cartActionMapper: jest.fn(),
@@ -24,10 +25,6 @@ jest.mock("@cart-module", () => ({
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
-}));
-
-jest.mock("@jwt-utils", () => ({
-  getCredentials: jest.fn(),
 }));
 
 jest.mock("@http-utils", () => ({
@@ -38,7 +35,6 @@ jest.mock("@http-utils", () => ({
 
 describe("onRequest", () => {
   const cartActionMapperSpy = jest.spyOn(CartModule, "cartActionMapper");
-  const getCredentialsSpy = jest.spyOn(JwtUtils, "getCredentials");
   const getBodyFromRequestSpy = jest.spyOn(HttpUtils, "getBodyFromRequest");
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,27 +51,23 @@ describe("onRequest", () => {
       },
     };
     cartActionMapperSpy.mockResolvedValueOnce(
-      successResponse.OK("success getting cart", cartMock),
+      successResponse.OK("success getting carts", cartMock),
     );
-    getCredentialsSpy.mockResolvedValueOnce({
-      userId: "userId",
-      cartId: "cartId",
-      refreshToken: "refreshToken",
-    });
     getBodyFromRequestSpy.mockResolvedValueOnce({});
     const response = await onRequest(event);
     const expectedResponse = successResponse.OK(
-      "success getting cart",
+      "success getting carts",
       cartMock,
     );
     await compareResponses(response, expectedResponse);
     expect(cartActionMapperSpy).toHaveBeenCalledWith(
-      { refreshToken: "refreshToken" },
-      undefined,
+      { refreshToken: "refreshToken", accessToken: "" },
+      false,
       {},
       "add",
       "cartId",
       "userId",
+      {},
     );
   });
   it("should call cartActionMapper with remember", async () => {
@@ -90,31 +82,26 @@ describe("onRequest", () => {
       },
     };
     cartActionMapperSpy.mockResolvedValueOnce(
-      successResponse.OK("success getting cart", cartMock),
+      successResponse.OK("success getting carts", cartMock),
     );
-    getCredentialsSpy.mockResolvedValueOnce({
-      userId: "userId",
-      cartId: "cartId",
-      refreshToken: "refreshToken",
-      remember: true,
-    });
     getBodyFromRequestSpy.mockResolvedValueOnce({});
 
     const response = await onRequest(event);
 
     const expectedResponse = successResponse.OK(
-      "success getting cart",
+      "success getting carts",
       cartMock,
     );
     await compareResponses(response, expectedResponse);
 
     expect(cartActionMapperSpy).toHaveBeenCalledWith(
-      { refreshToken: "refreshToken" },
-      true,
+      { refreshToken: "refreshToken", accessToken: "" },
+      false,
       {},
       "add",
       "cartId",
       "userId",
+      {},
     );
   });
   it.each(["PUT", "DELETE", "GET", "PATCH"])(
@@ -154,26 +141,6 @@ describe("onRequest", () => {
     );
     await compareErrorResponses(response, expectedResponse);
   });
-  it("should return error if credentials throw error", async () => {
-    const event = {
-      ...POSTEventMock,
-      request: {
-        ...POSTEventMock.request,
-        headers: {
-          ...POSTEventMock.request.headers,
-          get: jest.fn(() => "add"),
-        },
-      },
-    };
-    getCredentialsSpy.mockRejectedValueOnce(
-      errors.UNAUTHORIZED("invalid credentials"),
-    );
-    const response = await onRequest(event);
-    const expectedResponse = errorResponse.UNAUTHORIZED(
-      prepareError("invalid credentials"),
-    );
-    await compareErrorResponses(response, expectedResponse);
-  });
   it.each([
     [errors.DATABASE_NOT_INITIALIZED(), "INTERNAL_SERVER_ERROR" as const],
     [
@@ -198,11 +165,6 @@ describe("onRequest", () => {
         },
       };
       cartActionMapperSpy.mockRejectedValueOnce(error);
-      getCredentialsSpy.mockResolvedValueOnce({
-        userId: "userId",
-        cartId: "cartId",
-        refreshToken: "refreshToken",
-      });
       getBodyFromRequestSpy.mockResolvedValueOnce({});
       const response = await onRequest(event);
       const expectedResponse = errorResponse[expectedCode](

@@ -79,7 +79,13 @@ describe("updateCart", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
-    expect(addToCartSpy).toHaveBeenCalledWith(tokens, remember, {}, "cartId");
+    expect(addToCartSpy).toHaveBeenCalledWith(
+      tokens,
+      remember,
+      {},
+      "cartId",
+      undefined,
+    );
   });
   it("should remove from cart if action is remove", async () => {
     removeFromCartSpy.mockResolvedValueOnce(
@@ -101,6 +107,7 @@ describe("updateCart", () => {
       remember,
       {},
       "cartId",
+      undefined,
     );
   });
   it("should merge cart if action is merge", async () => {
@@ -116,7 +123,13 @@ describe("updateCart", () => {
     );
     await compareResponses(response, expectedResponse);
     expect(validateCartIdSpy).toHaveBeenCalledWith("cartId");
-    expect(mergeCartSpy).toHaveBeenCalledWith(tokens, remember, {}, "cartId");
+    expect(mergeCartSpy).toHaveBeenCalledWith(
+      tokens,
+      remember,
+      {},
+      "cartId",
+      undefined,
+    );
   });
   it("should get cart if action is get", async () => {
     getCartSpy.mockResolvedValueOnce(
@@ -134,7 +147,13 @@ describe("updateCart", () => {
       cart: { cartId: "cartId" },
     });
     await compareResponses(response, expectedResponse);
-    expect(getCartSpy).toHaveBeenCalledWith(tokens, remember, {}, "cartId");
+    expect(getCartSpy).toHaveBeenCalledWith(
+      tokens,
+      remember,
+      {},
+      "cartId",
+      undefined,
+    );
     expect(validateCartIdSpy).not.toHaveBeenCalled();
     expect(addToCartSpy).not.toHaveBeenCalled();
     expect(removeFromCartSpy).not.toHaveBeenCalled();

@@ -1,5 +1,3 @@
-//@ts-expect-error - unable to import from @tsndr/cloudflare-worker-jwt
-import jwt from "@tsndr/cloudflare-worker-jwt";
 import { JWT, jwtSchema, UserJWT, userJwtSchema } from "@jwt-entity";
 import {
   getFutureDate,
@@ -14,18 +12,22 @@ export const signJwt = async (
   secretKey: string,
 ): Promise<string> =>
   base64Encode(
-    await jwt.sign({ ...payload }, secretKey, {
-      algorithm: "HS512",
-    }),
+    await import("@tsndr/cloudflare-worker-jwt").then((jwt) =>
+      jwt.sign({ ...payload }, secretKey, {
+        algorithm: "HS512",
+      }),
+    ),
   );
 
 export const verifyJwt = async (
   encodedToken: string,
   secretKey: string,
 ): Promise<boolean> =>
-  await jwt.verify(base64Decode(encodedToken), secretKey, {
-    algorithm: "HS512",
-  });
+  await import("@tsndr/cloudflare-worker-jwt").then((jwt) =>
+    jwt.verify(base64Decode(encodedToken), secretKey, {
+      algorithm: "HS512",
+    }),
+  );
 
 export const verifyAccessToken = async (
   encodedToken: string,
@@ -35,9 +37,13 @@ export const verifyRefreshToken = async (
   encodedToken: string,
 ): Promise<boolean> => await verifyJwt(encodedToken, getRefreshTokenSecret());
 
-export const decodeJwt = (encodedToken: string): UserJWT | JWT => {
+export const decodeJwt = async (
+  encodedToken: string,
+): Promise<UserJWT | JWT> => {
   const token = base64Decode(encodedToken);
-  const tokenPayload = jwt.decode(token).payload;
+  const tokenPayload = (await import("@tsndr/cloudflare-worker-jwt")).decode(
+    token,
+  ).payload;
   const userJwtAttempt = userJwtSchema.safeParse(tokenPayload);
   if (userJwtAttempt.success) {
     return userJwtAttempt.data;

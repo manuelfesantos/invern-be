@@ -13,6 +13,8 @@ import {
 } from "@response-entity";
 import { toCartDTO } from "@cart-entity";
 import { errors } from "@error-handling-utils";
+import { Country } from "@country-entity";
+import { extendCart } from "@price-utils";
 
 const getCartPayloadSchema = z.array(productIdAndQuantitySchema);
 const NO_QUANTITY = 0;
@@ -22,6 +24,7 @@ export const getCart: ProtectedModuleFunction = async (
   remember,
   body: unknown,
   cartId?: string,
+  country?: Country,
 ) => {
   if (cartId) {
     const cart = await getCartById(cartId);
@@ -31,7 +34,7 @@ export const getCart: ProtectedModuleFunction = async (
     return protectedSuccessResponse.OK(
       tokens,
       "success getting cart",
-      toCartDTO(cart),
+      country ? extendCart(cart, country) : toCartDTO(cart),
       remember,
     );
   }
@@ -42,12 +45,15 @@ export const getCart: ProtectedModuleFunction = async (
     getProductIdsFromLineItems(lineItems),
   );
 
+  const cart = {
+    id: "",
+    products: mapProductsToLineItems(products, lineItems),
+  };
+
   return protectedSuccessResponse.OK(
     tokens,
     "success getting cart",
-    {
-      products: mapProductsToLineItems(products, lineItems),
-    },
+    country ? extendCart(cart, country) : cart,
     remember,
   );
 };
