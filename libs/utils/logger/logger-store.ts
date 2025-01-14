@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { Logger } from "./honeycomb-logger";
 import { LoggerUseCase } from "@logger-entity";
 import { buildLogObject } from "./build-log-object";
+import { localLogger } from "./local-logger";
 
 const DEBUG_LEVEL = 20;
 const INFO_LEVEL = 30;
@@ -73,6 +74,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     logger.addData(
       buildLogObject(currentLog, INFO_LEVEL, message, useCase, data),
     );
+    localLogger.info(message, data);
     incrementCurrentLog();
   };
 
@@ -84,6 +86,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     logger.addData(
       buildLogObject(currentLog, DEBUG_LEVEL, message, useCase, data),
     );
+    localLogger.debug(message, data);
     incrementCurrentLog();
   };
 
@@ -95,6 +98,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     logger.addData(
       buildLogObject(currentLog, WARNING_LEVEL, message, useCase, data),
     );
+    localLogger.warn(message, data);
     incrementCurrentLog();
   };
 
@@ -106,6 +110,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     logger.addData(
       buildLogObject(currentLog, ERROR_LEVEL, message, useCase, data),
     );
+    localLogger.error(message, data);
     incrementCurrentLog();
   };
   const loggerInstance = (): LoggerInstance => {

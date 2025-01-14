@@ -2,6 +2,7 @@ import { z, ZodError } from "zod";
 import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 import { CustomError } from "@error-handling-utils";
+import { localLogger } from "@logger-utils";
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown, headers?: Record<string, string>) =>
@@ -48,8 +49,12 @@ export const errorResponse = {
     ),
 } as const;
 
-export const prepareError = (message: string): SimpleError => {
-  return simplifyError(new Error(message));
+export const prepareError = (message: string, cause?: string): SimpleError => {
+  const error = new Error(message);
+  if (cause) {
+    Object.assign(error, cause);
+  }
+  return simplifyError(error);
 };
 
 interface SimplifiedZodError {
@@ -72,22 +77,26 @@ export const generateErrorResponse = (
   headers?: Record<string, string>,
 ): Response => {
   if (error instanceof z.ZodError) {
-    return errorResponse.BAD_REQUEST(simplifyZodError(error), headers);
+    const zodError = simplifyZodError(error);
+    localLogger.error(zodError);
+    return errorResponse.BAD_REQUEST(zodError, headers);
   }
 
   if (error instanceof CustomError) {
-    return buildErrorResponse(
-      simplifyError(error),
-      Number(error.code),
-      headers,
-    );
+    const simplifiedError = simplifyError(error);
+    localLogger.error(simplifiedError);
+    return buildErrorResponse(simplifiedError, Number(error.code), headers);
   }
 
-  if (error instanceof Error && error.message.includes("JSON")) {
-    return errorResponse.BAD_REQUEST(simplifyError(error), headers);
+  if (error instanceof Error && error.cause === "UNABLE_TO_PARSE_BODY") {
+    const simplifiedError = simplifyError(error);
+    localLogger.error(simplifiedError);
+    return errorResponse.BAD_REQUEST(simplifiedError, headers);
   }
   if (error instanceof Error) {
-    return errorResponse.INTERNAL_SERVER_ERROR(simplifyError(error), headers);
+    const simplifiedError = simplifyError(error);
+    localLogger.error(simplifiedError);
+    return errorResponse.INTERNAL_SERVER_ERROR(simplifiedError, headers);
   }
 
   return errorResponse.INTERNAL_SERVER_ERROR(error, headers);

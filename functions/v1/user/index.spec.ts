@@ -22,6 +22,12 @@ import * as JwtUtils from "@jwt-utils";
 
 jest.mock("@logger-utils", () => ({
   logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  localLogger: {
+    info: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
 jest.mock("@user-module", () => ({
