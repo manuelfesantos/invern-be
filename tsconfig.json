@@ -53,6 +53,7 @@
       "@order-module": ["libs/modules/order"],
       "@payment-entity": ["libs/entities/payment"],
       "@payment-db": ["libs/db/payment"],
+      "@price-utils": ["libs/utils/price"],
       "@product-db": ["libs/db/product"],
       "@product-entity": ["libs/entities/product"],
       "@product-module": ["libs/modules/product"],

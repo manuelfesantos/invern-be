@@ -22,7 +22,11 @@ export const clientCountrySchema = baseCountrySchema.merge(
   }),
 );
 
-export const countryEnumSchema = z.enum(countriesTable.code.enumValues);
+export const countryEnumSchema = z.enum(countriesTable.code.enumValues, {
+  message: "Invalid Country",
+  required_error: "Country Code is Required",
+  invalid_type_error: "Country Code needs to be a string",
+});
 export const CountryEnum = countryEnumSchema.Enum;
 export type CountryEnumType = keyof typeof CountryEnum;
 

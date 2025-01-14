@@ -1,3 +1,5 @@
+import { Country } from "@country-entity";
+
 export interface Env {
   INVERN_DB: D1Database;
   HONEYCOMB_API_KEY: string;
@@ -18,5 +20,18 @@ export interface Env {
   ZONE_ID: string;
   ENV: string;
   SETUP_STOCK_SECRET: string;
+  INSERT_TEST_DATA_SECRET: string;
   SETUP_COUNTRIES_SECRET: string;
 }
+
+export type CountriesEndpointData = {
+  country: Country;
+};
+
+export type CountriesEndpointProtectedData = CountriesEndpointData & {
+  userId: string;
+  cartId: string;
+  accessToken: string;
+  refreshToken: string;
+  remember: boolean;
+};

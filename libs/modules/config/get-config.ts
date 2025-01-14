@@ -22,7 +22,7 @@ export const getConfig = async (
       response = await loggedOutResponse(country, userVersion);
     } else {
       const tokenIsValid = await verifyRefreshToken(refreshToken);
-      const tokenPayload = decodeJwt(refreshToken);
+      const tokenPayload = await decodeJwt(refreshToken);
       if ("userId" in tokenPayload && tokenIsValid) {
         response = await getLoggedInConfig(
           refreshToken,

@@ -13,6 +13,7 @@ jest.mock("@logger-utils", () => ({
 
 jest.mock("@cart-db", () => ({
   removeFromCart: jest.fn(),
+  getCartById: jest.fn(),
 }));
 
 jest.mock("@product-db", () => ({

@@ -62,6 +62,7 @@ describe("getCart", () => {
   it("should get cart from line items", async () => {
     const response = await getCart(tokens, remember, requestedProductsMock);
     const expectedResponse = successResponse.OK("success getting cart", {
+      id: "",
       products: lineItemsMock,
       accessToken: tokens.accessToken,
     });

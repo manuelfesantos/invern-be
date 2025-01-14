@@ -11,3 +11,4 @@ export const currencySchema = baseCurrencySchema;
 export const clientCurrencySchema = currencySchema.omit({ rateToEuro: true });
 export type Currency = z.infer<typeof currencySchema>;
 export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
+export type ClientCurrency = z.infer<typeof clientCurrencySchema>;

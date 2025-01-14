@@ -56,7 +56,7 @@ describe("getConfig", () => {
         loggedIn: true,
       }),
     );
-    decodeJwtSpy.mockReturnValueOnce(validUserToken);
+    decodeJwtSpy.mockResolvedValueOnce(validUserToken);
     verifyRefreshTokenSpy.mockResolvedValueOnce(true);
     const response = await getConfig(
       "refreshToken",
@@ -108,7 +108,7 @@ describe("getConfig", () => {
         loggedIn: false,
       }),
     );
-    decodeJwtSpy.mockReturnValueOnce(invalidUserToken);
+    decodeJwtSpy.mockResolvedValueOnce(invalidUserToken);
     verifyRefreshTokenSpy.mockResolvedValueOnce(true);
     const response = await getConfig(
       "refreshToken",
@@ -128,7 +128,7 @@ describe("getConfig", () => {
         loggedIn: false,
       }),
     );
-    decodeJwtSpy.mockReturnValueOnce(validUserToken);
+    decodeJwtSpy.mockResolvedValueOnce(validUserToken);
     verifyRefreshTokenSpy.mockResolvedValueOnce(false);
     const response = await getConfig(
       "refreshToken",

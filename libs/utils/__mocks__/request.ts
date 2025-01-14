@@ -1,27 +1,57 @@
 import { HttpMethodEnum } from "@http-entity";
+import { CountriesEndpointProtectedData, Env } from "@request-entity";
+import { undefined } from "zod";
+import { Country } from "@country-entity";
 
 // eslint-disable-next-line max-len
 const edgeRequestKeepAliveStatus: IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = 0;
 
 const country: Iso3166Alpha2Code = "PT";
 
-export const GETEventMock = {
-  data: {
-    honeycomb: {
-      tracer: {
-        addData: jest.fn(),
-      },
+const envMock: Env = {
+  INSERT_TEST_DATA_SECRET: "",
+  INVERN_DB: {} as D1Database,
+  REFRESH_TOKEN_SECRET: "",
+  SENDGRID_API_KEY: "",
+  SETUP_COUNTRIES_SECRET: "",
+  SETUP_STOCK_SECRET: "",
+  STOCK_BUCKET: {} as R2Bucket,
+  STOCK_HOST: "",
+  STRIPE_API_KEY: "",
+  TOKEN_SECRET: "",
+  ZONE_ID: "",
+  STRIPE_ENV: "",
+  ENV: "test",
+  COUNTRIES_BUCKET: {} as unknown as R2Bucket,
+  AUTH_KV: {} as unknown as KVNamespace<string>,
+  CACHE_API_EMAIL: "",
+  CACHE_API_KEY: "",
+  COUNTRIES_HOST: "",
+  FRONTEND_HOST: "",
+  HONEYCOMB_API_KEY: "",
+  HONEYCOMB_DATASET: "",
+};
+
+const dataMock: CountriesEndpointProtectedData & {
+  honeycomb: { tracer: { addData: () => void } };
+} = {
+  accessToken: "",
+  cartId: "cartId",
+  country: {} as unknown as Country,
+  honeycomb: {
+    tracer: {
+      addData: function () {},
     },
   },
+  refreshToken: "refreshToken",
+  remember: false,
+  userId: "userId",
+};
+
+export const GETEventMock = {
+  data: dataMock,
   env: {
-    INVERN_DB: {
-      batch: jest.fn(),
-      dump: jest.fn(),
-      exec: jest.fn(),
-      prepare: jest.fn(),
-    },
-    HONEYCOMB_API_KEY: "12345",
-    HONEYCOMB_DATASET: "12345",
+    ...envMock,
     ASSETS: {
       fetch: jest.fn(),
     },
@@ -123,22 +153,9 @@ export const GETEventMock = {
   waitUntil: jest.fn(),
 };
 export const POSTEventMock = {
-  data: {
-    honeycomb: {
-      tracer: {
-        addData: jest.fn(),
-      },
-    },
-  },
+  data: dataMock,
   env: {
-    INVERN_DB: {
-      batch: jest.fn(),
-      dump: jest.fn(),
-      exec: jest.fn(),
-      prepare: jest.fn(),
-    },
-    HONEYCOMB_API_KEY: "12345",
-    HONEYCOMB_DATASET: "12345",
+    ...envMock,
     ASSETS: {
       fetch: jest.fn(),
     },
@@ -240,22 +257,9 @@ export const POSTEventMock = {
   waitUntil: jest.fn(),
 };
 export const PUTEventMock = {
-  data: {
-    honeycomb: {
-      tracer: {
-        addData: jest.fn(),
-      },
-    },
-  },
+  data: dataMock,
   env: {
-    INVERN_DB: {
-      batch: jest.fn(),
-      dump: jest.fn(),
-      exec: jest.fn(),
-      prepare: jest.fn(),
-    },
-    HONEYCOMB_API_KEY: "12345",
-    HONEYCOMB_DATASET: "12345",
+    ...envMock,
     ASSETS: {
       fetch: jest.fn(),
     },
@@ -357,22 +361,9 @@ export const PUTEventMock = {
   waitUntil: jest.fn(),
 };
 export const DELETEEventMock = {
-  data: {
-    honeycomb: {
-      tracer: {
-        addData: jest.fn(),
-      },
-    },
-  },
+  data: dataMock,
   env: {
-    INVERN_DB: {
-      batch: jest.fn(),
-      dump: jest.fn(),
-      exec: jest.fn(),
-      prepare: jest.fn(),
-    },
-    HONEYCOMB_API_KEY: "12345",
-    HONEYCOMB_DATASET: "12345",
+    ...envMock,
     ASSETS: {
       fetch: jest.fn(),
     },

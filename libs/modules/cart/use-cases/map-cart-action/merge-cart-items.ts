@@ -6,12 +6,15 @@ import { mergeCartItemsBodySchema } from "./types/update-cart";
 import { mergeCart, getCartById } from "@cart-db";
 import { validateProductIds } from "@product-db";
 import { errors } from "@error-handling-utils";
+import { Country } from "@country-entity";
+import { extendCart } from "@price-utils";
 
 export const mergeCartItems: ProtectedModuleFunction = async (
   tokens,
   remember,
   body: unknown,
   cartId: string,
+  country?: Country,
 ): Promise<Response> => {
   const { products } = mergeCartItemsBodySchema.parse(body);
   if (!products.length) {
@@ -23,10 +26,11 @@ export const mergeCartItems: ProtectedModuleFunction = async (
   }
   await validateProductIds(products.map((product) => product.id));
   await mergeCart(cartId, products);
+  const newCart = await getCartById(cartId);
   return protectedSuccessResponse.OK(
     tokens,
     "cart merged",
-    undefined,
+    country ? extendCart(newCart, country) : newCart,
     remember,
   );
 };

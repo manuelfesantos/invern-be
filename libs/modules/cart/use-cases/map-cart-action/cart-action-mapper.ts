@@ -8,6 +8,7 @@ import { incrementUserVersion } from "@user-db";
 import { ProtectedModuleFunction } from "@response-entity";
 import { getCart } from "../get-cart";
 import { errors } from "@error-handling-utils";
+import { Country } from "@country-entity";
 
 const actionMapper = {
   [CartAction.add]: addProductToCart,
@@ -22,11 +23,12 @@ export const cartActionMapper: ProtectedModuleFunction = async (
   action: string,
   cartId?: string,
   userId?: string,
+  country?: Country,
 ): Promise<Response> => {
   const cartAction = cartActionSchema.parse(action);
 
   if (cartAction === CartAction.get) {
-    return await getCart(tokens, remember, body, cartId);
+    return await getCart(tokens, remember, body, cartId, country);
   }
 
   if (!cartId || !userId) {
@@ -39,6 +41,7 @@ export const cartActionMapper: ProtectedModuleFunction = async (
     remember,
     body,
     cartId,
+    country,
   );
 
   if (response.status === HttpStatusEnum.OK) {

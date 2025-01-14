@@ -69,7 +69,7 @@ describe("onRequest", () => {
     };
     getBodyFromRequestSpy.mockResolvedValueOnce(body);
     userActionMapperSpy.mockResolvedValueOnce(
-      successResponse.OK("success getting user", userMock),
+      successResponse.OK("success getting users", userMock),
     );
     getCredentialsSpy.mockResolvedValueOnce({
       userId: "userId",
@@ -77,7 +77,7 @@ describe("onRequest", () => {
       refreshToken: "refreshToken",
     });
     const expectedResponse = successResponse.OK(
-      "success getting user",
+      "success getting users",
       userMock,
     );
     const response = await onRequest(event);
@@ -98,17 +98,17 @@ describe("onRequest", () => {
       refreshToken: "refreshToken",
     });
     getUserSpy.mockResolvedValueOnce(
-      successResponse.OK("success getting user", userMock),
+      successResponse.OK("success getting users", userMock),
     );
     const expectedResponse = successResponse.OK(
-      "success getting user",
+      "success getting users",
       userMock,
     );
     const response = await onRequest(event);
     await compareResponses(response, expectedResponse);
     expect(getUserSpy).toHaveBeenCalledWith(
-      { refreshToken: "refreshToken" },
-      undefined,
+      { refreshToken: "refreshToken", accessToken: "" },
+      false,
       "userId",
     );
   });
@@ -130,17 +130,17 @@ describe("onRequest", () => {
       refreshToken: "refreshToken",
     });
     updateUserSpy.mockResolvedValueOnce(
-      successResponse.OK("success updating user", userMock),
+      successResponse.OK("success updating users", userMock),
     );
     const expectedResponse = successResponse.OK(
-      "success updating user",
+      "success updating users",
       userMock,
     );
     const response = await onRequest(event);
     await compareResponses(response, expectedResponse);
     expect(updateUserSpy).toHaveBeenCalledWith(
-      { refreshToken: "refreshToken" },
-      undefined,
+      { refreshToken: "refreshToken", accessToken: "" },
+      false,
       userMock,
       "email",
       "userId",
@@ -159,17 +159,17 @@ describe("onRequest", () => {
       refreshToken: "refreshToken",
     });
     deleteUserSpy.mockResolvedValueOnce(
-      successResponse.OK("success deleting user", userMock),
+      successResponse.OK("success deleting users", userMock),
     );
     const expectedResponse = successResponse.OK(
-      "success deleting user",
+      "success deleting users",
       userMock,
     );
     const response = await onRequest(event);
     await compareResponses(response, expectedResponse);
     expect(deleteUserSpy).toHaveBeenCalledWith(
-      { refreshToken: "refreshToken" },
-      undefined,
+      { refreshToken: "refreshToken", accessToken: "" },
+      false,
       "userId",
     );
   });
