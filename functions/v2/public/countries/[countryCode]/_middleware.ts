@@ -26,15 +26,14 @@ const getContext: PagesFunction<Env> = async ({ request, next, data }) => {
   }
   const [countryCode, endpoint] = path;
 
-  if (protectedEndpoints.includes(endpoint)) {
-    const { headers } = request;
-
-    const credentials = await getCredentials(headers);
-
-    Object.assign(data, credentials);
-  }
-
   try {
+    if (protectedEndpoints.includes(endpoint)) {
+      const { headers } = request;
+
+      const credentials = await getCredentials(headers);
+
+      Object.assign(data, credentials);
+    }
     data.country = await getCountryByCode(
       countryEnumSchema.parse(countryCode.toUpperCase()),
     );
