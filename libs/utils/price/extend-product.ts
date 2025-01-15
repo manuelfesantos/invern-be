@@ -1,10 +1,10 @@
 import {
   ExtendedProduct,
-  ExtendedProductDetails,
-  extendedProductDetailsSchema,
   extendedProductSchema,
+  ExtendedProductWithCollectionDetails,
+  extendedProductWithCollectionDetailsSchema,
   Product,
-  ProductDetails,
+  ProductWithCollectionDetails,
 } from "@product-entity";
 import { Country } from "@country-entity";
 import { getTaxedPrice } from "./utils/get-taxed-price";
@@ -27,14 +27,14 @@ export const extendProduct = (
 };
 
 export const extendProductDetails = (
-  product: ProductDetails,
+  product: ProductWithCollectionDetails,
   country: Country,
-): ExtendedProductDetails => {
+): ExtendedProductWithCollectionDetails => {
   const extendedTaxes = extendTaxes(product.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedProductDetailsSchema.parse({
+  return extendedProductWithCollectionDetailsSchema.parse({
     ...product,
     netPrice: product.priceInCents,
     grossPrice: product.priceInCents + taxedPrice,
