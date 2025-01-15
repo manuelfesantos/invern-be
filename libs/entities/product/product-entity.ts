@@ -8,7 +8,6 @@ import {
   uuidSchema,
 } from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
-import { clientCurrencySchema } from "@currency-entity";
 
 const priceDetailsSchema = z.object({
   netPrice: positiveIntegerSchema("product net price"),
@@ -78,7 +77,6 @@ export const extendedLineItemSchema = lineItemSchema
       netPrice: positiveIntegerSchema("line item net price"),
       grossPrice: positiveIntegerSchema("line item gross price"),
       taxes: extendedClientTaxSchema.array(),
-      currency: clientCurrencySchema,
     }),
   );
 

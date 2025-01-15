@@ -7,13 +7,7 @@ import { getCredentials } from "@jwt-utils";
 
 const SECOND_INDEX = 1;
 
-const protectedEndpoints = [
-  "addresses",
-  "carts",
-  "checkout",
-  "orders",
-  "users",
-];
+const protectedEndpoints = ["addresses", "cart", "checkout", "orders", "user"];
 
 const getContext: PagesFunction<Env> = async ({ request, next, data }) => {
   const path = request.url
