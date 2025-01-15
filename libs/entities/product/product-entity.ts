@@ -2,7 +2,11 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { productsTable } from "@schema";
 import { z } from "zod";
 import { imageSchema } from "@image-entity";
-import { positiveIntegerSchema, uuidSchema } from "@global-entity";
+import {
+  positiveIntegerSchema,
+  requiredStringSchema,
+  uuidSchema,
+} from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 import { clientCurrencySchema } from "@currency-entity";
 
@@ -22,6 +26,26 @@ export const productDetailsSchema = baseProductSchema.merge(
     images: z.array(imageSchema),
   }),
 );
+
+export const productWithCollectionDetailsSchema = productDetailsSchema
+  .omit({
+    collectionId: true,
+  })
+  .merge(
+    z.object({
+      collection: z.object({
+        name: requiredStringSchema("collection name"),
+        id: uuidSchema("collection name"),
+      }),
+    }),
+  );
+
+export const extendedProductWithCollectionDetailsSchema =
+  productWithCollectionDetailsSchema
+    .omit({
+      priceInCents: true,
+    })
+    .merge(priceDetailsSchema);
 
 export const productSchema = baseProductSchema
   .omit({ collectionId: true, description: true })
@@ -84,3 +108,11 @@ export type ExtendedLineItem = z.infer<typeof extendedLineItemSchema>;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 
 export type ProductIdAndQuantity = z.infer<typeof productIdAndQuantitySchema>;
+
+export type ProductWithCollectionDetails = z.infer<
+  typeof productWithCollectionDetailsSchema
+>;
+
+export type ExtendedProductWithCollectionDetails = z.infer<
+  typeof extendedProductWithCollectionDetailsSchema
+>;

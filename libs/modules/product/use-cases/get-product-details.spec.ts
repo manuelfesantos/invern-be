@@ -18,6 +18,10 @@ jest.mock("@image-db", () => ({
   getImagesByProductId: jest.fn(),
 }));
 
+jest.mock("@collection-db", () => ({
+  getCollectionById: jest.fn(() => ({ name: "123" })),
+}));
+
 jest.mock("@jwt-utils", () => ({}));
 
 describe("getProductDetails", () => {

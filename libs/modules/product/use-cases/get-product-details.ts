@@ -5,6 +5,8 @@ import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { Country } from "@country-entity";
 import { extendProductDetails } from "@price-utils";
+import { getCollectionById } from "@collection-db";
+import { productWithCollectionDetailsSchema } from "@product-entity";
 
 export const getProductDetails = async (
   id: HttpParams,
@@ -15,11 +17,27 @@ export const getProductDetails = async (
   if (!product) {
     throw errors.PRODUCT_NOT_FOUND();
   }
-  if (country) {
-    return successResponse.OK(
-      "success getting product details",
-      extendProductDetails(product, country),
-    );
+  if (!country) {
+    return successResponse.OK("success getting product details", product);
   }
-  return successResponse.OK("success getting product details", product);
+  const { name } = (await getCollectionById(product.collectionId)) || {};
+
+  if (!name) {
+    throw errors.COLLECTION_NOT_FOUND();
+  }
+
+  const productWithCollectionDetails = productWithCollectionDetailsSchema.parse(
+    {
+      ...product,
+      collection: {
+        id: product.collectionId,
+        name,
+      },
+    },
+  );
+
+  return successResponse.OK(
+    "success getting product details",
+    extendProductDetails(productWithCollectionDetails, country),
+  );
 };
