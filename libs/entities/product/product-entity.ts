@@ -6,6 +6,12 @@ import { positiveIntegerSchema, uuidSchema } from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 import { clientCurrencySchema } from "@currency-entity";
 
+const priceDetailsSchema = z.object({
+  netPrice: positiveIntegerSchema("product net price"),
+  grossPrice: positiveIntegerSchema("product gross price"),
+  taxes: extendedClientTaxSchema.array(),
+});
+
 const baseProductSchema = createSelectSchema(productsTable);
 export const insertProductSchema = createInsertSchema(productsTable).omit({
   id: true,
@@ -26,17 +32,12 @@ export const productSchema = baseProductSchema
   );
 
 export const extendedProductSchema = productSchema
-  .omit({
-    priceInCents: true,
-  })
-  .merge(
-    z.object({
-      netPrice: positiveIntegerSchema("product net price"),
-      grossPrice: positiveIntegerSchema("product gross price"),
-      taxes: extendedClientTaxSchema.array(),
-      currency: clientCurrencySchema,
-    }),
-  );
+  .omit({ priceInCents: true })
+  .merge(priceDetailsSchema);
+
+export const extendedProductDetailsSchema = productDetailsSchema
+  .omit({ priceInCents: true })
+  .merge(priceDetailsSchema);
 
 export const lineItemSchema = productSchema.merge(
   z.object({
@@ -67,6 +68,10 @@ export const productIdAndQuantityArraySchema = z.array(
 );
 
 export type ProductDetails = z.infer<typeof productDetailsSchema>;
+
+export type ExtendedProductDetails = z.infer<
+  typeof extendedProductDetailsSchema
+>;
 
 export type Product = z.infer<typeof productSchema>;
 

@@ -4,7 +4,7 @@ import { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { Country } from "@country-entity";
-import { extendProduct } from "@price-utils";
+import { extendProductDetails } from "@price-utils";
 
 export const getProductDetails = async (
   id: HttpParams,
@@ -18,7 +18,7 @@ export const getProductDetails = async (
   if (country) {
     return successResponse.OK(
       "success getting product details",
-      extendProduct(product, country),
+      extendProductDetails(product, country),
     );
   }
   return successResponse.OK("success getting product details", product);
