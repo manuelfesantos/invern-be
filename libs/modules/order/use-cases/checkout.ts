@@ -38,9 +38,12 @@ export const checkout: ProtectedModuleFunction = async (
   let lineItems: LineItem[] = [];
   let countryCode: CountryEnumType;
 
+  const v1 = Boolean(!country);
+  const v2 = Boolean(country);
+
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
-    if (!country) {
+    if (v1) {
       countryCode = countryEnumSchema.parse(
         checkoutBodySchema.parse(body).countryCode,
       );
@@ -56,14 +59,14 @@ export const checkout: ProtectedModuleFunction = async (
     const { products, countryCode: requestedCountryCode } =
       checkoutBodySchema.parse(body);
 
-    if (!country) {
+    if (v1) {
       countryCode = countryEnumSchema.parse(requestedCountryCode);
     }
 
     lineItems = await getLineItems(products);
   }
 
-  if (!country) {
+  if (v1) {
     country = await getCountryByCode(countryCode!);
   }
 
@@ -73,7 +76,7 @@ export const checkout: ProtectedModuleFunction = async (
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(lineItems, country, origin);
+  const session = await createCheckoutSession(lineItems, country, origin, v2);
 
   const { url, expires_at, id, created } = session;
 

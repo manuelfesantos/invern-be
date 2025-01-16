@@ -131,6 +131,7 @@ describe("checkout", () => {
       lineItemsMock,
       countryMock,
       undefined,
+      false,
     );
   });
   it("should create checkout session from logged in user", async () => {
@@ -160,6 +161,7 @@ describe("checkout", () => {
       lineItemsMock,
       countryMock,
       undefined,
+      false,
     );
   });
   it("should create checkout session with redirect host as origin if origin header is provided", async () => {
@@ -196,6 +198,7 @@ describe("checkout", () => {
       lineItemsMock,
       countryMock,
       "origin",
+      false,
     );
   });
   it("should throw error if cart id is invalid", async () => {
@@ -261,6 +264,7 @@ describe("checkout", () => {
       lineItemsMock,
       countryMock,
       undefined,
+      false,
     );
   });
   it("should throw error if any line item has more quantity than stock", async () => {
