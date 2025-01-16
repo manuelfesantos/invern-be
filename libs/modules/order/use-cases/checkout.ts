@@ -24,7 +24,7 @@ import { getCookieHeader } from "@http-utils";
 import { MILLISECONDS_IN_SECOND, SESSION_EXPIRY } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
 import { getCountryByCode } from "@country-db";
-import { Country, CountryEnumType } from "@country-entity";
+import { Country, countryEnumSchema, CountryEnumType } from "@country-entity";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -41,7 +41,9 @@ export const checkout: ProtectedModuleFunction = async (
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
     if (!country) {
-      countryCode = checkoutBodySchema.parse(body).countryCode;
+      countryCode = countryEnumSchema.parse(
+        checkoutBodySchema.parse(body).countryCode,
+      );
     }
   } else {
     if (!body) {
@@ -54,7 +56,9 @@ export const checkout: ProtectedModuleFunction = async (
     const { products, countryCode: requestedCountryCode } =
       checkoutBodySchema.parse(body);
 
-    countryCode = requestedCountryCode;
+    if (!country) {
+      countryCode = countryEnumSchema.parse(requestedCountryCode);
+    }
 
     lineItems = await getLineItems(products);
   }
