@@ -24,7 +24,7 @@ import { getCookieHeader } from "@http-utils";
 import { MILLISECONDS_IN_SECOND, SESSION_EXPIRY } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
 import { getCountryByCode } from "@country-db";
-import { CountryEnumType } from "@country-entity";
+import { Country, CountryEnumType } from "@country-entity";
 
 export const checkout: ProtectedModuleFunction = async (
   tokens,
@@ -33,13 +33,16 @@ export const checkout: ProtectedModuleFunction = async (
   cartId?: string,
   body?: unknown,
   origin?: string,
+  country?: Country,
 ): Promise<Response> => {
   let lineItems: LineItem[] = [];
   let countryCode: CountryEnumType;
 
   if (cartId) {
     lineItems = await getLineItemsByCartId(cartId);
-    countryCode = checkoutBodySchema.parse(body).countryCode;
+    if (!country) {
+      countryCode = checkoutBodySchema.parse(body).countryCode;
+    }
   } else {
     if (!body) {
       logger().error(
@@ -56,10 +59,12 @@ export const checkout: ProtectedModuleFunction = async (
     lineItems = await getLineItems(products);
   }
 
-  const country = await getCountryByCode(countryCode);
+  if (!country) {
+    country = await getCountryByCode(countryCode!);
+  }
 
   if (!country) {
-    throw errors.INVALID_COUNTRY_CODE(countryCode);
+    throw errors.INVALID_COUNTRY_CODE(countryCode!);
   }
 
   await reserveLineItems(lineItems);
