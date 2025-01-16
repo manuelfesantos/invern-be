@@ -24,11 +24,11 @@ export const onRequest: PagesFunction<
     return await checkout(
       { refreshToken, accessToken },
       remember,
-      data.country,
       userId,
       cartId,
       body,
       origin,
+      data.country,
     );
   } catch (error) {
     return generateErrorResponse(error);
