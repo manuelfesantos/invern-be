@@ -11,6 +11,7 @@ export const createCheckoutSession = async (
   lineItems: LineItem[],
   country: Country,
   origin?: string,
+  v2?: boolean,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
@@ -27,7 +28,7 @@ export const createCheckoutSession = async (
         stripeEnv: getStripeEnv(),
       },
     },
-    success_url: `${origin || frontendHost()}/order?id=${clientId}`,
+    success_url: `${origin || frontendHost()}/${v2 ? `${country.code.toLowerCase()}/` : ""}order?id=${clientId}`,
     cancel_url: `${origin || frontendHost()}/cart`,
     line_items: lineItems.map((product) => {
       return {
