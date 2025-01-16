@@ -4,5 +4,5 @@ import { countryEnumSchema } from "@country-entity";
 
 export const checkoutBodySchema = z.object({
   products: z.array(productIdAndQuantitySchema),
-  countryCode: countryEnumSchema,
+  countryCode: countryEnumSchema.optional(),
 });
