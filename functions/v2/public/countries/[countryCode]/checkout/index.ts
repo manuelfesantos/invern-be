@@ -24,6 +24,7 @@ export const onRequest: PagesFunction<
     return await checkout(
       { refreshToken, accessToken },
       remember,
+      data.country,
       userId,
       cartId,
       body,
