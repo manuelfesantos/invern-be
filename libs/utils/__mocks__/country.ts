@@ -4,13 +4,11 @@ export const countriesMock: Country[] = [
   {
     name: "Portugal",
     code: "PT",
-    currencies: [
-      {
-        code: "EUR",
-        name: "Euro",
-        symbol: "@",
-      },
-    ],
+    currency: {
+      code: "EUR",
+      name: "Euro",
+      symbol: "@",
+    },
     taxes: [
       {
         id: "1",
@@ -22,13 +20,12 @@ export const countriesMock: Country[] = [
   {
     name: "Spain",
     code: "ES",
-    currencies: [
-      {
-        code: "EUR",
-        name: "Euro",
-        symbol: "€",
-      },
-    ],
+    currency: {
+      code: "EUR",
+      name: "Euro",
+      symbol: "€",
+    },
+
     taxes: [
       {
         id: "2",

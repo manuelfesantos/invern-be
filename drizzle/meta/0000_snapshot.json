@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "58481a1e-2330-429a-b211-01c663be440e",
+  "id": "c06142ef-24cc-4caa-876c-0ac067701d13",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
@@ -209,25 +209,9 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "countriesToCurrencies": {
-      "name": "countriesToCurrencies",
-      "columns": {
-        "countryId": {
-          "name": "countryId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         },
-        "currencyId": {
-          "name": "currencyId",
+        "currencyCode": {
+          "name": "currencyCode",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -236,25 +220,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "countriesToCurrencies_countryId_countries_code_fk": {
-          "name": "countriesToCurrencies_countryId_countries_code_fk",
-          "tableFrom": "countriesToCurrencies",
-          "tableTo": "countries",
-          "columnsFrom": [
-            "countryId"
-          ],
-          "columnsTo": [
-            "code"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "countriesToCurrencies_currencyId_currencies_currencyId_fk": {
-          "name": "countriesToCurrencies_currencyId_currencies_currencyId_fk",
-          "tableFrom": "countriesToCurrencies",
+        "countries_currencyCode_currencies_currencyId_fk": {
+          "name": "countries_currencyCode_currencies_currencyId_fk",
+          "tableFrom": "countries",
           "tableTo": "currencies",
           "columnsFrom": [
-            "currencyId"
+            "currencyCode"
           ],
           "columnsTo": [
             "currencyId"
@@ -263,15 +234,7 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "countriesToCurrencies_countryId_currencyId_pk": {
-          "columns": [
-            "countryId",
-            "currencyId"
-          ],
-          "name": "countriesToCurrencies_countryId_currencyId_pk"
-        }
-      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
     "currencies": {
@@ -393,8 +356,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "clientId": {
-          "name": "clientId",
+        "stripeId": {
+          "name": "stripeId",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -437,10 +400,10 @@
         }
       },
       "indexes": {
-        "orders_clientId_unique": {
-          "name": "orders_clientId_unique",
+        "orders_stripeId_unique": {
+          "name": "orders_stripeId_unique",
           "columns": [
-            "clientId"
+            "stripeId"
           ],
           "isUnique": true
         }

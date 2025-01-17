@@ -12,11 +12,11 @@ jest.mock("@logger-utils", () => ({
 jest.mock("@jwt-utils", () => ({}));
 
 jest.mock("@order-db", () => ({
-  getOrderByClientId: jest.fn(),
+  getOrderById: jest.fn(),
 }));
 
 describe("getOrder", () => {
-  const getOrderByClientIdSpy = jest.spyOn(OrderDb, "getOrderByClientId");
+  const getOrderByClientIdSpy = jest.spyOn(OrderDb, "getOrderById");
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -25,6 +25,7 @@ describe("insertCountry", () => {
     const country: InsertCountry = {
       code: CountryEnum.PT,
       name: "name",
+      currencyCode: "EUR",
     };
     const result = await insertCountry(country);
     expect(result).toEqual([

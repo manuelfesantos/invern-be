@@ -5,7 +5,11 @@ export const addressMock: Address = {
   city: "1",
   country: {
     taxes: [],
-    currencies: [],
+    currency: {
+      code: "EUR",
+      name: "Euro",
+      symbol: "€",
+    },
     code: "PT",
     name: "1",
   },

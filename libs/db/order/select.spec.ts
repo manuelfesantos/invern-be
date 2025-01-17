@@ -1,8 +1,8 @@
 import * as DB from "@db";
-import { getOrderByClientId, getOrderById, getOrdersByUserId } from "./select";
+import { getOrderById, getOrderByStripeId, getOrdersByUserId } from "./select";
 
 const foundOrder = {
-  clientId: "1",
+  stripeId: "1",
   id: "1",
   createdAt: "1",
   userId: "1",
@@ -24,15 +24,11 @@ const foundOrder = {
           rate: 1,
         },
       ],
-      countriesToCurrencies: [
-        {
-          currency: {
-            code: "1",
-            name: "1",
-            symbol: "1",
-          },
-        },
-      ],
+      currency: {
+        code: "1",
+        name: "1",
+        symbol: "1",
+      },
     },
   },
   payment: {
@@ -65,7 +61,7 @@ const foundOrder = {
 };
 
 const returnedOrder = {
-  clientId: "1",
+  stripeId: "1",
   createdAt: "1",
   id: "1",
   products: [
@@ -106,20 +102,18 @@ const returnedOrder = {
           rate: 1,
         },
       ],
-      currencies: [
-        {
-          code: "1",
-          name: "1",
-          symbol: "1",
-        },
-      ],
+      currency: {
+        code: "1",
+        name: "1",
+        symbol: "1",
+      },
     },
   },
   snapshot: null,
 };
 
 const returnedClientOrder = {
-  clientId: "1",
+  id: "1",
   createdAt: "1",
   products: [
     {
@@ -158,16 +152,13 @@ const returnedClientOrder = {
           rate: 1,
         },
       ],
-      currencies: [
-        {
-          code: "1",
-          name: "1",
-          symbol: "1",
-        },
-      ],
+      currency: {
+        code: "1",
+        name: "1",
+        symbol: "1",
+      },
     },
   },
-  snapshot: null,
 };
 
 jest.mock("@db", () => ({
@@ -207,7 +198,7 @@ describe("get", () => {
     it("should get order by id", async () => {
       findFirstSpy.mockResolvedValueOnce(foundOrder);
       const orderId = "1";
-      const result = await getOrderById(orderId);
+      const result = await getOrderByStripeId(orderId);
       expect(findFirstSpy).toHaveBeenCalled();
       expect(result).toEqual(returnedOrder);
     });
@@ -217,7 +208,7 @@ describe("get", () => {
     it("should get order by client order id", async () => {
       findFirstSpy.mockResolvedValueOnce(foundOrder);
       const clientOrderId = "1";
-      const result = await getOrderByClientId(clientOrderId);
+      const result = await getOrderById(clientOrderId);
       expect(findFirstSpy).toHaveBeenCalled();
       expect(result).toEqual({ ...returnedClientOrder });
     });

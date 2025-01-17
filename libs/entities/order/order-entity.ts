@@ -1,9 +1,15 @@
 import { createSelectSchema } from "drizzle-zod";
 import { ordersTable } from "@schema";
 import { z } from "zod";
-import { lineItemSchema } from "@product-entity";
-import { addressSchema, clientAddressSchema } from "@address-entity";
+import { extendedProductSchema, lineItemSchema } from "@product-entity";
+import {
+  addressSchema,
+  clientAddressSchema,
+  simpleAddressSchema,
+} from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
+import { extendedClientTaxSchema } from "@tax-entity";
+import { clientCurrencySchema } from "@currency-entity";
 
 const baseOrderSchema = createSelectSchema(ordersTable);
 
@@ -16,15 +22,16 @@ export const orderSchema = baseOrderSchema
   .merge(
     z.object({
       products: z.array(lineItemSchema),
-      address: addressSchema.nullable(),
+      address: addressSchema,
       payment: clientPaymentSchema.nullable(),
     }),
   );
 
 export const clientOrderSchema = orderSchema
   .omit({
-    id: true,
+    stripeId: true,
     address: true,
+    snapshot: true,
   })
   .merge(
     z.object({
@@ -32,7 +39,15 @@ export const clientOrderSchema = orderSchema
     }),
   );
 
+export const extendedClientOrderSchema = clientOrderSchema.extend({
+  products: extendedProductSchema.array(),
+  taxes: extendedClientTaxSchema.array(),
+  currency: clientCurrencySchema,
+  address: simpleAddressSchema,
+});
+
 export type ClientOrder = z.infer<typeof clientOrderSchema>;
+export type ExtendedClientOrder = z.infer<typeof extendedClientOrderSchema>;
 export type Order = z.infer<typeof orderSchema>;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 
