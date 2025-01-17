@@ -4,6 +4,7 @@ import { z } from "zod";
 import { extendedLineItemSchema, lineItemSchema } from "@product-entity";
 import { positiveIntegerSchema } from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
+import { clientCurrencySchema } from "@currency-entity";
 
 const baseCartSchema = createSelectSchema(cartsTable);
 
@@ -28,6 +29,7 @@ export const extendedCartSchema = cartSchema
       grossPrice: positiveIntegerSchema("cart gross price"),
       netPrice: positiveIntegerSchema("cart net price"),
       taxes: extendedClientTaxSchema.array(),
+      currency: clientCurrencySchema,
     }),
   );
 

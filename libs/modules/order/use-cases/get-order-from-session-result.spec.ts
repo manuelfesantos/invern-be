@@ -113,7 +113,7 @@ describe("getOrderFromSessionResult", () => {
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, id: orderId });
+    getOrderByIdSpy.mockResolvedValueOnce(orderMock);
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithoutUserId,
     );
@@ -132,8 +132,8 @@ describe("getOrderFromSessionResult", () => {
       addressId: addressMock.id,
       paymentId,
       userId: "qsRTdjB1g5nKTa8tb6JGmC",
-      id: orderId,
-      clientId: stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientId,
+      stripeId: orderId,
+      id: stripeCheckoutSessionResultMockWithoutUserId.metadata?.clientId,
       snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);
@@ -158,7 +158,7 @@ describe("getOrderFromSessionResult", () => {
     getPaymentByIdSpy.mockResolvedValueOnce(undefined);
     insertPaymentReturningIdSpy.mockResolvedValueOnce([{ paymentId }]);
     insertOrderSpy.mockResolvedValueOnce([{ orderId }]);
-    getOrderByIdSpy.mockResolvedValueOnce({ ...orderMock, id: orderId });
+    getOrderByIdSpy.mockResolvedValueOnce(orderMock);
     const order = await getOrderFromSessionResult(
       stripeCheckoutSessionResultMockWithUserId,
     );
@@ -177,8 +177,8 @@ describe("getOrderFromSessionResult", () => {
       addressId: addressMock.id,
       paymentId,
       userId: "qsRTdjB1g5nKTa8tb6JGmC",
-      id: orderId,
-      clientId: stripeCheckoutSessionResultMockWithUserId.metadata?.clientId,
+      stripeId: orderId,
+      id: stripeCheckoutSessionResultMockWithUserId.metadata?.clientId,
       snapshot: null,
     });
     expect(addToOrderSpy).toHaveBeenCalledTimes(ONE_TIME);

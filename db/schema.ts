@@ -79,7 +79,7 @@ export const productsToCartsTable = sqliteTable(
 
 export const ordersTable = sqliteTable("orders", {
   id: text("id").primaryKey(),
-  clientId: text("clientId").unique().notNull(),
+  stripeId: text("stripeId").unique().notNull(),
   createdAt: text("createdAt").notNull(),
   userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
@@ -132,26 +132,12 @@ export const countriesTable = sqliteTable("countries", {
   code: text("code", { enum: ["PT", "ES"] })
     .notNull()
     .primaryKey(),
+  currencyCode: text("currencyCode")
+    .notNull()
+    .references(() => currenciesTable.code, {
+      onDelete: "cascade",
+    }),
 });
-
-export const countriesToCurrenciesTable = sqliteTable(
-  "countriesToCurrencies",
-  {
-    countryCode: text("countryId")
-      .notNull()
-      .references(() => countriesTable.code, {
-        onDelete: "cascade",
-      }),
-    currencyCode: text("currencyId")
-      .notNull()
-      .references(() => currenciesTable.code, {
-        onDelete: "cascade",
-      }),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.countryCode, t.currencyCode] }),
-  }),
-);
 
 export const addressesTable = sqliteTable("addresses", {
   id: text("id").primaryKey(),
@@ -279,7 +265,7 @@ export const productsToOrdersRelations = relations(
 );
 
 export const currenciesRelations = relations(currenciesTable, ({ many }) => ({
-  countriesToCurrencies: many(countriesToCurrenciesTable),
+  countries: many(countriesTable),
 }));
 
 export const taxesRelations = relations(taxesTable, ({ one }) => ({
@@ -289,23 +275,15 @@ export const taxesRelations = relations(taxesTable, ({ one }) => ({
   }),
 }));
 
-export const countriesRelations = relations(countriesTable, ({ many }) => ({
-  addresses: many(addressesTable),
-  countriesToCurrencies: many(countriesToCurrenciesTable),
-  taxes: many(taxesTable),
-}));
-
-export const countriesToCurrenciesRelations = relations(
-  countriesToCurrenciesTable,
-  ({ one }) => ({
-    country: one(countriesTable, {
-      fields: [countriesToCurrenciesTable.countryCode],
-      references: [countriesTable.code],
-    }),
+export const countriesRelations = relations(
+  countriesTable,
+  ({ one, many }) => ({
+    addresses: many(addressesTable),
     currency: one(currenciesTable, {
-      fields: [countriesToCurrenciesTable.currencyCode],
+      fields: [countriesTable.currencyCode],
       references: [currenciesTable.code],
     }),
+    taxes: many(taxesTable),
   }),
 );
 

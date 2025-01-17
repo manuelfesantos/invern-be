@@ -1,9 +1,10 @@
 import * as DB from "@db";
 import {
   getCurrencies,
-  getCurrenciesByCountryCode,
   getCurrencyByCode,
+  getCurrencyByCountryCode,
 } from "./select";
+import { CountryEnum } from "@country-entity";
 
 jest.mock("@db", () => ({
   db: jest.fn().mockReturnValue({
@@ -63,20 +64,18 @@ describe("get", () => {
       expect(findFirstSpy).toHaveBeenCalled();
     });
   });
-  describe("currenciesByCountryCode", () => {
-    const findManySpy = jest.spyOn(DB.db().query.currenciesTable, "findMany");
-    it("should get all currencies", async () => {
-      const countryCode = "1";
-      const result = await getCurrenciesByCountryCode(countryCode);
-      expect(result).toEqual([
-        {
-          code: "1",
-          name: "name",
-          symbol: "symbol",
-          rateToEuro: 1,
-        },
-      ]);
-      expect(findManySpy).toHaveBeenCalled();
+  describe("currencyByCountryCode", () => {
+    const findFirstSpy = jest.spyOn(DB.db().query.currenciesTable, "findFirst");
+    it("should get currency", async () => {
+      const countryCode = CountryEnum.PT;
+      const result = await getCurrencyByCountryCode(countryCode);
+      expect(result).toEqual({
+        code: "1",
+        name: "name",
+        symbol: "symbol",
+        rateToEuro: 1,
+      });
+      expect(findFirstSpy).toHaveBeenCalled();
     });
   });
 });

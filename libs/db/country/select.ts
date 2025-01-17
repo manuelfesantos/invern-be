@@ -14,17 +14,11 @@ export const getCountryByCode = async (
 ): Promise<Country | undefined> => {
   const countryTemplate = await db().query.countriesTable.findFirst({
     where: eq(countriesTable.code, countryCode),
+    columns: {
+      currencyCode: false,
+    },
     with: {
-      countriesToCurrencies: {
-        columns: {},
-        with: {
-          currency: {
-            columns: {
-              rateToEuro: false,
-            },
-          },
-        },
-      },
+      currency: {},
       taxes: {
         columns: {
           countryCode: false,
@@ -39,26 +33,17 @@ export const getCountryByCode = async (
 
   return countrySchema.parse({
     ...countryTemplate,
-    currencies: countryTemplate.countriesToCurrencies
-      .map((c) => c.currency)
-      .filter((c) => c),
     taxes: countryTemplate.taxes || [],
   });
 };
 
 export const selectAllCountries = async (): Promise<ClientCountry[]> => {
   const countriesTemplate = await db().query.countriesTable.findMany({
+    columns: {
+      currencyCode: false,
+    },
     with: {
-      countriesToCurrencies: {
-        columns: {},
-        with: {
-          currency: {
-            columns: {
-              rateToEuro: false,
-            },
-          },
-        },
-      },
+      currency: {},
       taxes: {
         columns: {
           countryCode: false,
@@ -69,9 +54,6 @@ export const selectAllCountries = async (): Promise<ClientCountry[]> => {
   return countriesTemplate.map((countryTemplate) =>
     clientCountrySchema.parse({
       ...countryTemplate,
-      currencies: countryTemplate.countriesToCurrencies
-        .map((c) => c.currency)
-        .filter((c) => c),
       taxes: countryTemplate.taxes || [],
     }),
   );

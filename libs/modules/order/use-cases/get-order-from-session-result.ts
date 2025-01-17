@@ -64,8 +64,8 @@ export const getOrderFromSessionResult = async (
     addressId,
     paymentId: payment.id,
     userId: userId ?? null,
-    id: sessionResult.id,
-    clientId,
+    id: clientId,
+    stripeId: sessionResult.id,
     snapshot: null,
   });
 

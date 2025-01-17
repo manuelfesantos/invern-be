@@ -1,7 +1,8 @@
-import { countriesToCurrenciesTable, currenciesTable } from "@schema";
+import { countriesTable, currenciesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { Currency } from "@currency-entity";
 import { db } from "@db";
+import { CountryEnumType } from "@country-entity";
 
 export const getCurrencyByCode = async (
   currencyCode: string,
@@ -15,15 +16,10 @@ export const getCurrencies = async (): Promise<Currency[]> => {
   return db().query.currenciesTable.findMany();
 };
 
-export const getCurrenciesByCountryCode = async (
-  countryCode: string,
-): Promise<Currency[]> => {
-  return db().query.currenciesTable.findMany({
-    with: {
-      countriesToCurrencies: {
-        columns: {},
-        where: eq(countriesToCurrenciesTable.countryCode, countryCode),
-      },
-    },
+export const getCurrencyByCountryCode = async (
+  countryCode: CountryEnumType,
+): Promise<Currency | undefined> => {
+  return db().query.currenciesTable.findFirst({
+    where: eq(countriesTable.code, countryCode),
   });
 };

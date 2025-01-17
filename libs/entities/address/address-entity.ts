@@ -1,7 +1,11 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { addressesTable } from "@schema";
 import { z } from "zod";
-import { clientCountrySchema, countrySchema } from "@country-entity";
+import {
+  clientCountrySchema,
+  countrySchema,
+  simpleCountrySchema,
+} from "@country-entity";
 
 const baseAddressSchema = createSelectSchema(addressesTable);
 
@@ -23,6 +27,14 @@ export const clientAddressSchema = addressSchema.omit({ country: true }).merge(
     country: clientCountrySchema,
   }),
 );
+
+export const simpleAddressSchema = addressSchema
+  .omit({
+    id: true,
+  })
+  .extend({
+    country: simpleCountrySchema,
+  });
 
 export type BaseAddress = z.infer<typeof baseAddressSchema>;
 

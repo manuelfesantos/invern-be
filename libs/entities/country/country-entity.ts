@@ -8,19 +8,31 @@ const baseCountrySchema = createSelectSchema(countriesTable);
 
 export const insertCountrySchema = createSelectSchema(countriesTable);
 
-export const countrySchema = baseCountrySchema.merge(
-  z.object({
-    currencies: z.array(clientCurrencySchema).optional(),
-    taxes: z.array(taxSchema),
-  }),
-);
+export const countrySchema = baseCountrySchema
+  .omit({
+    currencyCode: true,
+  })
+  .merge(
+    z.object({
+      currency: clientCurrencySchema,
+      taxes: z.array(taxSchema),
+    }),
+  );
 
-export const clientCountrySchema = baseCountrySchema.merge(
-  z.object({
-    currencies: z.array(clientCurrencySchema).optional(),
-    taxes: z.array(clientTaxSchema),
-  }),
-);
+export const simpleCountrySchema = baseCountrySchema.omit({
+  currencyCode: true,
+});
+
+export const clientCountrySchema = baseCountrySchema
+  .omit({
+    currencyCode: true,
+  })
+  .merge(
+    z.object({
+      currency: clientCurrencySchema,
+      taxes: z.array(clientTaxSchema),
+    }),
+  );
 
 export const countryEnumSchema = z.enum(countriesTable.code.enumValues, {
   message: "Invalid Country",

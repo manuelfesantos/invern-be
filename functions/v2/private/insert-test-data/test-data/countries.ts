@@ -6,10 +6,12 @@ const countriesList: InsertCountry[] = [
   {
     name: "Portugal",
     code: "PT",
+    currencyCode: "EUR",
   },
   {
     name: "Spain",
     code: "ES",
+    currencyCode: "EUR",
   },
 ];
 

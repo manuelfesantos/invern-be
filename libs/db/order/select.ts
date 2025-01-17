@@ -34,19 +34,7 @@ export const getOrdersByUserId = async (
                   id: false,
                 },
               },
-              countriesToCurrencies: {
-                columns: {
-                  countryCode: false,
-                  currencyCode: false,
-                },
-                with: {
-                  currency: {
-                    columns: {
-                      rateToEuro: false,
-                    },
-                  },
-                },
-              },
+              currency: {},
             },
           },
         },
@@ -92,9 +80,6 @@ export const getOrdersByUserId = async (
                   taxes: order.address.country.taxes
                     ? order.address.country.taxes
                     : [],
-                  currencies: order.address.country.countriesToCurrencies?.map(
-                    (c) => c.currency,
-                  ),
                 }
               : undefined,
           }
@@ -103,11 +88,11 @@ export const getOrdersByUserId = async (
   );
 };
 
-export const getOrderById = async (
-  orderId: string,
+export const getOrderByStripeId = async (
+  stripeId: string,
 ): Promise<Order | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
-    where: eq(ordersTable.id, orderId),
+    where: eq(ordersTable.stripeId, stripeId),
     columns: {
       userId: false,
       addressId: false,
@@ -126,19 +111,7 @@ export const getOrderById = async (
                   countryCode: false,
                 },
               },
-              countriesToCurrencies: {
-                columns: {
-                  countryCode: false,
-                  currencyCode: false,
-                },
-                with: {
-                  currency: {
-                    columns: {
-                      rateToEuro: false,
-                    },
-                  },
-                },
-              },
+              currency: {},
             },
           },
         },
@@ -184,10 +157,6 @@ export const getOrderById = async (
                     taxes: orderTemplate.address.country.taxes
                       ? orderTemplate.address.country.taxes
                       : [],
-                    currencies:
-                      orderTemplate.address.country.countriesToCurrencies?.map(
-                        (c) => c.currency,
-                      ),
                   }
                 : undefined,
             }
@@ -196,16 +165,16 @@ export const getOrderById = async (
     : undefined;
 };
 
-export const getOrderByClientId = async (
-  clientId: string,
+export const getOrderById = async (
+  id: string,
 ): Promise<ClientOrder | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
-    where: eq(ordersTable.clientId, clientId),
+    where: eq(ordersTable.id, id),
     columns: {
       userId: false,
       addressId: false,
       paymentId: false,
-      id: false,
+      stripeId: false,
     },
     with: {
       address: {
@@ -221,19 +190,7 @@ export const getOrderByClientId = async (
                   id: false,
                 },
               },
-              countriesToCurrencies: {
-                columns: {
-                  countryCode: false,
-                  currencyCode: false,
-                },
-                with: {
-                  currency: {
-                    columns: {
-                      rateToEuro: false,
-                    },
-                  },
-                },
-              },
+              currency: {},
             },
           },
         },
@@ -279,10 +236,6 @@ export const getOrderByClientId = async (
                     taxes: orderTemplate.address.country.taxes
                       ? orderTemplate.address.country.taxes
                       : [],
-                    currencies:
-                      orderTemplate.address.country.countriesToCurrencies?.map(
-                        (c) => c.currency,
-                      ),
                   }
                 : undefined,
             }

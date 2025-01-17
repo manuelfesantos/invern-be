@@ -31,15 +31,9 @@ CREATE TABLE `collections` (
 --> statement-breakpoint
 CREATE TABLE `countries` (
 	`name` text NOT NULL,
-	`code` text PRIMARY KEY NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `countriesToCurrencies` (
-	`countryId` text NOT NULL,
-	`currencyId` text NOT NULL,
-	PRIMARY KEY(`countryId`, `currencyId`),
-	FOREIGN KEY (`countryId`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`currencyId`) REFERENCES `currencies`(`currencyId`) ON UPDATE no action ON DELETE cascade
+	`code` text PRIMARY KEY NOT NULL,
+	`currencyCode` text NOT NULL,
+	FOREIGN KEY (`currencyCode`) REFERENCES `currencies`(`currencyId`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `currencies` (
@@ -60,7 +54,7 @@ CREATE TABLE `images` (
 --> statement-breakpoint
 CREATE TABLE `orders` (
 	`id` text PRIMARY KEY NOT NULL,
-	`clientId` text NOT NULL,
+	`stripeId` text NOT NULL,
 	`createdAt` text NOT NULL,
 	`userId` text,
 	`addressId` text,
@@ -129,4 +123,4 @@ CREATE TABLE `users` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `orders_clientId_unique` ON `orders` (`clientId`);
+CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);

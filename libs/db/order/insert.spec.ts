@@ -30,7 +30,7 @@ describe("insertOrder", () => {
   it("should insert order", async () => {
     const order = {
       id: "orderId",
-      clientId: "1",
+      stripeId: "1",
       userId: "1",
       addressId: "1",
       paymentId: "1",

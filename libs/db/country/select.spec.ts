@@ -14,15 +14,11 @@ jest.mock("@db", () => ({
           {
             code: "PT",
             name: "name",
-            countriesToCurrencies: [
-              {
-                currency: {
-                  symbol: "symbol",
-                  name: "name",
-                  code: "code",
-                },
-              },
-            ],
+            currency: {
+              symbol: "symbol",
+              name: "name",
+              code: "code",
+            },
             taxes: [
               {
                 id: "1",
@@ -35,15 +31,11 @@ jest.mock("@db", () => ({
         findFirst: jest.fn().mockReturnValue({
           code: "PT",
           name: "name",
-          countriesToCurrencies: [
-            {
-              currency: {
-                symbol: "symbol",
-                name: "name",
-                code: "code",
-              },
-            },
-          ],
+          currency: {
+            symbol: "symbol",
+            name: "name",
+            code: "code",
+          },
           taxes: [
             {
               id: "2",
@@ -69,13 +61,11 @@ describe("get", () => {
       expect(result[FIRST_ELEMENT]).toEqual({
         code: CountryEnum.PT,
         name: "name",
-        currencies: [
-          {
-            symbol: "symbol",
-            name: "name",
-            code: "code",
-          },
-        ],
+        currency: {
+          symbol: "symbol",
+          name: "name",
+          code: "code",
+        },
         taxes: [
           {
             name: "name",
@@ -91,28 +81,22 @@ describe("get", () => {
         {
           code: CountryEnum.PT,
           name: "name",
-          countriesToCurrencies: [
-            {
-              currency: {
-                symbol: "symbol",
-                name: "name",
-                code: "code",
-              },
-            },
-          ],
+          currency: {
+            symbol: "symbol",
+            name: "name",
+            code: "code",
+          },
         },
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
       ] as any;
       const country = {
         code: CountryEnum.PT,
         name: "name",
-        currencies: [
-          {
-            symbol: "symbol",
-            name: "name",
-            code: "code",
-          },
-        ],
+        currency: {
+          symbol: "symbol",
+          name: "name",
+          code: "code",
+        },
         taxes: [],
       };
       findManySpy.mockReturnValue(countryTemplate);
@@ -130,13 +114,11 @@ describe("get", () => {
       expect(result).toEqual({
         code: CountryEnum.PT,
         name: "name",
-        currencies: [
-          {
-            symbol: "symbol",
-            name: "name",
-            code: "code",
-          },
-        ],
+        currency: {
+          symbol: "symbol",
+          name: "name",
+          code: "code",
+        },
         taxes: [
           {
             id: "2",
@@ -159,27 +141,21 @@ describe("get", () => {
       const countryTemplate = {
         code: CountryEnum.ES,
         name: "name",
-        countriesToCurrencies: [
-          {
-            currency: {
-              symbol: "symbol",
-              name: "name",
-              code: "code",
-            },
-          },
-        ],
+        currency: {
+          symbol: "symbol",
+          name: "name",
+          code: "code",
+        },
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
       const country = {
         code: CountryEnum.ES,
         name: "name",
-        currencies: [
-          {
-            symbol: "symbol",
-            name: "name",
-            code: "code",
-          },
-        ],
+        currency: {
+          symbol: "symbol",
+          name: "name",
+          code: "code",
+        },
         taxes: [],
       };
 

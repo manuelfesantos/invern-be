@@ -24,6 +24,7 @@ export const extendCart = (cart: Cart, country: Country): ExtendedCart => {
     taxes: extendedTaxes,
     netPrice,
     grossPrice: netPrice + taxedPrice,
+    currency: country.currency,
   });
 };
 

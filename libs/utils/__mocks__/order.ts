@@ -1,12 +1,11 @@
 import { ClientOrder, Order } from "@order-entity";
 import { Tax } from "@tax-entity";
-import { Currency } from "@currency-entity";
 
 const FIRST_ELEMENT = 0;
 
 export const clientOrdersMock: ClientOrder[] = [
   {
-    clientId: "1",
+    id: "1",
     products: [],
     createdAt: "1",
     address: {
@@ -14,7 +13,11 @@ export const clientOrdersMock: ClientOrder[] = [
       city: "1",
       country: {
         taxes: [] as Tax[],
-        currencies: [] as Currency[],
+        currency: {
+          code: "EUR",
+          name: "Euro",
+          symbol: "€",
+        },
         code: "PT",
         name: "1",
       },
@@ -29,10 +32,9 @@ export const clientOrdersMock: ClientOrder[] = [
       state: "succeeded",
       type: "card",
     },
-    snapshot: null,
   },
   {
-    clientId: "2",
+    id: "2",
     products: [],
     createdAt: "2",
     address: {
@@ -40,7 +42,11 @@ export const clientOrdersMock: ClientOrder[] = [
       city: "2",
       country: {
         taxes: [] as Tax[],
-        currencies: [] as Currency[],
+        currency: {
+          code: "EUR",
+          symbol: "€",
+          name: "Euro",
+        },
         code: "ES",
         name: "2",
       },
@@ -55,14 +61,13 @@ export const clientOrdersMock: ClientOrder[] = [
       state: "succeeded",
       type: "card",
     },
-    snapshot: null,
   },
 ];
 
 export const ordersMock: Order[] = [
   {
-    clientId: "1",
     id: "1",
+    stripeId: "1",
     products: [],
     createdAt: "1",
     address: {
@@ -70,7 +75,11 @@ export const ordersMock: Order[] = [
       city: "1",
       country: {
         taxes: [] as Tax[],
-        currencies: [] as Currency[],
+        currency: {
+          symbol: "€",
+          name: "Euro",
+          code: "EUR",
+        },
         code: "PT",
         name: "1",
       },
@@ -88,7 +97,7 @@ export const ordersMock: Order[] = [
     snapshot: null,
   },
   {
-    clientId: "2",
+    stripeId: "2",
     id: "2",
     products: [],
     createdAt: "2",
@@ -97,7 +106,11 @@ export const ordersMock: Order[] = [
       city: "2",
       country: {
         taxes: [] as Tax[],
-        currencies: [] as Currency[],
+        currency: {
+          code: "EUR",
+          name: "Euro",
+          symbol: "€",
+        },
         code: "ES",
         name: "2",
       },

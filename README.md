@@ -6,22 +6,18 @@ To startup on this repo after cloning it, run the following command:
 
 ```npm run init```
 
-This installs all dependencies and starts up husky as well.
+This installs all dependencies, starts up husky and builds the local database.
 
 To run the app locally, you can run the following command:
 
 ```npm run local```
 
-This is a command that comprises 3 different commands:
+After starting the local server, you should setup all the needed data for the project:
 
-```npm run build-local-db```:
-Builds the local DB, following the db.sql fil inside db folder.
+- Call the endpoint `v2/private/insert-test-data` so that the test data is inserted in the database.
+- Call the endpoint `setup-stock` so that the stock bucket is setup locally.
 
-```npm run insert-local```:
-Inserts mock products, collections and images inside the local DB, following the add-data.sql inside the db folder
 
-``npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --local-protocol=https --compatibility-date=2024-04-26``:
-Compiles the code and runs a local server, incorporating it with the local DB and adding https connection
 
 ## Architecture
 
