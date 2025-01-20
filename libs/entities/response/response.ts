@@ -1,4 +1,4 @@
-import { logger, redactPropertiesFromData } from "@logger-utils";
+import { logger } from "@logger-utils";
 
 export const buildResponse = (
   data: unknown,
@@ -6,7 +6,7 @@ export const buildResponse = (
   headers?: Record<string, string>,
 ): Response => {
   logger().addRedactedData({
-    responseData: redactPropertiesFromData(data),
+    responseData: data,
   });
   return Response.json(data, {
     ...maybeInit,
