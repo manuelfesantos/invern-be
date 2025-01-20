@@ -52,13 +52,17 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     currentLog++;
   };
 
+  const addRedactedData = (...data: unknown[]): void => {
+    logger.addData(...data.map((data) => redactPropertiesFromData(data)));
+  };
+
   const info = (
     message: string,
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= INFO_LEVEL) {
-      logger.addData(
+      addRedactedData(
         buildLogObject(currentLog, INFO_LEVEL, message, useCase, data),
       );
       localLogger.info(message, data);
@@ -72,7 +76,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= DEBUG_LEVEL) {
-      logger.addData(
+      addRedactedData(
         buildLogObject(currentLog, DEBUG_LEVEL, message, useCase, data),
       );
       localLogger.debug(message, data);
@@ -86,7 +90,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= WARNING_LEVEL) {
-      logger.addData(
+      addRedactedData(
         buildLogObject(currentLog, WARNING_LEVEL, message, useCase, data),
       );
       localLogger.warn(message, data);
@@ -100,16 +104,12 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= ERROR_LEVEL) {
-      logger.addData(
+      addRedactedData(
         buildLogObject(currentLog, ERROR_LEVEL, message, useCase, data),
       );
       localLogger.error(message, data);
       incrementCurrentLog();
     }
-  };
-
-  const addRedactedData = (...data: unknown[]): void => {
-    logger.addData(...data.map((data) => redactPropertiesFromData(data)));
   };
   const loggerInstance = (): LoggerInstance => {
     logger.currentLog = currentLog;
