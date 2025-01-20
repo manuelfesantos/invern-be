@@ -30,6 +30,7 @@ const envMock: Env = {
   FRONTEND_HOST: "",
   HONEYCOMB_API_KEY: "",
   HONEYCOMB_DATASET: "",
+  LOGGER_LEVEL: "",
 };
 
 const dataMock: CountriesEndpointProtectedData & {

@@ -9,9 +9,12 @@ import { errors } from "@error-handling-utils";
 import { CountryEnum } from "@country-entity";
 
 jest.mock("@logger-utils", () => ({
-  logger: jest
-    .fn()
-    .mockReturnValue({ addData: jest.fn(), info: jest.fn(), error: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest.fn().mockReturnValue({
+    addRedactedData: jest.fn(),
+    info: jest.fn(),
+    error: jest.fn(),
+  }),
 }));
 
 jest.mock("@jwt-utils", () => ({

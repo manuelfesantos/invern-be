@@ -28,7 +28,8 @@ jest.mock("@jwt-utils", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest.fn().mockReturnValue({ addRedactedData: jest.fn() }),
 }));
 
 jest.mock("./logged-in", () => ({

@@ -26,7 +26,7 @@ export const getOrderFromSessionResult = async (
 ): Promise<ClientOrder> => {
   const orderAlreadyExists = await checkIfOrderExists(sessionResult.id);
 
-  logger().addData({ orderId: sessionResult.id });
+  logger().addRedactedData({ orderId: sessionResult.id });
 
   if (orderAlreadyExists) {
     throw errors.ORDER_ALREADY_EXISTS();

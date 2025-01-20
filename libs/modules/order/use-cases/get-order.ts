@@ -14,7 +14,7 @@ export const getOrder = async (
     throw errors.ORDER_NOT_FOUND();
   }
 
-  logger().addData({
+  logger().addRedactedData({
     orderId: order.id,
   });
 

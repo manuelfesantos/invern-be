@@ -9,7 +9,7 @@ import { initSendgrid } from "@mail-utils";
 import { HttpMethodEnum } from "@http-entity";
 import { initAuthSecretClient } from "@kv-adapter";
 import { setSecrets } from "@jwt-utils";
-import { withLogger } from "@logger-utils";
+import { setLoggerLevel, withLogger } from "@logger-utils";
 import { setEnv, setHosts, setStripeEnv } from "@http-utils";
 import {
   initZoneId,
@@ -31,6 +31,16 @@ export const startLogger: PagesFunction<Env> = async (context) => {
   return honeyCombPlugin({
     apiKey: env.HONEYCOMB_API_KEY,
     dataset: env.HONEYCOMB_DATASET,
+    redactRequestHeaders: [
+      "authorization",
+      "cookie",
+      "referer",
+      "cf-access-jwt-assertion",
+      "cf-connecting-ip",
+      "host",
+      "x-forwarded-for",
+      "x-real-ip",
+    ],
   })(context);
 };
 
@@ -55,6 +65,7 @@ export const setGlobalEnvs: PagesFunction<Env, string, PluginData> = async (
   initCacheApiEmail(env.CACHE_API_EMAIL);
   setStripeEnv(env.STRIPE_ENV);
   setEnv(env.ENV);
+  setLoggerLevel(Number(env.LOGGER_LEVEL));
   stockClient.init(env.STOCK_BUCKET);
   countriesClient.init(env.COUNTRIES_BUCKET);
   logger.addData({

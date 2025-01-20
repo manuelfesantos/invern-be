@@ -45,7 +45,7 @@ export const mapPaymentIntentEvent = async (
     LoggerUseCaseEnum.GET_PAYMENT_INTENT,
   );
 
-  logger().addData({ paymentId: paymentIntent.id });
+  logger().addRedactedData({ paymentId: paymentIntent.id });
 
   return await withRetry(
     paymentIntent,

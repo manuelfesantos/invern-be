@@ -39,7 +39,7 @@ export const onRequest: PagesFunction = async (context) => {
         return successResponse.OK("Unsupported event, ignoring request");
       }
 
-      logger().addData({
+      logger().addRedactedData({
         sessionExpired: stringifyObject(body),
       });
 
@@ -58,7 +58,7 @@ export const onRequest: PagesFunction = async (context) => {
       return successResponse.OK("Unsupported event, ignoring request");
     }
 
-    logger().addData({
+    logger().addRedactedData({
       checkoutSessionResult: stringifyObject(body),
     });
     const clientOrder = await getOrderFromSessionResult(sessionEvent);
@@ -67,7 +67,7 @@ export const onRequest: PagesFunction = async (context) => {
       "Checkout",
       `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
     );
-    logger().addData({
+    logger().addRedactedData({
       createdOrder: stringifyObject(clientOrder),
     });
     return successResponse.OK("success getting checkout-session", clientOrder);

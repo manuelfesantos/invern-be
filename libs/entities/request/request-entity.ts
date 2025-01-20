@@ -22,6 +22,7 @@ export interface Env {
   SETUP_STOCK_SECRET: string;
   INSERT_TEST_DATA_SECRET: string;
   SETUP_COUNTRIES_SECRET: string;
+  LOGGER_LEVEL: string;
 }
 
 export type CountriesEndpointData = {
