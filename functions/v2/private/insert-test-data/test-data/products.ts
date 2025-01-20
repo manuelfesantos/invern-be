@@ -9,21 +9,21 @@ const getProductsList = (): InsertProduct[] => [
     collectionId: "Erosion",
     description: "Earth Jar 20 'riven', unglazed stoneware",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Raku Fire",
     collectionId: "Erosion",
     description: "Watershed' hand formed, raku fired ceramic",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Saggar Bottle",
     collectionId: "Erosion",
     description: "Erosion bottle of saggar fired stoneware",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Strata Flask",
@@ -31,7 +31,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Erosion Cup",
@@ -39,7 +39,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "A hand made erosion cup (or yunomi) with iron matt glaze interior.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Tanka Fired",
@@ -47,7 +47,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Strata Flask",
@@ -55,7 +55,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Strata Vase",
@@ -63,7 +63,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "Tanka fired strata vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Rolling Erosion",
@@ -71,7 +71,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "Rolling erosion bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Contour Vase",
@@ -79,7 +79,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "Contour vase. This textured hand made vase has been fired in a charcoal saggar in the gas kiln.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Strata Flask",
@@ -87,7 +87,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "A small hand made strata flask with dark iron tenmoku glazed interior.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
   {
     name: "Kappa Vase",
@@ -95,7 +95,7 @@ const getProductsList = (): InsertProduct[] => [
     description:
       "Kappa vase bowl. This textured hand made bowl has been fired in a charcoal saggar in the wood kiln where it takes on the soft greys and blacks from the firing process.",
     priceInCents: 500,
-    stock: 2,
+    stock: 10,
   },
 ];
 

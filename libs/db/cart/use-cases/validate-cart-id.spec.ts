@@ -9,7 +9,10 @@ jest.mock("@cart-db", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn(), info: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest
+    .fn()
+    .mockReturnValue({ addRedactedData: jest.fn(), info: jest.fn() }),
 }));
 
 describe("validateCartId", () => {

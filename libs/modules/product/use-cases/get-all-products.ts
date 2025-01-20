@@ -9,7 +9,7 @@ export const getAllProducts = async (
   country?: Country,
 ): Promise<Response> => {
   if (search) {
-    logger().addData({ search });
+    logger().addRedactedData({ search });
     const products = await getProductsBySearch(search);
     if (country) {
       return successResponse.OK(

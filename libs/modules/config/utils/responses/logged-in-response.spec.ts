@@ -16,7 +16,8 @@ const NO_USER_VERSION = 0;
 const ONE_VERSION = 1;
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest.fn().mockReturnValue({ addRedactedData: jest.fn() }),
 }));
 
 jest.mock("./logged-out-response", () => ({

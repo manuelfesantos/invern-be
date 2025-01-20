@@ -12,7 +12,8 @@ const { id: userId } = userMock;
 const { id: cartId } = userMock.cart as Cart;
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest.fn().mockReturnValue({ addRedactedData: jest.fn() }),
 }));
 
 jest.mock("@cart-db", () => ({

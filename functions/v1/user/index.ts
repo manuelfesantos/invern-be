@@ -32,7 +32,7 @@ export const onRequest: PagesFunction = async (context): Promise<Response> => {
     const body = await getBodyFromRequest(request);
     const action = request.headers.get(HttpHeaderEnum.ACTION);
 
-    logger().addData({ body });
+    logger().addRedactedData({ body });
 
     if (request.method === HttpMethodEnum.POST) {
       return await userActionMapper(body, action, userId);

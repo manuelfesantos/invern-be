@@ -36,13 +36,13 @@ export const onRequest: PagesFunction = async (context) => {
       return successResponse.OK("Unsupported event, ignoring request");
     }
 
-    logger().addData({
+    logger().addRedactedData({
       checkoutPaymentIntent: stringifyObject(body),
     });
 
     const payment = await mapPaymentIntentEvent(paymentIntent, body.type);
 
-    logger().addData({ createdPayment: stringifyObject(payment) });
+    logger().addRedactedData({ createdPayment: stringifyObject(payment) });
     return successResponse.OK("success getting checkout-session");
   } catch (error) {
     return generateErrorResponse(error);

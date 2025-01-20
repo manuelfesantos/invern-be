@@ -77,7 +77,7 @@ const getTokensFromHeaders = (
 };
 
 const logCredentials = (cartId?: string, userId?: string): void => {
-  logger().addData({
+  logger().addRedactedData({
     ...(cartId && { cartId }),
     ...(userId && { userId }),
   });

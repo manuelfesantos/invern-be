@@ -3,11 +3,18 @@ import { Logger } from "./honeycomb-logger";
 import { LoggerUseCase } from "@logger-entity";
 import { buildLogObject } from "./build-log-object";
 import { localLogger } from "./local-logger";
+import { redactPropertiesFromData } from "./redact-properties-from-data";
 
 const DEBUG_LEVEL = 20;
 const INFO_LEVEL = 30;
 const WARNING_LEVEL = 40;
 const ERROR_LEVEL = 50;
+
+let loggerLevel: number = DEBUG_LEVEL;
+
+export const setLoggerLevel = (level: number): void => {
+  loggerLevel = level;
+};
 
 interface LoggerStore extends Logger {
   info: (
@@ -30,33 +37,12 @@ interface LoggerStore extends Logger {
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ) => void;
-  addData: (data: unknown) => void;
+  addRedactedData: (...data: unknown[]) => void;
 }
 
-interface LoggerInstance extends Logger {
+interface LoggerInstance extends LoggerStore {
   currentLog: number;
   incrementCurrentLog: () => void;
-  info: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  debug: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  warn: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  error: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  addData: (data: unknown) => void;
 }
 
 const buildLoggerInstance = (logger: Logger): LoggerInstance => {
@@ -71,11 +57,13 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ): void => {
-    logger.addData(
-      buildLogObject(currentLog, INFO_LEVEL, message, useCase, data),
-    );
-    localLogger.info(message, data);
-    incrementCurrentLog();
+    if (loggerLevel <= INFO_LEVEL) {
+      logger.addData(
+        buildLogObject(currentLog, INFO_LEVEL, message, useCase, data),
+      );
+      localLogger.info(message, data);
+      incrementCurrentLog();
+    }
   };
 
   const debug = (
@@ -83,11 +71,13 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ): void => {
-    logger.addData(
-      buildLogObject(currentLog, DEBUG_LEVEL, message, useCase, data),
-    );
-    localLogger.debug(message, data);
-    incrementCurrentLog();
+    if (loggerLevel <= DEBUG_LEVEL) {
+      logger.addData(
+        buildLogObject(currentLog, DEBUG_LEVEL, message, useCase, data),
+      );
+      localLogger.debug(message, data);
+      incrementCurrentLog();
+    }
   };
 
   const warn = (
@@ -95,11 +85,13 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ): void => {
-    logger.addData(
-      buildLogObject(currentLog, WARNING_LEVEL, message, useCase, data),
-    );
-    localLogger.warn(message, data);
-    incrementCurrentLog();
+    if (loggerLevel <= WARNING_LEVEL) {
+      logger.addData(
+        buildLogObject(currentLog, WARNING_LEVEL, message, useCase, data),
+      );
+      localLogger.warn(message, data);
+      incrementCurrentLog();
+    }
   };
 
   const error = (
@@ -107,11 +99,17 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     useCase: LoggerUseCase,
     data?: Record<string, unknown>,
   ): void => {
-    logger.addData(
-      buildLogObject(currentLog, ERROR_LEVEL, message, useCase, data),
-    );
-    localLogger.error(message, data);
-    incrementCurrentLog();
+    if (loggerLevel <= ERROR_LEVEL) {
+      logger.addData(
+        buildLogObject(currentLog, ERROR_LEVEL, message, useCase, data),
+      );
+      localLogger.error(message, data);
+      incrementCurrentLog();
+    }
+  };
+
+  const addRedactedData = (...data: unknown[]): void => {
+    logger.addData(...data.map((data) => redactPropertiesFromData(data)));
   };
   const loggerInstance = (): LoggerInstance => {
     logger.currentLog = currentLog;
@@ -120,6 +118,7 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     logger.debug = debug;
     logger.warn = warn;
     logger.error = error;
+    logger.addRedactedData = addRedactedData;
 
     return logger;
   };

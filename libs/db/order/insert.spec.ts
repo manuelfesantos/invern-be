@@ -17,6 +17,7 @@ jest.mock("@db", () => ({
 }));
 
 jest.mock("@logger-utils", () => ({
+  redactPropertiesFromData: jest.fn(),
   logger: jest.fn(() => ({
     info: jest.fn(),
   })),

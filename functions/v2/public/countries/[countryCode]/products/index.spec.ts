@@ -18,7 +18,8 @@ import { errors } from "@error-handling-utils";
 import { ZodError } from "zod";
 
 jest.mock("@logger-utils", () => ({
-  logger: jest.fn().mockReturnValue({ addData: jest.fn() }),
+  redactPropertiesFromData: jest.fn(),
+  logger: jest.fn().mockReturnValue({ addRedactedData: jest.fn() }),
   localLogger: {
     info: jest.fn(),
     debug: jest.fn(),
