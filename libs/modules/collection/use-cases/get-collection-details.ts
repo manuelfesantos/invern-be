@@ -1,27 +1,21 @@
-import { getCollectionById } from "@collection-db";
-import { successResponse } from "@response-entity";
+import { selectCollectionById } from "@collection-db";
 import { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
-import { Country } from "@country-entity";
 import { extendProduct } from "@price-utils";
+import { ExtendedCollectionDetails } from "@collection-entity";
 
 export const getCollectionDetails = async (
   id: HttpParams,
-  country?: Country,
-): Promise<Response> => {
+): Promise<ExtendedCollectionDetails> => {
   const collectionId = uuidSchema("collection id").parse(id);
-  const collection = await getCollectionById(collectionId);
+  const collection = await selectCollectionById(collectionId);
   if (!collection) {
     throw errors.COLLECTION_NOT_FOUND();
   }
-  if (country) {
-    return successResponse.OK("success getting collection details", {
-      ...collection,
-      products: collection.products.map((product) =>
-        extendProduct(product, country),
-      ),
-    });
-  }
-  return successResponse.OK("success getting collection details", collection);
+
+  return {
+    ...collection,
+    products: collection.products.map((product) => extendProduct(product)),
+  };
 };

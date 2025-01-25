@@ -7,12 +7,15 @@ import {
   countrySchema,
 } from "@country-entity";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { eq } from "drizzle-orm";
 
 export const getCountryByCode = async (
   countryCode: CountryEnumType,
 ): Promise<Country | undefined> => {
-  const countryTemplate = await db().query.countriesTable.findFirst({
+  const countryTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.countriesTable.findFirst({
     where: eq(countriesTable.code, countryCode),
     columns: {
       currencyCode: false,
@@ -38,7 +41,9 @@ export const getCountryByCode = async (
 };
 
 export const selectAllCountries = async (): Promise<ClientCountry[]> => {
-  const countriesTemplate = await db().query.countriesTable.findMany({
+  const countriesTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.countriesTable.findMany({
     columns: {
       currencyCode: false,
     },

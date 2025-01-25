@@ -1,4 +1,5 @@
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { addressesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { BaseAddress } from "@address-entity";
@@ -6,7 +7,9 @@ import { BaseAddress } from "@address-entity";
 export const getAddressById = async (
   id: string,
 ): Promise<BaseAddress | undefined> => {
-  return db().query.addressesTable.findFirst({
+  return (
+    contextStore.context.transaction ?? db()
+  ).query.addressesTable.findFirst({
     where: eq(addressesTable.id, id),
   });
 };

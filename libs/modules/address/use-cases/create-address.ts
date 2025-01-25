@@ -1,22 +1,10 @@
-import {
-  ProtectedModuleFunction,
-  protectedSuccessResponse,
-} from "@response-entity";
-import { insertAddressSchema } from "@address-entity";
-import { insertAddress } from "@address-db";
+import { BaseAddress, insertAddressSchema } from "@address-entity";
+import { getAddressById, insertAddress } from "@address-db";
 
-export const createAddress: ProtectedModuleFunction = async (
-  tokens,
-  remember,
+export const createAddress = async (
   body: unknown,
-) => {
+): Promise<BaseAddress | undefined> => {
   const newAddress = insertAddressSchema.parse(body);
-  const [{ addressId }] = await insertAddress(newAddress);
-
-  return protectedSuccessResponse.OK(
-    tokens,
-    "successfully created address",
-    { addressId },
-    remember,
-  );
+  const addressId = await insertAddress(newAddress);
+  return await getAddressById(addressId);
 };

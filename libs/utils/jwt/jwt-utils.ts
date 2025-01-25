@@ -6,6 +6,8 @@ import {
 } from "@timer-utils";
 import { getRefreshTokenSecret, getTokenSecret } from "./token-secret";
 import { base64Decode, base64Encode } from "@crypto-utils";
+import { CookieNameEnum } from "@http-entity";
+import { getDomain } from "@http-utils";
 
 export const signJwt = async (
   payload: object,
@@ -51,31 +53,18 @@ export const decodeJwt = async (
   return jwtSchema.parse(tokenPayload);
 };
 
-const typeToCookie = {
-  token: "s_a",
-  refresh: "s_r",
-};
-
-export const getTokenCookie = (
-  token: string,
-  type: "token" | "refresh",
-  remember?: boolean,
-): string =>
-  `${typeToCookie[type]}=${token}; Path=/; HttpOnly; Secure; Domain=invernspirit.com; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+export const getTokenCookie = (token: string, remember?: boolean): string =>
+  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${getDomain()}; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
 
 export const getLoggedInToken = async (
   userId: string,
   cartId?: string,
-  remember?: boolean,
 ): Promise<string> =>
   await signJwt(
-    { userId, cartId, remember, exp: getFutureDate(TOKEN_EXPIRY) },
+    { userId, cartId, exp: getFutureDate(TOKEN_EXPIRY) },
     getTokenSecret(),
   );
 
 export const getLoggedInRefreshToken = async (
   userId: string,
-  cartId?: string,
-  remember?: boolean,
-): Promise<string> =>
-  await signJwt({ userId, cartId, remember }, getRefreshTokenSecret());
+): Promise<string> => await signJwt({ userId }, getRefreshTokenSecret());

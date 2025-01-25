@@ -1,5 +1,6 @@
 {
   "include": ["*/**/*.ts"],
+  "exclude": ["node_modules", "dist", "*/**/*.spec.ts"],
   "compilerOptions": {
     "baseUrl": ".",
     "esModuleInterop": true,
@@ -27,12 +28,16 @@
       "@collection-entity": ["libs/entities/collection"],
       "@collection-module": ["libs/modules/collection"],
       "@config-module": ["libs/modules/config"],
+      "@context-utils": ["libs/utils/context"],
       "@country-db": ["libs/db/country"],
       "@country-entity": ["libs/entities/country"],
       "@country-module": ["libs/modules/country"],
       "@crypto-utils": ["libs/utils/crypto"],
       "@currency-entity": ["libs/entities/currency"],
       "@db": ["libs/db"],
+      "@db-entity": ["libs/entities/db"],
+      "@db-schema": ["db/schema"],
+      "@decorator-utils": ["libs/utils/decorator"],
       "@encoding-utils": ["libs/utils/encoding"],
       "@error-handling-utils": ["libs/utils/error-handling"],
       "@global-entity": ["libs/entities/global"],

@@ -1,53 +1,42 @@
-import { getUserById, getUserVersionById } from "@user-db";
+import { getUserById } from "@user-db";
 import { protectedSuccessResponse } from "@response-entity";
 import { getLoggedInToken } from "@jwt-utils";
 import { loggedOutResponse } from "./logged-out-response";
 import { userDTOSchema } from "@user-entity";
+import { deleteCookieFromResponse, getCartIdFromHeaders } from "@http-utils";
+import { EMPTY_CART, toCartDTO } from "@cart-entity";
+import { CookieNameEnum } from "@http-entity";
 
 export const loggedInResponse = async (
+  headers: Headers,
   userId: string,
-  userVersion: number,
   refreshToken: string,
-  country?: string,
   cartId?: string,
   remember?: boolean,
 ): Promise<Response> => {
-  const savedUserVersion = await getUserVersionById(userId);
-
-  if (!savedUserVersion) {
-    return loggedOutResponse(country, userVersion);
-  }
-
-  const accessToken = await getLoggedInToken(userId, cartId, remember);
-
-  if (userVersion === savedUserVersion) {
-    return protectedSuccessResponse.OK(
-      { refreshToken, accessToken },
-      "success getting logged in config",
-      {
-        country,
-      },
-      remember,
-    );
-  }
-
-  if (userVersion > savedUserVersion) {
-    return loggedOutResponse(country, userVersion);
-  }
-
   const user = await getUserById(userId);
 
   if (!user) {
-    return loggedOutResponse(country, userVersion);
+    return loggedOutResponse(headers);
   }
 
-  return protectedSuccessResponse.OK(
-    { refreshToken, accessToken },
+  const accessToken = await getLoggedInToken(userId, cartId);
+
+  const cartIdFromCookie = getCartIdFromHeaders(headers);
+
+  const response = protectedSuccessResponse.OK(
     "success getting logged in config",
     {
-      country,
       user: userDTOSchema.parse(user),
+      cart: toCartDTO(user.cart || EMPTY_CART),
     },
-    remember,
+    undefined,
+    { refreshToken, accessToken, remember },
   );
+
+  if (cartIdFromCookie) {
+    deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+  }
+
+  return response;
 };

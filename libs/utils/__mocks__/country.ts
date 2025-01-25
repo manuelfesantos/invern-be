@@ -2,6 +2,7 @@ import { Country } from "@country-entity";
 
 export const countriesMock: Country[] = [
   {
+    locale: "pt-PT",
     name: "Portugal",
     code: "PT",
     currency: {
@@ -18,6 +19,7 @@ export const countriesMock: Country[] = [
     ],
   },
   {
+    locale: "es-ES",
     name: "Spain",
     code: "ES",
     currency: {

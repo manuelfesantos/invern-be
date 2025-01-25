@@ -1,5 +1,6 @@
 import { productsTable } from "@schema";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { InsertProduct } from "@product-entity";
 import { getRandomUUID } from "@crypto-utils";
 
@@ -14,7 +15,10 @@ export const insertProduct = async (
     ...product,
     id: getRandomUUID(),
   };
-  return db().insert(productsTable).values(insertProduct).returning({
-    productId: productsTable.id,
-  });
+  return (contextStore.context.transaction ?? db())
+    .insert(productsTable)
+    .values(insertProduct)
+    .returning({
+      productId: productsTable.id,
+    });
 };

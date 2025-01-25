@@ -1,4 +1,5 @@
 import { z, ZodEffects, ZodNumber, ZodString } from "zod";
+// eslint-disable-next-line import/no-restricted-paths
 import { isValidUUID } from "@crypto-utils";
 
 const ZERO_ELEMENTS = 0;

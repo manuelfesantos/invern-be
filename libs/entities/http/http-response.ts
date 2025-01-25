@@ -12,3 +12,9 @@ export const HttpStatusEnum = {
 } as const;
 
 export type HttpResponse = (typeof HttpStatusEnum)[keyof typeof HttpStatusEnum];
+
+export interface ResponseContext {
+  refreshToken: string;
+  accessToken?: string;
+  remember?: boolean;
+}

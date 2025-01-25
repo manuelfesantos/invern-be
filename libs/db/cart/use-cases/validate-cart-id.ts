@@ -3,11 +3,12 @@ import { errors } from "@error-handling-utils";
 import { logger } from "@logger-utils";
 import { getCartById } from "@cart-db";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { Cart } from "@cart-entity";
 
-export const validateCartId = async (cartId: string): Promise<void> => {
+export const validateCartId = async (cartId: string): Promise<Cart> => {
   const id = uuidSchema("cart id").parse(cartId);
-  const cartToValidate = await getCartById(id);
-  const cartIsValid = cartToValidate !== undefined;
+  const cart = await getCartById(id);
+  const cartIsValid = cart !== undefined;
 
   logger().info("Validating Cart Id", LoggerUseCaseEnum.VALIDATE_CART_ID, {
     isValid: cartIsValid,
@@ -15,4 +16,5 @@ export const validateCartId = async (cartId: string): Promise<void> => {
   if (!cartIsValid) {
     throw errors.CART_NOT_FOUND();
   }
+  return cart;
 };

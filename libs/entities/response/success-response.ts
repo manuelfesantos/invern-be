@@ -1,6 +1,10 @@
-import { HttpStatusEnum } from "@http-entity";
+import { HttpStatusEnum, ResponseContext } from "@http-entity";
 import { buildResponse } from "./response";
+/* eslint-disable import/no-restricted-paths */
 import { getTokenCookie } from "@jwt-utils";
+import { getRememberCookieHeader, setCookieInResponse } from "@http-utils";
+import { contextStore } from "@context-utils";
+/* eslint-enable import/no-restricted-paths */
 
 export const successResponse = {
   OK: (
@@ -19,42 +23,47 @@ export const successResponse = {
 
 export const protectedSuccessResponse = {
   OK: (
-    tokens: { refreshToken: string; accessToken?: string },
     message: string,
     data?: unknown,
-    remember?: boolean,
     headers?: Record<string, string>,
+    context?: ResponseContext,
   ): Response => {
-    const { refreshToken, accessToken } = tokens;
+    const { accessToken, refreshToken, remember } =
+      context ?? contextStore.context;
+
     const response = successResponse.OK(message, {
       ...(data && typeof data === "object" ? data : {}),
       accessToken,
     });
-    response.headers.append(
-      "Set-Cookie",
-      getTokenCookie(refreshToken, "refresh", remember),
-    );
+
+    setCookieInResponse(response, getTokenCookie(refreshToken, remember));
+
+    if (remember) {
+      setCookieInResponse(response, getRememberCookieHeader());
+    }
+
     for (const header in headers) {
       response.headers.append(header, headers[header]);
     }
     return response;
   },
   CREATED: (
-    tokens: { refreshToken: string; accessToken?: string },
     message: string,
     data?: unknown,
-    remember?: boolean,
     headers?: Record<string, string>,
+    context?: ResponseContext,
   ): Response => {
-    const { refreshToken, accessToken } = tokens;
+    const { refreshToken, accessToken, remember } =
+      context || contextStore.context;
     const response = successResponse.CREATED(message, {
       ...(data && typeof data === "object" ? data : {}),
       accessToken,
     });
     response.headers.append(
       "Set-Cookie",
-      getTokenCookie(refreshToken, "refresh", remember),
+      getTokenCookie(refreshToken, remember),
     );
+    response.headers.append("Set-Cookie", getRememberCookieHeader());
     for (const header in headers) {
       response.headers.append(header, headers[header]);
     }

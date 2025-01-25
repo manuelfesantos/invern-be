@@ -5,14 +5,13 @@ import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
 import { frontendHost, getStripeEnv } from "@http-utils";
-import { Country } from "@country-entity";
+import { contextStore } from "@context-utils";
 
 export const createCheckoutSession = async (
   lineItems: LineItem[],
-  country: Country,
   origin?: string,
-  v2?: boolean,
 ): Promise<Response<Stripe.Checkout.Session>> => {
+  const { country } = contextStore.context;
   const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
     customer_creation: "always",
@@ -28,8 +27,9 @@ export const createCheckoutSession = async (
         stripeEnv: getStripeEnv(),
       },
     },
-    success_url: `${origin || frontendHost()}/${v2 ? `${country.code.toLowerCase()}/` : ""}order?id=${clientId}`,
+    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}order?id=${clientId}`,
     cancel_url: `${origin || frontendHost()}/cart`,
+
     line_items: lineItems.map((product) => {
       return {
         price_data: {

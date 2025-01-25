@@ -1,7 +1,7 @@
 import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
 import { z } from "zod";
-import { cartDTOSchema, cartSchema } from "@cart-entity";
+import { cartSchema } from "@cart-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
 
 export const DEFAULT_USER_VERSION = 1;
@@ -32,16 +32,12 @@ export const userSchema = baseUserSchema
     }),
   );
 
-export const userDTOSchema = userSchema
-  .omit({
-    password: true,
-    role: true,
-    id: true,
-  })
-  .transform((payload) => ({
-    ...payload,
-    cart: payload.cart ? cartDTOSchema.parse(payload.cart) : null,
-  }));
+export const userDTOSchema = userSchema.omit({
+  password: true,
+  role: true,
+  id: true,
+  cart: true,
+});
 
 export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);

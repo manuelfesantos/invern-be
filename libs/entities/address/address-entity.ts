@@ -3,24 +3,25 @@ import { addressesTable } from "@schema";
 import { z } from "zod";
 import {
   clientCountrySchema,
+  countryEnumSchema,
   countrySchema,
   simpleCountrySchema,
 } from "@country-entity";
 
 const baseAddressSchema = createSelectSchema(addressesTable);
 
-export const insertAddressSchema = createInsertSchema(addressesTable).omit({
-  id: true,
-});
+export const insertAddressSchema = createInsertSchema(addressesTable)
+  .omit({
+    id: true,
+  })
+  .extend({
+    country: countryEnumSchema,
+  });
 
-export const addressSchema = baseAddressSchema
-  .omit({ country: true, line2: true })
-  .merge(
-    z.object({
-      country: countrySchema,
-      line2: z.string().optional().nullable(),
-    }),
-  );
+export const addressSchema = baseAddressSchema.extend({
+  country: countrySchema,
+  line2: z.string().optional().nullable(),
+});
 
 export const clientAddressSchema = addressSchema.omit({ country: true }).merge(
   z.object({

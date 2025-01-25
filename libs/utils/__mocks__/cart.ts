@@ -45,6 +45,8 @@ export const lineItemsMock: LineItem[] = [
 
 export const cartMock: Cart = {
   id: "",
+  lastModifiedAt: 0,
+  isLoggedIn: false,
   products: lineItemsMock,
 };
 

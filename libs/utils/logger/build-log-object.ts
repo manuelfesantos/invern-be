@@ -1,16 +1,17 @@
 import { LoggerUseCase } from "@logger-entity";
+import { stringifyObject } from "@string-utils";
 
 export const buildLogObject = (
-  currentLog: number,
   level: number,
   message: string,
   useCase: LoggerUseCase,
   data: Record<string, unknown> = {},
-): Record<string, unknown> => {
-  return {
-    [`${currentLog}-level`]: level,
-    [`${currentLog}-message`]: message,
-    [`${currentLog}-use-case`]: useCase,
-    [`${currentLog}-data`]: data,
-  };
+): string => {
+  return stringifyObject({
+    level,
+    message,
+    useCase,
+    ...data,
+    timeStamp: new Date().toISOString(),
+  });
 };

@@ -1,4 +1,5 @@
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { productsToCartsTable } from "@schema";
 import { getQuantityInCart } from "./get-quantity-in-cart";
 import { and, eq } from "drizzle-orm";
@@ -14,7 +15,7 @@ export const removeFromCart = async (
     throw errors.PRODUCT_NOT_IN_CART();
   }
   if (quantityInCart <= quantity) {
-    await db()
+    await (contextStore.context.transaction ?? db())
       .delete(productsToCartsTable)
       .where(
         and(
@@ -23,7 +24,7 @@ export const removeFromCart = async (
         ),
       );
   } else {
-    await db()
+    await (contextStore.context.transaction ?? db())
       .update(productsToCartsTable)
       .set({
         quantity: quantityInCart - quantity,
