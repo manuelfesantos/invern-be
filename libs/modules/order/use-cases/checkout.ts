@@ -1,82 +1,42 @@
-import { checkoutBodySchema } from "./types/checkout";
 import { createCheckoutSession } from "@stripe-adapter";
-import {
-  ProtectedModuleFunction,
-  protectedSuccessResponse,
-} from "@response-entity";
-import { getProductsByProductIds, increaseProductsStock } from "@product-db";
+import { increaseProductsStock } from "@product-db";
 import { errors } from "@error-handling-utils";
 import {
-  Product,
   LineItem,
   lineItemSchema,
   productIdAndQuantityArraySchema,
 } from "@product-entity";
-import { getCartById, validateCartId } from "@cart-db";
+import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
 import { decreaseProductsStock } from "@product-db";
-import { uuidSchema } from "@global-entity";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
-import { base64Encode } from "@crypto-utils";
-import { getCookieHeader } from "@http-utils";
-import { MILLISECONDS_IN_SECOND, SESSION_EXPIRY } from "@timer-utils";
+import { MILLISECONDS_IN_SECOND } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
-import { getCountryByCode } from "@country-db";
-import { Country, countryEnumSchema, CountryEnumType } from "@country-entity";
+import { contextStore } from "@context-utils";
 
-export const checkout: ProtectedModuleFunction = async (
-  tokens,
-  remember,
-  userId?: string,
-  cartId?: string,
-  body?: unknown,
+interface CheckoutReturnType {
+  url: string;
+  checkoutSessionId: string;
+}
+
+export const checkout = async (
   origin?: string,
-  country?: Country,
-): Promise<Response> => {
-  let lineItems: LineItem[] = [];
-  let countryCode: CountryEnumType;
-
-  const v1 = Boolean(!country);
-  const v2 = Boolean(country);
-
-  if (cartId) {
-    lineItems = await getLineItemsByCartId(cartId);
-    if (v1) {
-      countryCode = countryEnumSchema.parse(
-        checkoutBodySchema.parse(body).countryCode,
-      );
-    }
-  } else {
-    if (!body) {
-      logger().error(
-        "Checkout body not provided",
-        LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-      );
-      throw errors.PRODUCTS_ARE_REQUIRED();
-    }
-    const { products, countryCode: requestedCountryCode } =
-      checkoutBodySchema.parse(body);
-
-    if (v1) {
-      countryCode = countryEnumSchema.parse(requestedCountryCode);
-    }
-
-    lineItems = await getLineItems(products);
+): Promise<CheckoutReturnType> => {
+  const { cartId, userId } = contextStore.context;
+  if (!cartId) {
+    logger().error(
+      "No cart provided",
+      LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    );
+    throw errors.CART_NOT_PROVIDED();
   }
-
-  if (v1) {
-    country = await getCountryByCode(countryCode!);
-  }
-
-  if (!country) {
-    throw errors.INVALID_COUNTRY_CODE(countryCode!);
-  }
+  const lineItems = await getLineItemsByCartId(cartId);
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(lineItems, country, origin, v2);
+  const session = await createCheckoutSession(lineItems, origin);
 
   const { url, expires_at, id, created } = session;
 
@@ -96,44 +56,23 @@ export const checkout: ProtectedModuleFunction = async (
   });
 
   logger().info(
-    "checkout session created",
-    LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    { checkoutSession },
-  );
-
-  const checkoutSessionToken = base64Encode(id);
-
-  const checkoutSessionCookie = getCookieHeader(
-    "c_s",
-    checkoutSessionToken,
-    SESSION_EXPIRY,
-  );
-
-  logger().info(
     "Finished creating checkout session",
     LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
     {
       sessionDetails: stringifyObject(session),
+      checkoutSession,
     },
   );
 
-  return protectedSuccessResponse.OK(
-    tokens,
-    "checkout session created",
-    {
-      url,
-    },
-    remember,
-    {
-      "Set-Cookie": checkoutSessionCookie,
-    },
-  );
+  return {
+    url,
+    checkoutSessionId: id,
+  };
 };
 
 const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
-  await validateCartId(cartId);
-  const cart = await getCartById(cartId);
-  if (!cart.products?.length) {
+  const cart = await validateCartId(cartId);
+  if (!cart?.products?.length) {
     throw errors.CART_IS_EMPTY();
   }
   const lineItems = cart.products.map((product) =>
@@ -143,46 +82,6 @@ const getLineItemsByCartId = async (cartId: string): Promise<LineItem[]> => {
   validateLineItems(lineItems);
 
   return lineItems;
-};
-
-const getLineItems = async (
-  products: { id: string; quantity: number }[],
-): Promise<LineItem[]> => {
-  const dbProducts = await getProductsByProductIds(
-    products.map((product) => uuidSchema("product id").parse(product.id)),
-  );
-  if (dbProducts.length !== products.length) {
-    throw errors.INVALID_PRODUCT_IDS(
-      getInvalidProductIds(products, dbProducts),
-    );
-  }
-
-  const lineItems = buildLineItems(products, dbProducts);
-
-  validateLineItems(lineItems);
-
-  return lineItems;
-};
-
-const getInvalidProductIds = (
-  products: { id: string; quantity: number }[],
-  dbProducts: Product[],
-): string[] => {
-  return products
-    .filter(
-      (product) => !dbProducts.find((dbProduct) => dbProduct.id === product.id),
-    )
-    .map((product) => product.id);
-};
-
-const buildLineItems = (
-  products: { id: string; quantity: number }[],
-  dbProducts: Product[],
-): LineItem[] => {
-  return products.map((product) => ({
-    ...dbProducts.find((dbProduct) => dbProduct.id === product.id)!,
-    quantity: product.quantity,
-  }));
 };
 
 const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {

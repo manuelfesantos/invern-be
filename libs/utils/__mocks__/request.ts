@@ -1,7 +1,6 @@
 import { HttpMethodEnum } from "@http-entity";
-import { CountriesEndpointProtectedData, Env } from "@request-entity";
+import { Env } from "@request-entity";
 import { undefined } from "zod";
-import { Country } from "@country-entity";
 
 // eslint-disable-next-line max-len
 const edgeRequestKeepAliveStatus: IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = 0;
@@ -31,26 +30,10 @@ const envMock: Env = {
   HONEYCOMB_API_KEY: "",
   HONEYCOMB_DATASET: "",
   LOGGER_LEVEL: "",
-};
-
-const dataMock: CountriesEndpointProtectedData & {
-  honeycomb: { tracer: { addData: () => void } };
-} = {
-  accessToken: "",
-  cartId: "cartId",
-  country: {} as unknown as Country,
-  honeycomb: {
-    tracer: {
-      addData: function () {},
-    },
-  },
-  refreshToken: "refreshToken",
-  remember: false,
-  userId: "userId",
+  DOMAIN: "",
 };
 
 export const GETEventMock = {
-  data: dataMock,
   env: {
     ...envMock,
     ASSETS: {
@@ -154,7 +137,6 @@ export const GETEventMock = {
   waitUntil: jest.fn(),
 };
 export const POSTEventMock = {
-  data: dataMock,
   env: {
     ...envMock,
     ASSETS: {
@@ -258,7 +240,6 @@ export const POSTEventMock = {
   waitUntil: jest.fn(),
 };
 export const PUTEventMock = {
-  data: dataMock,
   env: {
     ...envMock,
     ASSETS: {
@@ -362,7 +343,6 @@ export const PUTEventMock = {
   waitUntil: jest.fn(),
 };
 export const DELETEEventMock = {
-  data: dataMock,
   env: {
     ...envMock,
     ASSETS: {

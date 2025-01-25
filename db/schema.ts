@@ -14,6 +14,10 @@ const VALUE_ZERO = 0;
 
 export const cartsTable = sqliteTable("carts", {
   id: text("id").primaryKey(),
+  lastModifiedAt: int("lastModifiedAt").notNull(),
+  isLoggedIn: int("isLoggedIn", {
+    mode: "boolean",
+  }).notNull(),
 });
 
 export const usersTable = sqliteTable("users", {
@@ -27,9 +31,9 @@ export const usersTable = sqliteTable("users", {
     .notNull()
     .default("USER"),
   cartId: text("cartId")
-    .notNull()
+    .unique()
     .references(() => cartsTable.id, {
-      onDelete: "cascade",
+      onDelete: "set null",
     }),
 });
 
@@ -132,6 +136,7 @@ export const countriesTable = sqliteTable("countries", {
   code: text("code", { enum: ["PT", "ES"] })
     .notNull()
     .primaryKey(),
+  locale: text("locale").notNull(),
   currencyCode: text("currencyCode")
     .notNull()
     .references(() => currenciesTable.code, {
@@ -141,10 +146,12 @@ export const countriesTable = sqliteTable("countries", {
 
 export const addressesTable = sqliteTable("addresses", {
   id: text("id").primaryKey(),
-  line1: text("line1").notNull(),
-  line2: text("line2"),
+  street: text("street").notNull(),
+  houseNumber: text("houseNumber").notNull(),
+  apartment: text("apartment"),
   postalCode: text("postalCode").notNull(),
   city: text("city").notNull(),
+  province: text("province"),
   country: text("countryId")
     .notNull()
     .references(() => countriesTable.code, {
@@ -172,6 +179,15 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
     onDelete: "cascade",
   }),
   cartId: text("cartId").references(() => cartsTable.id, {
+    onDelete: "cascade",
+  }),
+});
+
+export const shippingMethodsTable = sqliteTable("shippingMethods", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  priceInCents: int("priceInCents").notNull(),
+  countryCode: text("countryCode").references(() => countriesTable.code, {
     onDelete: "cascade",
   }),
 });

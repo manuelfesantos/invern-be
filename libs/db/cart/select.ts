@@ -1,10 +1,15 @@
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { cartsTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { Cart, cartSchema } from "@cart-entity";
 
-export const getCartById = async (cartId: string): Promise<Cart> => {
-  const cartTemplate = await db().query.cartsTable.findFirst({
+export const getCartById = async (
+  cartId: string,
+): Promise<Cart | undefined> => {
+  const cartTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.cartsTable.findFirst({
     where: eq(cartsTable.id, cartId),
     with: {
       productsToCarts: {
@@ -28,11 +33,13 @@ export const getCartById = async (cartId: string): Promise<Cart> => {
     },
   });
 
-  return cartSchema.parse({
-    ...cartTemplate,
-    products: cartTemplate?.productsToCarts.map((product) => ({
-      ...product.product,
-      quantity: product.quantity,
-    })),
-  });
+  if (cartTemplate) {
+    return cartSchema.parse({
+      ...cartTemplate,
+      products: cartTemplate?.productsToCarts.map((product) => ({
+        ...product.product,
+        quantity: product.quantity,
+      })),
+    });
+  }
 };

@@ -12,6 +12,7 @@ export const clientOrdersMock: ClientOrder[] = [
       id: "1",
       city: "1",
       country: {
+        locale: "pt-PT",
         taxes: [] as Tax[],
         currency: {
           code: "EUR",
@@ -21,9 +22,11 @@ export const clientOrdersMock: ClientOrder[] = [
         code: "PT",
         name: "1",
       },
-      line1: "1",
-      line2: "1",
       postalCode: "1",
+      street: "1",
+      houseNumber: "1",
+      apartment: "1",
+      province: "1",
     },
     payment: {
       grossAmount: 1,
@@ -41,6 +44,7 @@ export const clientOrdersMock: ClientOrder[] = [
       id: "2",
       city: "2",
       country: {
+        locale: "es-ES",
         taxes: [] as Tax[],
         currency: {
           code: "EUR",
@@ -50,9 +54,11 @@ export const clientOrdersMock: ClientOrder[] = [
         code: "ES",
         name: "2",
       },
-      line1: "2",
-      line2: "2",
       postalCode: "2",
+      street: "2",
+      houseNumber: "2",
+      apartment: "2",
+      province: "2",
     },
     payment: {
       grossAmount: 3,
@@ -74,6 +80,7 @@ export const ordersMock: Order[] = [
       id: "1",
       city: "1",
       country: {
+        locale: "pt-PT",
         taxes: [] as Tax[],
         currency: {
           symbol: "€",
@@ -83,9 +90,11 @@ export const ordersMock: Order[] = [
         code: "PT",
         name: "1",
       },
-      line1: "1",
-      line2: "1",
       postalCode: "1",
+      street: "1",
+      houseNumber: "1",
+      apartment: "1",
+      province: "1",
     },
     payment: {
       grossAmount: 1,
@@ -105,6 +114,7 @@ export const ordersMock: Order[] = [
       id: "2",
       city: "2",
       country: {
+        locale: "es-ES",
         taxes: [] as Tax[],
         currency: {
           code: "EUR",
@@ -114,9 +124,11 @@ export const ordersMock: Order[] = [
         code: "ES",
         name: "2",
       },
-      line1: "2",
-      line2: "2",
       postalCode: "2",
+      street: "2",
+      houseNumber: "2",
+      apartment: "2",
+      province: "2",
     },
     payment: {
       grossAmount: 2,

@@ -1,8 +1,10 @@
 import { productsToCartsTable } from "@schema";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { getQuantityInCart } from "./get-quantity-in-cart";
 import { and, eq } from "drizzle-orm";
 import { errors } from "@error-handling-utils";
+import { updateCart } from "../update";
 
 const QUANTITY_VALUE_ZERO = 0;
 
@@ -19,11 +21,11 @@ export const addToCart = async (
   }
 
   if (quantityInCart === QUANTITY_VALUE_ZERO) {
-    await db()
+    await (contextStore.context.transaction ?? db())
       .insert(productsToCartsTable)
       .values({ cartId, productId, quantity });
   } else {
-    await db()
+    await (contextStore.context.transaction ?? db())
       .update(productsToCartsTable)
       .set({ quantity: quantityInCart + quantity })
       .where(
@@ -33,4 +35,5 @@ export const addToCart = async (
         ),
       );
   }
+  await updateCart(cartId, { lastModifiedAt: Date.now() });
 };

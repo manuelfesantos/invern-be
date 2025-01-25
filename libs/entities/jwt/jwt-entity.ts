@@ -8,7 +8,6 @@ export const jwtSchema = z.object({
 export const userJwtSchema = jwtSchema.extend({
   userId: z.string(),
   cartId: z.string().optional(),
-  remember: z.boolean().default(false),
 });
 
 export type UserJWT = z.infer<typeof userJwtSchema>;

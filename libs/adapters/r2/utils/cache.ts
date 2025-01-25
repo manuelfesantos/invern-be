@@ -1,7 +1,7 @@
 import { frontendHost } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { HttpStatusEnum } from "@http-entity";
+import { HttpMethodEnum, HttpStatusEnum } from "@http-entity";
 
 let cacheApiKey: string | null = null;
 let zoneId: string | null = null;
@@ -43,7 +43,7 @@ export const purgeCache = async (
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
     {
-      method: "POST",
+      method: HttpMethodEnum.POST,
       headers: {
         "Content-Type": "application/json",
         "X-Auth-Key": cacheApiKey,

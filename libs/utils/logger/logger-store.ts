@@ -4,6 +4,7 @@ import { LoggerUseCase } from "@logger-entity";
 import { buildLogObject } from "./build-log-object";
 import { localLogger } from "./local-logger";
 import { redactPropertiesFromData } from "./redact-properties-from-data";
+import { stringifyObject } from "@string-utils";
 
 const DEBUG_LEVEL = 20;
 const INFO_LEVEL = 30;
@@ -46,14 +47,14 @@ interface LoggerInstance extends LoggerStore {
 }
 
 const buildLoggerInstance = (logger: Logger): LoggerInstance => {
-  let currentLog = 1;
-
-  const incrementCurrentLog = (): void => {
-    currentLog++;
+  const addRedactedData = (...data: unknown[]): void => {
+    const redactedData = data.map((data) => redactPropertiesFromData(data));
+    logger.addData(...redactedData);
   };
 
-  const addRedactedData = (...data: unknown[]): void => {
-    logger.addData(...data.map((data) => redactPropertiesFromData(data)));
+  const addRedactedLog = (data: string): void => {
+    const redactedData = redactPropertiesFromData(JSON.parse(data));
+    logger.log(stringifyObject(redactedData));
   };
 
   const info = (
@@ -62,11 +63,8 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= INFO_LEVEL) {
-      addRedactedData(
-        buildLogObject(currentLog, INFO_LEVEL, message, useCase, data),
-      );
+      addRedactedLog(buildLogObject(INFO_LEVEL, message, useCase, data));
       localLogger.info(message, data);
-      incrementCurrentLog();
     }
   };
 
@@ -76,11 +74,8 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= DEBUG_LEVEL) {
-      addRedactedData(
-        buildLogObject(currentLog, DEBUG_LEVEL, message, useCase, data),
-      );
+      addRedactedLog(buildLogObject(DEBUG_LEVEL, message, useCase, data));
       localLogger.debug(message, data);
-      incrementCurrentLog();
     }
   };
 
@@ -90,11 +85,8 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= WARNING_LEVEL) {
-      addRedactedData(
-        buildLogObject(currentLog, WARNING_LEVEL, message, useCase, data),
-      );
+      addRedactedLog(buildLogObject(WARNING_LEVEL, message, useCase, data));
       localLogger.warn(message, data);
-      incrementCurrentLog();
     }
   };
 
@@ -104,16 +96,11 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
     data?: Record<string, unknown>,
   ): void => {
     if (loggerLevel <= ERROR_LEVEL) {
-      addRedactedData(
-        buildLogObject(currentLog, ERROR_LEVEL, message, useCase, data),
-      );
+      addRedactedLog(buildLogObject(ERROR_LEVEL, message, useCase, data));
       localLogger.error(message, data);
-      incrementCurrentLog();
     }
   };
   const loggerInstance = (): LoggerInstance => {
-    logger.currentLog = currentLog;
-    logger.incrementCurrentLog = incrementCurrentLog;
     logger.info = info;
     logger.debug = debug;
     logger.warn = warn;
@@ -136,6 +123,5 @@ export const logger = (): LoggerStore => {
   return logger;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const withLogger = (logger: Logger, fn: () => any): any =>
+export const withLogger = <T>(logger: Logger, fn: () => T): T =>
   loggerStore.run(buildLoggerInstance(logger), fn);

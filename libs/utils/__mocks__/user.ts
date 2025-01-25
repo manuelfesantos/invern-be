@@ -4,9 +4,6 @@ export const userDtoMock: UserDTO = {
   email: "example@example.com",
   firstName: "example",
   lastName: "example",
-  cart: {
-    products: [],
-  },
   version: 1,
 };
 
@@ -17,6 +14,8 @@ export const userMock: User = {
   cart: {
     id: "591fd975-606e-4d51-b42a-51a2f0d052a5",
     products: [],
+    lastModifiedAt: 1234,
+    isLoggedIn: true,
   },
   email: "example@example.com",
   firstName: "example",

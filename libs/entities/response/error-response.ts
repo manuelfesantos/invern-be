@@ -1,8 +1,10 @@
 import { z, ZodError } from "zod";
 import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
+/* eslint-disable import/no-restricted-paths */
 import { CustomError } from "@error-handling-utils";
 import { localLogger } from "@logger-utils";
+/* eslint-enable import/no-restricted-paths */
 
 export const errorResponse = {
   BAD_REQUEST: (error?: unknown, headers?: Record<string, string>) =>

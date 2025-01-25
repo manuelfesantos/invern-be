@@ -1,4 +1,5 @@
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { eq } from "drizzle-orm";
 import { ordersTable, productsToOrdersTable } from "@schema";
 import {
@@ -12,7 +13,9 @@ import { ProductIdAndQuantity } from "@product-entity";
 export const getOrdersByUserId = async (
   userId: string,
 ): Promise<ClientOrder[]> => {
-  const ordersTemplate = await db().query.ordersTable.findMany({
+  const ordersTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.ordersTable.findMany({
     columns: {
       userId: false,
       addressId: false,
@@ -91,7 +94,9 @@ export const getOrdersByUserId = async (
 export const getOrderByStripeId = async (
   stripeId: string,
 ): Promise<Order | undefined> => {
-  const orderTemplate = await db().query.ordersTable.findFirst({
+  const orderTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.ordersTable.findFirst({
     where: eq(ordersTable.stripeId, stripeId),
     columns: {
       userId: false,
@@ -168,7 +173,9 @@ export const getOrderByStripeId = async (
 export const getOrderById = async (
   id: string,
 ): Promise<ClientOrder | undefined> => {
-  const orderTemplate = await db().query.ordersTable.findFirst({
+  const orderTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.ordersTable.findFirst({
     where: eq(ordersTable.id, id),
     columns: {
       userId: false,
@@ -247,7 +254,7 @@ export const getOrderById = async (
 export const getOrderProductsByPaymentId = async (
   paymentId: string,
 ): Promise<ProductIdAndQuantity[]> => {
-  return db()
+  return (contextStore.context.transaction ?? db())
     .select({
       id: productsToOrdersTable.productId,
       quantity: productsToOrdersTable.quantity,

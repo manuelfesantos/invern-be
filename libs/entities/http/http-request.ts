@@ -1,13 +1,11 @@
 import { z } from "zod";
 
-export const httpMethodsSchema = z.enum([
-  "GET",
-  "POST",
-  "PUT",
-  "PATCH",
-  "DELETE",
-  "OPTIONS",
-]);
+export const httpMethodsSchema = z.enum(
+  ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
+  {
+    message: "Invalid HTTP method",
+  },
+);
 export const HttpMethodEnum = httpMethodsSchema.enum;
 export type HttpMethod = (typeof HttpMethodEnum)[keyof typeof HttpMethodEnum];
 
@@ -19,3 +17,12 @@ export const HttpHeaderEnum = {
 export type HttpHeader = (typeof HttpHeaderEnum)[keyof typeof HttpHeaderEnum];
 
 export type HttpParams = string | string[];
+
+export const CookieNameEnum = {
+  CART_ID: "c_i",
+  REFRESH_TOKEN: "s_r",
+  CHECKOUT_SESSION: "c_s",
+  REMEMBER: "r_m",
+} as const;
+
+export type CookieName = (typeof CookieNameEnum)[keyof typeof CookieNameEnum];

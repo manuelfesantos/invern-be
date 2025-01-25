@@ -1,13 +1,16 @@
 import { errors } from "@error-handling-utils";
 import { uuidSchema } from "@global-entity";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { eq, inArray } from "drizzle-orm";
 import { productsTable } from "@schema";
 
 export const validateProductId = async (productId: string): Promise<void> => {
   const id = uuidSchema("product id").parse(productId);
   const productIsValid = Boolean(
-    await db().query.productsTable.findFirst({
+    await (
+      contextStore.context.transaction ?? db()
+    ).query.productsTable.findFirst({
       where: eq(productsTable.id, id),
     }),
   );
@@ -21,7 +24,9 @@ export const validateProductIdAndGetStock = async (
   quantity: number,
 ): Promise<number> => {
   const id = uuidSchema("product id").parse(productId);
-  const product = await db().query.productsTable.findFirst({
+  const product = await (
+    contextStore.context.transaction ?? db()
+  ).query.productsTable.findFirst({
     where: eq(productsTable.id, id),
   });
   if (!product) {
@@ -40,7 +45,9 @@ export const validateProductIds = async (
   const ids = productIds.map((productId) =>
     uuidSchema("product id").parse(productId),
   );
-  const products = await db().query.productsTable.findMany({
+  const products = await (
+    contextStore.context.transaction ?? db()
+  ).query.productsTable.findMany({
     where: inArray(productsTable.id, ids),
   });
   if (products.length !== ids.length) {
