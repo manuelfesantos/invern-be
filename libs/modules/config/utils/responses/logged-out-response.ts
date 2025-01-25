@@ -1,18 +1,43 @@
 import { protectedSuccessResponse } from "@response-entity";
 import { getAnonymousTokens } from "@jwt-utils";
+import {
+  deleteCookieFromResponse,
+  getCartIdFromHeaders,
+  setCartIdCookieInResponse,
+} from "@http-utils";
+import { getCartById } from "@cart-db";
+import { Cart, EMPTY_CART, toCartDTO } from "@cart-entity";
+import { CookieNameEnum } from "@http-entity";
+import { extendCart } from "@price-utils";
 
 export const loggedOutResponse = async (
-  country?: string,
-  userVersion?: number,
+  headers: Headers,
 ): Promise<Response> => {
-  const { token, refreshToken } = await getAnonymousTokens();
+  const { accessToken, refreshToken } = await getAnonymousTokens();
+  let cart: Cart = EMPTY_CART;
 
-  return protectedSuccessResponse.OK(
-    { refreshToken, accessToken: token },
+  const cartId = getCartIdFromHeaders(headers);
+  if (cartId) {
+    cart = (await getCartById(cartId)) || cart;
+  }
+
+  const response = protectedSuccessResponse.OK(
     "success getting logged out config",
     {
-      country,
-      ...(userVersion ? { deleteUser: true } : {}),
+      cart: extendCart(toCartDTO(cart)),
     },
+    undefined,
+    { refreshToken, accessToken },
   );
+
+  if (cartId) {
+    if (cart.id) {
+      setCartIdCookieInResponse(response, cartId);
+    } else {
+      deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+    }
+  }
+
+  deleteCookieFromResponse(response, CookieNameEnum.REMEMBER);
+  return response;
 };

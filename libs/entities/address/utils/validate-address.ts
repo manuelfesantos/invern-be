@@ -1,4 +1,5 @@
 import { InsertAddress, insertAddressSchema } from "../address-entity";
+// eslint-disable-next-line import/no-restricted-paths
 import { errors } from "@error-handling-utils";
 
 export const validateStripeAddress = (address: unknown): InsertAddress => {

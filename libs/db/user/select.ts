@@ -1,5 +1,6 @@
 import { usersTable } from "@schema";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { eq } from "drizzle-orm";
 import { User, userSchema } from "@user-entity";
 import { errors } from "@error-handling-utils";
@@ -12,7 +13,9 @@ const getUser = async (
   where: "id" | "email" | "cartId",
   selection: string,
 ): Promise<User | undefined> => {
-  const userTemplate = await db().query.usersTable.findFirst({
+  const userTemplate = await (
+    contextStore.context.transaction ?? db()
+  ).query.usersTable.findFirst({
     where: eq(usersTable[where], selection),
     with: {
       cart: {
@@ -70,7 +73,9 @@ export const getUserById = async (userId: string): Promise<User> => {
 };
 
 export const getUserVersionById = async (userId: string): Promise<number> => {
-  const user = await db().query.usersTable.findFirst({
+  const user = await (
+    contextStore.context.transaction ?? db()
+  ).query.usersTable.findFirst({
     where: eq(usersTable.id, userId),
     columns: {
       version: true,

@@ -1,5 +1,6 @@
 import { InsertPayment, Payment } from "@payment-entity";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { paymentsTable } from "@schema";
 
 export const insertPaymentReturningId = async (
@@ -13,9 +14,12 @@ export const insertPaymentReturningId = async (
     ...payment,
     createdAt: new Date().toISOString(),
   };
-  return db().insert(paymentsTable).values(insertPayment).returning({
-    paymentId: paymentsTable.id,
-  });
+  return (contextStore.context.transaction ?? db())
+    .insert(paymentsTable)
+    .values(insertPayment)
+    .returning({
+      paymentId: paymentsTable.id,
+    });
 };
 
 export const insertPaymentReturningAll = async (
@@ -25,5 +29,8 @@ export const insertPaymentReturningAll = async (
     ...payment,
     createdAt: new Date().toISOString(),
   };
-  return db().insert(paymentsTable).values(insertPayment).returning();
+  return (contextStore.context.transaction ?? db())
+    .insert(paymentsTable)
+    .values(insertPayment)
+    .returning();
 };

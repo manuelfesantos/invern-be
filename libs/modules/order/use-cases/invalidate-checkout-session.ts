@@ -1,16 +1,13 @@
 import { expireCheckoutSession } from "@stripe-adapter";
-import { getCookieHeader } from "@http-utils";
 import { selectCheckoutSessionById } from "@checkout-session-db";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { errors } from "@error-handling-utils";
 import { getCurrentTime } from "@timer-utils";
 
-const NO_MAX_AGE = 0;
-
 export const invalidateCheckoutSession = async (
   checkoutSessionId: string,
-): Promise<string> => {
+): Promise<void> => {
   const checkoutSession = await selectCheckoutSessionById(checkoutSessionId);
 
   if (!checkoutSession) {
@@ -18,14 +15,14 @@ export const invalidateCheckoutSession = async (
       `checkout session with id ${checkoutSessionId} not found`,
       LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
     );
-    return getCookieHeader("c_s", "", NO_MAX_AGE);
+    return;
   }
   if (checkoutSession.expiresAt < getCurrentTime()) {
     logger().info(
       `checkout session with id ${checkoutSessionId} already expired`,
       LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
     );
-    return getCookieHeader("c_s", "", NO_MAX_AGE);
+    return;
   }
 
   const productsString = checkoutSession.products;
@@ -41,6 +38,4 @@ export const invalidateCheckoutSession = async (
     LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
     { checkoutSessionId },
   );
-
-  return getCookieHeader("c_s", "", NO_MAX_AGE);
 };

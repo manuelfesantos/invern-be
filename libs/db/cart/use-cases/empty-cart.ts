@@ -1,9 +1,10 @@
 import { db } from "@db";
-import { productsToCartsTable } from "@schema";
+import { contextStore } from "@context-utils";
+import { cartsTable } from "@schema";
 import { eq } from "drizzle-orm";
 
 export const emptyCart = async (cartId: string): Promise<void> => {
-  await db()
-    .delete(productsToCartsTable)
-    .where(eq(productsToCartsTable.cartId, cartId));
+  await (contextStore.context.transaction ?? db())
+    .delete(cartsTable)
+    .where(eq(cartsTable.id, cartId));
 };

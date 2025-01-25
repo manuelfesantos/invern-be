@@ -1,6 +1,9 @@
 import { login } from "./login";
 import { signup } from "./signup";
-import { userActionSchema } from "./types/map-user-action";
+import {
+  UserActionReturnType,
+  userActionSchema,
+} from "./types/map-user-action";
 import { logout } from "./logout";
 
 const userActionMap = {
@@ -12,9 +15,8 @@ const userActionMap = {
 export const userActionMapper = async (
   body: unknown,
   action: string | null,
-  userId?: string,
-): Promise<Response> => {
+): Promise<UserActionReturnType> => {
   const userAction = userActionSchema.parse(action);
 
-  return userActionMap[userAction](body, userId);
+  return userActionMap[userAction](body);
 };

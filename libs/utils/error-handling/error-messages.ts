@@ -41,6 +41,8 @@ export const errors = {
     new CustomError("Collection not found", HttpStatusEnum.NOT_FOUND),
   CART_NOT_FOUND: (): CustomError =>
     new CustomError("Cart not found", HttpStatusEnum.NOT_FOUND),
+  CART_NOT_PROVIDED: (): CustomError =>
+    new CustomError("Cart not provided", HttpStatusEnum.BAD_REQUEST),
   INVALID_PRODUCT_IDS: (ids: string[]): CustomError =>
     new CustomError(
       "The following product ids are invalid: " + ids,

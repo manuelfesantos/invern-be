@@ -1,7 +1,7 @@
 import { createSelectSchema } from "drizzle-zod";
 import { collectionsTable } from "@schema";
 import { z } from "zod";
-import { productSchema } from "@product-entity";
+import { extendedProductSchema, productSchema } from "@product-entity";
 import { imageSchema } from "@image-entity";
 
 const baseCollectionSchema = createSelectSchema(collectionsTable);
@@ -17,6 +17,10 @@ export const collectionDetailsSchema = baseCollectionSchema.merge(
   }),
 );
 
+export const extendedCollectionDetailsSchema = collectionDetailsSchema.extend({
+  products: extendedProductSchema.array(),
+});
+
 export const collectionSchema = baseCollectionSchema
   .omit({ description: true })
   .merge(
@@ -28,3 +32,6 @@ export const collectionSchema = baseCollectionSchema
 export type CollectionDetails = z.infer<typeof collectionDetailsSchema>;
 export type Collection = z.infer<typeof collectionSchema>;
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
+export type ExtendedCollectionDetails = z.infer<
+  typeof extendedCollectionDetailsSchema
+>;

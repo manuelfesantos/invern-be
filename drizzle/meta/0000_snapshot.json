@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c06142ef-24cc-4caa-876c-0ac067701d13",
+  "id": "a62d775c-b3cf-4ad8-b711-8f5063acf0c4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "addresses": {
@@ -14,15 +14,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "line1": {
-          "name": "line1",
+        "street": {
+          "name": "street",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "line2": {
-          "name": "line2",
+        "houseNumber": {
+          "name": "houseNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "apartment": {
+          "name": "apartment",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -40,6 +47,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "province": {
+          "name": "province",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "countryId": {
@@ -76,6 +90,20 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "isLoggedIn": {
+          "name": "isLoggedIn",
+          "type": "integer",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
@@ -207,6 +235,13 @@
           "name": "code",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "locale": {
+          "name": "locale",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -699,6 +734,57 @@
       },
       "uniqueConstraints": {}
     },
+    "shippingMethods": {
+      "name": "shippingMethods",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priceInCents": {
+          "name": "priceInCents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "countryCode": {
+          "name": "countryCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shippingMethods_countryCode_countries_code_fk": {
+          "name": "shippingMethods_countryCode_countries_code_fk",
+          "tableFrom": "shippingMethods",
+          "tableTo": "countries",
+          "columnsFrom": [
+            "countryCode"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "taxes": {
       "name": "taxes",
       "columns": {
@@ -808,11 +894,19 @@
           "name": "cartId",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_cartId_unique": {
+          "name": "users_cartId_unique",
+          "columns": [
+            "cartId"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "users_cartId_carts_id_fk": {
           "name": "users_cartId_carts_id_fk",
@@ -824,7 +918,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

@@ -1,5 +1,4 @@
 import { popExpiredCheckoutSessions } from "@checkout-session-db";
-import { successResponse } from "@response-entity";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
@@ -8,10 +7,10 @@ import { getProductsFromString } from "../utils/get-products-from-string";
 import { increaseProductsStock } from "@product-db";
 import { stockClient } from "@r2-adapter";
 
-export const checkExpiredCheckoutSessions = async (): Promise<Response> => {
+export const checkExpiredCheckoutSessions = async (): Promise<string> => {
   const expiredSessions = await popExpiredCheckoutSessions();
   if (!expiredSessions.length) {
-    return successResponse.OK("No sessions were expired");
+    return "No sessions were expired";
   }
 
   logger().info(
@@ -26,7 +25,7 @@ export const checkExpiredCheckoutSessions = async (): Promise<Response> => {
     await retrieveProductsStockFromSession(session);
   }
 
-  return successResponse.OK("retrieved product stocks from expired session");
+  return "retrieved product stocks from expired session";
 };
 
 const retrieveProductsStockFromSession = async (

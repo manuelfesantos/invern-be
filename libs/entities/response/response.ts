@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-restricted-paths
 import { logger } from "@logger-utils";
 
 export const buildResponse = (

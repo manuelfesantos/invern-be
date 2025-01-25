@@ -1,16 +1,25 @@
 import { getUserByEmail } from "@user-db";
-import { protectedSuccessResponse } from "@response-entity";
-import { User, userToUserDTO } from "@user-entity";
+import { User, UserDTO, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
 import { loginBodySchema } from "./types/map-user-action";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
+import { ResponseContext } from "@http-entity";
+import { contextStore } from "@context-utils";
 
-export const login = async (body: unknown, id?: string): Promise<Response> => {
-  if (id) {
+interface ReturnType {
+  user: UserDTO;
+  responseContext: ResponseContext;
+}
+
+export const login = async (body: unknown): Promise<ReturnType> => {
+  const { isLoggedIn } = contextStore.context;
+
+  if (isLoggedIn) {
     throw errors.UNAUTHORIZED("already logged in");
   }
+
   const parsedBody = loginBodySchema.parse(body);
 
   const { email, password, remember } = parsedBody;
@@ -22,23 +31,22 @@ export const login = async (body: unknown, id?: string): Promise<Response> => {
   const { id: userId } = user;
   const { id: cartId } = user.cart ?? {};
 
-  const accessToken = await getLoggedInToken(userId, cartId, remember);
+  const accessToken = await getLoggedInToken(userId, cartId);
   let refreshToken = await getAuthSecret(userId);
 
   if (!refreshToken) {
-    refreshToken = await getLoggedInRefreshToken(userId, cartId);
+    refreshToken = await getLoggedInRefreshToken(userId);
     await setAuthSecret(userId, refreshToken);
   }
 
-  return protectedSuccessResponse.OK(
-    { refreshToken, accessToken },
-    "successfully logged in",
-    {
-      user: userToUserDTO(user),
-      accessToken: accessToken,
+  return {
+    user: userToUserDTO(user),
+    responseContext: {
+      accessToken,
+      refreshToken,
+      remember,
     },
-    remember,
-  );
+  };
 };
 
 const getUser = async (email: string): Promise<User> => {

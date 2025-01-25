@@ -1,43 +1,38 @@
-import { updateUserActionSchema } from "./types/update-user";
+import { updateUserBodySchema } from "./types/update-user";
 import { updateEmail } from "./update-email";
 import { updatePassword } from "./update-password";
 import { updateName } from "./update-name";
-import { HttpStatusEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
-import { incrementUserVersion } from "@user-db";
-import { ProtectedModuleFunction } from "@response-entity";
+import { getUserById, incrementUserVersion } from "@user-db";
+import { contextStore } from "@context-utils";
+import { transaction } from "@db";
+import { UserDTO, userDTOSchema } from "@user-entity";
 
-const actionToUpdateMap = {
-  "update-email": updateEmail,
-  "update-password": updatePassword,
-  "update-name": updateName,
-};
-
-export const updateUser: ProtectedModuleFunction = async (
-  tokens,
-  remember,
-  body: unknown,
-  action: string | null,
-  id?: string,
-): Promise<Response> => {
-  const userId = id;
+export const updateUser = async (body: unknown): Promise<UserDTO> => {
+  const { userId } = contextStore.context;
 
   if (!userId) {
     throw errors.UNAUTHORIZED("not logged in");
   }
-  if (!action) {
-    throw errors.ACTION_IS_REQUIRED();
-  }
-  const updateUserAction = updateUserActionSchema.parse(action);
-  const response = await actionToUpdateMap[updateUserAction](
-    tokens,
-    remember,
-    userId,
-    body,
-  );
-  if (response.status === HttpStatusEnum.OK) {
-    await incrementUserVersion(userId);
-  }
+  const updateUserBody = updateUserBodySchema.parse(body);
 
-  return response;
+  return await transaction<UserDTO>(async () => {
+    if (updateUserBody.email) {
+      await updateEmail(userId, updateUserBody.email);
+    }
+    if (updateUserBody.password) {
+      await updatePassword(userId, updateUserBody.password);
+    }
+    if (updateUserBody.firstName || updateUserBody.lastName) {
+      await updateName(
+        userId,
+        updateUserBody.firstName,
+        updateUserBody.lastName,
+      );
+    }
+    await incrementUserVersion(userId);
+
+    const updatedUser = await getUserById(userId);
+    return userDTOSchema.parse(updatedUser);
+  });
 };

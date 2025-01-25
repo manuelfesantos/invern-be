@@ -15,8 +15,8 @@ import {
 import { getPaymentFromSessionResult } from "@payment-entity";
 import { ClientOrder, clientOrderSchema } from "@order-entity";
 import { errors } from "@error-handling-utils";
-import { emptyCart } from "@cart-db";
-import { incrementUserVersion } from "@user-db";
+import { deleteCart, insertCartReturningAll } from "@cart-db";
+import { incrementUserVersion, updateUser } from "@user-db";
 import { popCheckoutSessionById } from "@checkout-session-db";
 import { getProductsFromString } from "../utils/get-products-from-string";
 import { logger } from "@logger-utils";
@@ -32,7 +32,7 @@ export const getOrderFromSessionResult = async (
     throw errors.ORDER_ALREADY_EXISTS();
   }
 
-  const [{ addressId }] = await insertAddress(
+  const addressId = await insertAddress(
     validateStripeAddress(sessionResult.customer_details?.address),
   );
 
@@ -78,7 +78,13 @@ export const getOrderFromSessionResult = async (
   }
 
   if (cartId) {
-    await emptyCart(cartId);
+    await deleteCart(cartId);
+    const { id: newCartId } = await insertCartReturningAll({
+      isLoggedIn: Boolean(userId),
+    });
+    if (userId) {
+      await updateUser(userId, { cartId: newCartId });
+    }
   }
 
   if (userId) {

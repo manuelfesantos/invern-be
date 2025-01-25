@@ -6,14 +6,12 @@ import {
   Product,
   ProductWithCollectionDetails,
 } from "@product-entity";
-import { Country } from "@country-entity";
 import { getTaxedPrice } from "./utils/get-taxed-price";
 import { extendTaxes } from "./utils/extend-taxes";
+import { contextStore } from "@context-utils";
 
-export const extendProduct = (
-  product: Product,
-  country: Country,
-): ExtendedProduct => {
+export const extendProduct = (product: Product): ExtendedProduct => {
+  const { country } = contextStore.context;
   const extendedTaxes = extendTaxes(product.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
@@ -28,8 +26,8 @@ export const extendProduct = (
 
 export const extendProductDetails = (
   product: ProductWithCollectionDetails,
-  country: Country,
 ): ExtendedProductWithCollectionDetails => {
+  const { country } = contextStore.context;
   const extendedTaxes = extendTaxes(product.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);

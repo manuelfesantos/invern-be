@@ -1,6 +1,7 @@
 import { ProductIdAndQuantity } from "@product-entity";
 import { inArray, sql } from "drizzle-orm";
 import { db } from "@db";
+import { contextStore } from "@context-utils";
 import { productsTable } from "@schema";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
@@ -19,7 +20,12 @@ export const decreaseProductsStock = async (
     products,
   });
 
-  const updatedProducts = await db()
+  const updatedProducts = await (
+    contextStore.context.transaction ??
+    contextStore.context.transaction ??
+    contextStore.context.transaction ??
+    db()
+  )
     .update(productsTable)
     .set({
       stock: setQuery,
@@ -57,7 +63,12 @@ export const increaseProductsStock = async (
     products,
   });
 
-  return db()
+  return (
+    contextStore.context.transaction ??
+    contextStore.context.transaction ??
+    contextStore.context.transaction ??
+    db()
+  )
     .update(productsTable)
     .set({
       stock: setQuery,
