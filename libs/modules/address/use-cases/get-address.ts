@@ -18,7 +18,5 @@ const getAddressFromUser = async (
   userId: string,
 ): Promise<Address | undefined> => {
   const { address } = await getUserById(userId);
-  if (address) {
-    return decryptAddress(address);
-  }
+  return address ?? undefined;
 };
