@@ -15,6 +15,8 @@ import { stringifyObject } from "@string-utils";
 import { MILLISECONDS_IN_SECOND } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
 import { contextStore } from "@context-utils";
+import { decryptAddress } from "@address-utils";
+import { Country } from "@country-entity";
 
 interface CheckoutReturnType {
   url: string;
@@ -24,7 +26,7 @@ interface CheckoutReturnType {
 export const checkout = async (
   origin?: string,
 ): Promise<CheckoutReturnType> => {
-  const { cartId, userId } = contextStore.context;
+  const { cartId, userId, address, country } = contextStore.context;
   if (!cartId) {
     logger().error(
       "No cart provided",
@@ -32,6 +34,16 @@ export const checkout = async (
     );
     throw errors.CART_NOT_PROVIDED();
   }
+  if (!address) {
+    logger().error(
+      "No address provided",
+      LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    );
+    throw errors.ADDRESS_NOT_PROVIDED();
+  }
+
+  await validateAddressCountry(address, country);
+
   const lineItems = await getLineItemsByCartId(cartId);
 
   await reserveLineItems(lineItems);
@@ -112,5 +124,19 @@ const validateLineItems = (lineItems: LineItem[]): void => {
 
   if (productsOutOfStock.length) {
     throw errors.PRODUCTS_OUT_OF_STOCK(productsOutOfStock);
+  }
+};
+
+const validateAddressCountry = async (
+  address: string,
+  country: Country,
+): Promise<void> => {
+  const parsedAddress = await decryptAddress(address);
+  if (parsedAddress.country !== country.code) {
+    logger().error(
+      "Address country does not match the country of the user",
+      LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    );
+    throw errors.ADDRESS_COUNTRY_MISMATCH();
   }
 };

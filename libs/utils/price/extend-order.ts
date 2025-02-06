@@ -1,7 +1,6 @@
 import { ClientOrder, ExtendedClientOrder } from "@order-entity";
 import { extendProduct } from "./extend-product";
 import { extendTaxes } from "./utils/extend-taxes";
-import { simpleAddressSchema } from "@address-entity";
 import { contextStore } from "@context-utils";
 
 const NO_PRICE = 0;
@@ -19,7 +18,6 @@ export const extendOrder = (order: ClientOrder): ExtendedClientOrder => {
 
   return {
     ...order,
-    address: simpleAddressSchema.parse(order.address),
     products: extendedProducts,
     taxes: extendedTaxes,
     currency: country.currency,

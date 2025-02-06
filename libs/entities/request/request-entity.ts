@@ -22,6 +22,8 @@ export interface Env {
   SETUP_COUNTRIES_SECRET: string;
   LOGGER_LEVEL: string;
   DOMAIN: string;
+  ENCRYPTION_KEY: string;
+  DEFAULT_IV: string;
 }
 
 export type Credentials = {
@@ -30,4 +32,5 @@ export type Credentials = {
   accessToken?: string;
   refreshToken: string;
   remember?: boolean;
+  address?: string;
 };

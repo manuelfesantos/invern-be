@@ -1,6 +1,4 @@
 import { StripeSessionResult } from "@stripe-entity";
-import { insertAddress } from "@address-db";
-import { validateStripeAddress } from "@address-entity";
 import {
   addToOrder,
   checkIfOrderExists,
@@ -32,10 +30,6 @@ export const getOrderFromSessionResult = async (
     throw errors.ORDER_ALREADY_EXISTS();
   }
 
-  const addressId = await insertAddress(
-    validateStripeAddress(sessionResult.customer_details?.address),
-  );
-
   const payment = getPaymentFromSessionResult(sessionResult);
 
   const paymentExists = Boolean(await getPaymentById(payment.id));
@@ -46,7 +40,7 @@ export const getOrderFromSessionResult = async (
     await updatePayment(payment.id, { netAmount: payment.netAmount });
   }
 
-  const { clientId } = sessionResult.metadata ?? {};
+  const { clientId, address } = sessionResult.metadata ?? {};
 
   const [checkoutSession] = await popCheckoutSessionById(sessionResult.id);
 
@@ -61,7 +55,7 @@ export const getOrderFromSessionResult = async (
   }
 
   const [{ orderId }] = await insertOrder({
-    addressId,
+    address,
     paymentId: payment.id,
     userId: userId ?? null,
     id: clientId,
@@ -79,10 +73,10 @@ export const getOrderFromSessionResult = async (
 
   if (cartId) {
     await deleteCart(cartId);
-    const { id: newCartId } = await insertCartReturningAll({
-      isLoggedIn: Boolean(userId),
-    });
     if (userId) {
+      const { id: newCartId } = await insertCartReturningAll({
+        isLoggedIn: true,
+      });
       await updateUser(userId, { cartId: newCartId });
     }
   }

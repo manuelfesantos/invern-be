@@ -1,88 +1,9 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a62d775c-b3cf-4ad8-b711-8f5063acf0c4",
+  "id": "cd978772-8ad6-4033-aa6a-bd4c8e4cf3cc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "addresses": {
-      "name": "addresses",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "street": {
-          "name": "street",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "houseNumber": {
-          "name": "houseNumber",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "apartment": {
-          "name": "apartment",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "postalCode": {
-          "name": "postalCode",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "province": {
-          "name": "province",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "countryId": {
-          "name": "countryId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "addresses_countryId_countries_code_fk": {
-          "name": "addresses_countryId_countries_code_fk",
-          "tableFrom": "addresses",
-          "tableTo": "countries",
-          "columnsFrom": [
-            "countryId"
-          ],
-          "columnsTo": [
-            "code"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "carts": {
       "name": "carts",
       "columns": {
@@ -412,11 +333,11 @@
           "notNull": false,
           "autoincrement": false
         },
-        "addressId": {
-          "name": "addressId",
+        "address": {
+          "name": "address",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "paymentId": {
@@ -450,19 +371,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "orders_addressId_addresses_id_fk": {
-          "name": "orders_addressId_addresses_id_fk",
-          "tableFrom": "orders",
-          "tableTo": "addresses",
-          "columnsFrom": [
-            "addressId"
           ],
           "columnsTo": [
             "id"
@@ -892,6 +800,13 @@
         },
         "cartId": {
           "name": "cartId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

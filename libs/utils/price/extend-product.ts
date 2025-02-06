@@ -16,12 +16,14 @@ export const extendProduct = (product: Product): ExtendedProduct => {
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedProductSchema.parse({
+  const extendedProduct: ExtendedProduct = {
     ...product,
     netPrice: product.priceInCents,
     grossPrice: product.priceInCents + taxedPrice,
     taxes: extendedTaxes,
-  });
+  };
+
+  return extendedProductSchema.parse(extendedProduct);
 };
 
 export const extendProductDetails = (
@@ -32,10 +34,14 @@ export const extendProductDetails = (
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedProductWithCollectionDetailsSchema.parse({
+  const extendedProductDetails: ExtendedProductWithCollectionDetails = {
     ...product,
     netPrice: product.priceInCents,
     grossPrice: product.priceInCents + taxedPrice,
     taxes: extendedTaxes,
-  });
+  };
+
+  return extendedProductWithCollectionDetailsSchema.parse(
+    extendedProductDetails,
+  );
 };

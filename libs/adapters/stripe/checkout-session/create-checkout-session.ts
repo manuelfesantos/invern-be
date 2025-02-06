@@ -11,7 +11,7 @@ export const createCheckoutSession = async (
   lineItems: LineItem[],
   origin?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
-  const { country } = contextStore.context;
+  const { country, address } = contextStore.context;
   const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
     customer_creation: "always",
@@ -47,6 +47,7 @@ export const createCheckoutSession = async (
     metadata: {
       stripeEnv: getStripeEnv(),
       clientId,
+      address: address ?? null,
     },
   });
 };
