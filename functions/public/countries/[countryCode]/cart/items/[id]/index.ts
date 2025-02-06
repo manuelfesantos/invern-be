@@ -38,8 +38,11 @@ const DELETE: PagesFunction = async ({ params }) => {
 
   const cartId = await removeCartItem(productId as string);
 
+  const cart = await getCart();
+
   const response = protectedSuccessResponse.OK(
     "successfully removed item from cart",
+    cart,
   );
 
   if (contextStore.context.isLoggedOut) {
