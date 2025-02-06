@@ -6,7 +6,7 @@ export const removeCartItemInDb = async (
   cartId: string,
   productId: string,
 ): Promise<void> => {
-  db()
+  await db()
     .delete(productsToCartsTable)
     .where(
       and(
