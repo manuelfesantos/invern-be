@@ -51,8 +51,8 @@ export const startLogger = middlewareRequestHandler(async (context) => {
 export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
   async (context) => {
     const { env, data, request, next } = context;
-    const { tracer: logger } = data.honeycomb;
 
+    const { tracer: logger } = data.honeycomb;
     const country = request.headers.get("country");
 
     logger.addData({
