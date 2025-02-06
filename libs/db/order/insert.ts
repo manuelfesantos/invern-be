@@ -1,6 +1,5 @@
 import { InsertOrder } from "@order-entity";
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 import { ordersTable } from "@schema";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
@@ -22,10 +21,7 @@ export const insertOrder = async (
     insertedOrder: insertOrder,
   });
 
-  return (contextStore.context.transaction ?? db())
-    .insert(ordersTable)
-    .values(insertOrder)
-    .returning({
-      orderId: ordersTable.id,
-    });
+  return db().insert(ordersTable).values(insertOrder).returning({
+    orderId: ordersTable.id,
+  });
 };

@@ -7,28 +7,26 @@ import { middlewareRequestHandler } from "@decorator-utils";
 
 const SECOND_INDEX = 1;
 
-const protectedEndpoints = ["addresses", "cart", "checkout", "orders", "user"];
+const protectedEndpoints = ["address", "cart", "checkout", "orders", "user"];
 
 type ProtectedContextData = {
   endpoint?: string;
   countryCode?: string;
 };
 
-const getCountry = middlewareRequestHandler(
-  async ({ request, next, data, env }) => {
-    const path = request.url
-      .split(`${env.DOMAIN}/public/countries/`)
-      // eslint-disable-next-line no-unexpected-multiline
-      [SECOND_INDEX].split("/");
+const getCountry = middlewareRequestHandler(async ({ request, next, data }) => {
+  const path = request.url
+    .split(`/public/countries/`)
+    // eslint-disable-next-line no-unexpected-multiline
+    [SECOND_INDEX].split("/");
 
-    const [countryCode, endpoint] = path;
+  const [countryCode, endpoint] = path;
 
-    data.endpoint = endpoint;
-    data.countryCode = countryCode;
+  data.endpoint = endpoint;
+  data.countryCode = countryCode;
 
-    return contextStore.run(next);
-  },
-);
+  return contextStore.run(next);
+});
 
 const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
   async ({ data, next, request }) => {
@@ -45,7 +43,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
 
     if (endpoint && protectedEndpoints.includes(endpoint)) {
       const { headers } = request;
-      const { cartId, userId, accessToken, refreshToken, remember } =
+      const { cartId, userId, accessToken, refreshToken, remember, address } =
         await getCredentials(headers);
 
       contextStore.context.cartId = cartId;
@@ -53,6 +51,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
       contextStore.context.accessToken = accessToken;
       contextStore.context.refreshToken = refreshToken;
       contextStore.context.remember = remember;
+      contextStore.context.address = address;
     }
 
     return next();

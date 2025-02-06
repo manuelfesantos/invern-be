@@ -1,6 +1,5 @@
 import { imagesTable } from "@schema";
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 import { InsertImage } from "@image-entity";
 
 export const insertImage = async (
@@ -10,10 +9,7 @@ export const insertImage = async (
     url: string;
   }[]
 > => {
-  return (contextStore.context.transaction ?? db())
-    .insert(imagesTable)
-    .values(image)
-    .returning({
-      url: imagesTable.url,
-    });
+  return db().insert(imagesTable).values(image).returning({
+    url: imagesTable.url,
+  });
 };

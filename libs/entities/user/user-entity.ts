@@ -3,6 +3,7 @@ import { usersTable } from "@schema";
 import { z } from "zod";
 import { cartSchema } from "@cart-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
+import { addressSchema } from "@address-entity";
 
 export const DEFAULT_USER_VERSION = 1;
 
@@ -26,11 +27,10 @@ export const userSchema = baseUserSchema
   .omit({
     cartId: true,
   })
-  .merge(
-    z.object({
-      cart: cartSchema.nullable(),
-    }),
-  );
+  .extend({
+    cart: cartSchema.nullable(),
+    address: addressSchema.nullable(),
+  });
 
 export const userDTOSchema = userSchema.omit({
   password: true,

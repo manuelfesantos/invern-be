@@ -1,7 +1,7 @@
 import { deleteCookieFromResponse, getCookies } from "@http-utils";
 import { getConfig } from "@config-module";
 import { invalidateCheckoutSession } from "@order-module";
-import { base64Decode } from "@crypto-utils";
+import { decrypt } from "@crypto-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 // eslint-disable-next-line import/no-restricted-paths
@@ -15,9 +15,9 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   const cookies = getCookies(request.headers);
 
   const {
-    s_r: refreshToken,
-    c_s: checkoutSessionCookie,
-    r_m: remember,
+    [CookieNameEnum.REFRESH_TOKEN]: refreshToken,
+    [CookieNameEnum.CHECKOUT_SESSION]: checkoutSessionCookie,
+    [CookieNameEnum.REMEMBER]: remember,
   } = cookies;
 
   const response = await getConfig(
@@ -33,7 +33,7 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     );
     initStripeClient(env.STRIPE_API_KEY);
 
-    await invalidateCheckoutSession(base64Decode(checkoutSessionCookie));
+    await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
 
     deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
   }

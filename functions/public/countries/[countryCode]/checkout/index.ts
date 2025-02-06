@@ -3,7 +3,7 @@ import { protectedSuccessResponse } from "@response-entity";
 import { initStripeClient } from "@stripe-adapter";
 import { getCookieHeader, setCookieInResponse } from "@http-utils";
 import { checkout } from "@order-module";
-import { base64Encode } from "@crypto-utils";
+import { encrypt } from "@crypto-utils";
 import { CookieNameEnum } from "@http-entity";
 import { SESSION_EXPIRY } from "@timer-utils";
 import { requestHandler } from "@decorator-utils";
@@ -18,7 +18,7 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   const origin = headers.get("origin") || undefined;
   const { url, checkoutSessionId } = await checkout(origin);
 
-  const checkoutSessionToken = base64Encode(checkoutSessionId);
+  const checkoutSessionToken = await encrypt(checkoutSessionId);
 
   const checkoutSessionCookie = getCookieHeader(
     CookieNameEnum.CHECKOUT_SESSION,

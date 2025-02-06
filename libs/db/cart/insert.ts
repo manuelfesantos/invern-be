@@ -1,6 +1,5 @@
 import { getRandomUUID } from "@crypto-utils";
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 import { cartsTable } from "@schema";
 import { Cart } from "@cart-entity";
 
@@ -17,12 +16,9 @@ export const insertCart = async ({
     isLoggedIn,
   };
 
-  return (contextStore.context.transaction ?? db())
-    .insert(cartsTable)
-    .values(insertCart)
-    .returning({
-      cartId: cartsTable.id,
-    });
+  return db().insert(cartsTable).values(insertCart).returning({
+    cartId: cartsTable.id,
+  });
 };
 
 export const insertCartReturningAll = async ({
@@ -36,10 +32,7 @@ export const insertCartReturningAll = async ({
     isLoggedIn,
   };
   const returnedCart = (
-    await (contextStore.context.transaction ?? db())
-      .insert(cartsTable)
-      .values(insertCart)
-      .returning()
+    await db().insert(cartsTable).values(insertCart).returning()
   )[FIRST_INDEX];
   return Object.assign({}, returnedCart, { products: [] });
 };

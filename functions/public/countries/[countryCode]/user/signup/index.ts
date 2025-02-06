@@ -6,7 +6,7 @@ import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
 
 const POST: PagesFunction = async ({ request }) => {
-  const body = getBodyFromRequest(request);
+  const body = await getBodyFromRequest(request);
 
   const { user, responseContext } = await signup(body);
 

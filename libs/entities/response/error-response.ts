@@ -3,7 +3,7 @@ import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 /* eslint-disable import/no-restricted-paths */
 import { CustomError } from "@error-handling-utils";
-import { localLogger } from "@logger-utils";
+import { localLogger, logger } from "@logger-utils";
 /* eslint-enable import/no-restricted-paths */
 
 export const errorResponse = {
@@ -81,34 +81,57 @@ export const generateErrorResponse = (
   if (error instanceof z.ZodError) {
     const zodError = simplifyZodError(error);
     localLogger.error(zodError);
-    return errorResponse.BAD_REQUEST(zodError, headers);
+    logger().addRedactedData({ error: zodError });
+
+    return errorResponse.BAD_REQUEST(
+      { issues: zodError.issues.map(({ message }) => message) },
+      headers,
+    );
   }
 
   if (error instanceof CustomError) {
     const simplifiedError = simplifyError(error);
     localLogger.error(simplifiedError);
-    return buildErrorResponse(simplifiedError, Number(error.code), headers);
+    logger().addRedactedData({ error: simplifiedError });
+    return buildErrorResponse(
+      { issues: [simplifiedError.message] },
+      Number(error.code),
+      headers,
+    );
   }
 
   if (error instanceof Error && error.cause === "UNABLE_TO_PARSE_BODY") {
     const simplifiedError = simplifyError(error);
     localLogger.error(simplifiedError);
-    return errorResponse.BAD_REQUEST(simplifiedError, headers);
+    logger().addRedactedData({ error: simplifiedError });
+    return errorResponse.BAD_REQUEST(
+      { issues: [simplifiedError.message] },
+      headers,
+    );
   }
   if (error instanceof Error) {
     const simplifiedError = simplifyError(error);
     localLogger.error(simplifiedError);
-    return errorResponse.INTERNAL_SERVER_ERROR(simplifiedError, headers);
+    logger().addRedactedData({ error: simplifiedError });
+    return errorResponse.INTERNAL_SERVER_ERROR(
+      { issues: [simplifiedError.message] },
+      headers,
+    );
   }
 
-  return errorResponse.INTERNAL_SERVER_ERROR(error, headers);
+  localLogger.error(error);
+  logger().addRedactedData({ error: simplifyUnknownError(error) });
+  return errorResponse.INTERNAL_SERVER_ERROR(
+    { issues: ["unknown error"] },
+    headers,
+  );
 };
 
 export const buildErrorResponse = (
   error: unknown,
   status: number,
   headers?: Record<string, string>,
-): Response => buildResponse({ error }, { status }, headers);
+): Response => buildResponse(error, { status }, headers);
 
 export const simplifyZodError = (error: ZodError): SimplifiedZodError => {
   return {
@@ -126,5 +149,13 @@ export const simplifyError = (error: Error): SimpleError => {
     cause: error.cause,
     stack: error.stack,
     message: error.message,
+  };
+};
+
+const simplifyUnknownError = (error: unknown): SimpleError => {
+  return {
+    name: "UnknownError",
+    message: "Unknown error",
+    cause: error,
   };
 };

@@ -10,5 +10,4 @@ export * from "./cart";
 export * from "./config";
 export * from "./order";
 export * from "./stripe";
-export * from "./address";
 export * from "./payment";

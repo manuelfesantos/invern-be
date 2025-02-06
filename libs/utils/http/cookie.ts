@@ -6,14 +6,14 @@ import { getDomain } from "./request.utils";
 export const getCookieHeader = (
   name: CookieName,
   value: string,
-  maxAge: number,
+  maxAge?: number,
   isSecure: boolean = true,
   isHttpOnly: boolean = true,
   isSameSite: boolean = true,
   domain?: string,
   path: string = "/",
 ): string =>
-  `${name}=${value}; Max-Age=${maxAge}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? "SameSite=Strict;" : ""} Domain=${domain || getDomain()}; ${path ? `Path=${path};` : ""}`;
+  `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? "SameSite=Strict;" : ""} Domain=${domain || getDomain()}; ${path ? `Path=${path};` : ""}`;
 
 export const getTokensFromHeaders = (
   headers: Headers,
@@ -34,6 +34,12 @@ export const getCartIdFromHeaders = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);
   const { [CookieNameEnum.CART_ID]: cartId } = cookies;
   return cartId;
+};
+
+export const getAddressFromHeaders = (headers: Headers): string | undefined => {
+  const cookies = getCookies(headers);
+  const { [CookieNameEnum.ADDRESS]: address } = cookies;
+  return address;
 };
 
 export const getCookies = (

@@ -3,7 +3,6 @@ import {
   InsertCheckoutSession,
 } from "@checkout-session-entity";
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 import { checkoutSessionsTable } from "@schema";
 
 export const insertCheckoutSession = async (
@@ -14,8 +13,5 @@ export const insertCheckoutSession = async (
     products: JSON.stringify(insertCheckoutSession.products),
   };
 
-  return (contextStore.context.transaction ?? db())
-    .insert(checkoutSessionsTable)
-    .values(checkoutSession)
-    .returning();
+  return db().insert(checkoutSessionsTable).values(checkoutSession).returning();
 };

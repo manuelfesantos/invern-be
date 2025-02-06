@@ -2,7 +2,6 @@ import { InsertTax } from "@tax-entity";
 import { getRandomUUID } from "@crypto-utils";
 import { taxesTable } from "@schema";
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 
 export const insertTax = async (
   tax: InsertTax,
@@ -15,10 +14,7 @@ export const insertTax = async (
     ...tax,
     id: getRandomUUID(),
   };
-  return (contextStore.context.transaction ?? db())
-    .insert(taxesTable)
-    .values(insertTax)
-    .returning({
-      taxId: taxesTable.id,
-    });
+  return db().insert(taxesTable).values(insertTax).returning({
+    taxId: taxesTable.id,
+  });
 };

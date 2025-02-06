@@ -1,15 +1,3 @@
-CREATE TABLE `addresses` (
-	`id` text PRIMARY KEY NOT NULL,
-	`street` text NOT NULL,
-	`houseNumber` text NOT NULL,
-	`apartment` text,
-	`postalCode` text NOT NULL,
-	`city` text NOT NULL,
-	`province` text,
-	`countryId` text NOT NULL,
-	FOREIGN KEY (`countryId`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `carts` (
 	`id` text PRIMARY KEY NOT NULL,
 	`lastModifiedAt` integer NOT NULL,
@@ -62,11 +50,10 @@ CREATE TABLE `orders` (
 	`stripeId` text NOT NULL,
 	`createdAt` text NOT NULL,
 	`userId` text,
-	`addressId` text,
+	`address` text NOT NULL,
 	`paymentId` text,
 	`snapshot` text,
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`addressId`) REFERENCES `addresses`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`paymentId`) REFERENCES `payments`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -132,6 +119,7 @@ CREATE TABLE `users` (
 	`version` integer DEFAULT 1 NOT NULL,
 	`role` text DEFAULT 'USER' NOT NULL,
 	`cartId` text,
+	`address` text,
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint

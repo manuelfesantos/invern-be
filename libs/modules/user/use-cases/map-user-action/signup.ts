@@ -7,7 +7,6 @@ import { setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
-import { transaction } from "@db";
 
 interface ReturnType {
   user: UserDTO;
@@ -27,30 +26,28 @@ export const signup = async (body: unknown): Promise<ReturnType> => {
 
   await validateThatEmailIsUnique(parsedBody.email);
 
-  return transaction<ReturnType>(async () => {
-    if (!cartId) {
-      const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
-      contextStore.context.cartId = newCartId;
-    } else {
-      await updateCart(cartId, { isLoggedIn: true });
-    }
+  if (!cartId) {
+    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+    contextStore.context.cartId = newCartId;
+  } else {
+    await updateCart(cartId, { isLoggedIn: true });
+  }
 
-    const [{ userId }] = await insertUser({
-      ...parsedBody,
-      cartId,
-    });
-    const user = await getUserById(userId);
-
-    const refreshToken = await getLoggedInRefreshToken(userId);
-    await setAuthSecret(userId, refreshToken);
-
-    const accessToken = await getLoggedInToken(userId, cartId);
-
-    return {
-      user: userToUserDTO(user),
-      responseContext: { refreshToken, accessToken, remember },
-    };
+  const [{ userId }] = await insertUser({
+    ...parsedBody,
+    cartId,
   });
+  const user = await getUserById(userId);
+
+  const refreshToken = await getLoggedInRefreshToken(userId);
+  await setAuthSecret(userId, refreshToken);
+
+  const accessToken = await getLoggedInToken(userId, cartId);
+
+  return {
+    user: userToUserDTO(user),
+    responseContext: { refreshToken, accessToken, remember },
+  };
 };
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {

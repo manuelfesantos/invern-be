@@ -23,6 +23,7 @@ export const CookieNameEnum = {
   REFRESH_TOKEN: "s_r",
   CHECKOUT_SESSION: "c_s",
   REMEMBER: "r_m",
+  ADDRESS: "a_d",
 } as const;
 
 export type CookieName = (typeof CookieNameEnum)[keyof typeof CookieNameEnum];
