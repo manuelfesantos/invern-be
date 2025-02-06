@@ -13,20 +13,28 @@ export const extendCart = (cart: CartDTO): ExtendedCart => {
     extendLineItem(product, country),
   );
 
+  const productsHaveErrors = extendedProducts.some(({ errors }) =>
+    Boolean(errors),
+  );
+
+  const isCheckoutPossible =
+    !productsHaveErrors && extendedProducts.length > VALUE_ZERO;
+
   const netPrice = getCartNetPrice(extendedProducts);
 
   const extendedTaxes = extendTaxes(netPrice, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedCartSchema.parse({
+  const extendedCart: ExtendedCart = {
     ...cart,
     products: extendedProducts,
     taxes: extendedTaxes,
     netPrice,
     grossPrice: netPrice + taxedPrice,
-    currency: country.currency,
-  });
+    isCheckoutPossible,
+  };
+  return extendedCartSchema.parse(extendedCart);
 };
 
 const getCartNetPrice = (products: ExtendedLineItem[]): number =>

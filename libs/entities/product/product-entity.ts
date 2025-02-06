@@ -68,17 +68,23 @@ export const lineItemSchema = productSchema.merge(
   }),
 );
 
+export const lineItemErrorEnumSchema = z.enum(["NOT_ENOUGH_STOCK"]);
+
+export const lineItemErrorSchema = z.object({
+  message: requiredStringSchema("cart item error"),
+  type: lineItemErrorEnumSchema,
+});
+
 export const extendedLineItemSchema = lineItemSchema
   .omit({
     priceInCents: true,
   })
-  .merge(
-    z.object({
-      netPrice: positiveIntegerSchema("line item net price"),
-      grossPrice: positiveIntegerSchema("line item gross price"),
-      taxes: extendedClientTaxSchema.array(),
-    }),
-  );
+  .extend({
+    netPrice: positiveIntegerSchema("line item net price"),
+    grossPrice: positiveIntegerSchema("line item gross price"),
+    taxes: extendedClientTaxSchema.array(),
+    errors: z.array(lineItemErrorSchema).optional(),
+  });
 
 export const productIdAndQuantitySchema = z.object({
   id: uuidSchema("product id"),
@@ -114,3 +120,7 @@ export type ProductWithCollectionDetails = z.infer<
 export type ExtendedProductWithCollectionDetails = z.infer<
   typeof extendedProductWithCollectionDetailsSchema
 >;
+
+export type LineItemError = z.infer<typeof lineItemErrorSchema>;
+export const LineItemErrorEnum = lineItemErrorEnumSchema.Enum;
+export type LineItemErrorEnumType = z.infer<typeof lineItemErrorEnumSchema>;

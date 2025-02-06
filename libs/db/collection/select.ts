@@ -1,13 +1,10 @@
 import { db } from "@db";
-import { contextStore } from "@context-utils";
 import { eq } from "drizzle-orm";
 import { collectionsTable } from "@schema";
 import { Collection, CollectionDetails } from "@collection-entity";
 
 export const selectCollections = async (): Promise<Collection[]> => {
-  const collections = await (
-    contextStore.context.transaction ?? db()
-  ).query.collectionsTable.findMany({
+  const collections = await db().query.collectionsTable.findMany({
     with: {
       images: {
         columns: {
@@ -28,9 +25,7 @@ export const selectCollections = async (): Promise<Collection[]> => {
 export const selectCollectionByName = async (
   collectionName: string,
 ): Promise<CollectionDetails | undefined> => {
-  return (
-    contextStore.context.transaction ?? db()
-  ).query.collectionsTable.findFirst({
+  return db().query.collectionsTable.findFirst({
     where: eq(collectionsTable.name, collectionName),
     with: {
       products: {
@@ -55,9 +50,7 @@ export const selectCollectionByName = async (
 export const selectCollectionById = async (
   collectionId: string,
 ): Promise<CollectionDetails | undefined> => {
-  return (
-    contextStore.context.transaction ?? db()
-  ).query.collectionsTable.findFirst({
+  return db().query.collectionsTable.findFirst({
     where: eq(collectionsTable.id, collectionId),
     with: {
       products: {

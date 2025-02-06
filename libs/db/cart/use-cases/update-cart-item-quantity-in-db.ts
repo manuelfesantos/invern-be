@@ -1,6 +1,5 @@
 import { db } from "@db";
-import { contextStore } from "@context-utils";
-import { cartsTable, productsToCartsTable } from "@schema";
+import { productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";
 import { errors } from "@error-handling-utils";
 import { Product } from "@product-entity";
@@ -37,17 +36,13 @@ export const updateCartItemQuantityInDb = async (
   } else if (shouldUpdateProduct) {
     await updateProductQuantityInCart(product.id, cartId, finalQuantity);
   }
-
-  await updateCartLastModifiedDate(cartId);
 };
 
 const getProductQuantityInCart = async (
   productId: string,
   cartId: string,
 ): Promise<number> => {
-  const result = await (
-    contextStore.context.transaction ?? db()
-  ).query.productsToCartsTable.findFirst({
+  const result = await db().query.productsToCartsTable.findFirst({
     where: and(
       eq(productsToCartsTable.productId, productId),
       eq(productsToCartsTable.cartId, cartId),
@@ -65,7 +60,7 @@ const insertProductInCart = async (
   cartId: string,
   quantity: number,
 ): Promise<void> => {
-  await (contextStore.context.transaction ?? db())
+  await db()
     .insert(productsToCartsTable)
     .values({ productId, cartId, quantity });
 };
@@ -75,7 +70,7 @@ const updateProductQuantityInCart = async (
   cartId: string,
   quantity: number,
 ): Promise<void> => {
-  await (contextStore.context.transaction ?? db())
+  await db()
     .update(productsToCartsTable)
     .set({ quantity })
     .where(
@@ -90,7 +85,7 @@ const deleteProductFromCart = async (
   productId: string,
   cartId: string,
 ): Promise<void> => {
-  await (contextStore.context.transaction ?? db())
+  await db()
     .delete(productsToCartsTable)
     .where(
       and(
@@ -98,11 +93,4 @@ const deleteProductFromCart = async (
         eq(productsToCartsTable.cartId, cartId),
       ),
     );
-};
-
-const updateCartLastModifiedDate = async (cartId: string): Promise<void> => {
-  await (contextStore.context.transaction ?? db())
-    .update(cartsTable)
-    .set({ lastModifiedAt: Date.now() })
-    .where(eq(cartsTable.id, cartId));
 };

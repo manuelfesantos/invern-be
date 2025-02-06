@@ -1,6 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Country } from "@country-entity";
-import { DbTransaction } from "@db-entity";
 
 class Context {
   private _cartId?: string;
@@ -9,7 +8,7 @@ class Context {
   private _accessToken?: string;
   private _refreshToken: string = "";
   private _remember?: boolean;
-  private _transaction?: DbTransaction;
+  private _address?: string;
 
   get cartId(): string | undefined {
     return this._cartId;
@@ -61,11 +60,12 @@ class Context {
     return !this._userId;
   }
 
-  get transaction(): DbTransaction | undefined {
-    return this._transaction;
+  get address(): string | undefined {
+    return this._address;
   }
-  set transaction(value: DbTransaction | undefined) {
-    this._transaction = value;
+
+  set address(value: string | undefined) {
+    this._address = value;
   }
 }
 

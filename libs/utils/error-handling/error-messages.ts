@@ -13,11 +13,6 @@ export const errors = {
     new CustomError("User not found", HttpStatusEnum.NOT_FOUND),
   PRODUCT_NOT_IN_CART: (): CustomError =>
     new CustomError("Product not in cart", HttpStatusEnum.BAD_REQUEST),
-  DATABASE_NOT_INITIALIZED: (): CustomError =>
-    new CustomError(
-      "Database not initialized",
-      HttpStatusEnum.INTERNAL_SERVER_ERROR,
-    ),
   PRODUCT_NOT_FOUND: (productId?: string): CustomError =>
     new CustomError(
       `Product ${productId ? `with id ${productId} ` : ""}not found`,
@@ -39,6 +34,13 @@ export const errors = {
     ),
   COLLECTION_NOT_FOUND: (): CustomError =>
     new CustomError("Collection not found", HttpStatusEnum.NOT_FOUND),
+  ADDRESS_NOT_PROVIDED: (): CustomError =>
+    new CustomError("Address not provided", HttpStatusEnum.BAD_REQUEST),
+  ADDRESS_COUNTRY_MISMATCH: (): CustomError =>
+    new CustomError(
+      "Address country does not match user country",
+      HttpStatusEnum.BAD_REQUEST,
+    ),
   CART_NOT_FOUND: (): CustomError =>
     new CustomError("Cart not found", HttpStatusEnum.NOT_FOUND),
   CART_NOT_PROVIDED: (): CustomError =>
@@ -50,31 +52,16 @@ export const errors = {
     ),
   PRODUCTS_ARE_REQUIRED: (): CustomError =>
     new CustomError("Products are required", HttpStatusEnum.BAD_REQUEST),
-  CART_IS_NOT_EMPTY: (): CustomError =>
-    new CustomError("Cart is not empty", HttpStatusEnum.CONFLICT),
   CART_IS_EMPTY: (): CustomError =>
     new CustomError("Cart is empty", HttpStatusEnum.CONFLICT),
-  ACTION_IS_REQUIRED: (): CustomError =>
-    new CustomError("Action is required", HttpStatusEnum.BAD_REQUEST),
-  INVALID_ACTION: (action: string): CustomError =>
-    new CustomError(`Invalid action: ${action}`, HttpStatusEnum.BAD_REQUEST),
-  INVALID_ADDRESS: (issue: string): CustomError =>
-    new CustomError(`Invalid address: ${issue}`, HttpStatusEnum.BAD_REQUEST),
   INVALID_PAYMENT: (issue: string): CustomError =>
     new CustomError(`Invalid payment: ${issue}`, HttpStatusEnum.BAD_REQUEST),
   ORDER_ALREADY_EXISTS: (): CustomError =>
     new CustomError("Order already exists", HttpStatusEnum.CONFLICT),
   PAYMENT_ALREADY_EXISTS: (): CustomError =>
     new CustomError("Payment already exists", HttpStatusEnum.CONFLICT),
-  INVALID_EVENT_TYPE: (type: string): CustomError =>
-    new CustomError(`Invalid event type: ${type}`, HttpStatusEnum.BAD_REQUEST),
   INVALID_PAYLOAD: (issue: string): CustomError =>
     new CustomError(`Invalid payload: ${issue}`, HttpStatusEnum.BAD_REQUEST),
-  INVALID_COUNTRY_CODE: (code: string): CustomError =>
-    new CustomError(
-      `Invalid country code: ${code}`,
-      HttpStatusEnum.BAD_REQUEST,
-    ),
   ORDER_NOT_FOUND: (): CustomError =>
     new CustomError("Order not found", HttpStatusEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): CustomError =>

@@ -1,12 +1,16 @@
 import { z } from "zod";
 import { emailSchema, requiredStringSchema } from "@global-entity";
+import { insertAddressSchema } from "@address-entity";
 
-export const updateUserBodySchema = z.object({
-  email: emailSchema("user mail").optional(),
-  password: requiredStringSchema("user password").optional(),
-  firstName: requiredStringSchema("first name").optional(),
-  lastName: requiredStringSchema("last name").optional(),
-});
+export const updateUserBodySchema = z
+  .object({
+    email: emailSchema("user mail"),
+    password: requiredStringSchema("user password"),
+    firstName: requiredStringSchema("first name"),
+    lastName: requiredStringSchema("last name"),
+    address: insertAddressSchema,
+  })
+  .partial();
 export const updateEmailBodySchema = z.object({
   email: emailSchema("user mail"),
 });

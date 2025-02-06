@@ -31,6 +31,8 @@ const envMock: Env = {
   HONEYCOMB_DATASET: "",
   LOGGER_LEVEL: "",
   DOMAIN: "",
+  DEFAULT_IV: "",
+  ENCRYPTION_KEY: "",
 };
 
 export const GETEventMock = {

@@ -9,6 +9,7 @@ import { getAnonymousToken } from "./get-anonymous-tokens";
 import { logger } from "@logger-utils";
 import { UserJWT } from "@jwt-entity";
 import {
+  getAddressFromHeaders,
   getCartIdFromHeaders,
   getRememberValue,
   getTokensFromHeaders,
@@ -73,10 +74,11 @@ const handleLoggedInToken = (
 ): Credentials => {
   const remember = getRememberValue(headers);
   const { userId, cartId } = token;
+  const address = getAddressFromHeaders(headers);
 
   logCredentials(cartId, userId);
 
-  return { userId, cartId, refreshToken, remember };
+  return { userId, cartId, refreshToken, remember, address };
 };
 
 const handleLoggedOutToken = async (
@@ -84,7 +86,8 @@ const handleLoggedOutToken = async (
   refreshToken: string,
 ): Promise<Credentials> => {
   const cartId = getCartIdFromHeaders(headers);
-  return { refreshToken, cartId };
+  const address = getAddressFromHeaders(headers);
+  return { refreshToken, cartId, address };
 };
 
 const handleLoggedInRefreshToken = async (
@@ -101,6 +104,7 @@ const handleLoggedInRefreshToken = async (
   }
 
   let { cart } = await getUserById(userId);
+  const address = getAddressFromHeaders(headers);
 
   if (!cart) {
     cart = await insertCartReturningAll({ isLoggedIn: true });
@@ -110,7 +114,14 @@ const handleLoggedInRefreshToken = async (
   logCredentials(cart.id, userId);
 
   const accessToken = await getLoggedInToken(userId, cart.id);
-  return { userId, cartId: cart.id, accessToken, refreshToken, remember };
+  return {
+    userId,
+    cartId: cart.id,
+    accessToken,
+    refreshToken,
+    remember,
+    address,
+  };
 };
 
 const handleLoggedOutRefreshToken = async (
@@ -119,5 +130,6 @@ const handleLoggedOutRefreshToken = async (
 ): Promise<Credentials> => {
   const accessToken = await getAnonymousToken();
   const cartId = getCartIdFromHeaders(headers);
-  return { accessToken, refreshToken, cartId };
+  const address = getAddressFromHeaders(headers);
+  return { accessToken, refreshToken, cartId, address };
 };
