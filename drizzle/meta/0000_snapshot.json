@@ -1,74 +1,9 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c06142ef-24cc-4caa-876c-0ac067701d13",
+  "id": "cd978772-8ad6-4033-aa6a-bd4c8e4cf3cc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "addresses": {
-      "name": "addresses",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "line1": {
-          "name": "line1",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "line2": {
-          "name": "line2",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "postalCode": {
-          "name": "postalCode",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "countryId": {
-          "name": "countryId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "addresses_countryId_countries_code_fk": {
-          "name": "addresses_countryId_countries_code_fk",
-          "tableFrom": "addresses",
-          "tableTo": "countries",
-          "columnsFrom": [
-            "countryId"
-          ],
-          "columnsTo": [
-            "code"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "carts": {
       "name": "carts",
       "columns": {
@@ -76,6 +11,20 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "isLoggedIn": {
+          "name": "isLoggedIn",
+          "type": "integer",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
@@ -207,6 +156,13 @@
           "name": "code",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "locale": {
+          "name": "locale",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -377,11 +333,11 @@
           "notNull": false,
           "autoincrement": false
         },
-        "addressId": {
-          "name": "addressId",
+        "address": {
+          "name": "address",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "paymentId": {
@@ -415,19 +371,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "orders_addressId_addresses_id_fk": {
-          "name": "orders_addressId_addresses_id_fk",
-          "tableFrom": "orders",
-          "tableTo": "addresses",
-          "columnsFrom": [
-            "addressId"
           ],
           "columnsTo": [
             "id"
@@ -699,6 +642,57 @@
       },
       "uniqueConstraints": {}
     },
+    "shippingMethods": {
+      "name": "shippingMethods",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "priceInCents": {
+          "name": "priceInCents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "countryCode": {
+          "name": "countryCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shippingMethods_countryCode_countries_code_fk": {
+          "name": "shippingMethods_countryCode_countries_code_fk",
+          "tableFrom": "shippingMethods",
+          "tableTo": "countries",
+          "columnsFrom": [
+            "countryCode"
+          ],
+          "columnsTo": [
+            "code"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "taxes": {
       "name": "taxes",
       "columns": {
@@ -808,11 +802,26 @@
           "name": "cartId",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_cartId_unique": {
+          "name": "users_cartId_unique",
+          "columns": [
+            "cartId"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "users_cartId_carts_id_fk": {
           "name": "users_cartId_carts_id_fk",
@@ -824,7 +833,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

@@ -1,23 +1,14 @@
 import { getOrdersByUserId } from "@order-db";
-import {
-  ProtectedModuleFunction,
-  protectedSuccessResponse,
-} from "@response-entity";
 import { errors } from "@error-handling-utils";
+import { extendOrder } from "@price-utils";
+import { ExtendedClientOrder } from "@order-entity";
 
-export const getUserOrders: ProtectedModuleFunction = async (
-  tokens,
-  remember,
+export const getUserOrders = async (
   userId: string,
-): Promise<Response> => {
+): Promise<ExtendedClientOrder[]> => {
   const orders = await getOrdersByUserId(userId);
   if (!orders) {
     throw errors.ORDERS_NOT_FOUND();
   }
-  return protectedSuccessResponse.OK(
-    tokens,
-    "success getting orders by user id",
-    { orders },
-    remember,
-  );
+  return orders.map(extendOrder);
 };

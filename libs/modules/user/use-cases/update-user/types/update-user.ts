@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { emailSchema, requiredStringSchema } from "@global-entity";
+import { insertAddressSchema } from "@address-entity";
 
-export const updateUserActionSchema = z.enum(
-  ["update-email", "update-password", "update-name"],
-  {
-    message: "Invalid action",
-  },
-);
-export const UpdateUserActionEnum = updateUserActionSchema.enum;
-export type UpdateUserAction =
-  (typeof UpdateUserActionEnum)[keyof typeof UpdateUserActionEnum];
-
+export const updateUserBodySchema = z
+  .object({
+    email: emailSchema("user mail"),
+    password: requiredStringSchema("user password"),
+    firstName: requiredStringSchema("first name"),
+    lastName: requiredStringSchema("last name"),
+    address: insertAddressSchema,
+  })
+  .partial();
 export const updateEmailBodySchema = z.object({
   email: emailSchema("user mail"),
 });

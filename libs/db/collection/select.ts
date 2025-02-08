@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { collectionsTable } from "@schema";
 import { Collection, CollectionDetails } from "@collection-entity";
 
-export const getCollections = async (): Promise<Collection[]> => {
+export const selectCollections = async (): Promise<Collection[]> => {
   const collections = await db().query.collectionsTable.findMany({
     with: {
       images: {
@@ -22,7 +22,7 @@ export const getCollections = async (): Promise<Collection[]> => {
   }));
 };
 
-export const getCollectionByName = async (
+export const selectCollectionByName = async (
   collectionName: string,
 ): Promise<CollectionDetails | undefined> => {
   return db().query.collectionsTable.findFirst({
@@ -47,7 +47,7 @@ export const getCollectionByName = async (
   });
 };
 
-export const getCollectionById = async (
+export const selectCollectionById = async (
   collectionId: string,
 ): Promise<CollectionDetails | undefined> => {
   return db().query.collectionsTable.findFirst({

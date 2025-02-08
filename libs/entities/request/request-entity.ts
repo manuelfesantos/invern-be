@@ -1,5 +1,3 @@
-import { Country } from "@country-entity";
-
 export interface Env {
   INVERN_DB: D1Database;
   HONEYCOMB_API_KEY: string;
@@ -23,16 +21,18 @@ export interface Env {
   INSERT_TEST_DATA_SECRET: string;
   SETUP_COUNTRIES_SECRET: string;
   LOGGER_LEVEL: string;
+  DOMAIN: string;
+  ENCRYPTION_KEY: string;
+  DEFAULT_IV: string;
 }
 
-export type CountriesEndpointData = {
-  country: Country;
-};
-
-export type CountriesEndpointProtectedData = CountriesEndpointData & {
-  userId: string;
-  cartId: string;
-  accessToken: string;
+export type Credentials = {
+  userId?: string;
+  cartId?: string;
+  accessToken?: string;
   refreshToken: string;
-  remember: boolean;
+  remember?: boolean;
+  address?: string;
+  userDetails?: string;
+  shippingMethod?: string;
 };

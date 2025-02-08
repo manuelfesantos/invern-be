@@ -1,24 +1,22 @@
-import { deleteUser as deleteUserAdapter, getUserById } from "@user-db";
-import {
-  ProtectedModuleFunction,
-  protectedSuccessResponse,
-} from "@response-entity";
+import { deleteUser as deleteUserAdapter } from "@user-db";
 import { errors } from "@error-handling-utils";
+import { contextStore } from "@context-utils";
+import { ResponseContext } from "@http-entity";
+import { getAnonymousTokens } from "@jwt-utils";
 
-export const deleteUser: ProtectedModuleFunction = async (
-  tokens,
-  remember,
-  id?: string,
-): Promise<Response> => {
-  if (!id) {
+interface ReturnType {
+  responseContext: ResponseContext;
+}
+
+export const deleteUser = async (): Promise<ReturnType> => {
+  const { userId } = contextStore.context;
+
+  if (!userId) {
     throw errors.UNAUTHORIZED();
   }
-  const user = await getUserById(id);
-  await deleteUserAdapter(user.id);
-  return protectedSuccessResponse.OK(
-    tokens,
-    "success deleting user",
-    undefined,
-    remember,
-  );
+  await deleteUserAdapter(userId);
+
+  return {
+    responseContext: await getAnonymousTokens(),
+  };
 };

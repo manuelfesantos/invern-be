@@ -1,8 +1,9 @@
 import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
 import { z } from "zod";
-import { cartDTOSchema, cartSchema } from "@cart-entity";
+import { cartSchema } from "@cart-entity";
 import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
+import { addressSchema } from "@address-entity";
 
 export const DEFAULT_USER_VERSION = 1;
 
@@ -26,27 +27,29 @@ export const userSchema = baseUserSchema
   .omit({
     cartId: true,
   })
-  .merge(
-    z.object({
-      cart: cartSchema.nullable(),
-    }),
-  );
+  .extend({
+    cart: cartSchema.nullable(),
+    address: addressSchema.nullable(),
+  });
 
-export const userDTOSchema = userSchema
-  .omit({
-    password: true,
-    role: true,
-    id: true,
-  })
-  .transform((payload) => ({
-    ...payload,
-    cart: payload.cart ? cartDTOSchema.parse(payload.cart) : null,
-  }));
+export const userDTOSchema = userSchema.omit({
+  password: true,
+  role: true,
+  id: true,
+  cart: true,
+});
 
 export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
+export const userDetailsSchema = z.object({
+  email: insertUserSchema.shape.email,
+  firstName: insertUserSchema.shape.firstName,
+  lastName: insertUserSchema.shape.lastName,
+});
+
 export type User = z.infer<typeof userSchema>;
 export type UserDTO = z.infer<typeof userDTOSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UserDetails = z.infer<typeof userDetailsSchema>;

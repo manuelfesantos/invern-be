@@ -6,38 +6,42 @@ import {
   Product,
   ProductWithCollectionDetails,
 } from "@product-entity";
-import { Country } from "@country-entity";
 import { getTaxedPrice } from "./utils/get-taxed-price";
 import { extendTaxes } from "./utils/extend-taxes";
+import { contextStore } from "@context-utils";
 
-export const extendProduct = (
-  product: Product,
-  country: Country,
-): ExtendedProduct => {
+export const extendProduct = (product: Product): ExtendedProduct => {
+  const { country } = contextStore.context;
   const extendedTaxes = extendTaxes(product.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedProductSchema.parse({
+  const extendedProduct: ExtendedProduct = {
     ...product,
     netPrice: product.priceInCents,
     grossPrice: product.priceInCents + taxedPrice,
     taxes: extendedTaxes,
-  });
+  };
+
+  return extendedProductSchema.parse(extendedProduct);
 };
 
 export const extendProductDetails = (
   product: ProductWithCollectionDetails,
-  country: Country,
 ): ExtendedProductWithCollectionDetails => {
+  const { country } = contextStore.context;
   const extendedTaxes = extendTaxes(product.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedProductWithCollectionDetailsSchema.parse({
+  const extendedProductDetails: ExtendedProductWithCollectionDetails = {
     ...product,
     netPrice: product.priceInCents,
     grossPrice: product.priceInCents + taxedPrice,
     taxes: extendedTaxes,
-  });
+  };
+
+  return extendedProductWithCollectionDetailsSchema.parse(
+    extendedProductDetails,
+  );
 };

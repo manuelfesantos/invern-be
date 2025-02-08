@@ -2,11 +2,11 @@ import { getRefreshTokenSecret, getTokenSecret, signJwt } from "./index";
 import { getFutureDate, TOKEN_EXPIRY } from "@timer-utils";
 
 export const getAnonymousTokens = async (): Promise<{
-  token: string;
+  accessToken: string;
   refreshToken: string;
 }> => {
   return {
-    token: await signJwt(
+    accessToken: await signJwt(
       { exp: getFutureDate(TOKEN_EXPIRY) },
       getTokenSecret(),
     ),

@@ -1,42 +1,53 @@
 import { signupBodySchema } from "./types/map-user-action";
 import { insertUser, getUserByEmail, getUserById } from "@user-db";
-import { insertCart } from "@cart-db";
-import { protectedSuccessResponse } from "@response-entity";
+import { insertCart, updateCart } from "@cart-db";
 import { errors } from "@error-handling-utils";
-import { userToUserDTO } from "@user-entity";
+import { UserDTO, userToUserDTO } from "@user-entity";
 import { setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
+import { ResponseContext } from "@http-entity";
+import { contextStore } from "@context-utils";
 
-export const signup = async (body: unknown, id?: string): Promise<Response> => {
-  if (id) {
+interface ReturnType {
+  user: UserDTO;
+  responseContext: ResponseContext;
+}
+
+export const signup = async (body: unknown): Promise<ReturnType> => {
+  const { isLoggedIn, cartId } = contextStore.context;
+
+  if (isLoggedIn) {
     throw errors.UNAUTHORIZED("already logged in");
   }
+
   const parsedBody = signupBodySchema.parse(body);
 
   const { remember } = parsedBody;
 
   await validateThatEmailIsUnique(parsedBody.email);
-  const [{ cartId }] = await insertCart();
+
+  if (!cartId) {
+    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+    contextStore.context.cartId = newCartId;
+  } else {
+    await updateCart(cartId, { isLoggedIn: true });
+  }
+
   const [{ userId }] = await insertUser({
     ...parsedBody,
     cartId,
   });
   const user = await getUserById(userId);
 
-  const refreshToken = await getLoggedInRefreshToken(userId, cartId);
+  const refreshToken = await getLoggedInRefreshToken(userId);
   await setAuthSecret(userId, refreshToken);
 
-  const accessToken = await getLoggedInToken(userId, cartId, remember);
+  const accessToken = await getLoggedInToken(userId, cartId);
 
-  return protectedSuccessResponse.CREATED(
-    { refreshToken, accessToken },
-    "user created",
-    {
-      user: userToUserDTO(user),
-      accessToken: accessToken,
-    },
-    remember,
-  );
+  return {
+    user: userToUserDTO(user),
+    responseContext: { refreshToken, accessToken, remember },
+  };
 };
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const configUseCasesSchema = ["GET_CONFIG"] as const;
+
 const productUseCasesSchema = [
   "GET_PRODUCT_DETAILS",
   "GET_PRODUCT_LIST",
@@ -61,6 +63,7 @@ const checkoutUseCasesSchema = [
 ] as const;
 
 const loggerUseCasesSchema = z.enum([
+  ...configUseCasesSchema,
   ...cartUseCasesSchema,
   ...productUseCasesSchema,
   ...userUseCasesSchema,

@@ -6,6 +6,7 @@ import {
   PaymentMethodType,
   paymentMethodTypeSchema,
 } from "@payment-entity";
+// eslint-disable-next-line import/no-restricted-paths
 import { errors } from "@error-handling-utils";
 import Stripe from "stripe";
 

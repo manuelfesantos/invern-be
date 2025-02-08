@@ -5,13 +5,15 @@ import {
   TOKEN_EXPIRY,
 } from "@timer-utils";
 import { getRefreshTokenSecret, getTokenSecret } from "./token-secret";
-import { base64Decode, base64Encode } from "@crypto-utils";
+import { decrypt, encrypt } from "@crypto-utils";
+import { CookieNameEnum } from "@http-entity";
+import { getDomain } from "@http-utils";
 
 export const signJwt = async (
   payload: object,
   secretKey: string,
 ): Promise<string> =>
-  base64Encode(
+  encrypt(
     await import("@tsndr/cloudflare-worker-jwt").then((jwt) =>
       jwt.sign({ ...payload }, secretKey, {
         algorithm: "HS512",
@@ -23,8 +25,8 @@ export const verifyJwt = async (
   encodedToken: string,
   secretKey: string,
 ): Promise<boolean> =>
-  await import("@tsndr/cloudflare-worker-jwt").then((jwt) =>
-    jwt.verify(base64Decode(encodedToken), secretKey, {
+  await import("@tsndr/cloudflare-worker-jwt").then(async (jwt) =>
+    jwt.verify(await decrypt(encodedToken), secretKey, {
       algorithm: "HS512",
     }),
   );
@@ -40,7 +42,7 @@ export const verifyRefreshToken = async (
 export const decodeJwt = async (
   encodedToken: string,
 ): Promise<UserJWT | JWT> => {
-  const token = base64Decode(encodedToken);
+  const token = await decrypt(encodedToken);
   const tokenPayload = (await import("@tsndr/cloudflare-worker-jwt")).decode(
     token,
   ).payload;
@@ -51,31 +53,18 @@ export const decodeJwt = async (
   return jwtSchema.parse(tokenPayload);
 };
 
-const typeToCookie = {
-  token: "s_a",
-  refresh: "s_r",
-};
-
-export const getTokenCookie = (
-  token: string,
-  type: "token" | "refresh",
-  remember?: boolean,
-): string =>
-  `${typeToCookie[type]}=${token}; Path=/; HttpOnly; Secure; Domain=invernspirit.com; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+export const getTokenCookie = (token: string, remember?: boolean): string =>
+  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${getDomain()}; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
 
 export const getLoggedInToken = async (
   userId: string,
   cartId?: string,
-  remember?: boolean,
 ): Promise<string> =>
   await signJwt(
-    { userId, cartId, remember, exp: getFutureDate(TOKEN_EXPIRY) },
+    { userId, cartId, exp: getFutureDate(TOKEN_EXPIRY) },
     getTokenSecret(),
   );
 
 export const getLoggedInRefreshToken = async (
   userId: string,
-  cartId?: string,
-  remember?: boolean,
-): Promise<string> =>
-  await signJwt({ userId, cartId, remember }, getRefreshTokenSecret());
+): Promise<string> => await signJwt({ userId }, getRefreshTokenSecret());

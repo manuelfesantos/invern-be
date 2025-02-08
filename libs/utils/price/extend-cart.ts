@@ -1,16 +1,24 @@
-import { Cart, ExtendedCart, extendedCartSchema } from "@cart-entity";
-import { Country } from "@country-entity";
+import { CartDTO, ExtendedCart, extendedCartSchema } from "@cart-entity";
 import { extendTaxes } from "./utils/extend-taxes";
 import { getTaxedPrice } from "./utils/get-taxed-price";
 import { ExtendedLineItem } from "@product-entity";
 import { extendLineItem } from "./utils/extend-line-item";
+import { contextStore } from "@context-utils";
 
 const VALUE_ZERO = 0;
 
-export const extendCart = (cart: Cart, country: Country): ExtendedCart => {
+export const extendCart = (cart: CartDTO): ExtendedCart => {
+  const { country } = contextStore.context;
   const extendedProducts = (cart.products || []).map((product) =>
     extendLineItem(product, country),
   );
+
+  const productsHaveErrors = extendedProducts.some(({ errors }) =>
+    Boolean(errors),
+  );
+
+  const isCheckoutPossible =
+    !productsHaveErrors && extendedProducts.length > VALUE_ZERO;
 
   const netPrice = getCartNetPrice(extendedProducts);
 
@@ -18,14 +26,15 @@ export const extendCart = (cart: Cart, country: Country): ExtendedCart => {
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
-  return extendedCartSchema.parse({
+  const extendedCart: ExtendedCart = {
     ...cart,
     products: extendedProducts,
     taxes: extendedTaxes,
     netPrice,
     grossPrice: netPrice + taxedPrice,
-    currency: country.currency,
-  });
+    isCheckoutPossible,
+  };
+  return extendedCartSchema.parse(extendedCart);
 };
 
 const getCartNetPrice = (products: ExtendedLineItem[]): number =>

@@ -1,5 +1,6 @@
 import { HttpMethodEnum } from "@http-entity";
 import Stripe from "stripe";
+import { logger } from "@logger-utils";
 
 const QUERY_INDEX = 1;
 
@@ -7,10 +8,15 @@ export const getBodyFromRequest = async (
   request: Request,
 ): Promise<unknown> => {
   try {
-    return request.method === HttpMethodEnum.POST ||
+    const body =
+      request.method === HttpMethodEnum.POST ||
       request.method === HttpMethodEnum.PUT
-      ? request.json()
-      : undefined;
+        ? await request.json()
+        : undefined;
+
+    logger().addRedactedData(body);
+
+    return body;
   } catch (error) {
     if (error instanceof Error) {
       throw {
@@ -31,6 +37,7 @@ let stHost: string;
 let ctHost: string;
 let stripeEnv: string;
 let env: string;
+let domain: string;
 
 export const setHosts = (
   frontendHost: string,
@@ -82,6 +89,17 @@ export const getEnv = (): string => {
     throw new Error("Env is not defined!");
   }
   return env;
+};
+
+export const setDomain = (newDomain: string): void => {
+  domain = newDomain;
+};
+
+export const getDomain = (): string => {
+  if (!domain) {
+    throw new Error("Domain is not defined!");
+  }
+  return domain;
 };
 
 export const isLocalEnv = (): boolean => {

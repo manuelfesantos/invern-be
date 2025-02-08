@@ -1,30 +1,21 @@
-import { successResponse } from "@response-entity";
 import { getProducts, getProductsBySearch } from "@product-db";
 import { logger } from "@logger-utils";
-import { Country } from "@country-entity";
 import { extendProduct } from "@price-utils";
+import { ExtendedProduct } from "@product-entity";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const getAllProducts = async (
   search: string | null,
-  country?: Country,
-): Promise<Response> => {
+): Promise<ExtendedProduct[]> => {
   if (search) {
-    logger().addRedactedData({ search });
+    logger().info(
+      "getting products by search",
+      LoggerUseCaseEnum.GET_PRODUCT_LIST,
+      { search },
+    );
     const products = await getProductsBySearch(search);
-    if (country) {
-      return successResponse.OK(
-        "success getting all products",
-        products.map((product) => extendProduct(product, country)),
-      );
-    }
-    return successResponse.OK("success getting all products", products);
+    return products.map(extendProduct);
   }
   const products = await getProducts();
-  if (country) {
-    return successResponse.OK(
-      "success getting all products",
-      products.map((product) => extendProduct(product, country)),
-    );
-  }
-  return successResponse.OK("success getting all products", products);
+  return products.map(extendProduct);
 };

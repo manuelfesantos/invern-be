@@ -1,10 +1,12 @@
 import { usersTable } from "@schema";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
-import { User, userSchema } from "@user-entity";
+import { User } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { decryptObjectString } from "@crypto-utils";
+import { Address } from "@address-entity";
 
 const NO_USER_VERSION = 0;
 
@@ -40,7 +42,7 @@ const getUser = async (
     },
   });
   if (!userTemplate) return undefined;
-  const user = {
+  return {
     ...userTemplate,
     cart: userTemplate?.cart
       ? {
@@ -51,8 +53,10 @@ const getUser = async (
           })),
         }
       : null,
+    address: userTemplate.address
+      ? await decryptObjectString<Address>(userTemplate.address)
+      : null,
   };
-  return userSchema.parse(user);
 };
 
 export const getUserByEmail = async (

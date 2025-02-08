@@ -1,6 +1,5 @@
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "@schema";
-
 let dbClient: DrizzleD1Database<typeof schema> | null = null;
 
 export const initDb = (database: D1Database): void => {

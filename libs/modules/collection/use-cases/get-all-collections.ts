@@ -1,7 +1,6 @@
-import { getCollections } from "@collection-db";
-import { successResponse } from "@response-entity";
+import { selectCollections } from "@collection-db";
+import { Collection } from "@collection-entity";
 
-export const getAllCollections = async (): Promise<Response> => {
-  const collections = await getCollections();
-  return successResponse.OK("success getting collections", collections);
+export const getAllCollections = async (): Promise<Collection[]> => {
+  return await selectCollections();
 };

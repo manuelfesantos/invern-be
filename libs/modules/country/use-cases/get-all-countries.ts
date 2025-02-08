@@ -1,7 +1,6 @@
-import { successResponse } from "@response-entity";
 import { selectAllCountries } from "@country-db";
+import { ClientCountry } from "@country-entity";
 
-export const getAllCountries = async (): Promise<Response> => {
-  const countries = await selectAllCountries();
-  return successResponse.OK("success getting countries", countries);
+export const getAllCountries = async (): Promise<ClientCountry[]> => {
+  return await selectAllCountries();
 };

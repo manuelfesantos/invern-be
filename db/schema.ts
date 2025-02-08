@@ -14,6 +14,10 @@ const VALUE_ZERO = 0;
 
 export const cartsTable = sqliteTable("carts", {
   id: text("id").primaryKey(),
+  lastModifiedAt: int("lastModifiedAt").notNull(),
+  isLoggedIn: int("isLoggedIn", {
+    mode: "boolean",
+  }).notNull(),
 });
 
 export const usersTable = sqliteTable("users", {
@@ -27,10 +31,11 @@ export const usersTable = sqliteTable("users", {
     .notNull()
     .default("USER"),
   cartId: text("cartId")
-    .notNull()
+    .unique()
     .references(() => cartsTable.id, {
-      onDelete: "cascade",
+      onDelete: "set null",
     }),
+  address: text("address"),
 });
 
 export const collectionsTable = sqliteTable("collections", {
@@ -48,6 +53,7 @@ export const productsTable = sqliteTable("products", {
     .notNull()
     .references(() => collectionsTable.id, { onDelete: "cascade" }),
   priceInCents: int("priceInCents").notNull(),
+  weight: int("weight").notNull(),
 });
 
 export const imagesTable = sqliteTable("images", {
@@ -84,9 +90,7 @@ export const ordersTable = sqliteTable("orders", {
   userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
-  addressId: text("addressId").references(() => addressesTable.id, {
-    onDelete: "cascade",
-  }),
+  address: text("address").notNull(),
   paymentId: text("paymentId").references(() => paymentsTable.id, {
     onDelete: "cascade",
   }),
@@ -132,22 +136,10 @@ export const countriesTable = sqliteTable("countries", {
   code: text("code", { enum: ["PT", "ES"] })
     .notNull()
     .primaryKey(),
+  locale: text("locale").notNull(),
   currencyCode: text("currencyCode")
     .notNull()
     .references(() => currenciesTable.code, {
-      onDelete: "cascade",
-    }),
-});
-
-export const addressesTable = sqliteTable("addresses", {
-  id: text("id").primaryKey(),
-  line1: text("line1").notNull(),
-  line2: text("line2"),
-  postalCode: text("postalCode").notNull(),
-  city: text("city").notNull(),
-  country: text("countryId")
-    .notNull()
-    .references(() => countriesTable.code, {
       onDelete: "cascade",
     }),
 });
@@ -175,6 +167,44 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
     onDelete: "cascade",
   }),
 });
+
+export const shippingMethodsTable = sqliteTable("shippingMethods", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+});
+
+export const shippingRatesTable = sqliteTable("shippingRates", {
+  id: text("id").primaryKey(),
+  priceInCents: int("priceInCents").notNull(),
+  minWeight: int("minWeight").notNull(),
+  maxWeight: int("maxWeight").notNull(),
+  // Delivery time in business days
+  deliveryTime: int("deliveryTime").notNull(),
+  shippingMethodId: text("shippingMethodId")
+    .references(() => shippingMethodsTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+});
+
+export const shippingRatesToCountriesTable = sqliteTable(
+  "shippingRatesToCountries",
+  {
+    shippingRateId: text("shippingRateId")
+      .notNull()
+      .references(() => shippingRatesTable.id, {
+        onDelete: "cascade",
+      }),
+    countryCode: text("countryCode")
+      .notNull()
+      .references(() => countriesTable.code, {
+        onDelete: "cascade",
+      }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.shippingRateId, t.countryCode] }),
+  }),
+);
 
 //---------------------------------RELATIONS---------------------------------//
 
@@ -239,10 +269,6 @@ export const ordersRelations = relations(ordersTable, ({ one, many }) => ({
     fields: [ordersTable.userId],
     references: [usersTable.id],
   }),
-  address: one(addressesTable, {
-    fields: [ordersTable.addressId],
-    references: [addressesTable.id],
-  }),
   productsToOrders: many(productsToOrdersTable),
   payment: one(paymentsTable, {
     fields: [ordersTable.paymentId],
@@ -278,21 +304,14 @@ export const taxesRelations = relations(taxesTable, ({ one }) => ({
 export const countriesRelations = relations(
   countriesTable,
   ({ one, many }) => ({
-    addresses: many(addressesTable),
     currency: one(currenciesTable, {
       fields: [countriesTable.currencyCode],
       references: [currenciesTable.code],
     }),
     taxes: many(taxesTable),
+    ratesToCountries: many(shippingRatesToCountriesTable),
   }),
 );
-
-export const addressesRelations = relations(addressesTable, ({ one }) => ({
-  country: one(countriesTable, {
-    fields: [addressesTable.country],
-    references: [countriesTable.code],
-  }),
-}));
 
 export const paymentsRelations = relations(paymentsTable, ({ one }) => ({
   orders: one(ordersTable),
@@ -308,6 +327,38 @@ export const checkoutSessionsRelations = relations(
     cart: one(cartsTable, {
       fields: [checkoutSessionsTable.cartId],
       references: [cartsTable.id],
+    }),
+  }),
+);
+
+export const shippingMethodsRelations = relations(
+  shippingMethodsTable,
+  ({ many }) => ({
+    rates: many(shippingRatesTable),
+  }),
+);
+
+export const shippingRatesRelations = relations(
+  shippingRatesTable,
+  ({ one, many }) => ({
+    shippingMethod: one(shippingMethodsTable, {
+      fields: [shippingRatesTable.shippingMethodId],
+      references: [shippingMethodsTable.id],
+    }),
+    ratesToCountries: many(shippingRatesToCountriesTable),
+  }),
+);
+
+export const shippingRatesToCountriesRelations = relations(
+  shippingRatesToCountriesTable,
+  ({ one }) => ({
+    shippingRate: one(shippingRatesTable, {
+      fields: [shippingRatesToCountriesTable.shippingRateId],
+      references: [shippingRatesTable.id],
+    }),
+    country: one(countriesTable, {
+      fields: [shippingRatesToCountriesTable.countryCode],
+      references: [countriesTable.code],
     }),
   }),
 );
