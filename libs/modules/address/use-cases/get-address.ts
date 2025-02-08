@@ -1,12 +1,12 @@
 import { contextStore } from "@context-utils";
 import { Address } from "@address-entity";
 import { getUserById } from "@user-db";
-import { decryptAddress } from "@address-utils";
+import { decryptObjectString } from "@crypto-utils";
 
 export const getAddress = async (): Promise<Address | undefined> => {
   const { address, userId } = contextStore.context;
   if (address) {
-    return decryptAddress(address);
+    return decryptObjectString<Address>(address);
   }
 
   if (userId) {

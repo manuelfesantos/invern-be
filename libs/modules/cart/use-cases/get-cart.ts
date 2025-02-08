@@ -1,4 +1,4 @@
-import { getCartById } from "@cart-db";
+import { selectCartById } from "@cart-db";
 import { extendCart } from "@price-utils";
 import { contextStore } from "@context-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
@@ -8,7 +8,7 @@ export const getCart = async (): Promise<ExtendedCart> => {
   if (!cartId) {
     return extendCart(toCartDTO(EMPTY_CART));
   }
-  const cart = await getCartById(cartId);
+  const cart = await selectCartById(cartId);
   if (!cart) {
     return extendCart(toCartDTO(EMPTY_CART));
   }

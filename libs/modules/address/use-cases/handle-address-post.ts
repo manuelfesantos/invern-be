@@ -1,7 +1,8 @@
 import { Address, insertAddressSchema } from "@address-entity";
 import { contextStore } from "@context-utils";
 import { updateUser } from "@user-db";
-import { encryptAddress } from "@address-utils";
+import { encryptObject } from "@crypto-utils";
+import { z } from "zod";
 
 export const handleAddressPost = async (
   body: unknown,
@@ -14,7 +15,7 @@ export const handleAddressPost = async (
     country: country.code,
   };
 
-  const encryptedAddress = await encryptAddress(address);
+  const encryptedAddress = await encryptObject(address);
 
   const { userId } = contextStore.context;
   if (userId) {
@@ -27,14 +28,10 @@ export const handleAddressPost = async (
 };
 
 const shouldSaveAddress = (body: unknown): boolean => {
-  if (
-    body &&
-    typeof body === "object" &&
-    "saveAddress" in body &&
-    body.saveAddress &&
-    typeof body.saveAddress === "boolean"
-  ) {
-    return body.saveAddress;
-  }
-  return false;
+  const { saveAddress } = saveAddressSchema.parse(body);
+  return saveAddress ?? false;
 };
+
+const saveAddressSchema = z.object({
+  saveAddress: z.boolean().optional(),
+});

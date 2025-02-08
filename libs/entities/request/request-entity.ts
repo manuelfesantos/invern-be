@@ -33,4 +33,6 @@ export type Credentials = {
   refreshToken: string;
   remember?: boolean;
   address?: string;
+  userDetails?: string;
+  shippingMethod?: string;
 };

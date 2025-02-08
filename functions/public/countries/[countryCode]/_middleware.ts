@@ -7,7 +7,7 @@ import { middlewareRequestHandler } from "@decorator-utils";
 
 const SECOND_INDEX = 1;
 
-const protectedEndpoints = ["address", "cart", "checkout", "orders", "user"];
+const protectedEndpoints = ["cart", "checkout", "orders", "user"];
 
 type ProtectedContextData = {
   endpoint?: string;
@@ -43,8 +43,16 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
 
     if (endpoint && protectedEndpoints.includes(endpoint)) {
       const { headers } = request;
-      const { cartId, userId, accessToken, refreshToken, remember, address } =
-        await getCredentials(headers);
+      const {
+        cartId,
+        userId,
+        accessToken,
+        refreshToken,
+        remember,
+        address,
+        userDetails,
+        shippingMethod,
+      } = await getCredentials(headers);
 
       contextStore.context.cartId = cartId;
       contextStore.context.userId = userId;
@@ -52,6 +60,8 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
       contextStore.context.refreshToken = refreshToken;
       contextStore.context.remember = remember;
       contextStore.context.address = address;
+      contextStore.context.userDetails = userDetails;
+      contextStore.context.shippingMethod = shippingMethod;
     }
 
     return next();
