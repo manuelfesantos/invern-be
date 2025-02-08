@@ -24,6 +24,8 @@ export const CookieNameEnum = {
   CHECKOUT_SESSION: "c_s",
   REMEMBER: "r_m",
   ADDRESS: "a_d",
+  USER_DETAILS: "u_d",
+  SHIPPING_METHOD: "s_m",
 } as const;
 
 export type CookieName = (typeof CookieNameEnum)[keyof typeof CookieNameEnum];

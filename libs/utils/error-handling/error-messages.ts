@@ -66,6 +66,10 @@ export const errors = {
     new CustomError("Order not found", HttpStatusEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): CustomError =>
     new CustomError("Orders not found", HttpStatusEnum.NOT_FOUND),
+  SHIPPING_METHOD_NOT_FOUND: (): CustomError =>
+    new CustomError("Shipping method not found", HttpStatusEnum.NOT_FOUND),
+  SHIPPING_RATE_NOT_FOUND: (): CustomError =>
+    new CustomError("Shipping rate not found", HttpStatusEnum.NOT_FOUND),
   UNAUTHORIZED: (message?: string): CustomError =>
     new CustomError(message || "Unauthorized", HttpStatusEnum.UNAUTHORIZED),
 };

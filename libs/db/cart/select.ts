@@ -3,7 +3,7 @@ import { cartsTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { Cart, cartSchema } from "@cart-entity";
 
-export const getCartById = async (
+export const selectCartById = async (
   cartId: string,
 ): Promise<Cart | undefined> => {
   const cartTemplate = await db().query.cartsTable.findFirst({

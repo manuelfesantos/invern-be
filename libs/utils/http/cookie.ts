@@ -15,31 +15,10 @@ export const getCookieHeader = (
 ): string =>
   `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? "SameSite=Strict;" : ""} Domain=${domain || getDomain()}; ${path ? `Path=${path};` : ""}`;
 
-export const getTokensFromHeaders = (
-  headers: Headers,
-): { token?: string; refreshToken?: string } => {
-  const token = headers.get("Authorization")?.replace("Bearer ", "");
-  const cookies = getCookies(headers);
-  const { [CookieNameEnum.REFRESH_TOKEN]: refreshToken } = cookies;
-  return { token, refreshToken };
-};
-
-export const getRememberValue = (headers: Headers): boolean => {
-  const cookies = getCookies(headers);
-  const { [CookieNameEnum.REMEMBER]: remember } = cookies;
-  return remember === "true";
-};
-
 export const getCartIdFromHeaders = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);
   const { [CookieNameEnum.CART_ID]: cartId } = cookies;
   return cartId;
-};
-
-export const getAddressFromHeaders = (headers: Headers): string | undefined => {
-  const cookies = getCookies(headers);
-  const { [CookieNameEnum.ADDRESS]: address } = cookies;
-  return address;
 };
 
 export const getCookies = (

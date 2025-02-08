@@ -43,6 +43,13 @@ export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
+export const userDetailsSchema = z.object({
+  email: insertUserSchema.shape.email,
+  firstName: insertUserSchema.shape.firstName,
+  lastName: insertUserSchema.shape.lastName,
+});
+
 export type User = z.infer<typeof userSchema>;
 export type UserDTO = z.infer<typeof userDTOSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UserDetails = z.infer<typeof userDetailsSchema>;
