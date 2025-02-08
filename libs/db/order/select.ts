@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { ordersTable, productsToOrdersTable } from "@schema";
 import { ClientOrder } from "@order-entity";
 import { ProductIdAndQuantity } from "@product-entity";
-import { decryptAddress } from "@address-utils";
+import { decryptObjectString } from "@crypto-utils";
 
 export const getOrdersByUserId = async (
   userId: string,
@@ -47,7 +47,7 @@ export const getOrdersByUserId = async (
         ...product.product,
         quantity: product.quantity,
       })),
-      address: await decryptAddress(order.address),
+      address: await decryptObjectString(order.address),
     })),
   );
 };
@@ -94,7 +94,7 @@ export const getOrderByStripeId = async (
         ...product.product,
         quantity: product.quantity,
       })),
-      address: await decryptAddress(orderTemplate.address),
+      address: await decryptObjectString(orderTemplate.address),
     }
   );
 };
@@ -141,7 +141,7 @@ export const getOrderById = async (
         ...product.product,
         quantity: product.quantity,
       })),
-      address: await decryptAddress(orderTemplate.address),
+      address: await decryptObjectString(orderTemplate.address),
     }
   );
 };

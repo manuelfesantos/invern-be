@@ -53,6 +53,7 @@ export const productsTable = sqliteTable("products", {
     .notNull()
     .references(() => collectionsTable.id, { onDelete: "cascade" }),
   priceInCents: int("priceInCents").notNull(),
+  weight: int("weight").notNull(),
 });
 
 export const imagesTable = sqliteTable("images", {
@@ -170,11 +171,40 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
 export const shippingMethodsTable = sqliteTable("shippingMethods", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
-  priceInCents: int("priceInCents").notNull(),
-  countryCode: text("countryCode").references(() => countriesTable.code, {
-    onDelete: "cascade",
-  }),
 });
+
+export const shippingRatesTable = sqliteTable("shippingRates", {
+  id: text("id").primaryKey(),
+  priceInCents: int("priceInCents").notNull(),
+  minWeight: int("minWeight").notNull(),
+  maxWeight: int("maxWeight").notNull(),
+  // Delivery time in business days
+  deliveryTime: int("deliveryTime").notNull(),
+  shippingMethodId: text("shippingMethodId")
+    .references(() => shippingMethodsTable.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+});
+
+export const shippingRatesToCountriesTable = sqliteTable(
+  "shippingRatesToCountries",
+  {
+    shippingRateId: text("shippingRateId")
+      .notNull()
+      .references(() => shippingRatesTable.id, {
+        onDelete: "cascade",
+      }),
+    countryCode: text("countryCode")
+      .notNull()
+      .references(() => countriesTable.code, {
+        onDelete: "cascade",
+      }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.shippingRateId, t.countryCode] }),
+  }),
+);
 
 //---------------------------------RELATIONS---------------------------------//
 
@@ -279,6 +309,7 @@ export const countriesRelations = relations(
       references: [currenciesTable.code],
     }),
     taxes: many(taxesTable),
+    ratesToCountries: many(shippingRatesToCountriesTable),
   }),
 );
 
@@ -296,6 +327,38 @@ export const checkoutSessionsRelations = relations(
     cart: one(cartsTable, {
       fields: [checkoutSessionsTable.cartId],
       references: [cartsTable.id],
+    }),
+  }),
+);
+
+export const shippingMethodsRelations = relations(
+  shippingMethodsTable,
+  ({ many }) => ({
+    rates: many(shippingRatesTable),
+  }),
+);
+
+export const shippingRatesRelations = relations(
+  shippingRatesTable,
+  ({ one, many }) => ({
+    shippingMethod: one(shippingMethodsTable, {
+      fields: [shippingRatesTable.shippingMethodId],
+      references: [shippingMethodsTable.id],
+    }),
+    ratesToCountries: many(shippingRatesToCountriesTable),
+  }),
+);
+
+export const shippingRatesToCountriesRelations = relations(
+  shippingRatesToCountriesTable,
+  ({ one }) => ({
+    shippingRate: one(shippingRatesTable, {
+      fields: [shippingRatesToCountriesTable.shippingRateId],
+      references: [shippingRatesTable.id],
+    }),
+    country: one(countriesTable, {
+      fields: [shippingRatesToCountriesTable.countryCode],
+      references: [countriesTable.code],
     }),
   }),
 );

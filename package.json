@@ -16,7 +16,7 @@
     "local": "npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --kv=AUTH_KV --compatibility-date=2024-04-26 --compatibility-flag=nodejs_compat --show-interactive-dev-session=false",
     "prepare": "husky",
     "db:generate": "npx drizzle-kit generate",
-    "typecheck": "npx tsc --noEmit"
+    "type-check": "npx tsc --noEmit"
   },
   "keywords": [],
   "author": "",

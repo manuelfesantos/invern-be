@@ -9,6 +9,8 @@ class Context {
   private _refreshToken: string = "";
   private _remember?: boolean;
   private _address?: string;
+  private _userDetails?: string;
+  private _shippingMethod?: string;
 
   get cartId(): string | undefined {
     return this._cartId;
@@ -44,10 +46,10 @@ class Context {
   set accessToken(value: string | undefined) {
     this._accessToken = value;
   }
+
   get remember(): boolean | undefined {
     return this._remember;
   }
-
   set remember(value: boolean | undefined) {
     this._remember = value;
   }
@@ -55,7 +57,6 @@ class Context {
   get isLoggedIn(): boolean {
     return Boolean(this._userId);
   }
-
   get isLoggedOut(): boolean {
     return !this._userId;
   }
@@ -63,9 +64,22 @@ class Context {
   get address(): string | undefined {
     return this._address;
   }
-
   set address(value: string | undefined) {
     this._address = value;
+  }
+
+  get userDetails(): string | undefined {
+    return this._userDetails;
+  }
+  set userDetails(value: string | undefined) {
+    this._userDetails = value;
+  }
+
+  get shippingMethod(): string | undefined {
+    return this._shippingMethod;
+  }
+  set shippingMethod(value: string | undefined) {
+    this._shippingMethod = value;
   }
 }
 

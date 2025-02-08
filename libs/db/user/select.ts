@@ -5,7 +5,8 @@ import { User } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { decryptAddress } from "@address-utils";
+import { decryptObjectString } from "@crypto-utils";
+import { Address } from "@address-entity";
 
 const NO_USER_VERSION = 0;
 
@@ -53,7 +54,7 @@ const getUser = async (
         }
       : null,
     address: userTemplate.address
-      ? await decryptAddress(userTemplate.address)
+      ? await decryptObjectString<Address>(userTemplate.address)
       : null,
   };
 };
