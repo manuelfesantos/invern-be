@@ -35,14 +35,17 @@ export const signup = async (body: unknown): Promise<ReturnType> => {
 
   const [{ userId }] = await insertUser({
     ...parsedBody,
-    cartId,
+    cartId: contextStore.context.cartId,
   });
   const user = await getUserById(userId);
 
   const refreshToken = await getLoggedInRefreshToken(userId);
   await setAuthSecret(userId, refreshToken);
 
-  const accessToken = await getLoggedInToken(userId, cartId);
+  const accessToken = await getLoggedInToken(
+    userId,
+    contextStore.context.cartId,
+  );
 
   return {
     user: userToUserDTO(user),

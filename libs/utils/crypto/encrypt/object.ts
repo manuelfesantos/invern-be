@@ -1,15 +1,10 @@
 import { decrypt, encrypt } from "./encryptor";
 
 const stringifyObject = <T extends object>(object: T): string =>
-  Object.entries(object)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map((entry) => entry.join(","))
-    .join("|");
+  JSON.stringify(object);
 
-const parseObjectString = <T extends object>(objectString: string): T => {
-  const entries = objectString.split("|").map((entry) => entry.split(","));
-  return Object.fromEntries(entries);
-};
+const parseObjectString = <T extends object>(objectString: string): T =>
+  JSON.parse(objectString);
 
 export const decryptObjectString = async <T extends object>(
   object: string,
