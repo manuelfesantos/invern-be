@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { positiveIntegerSchema, uuidSchema } from "@global-entity";
 
 export const jwtSchema = z.object({
-  iat: z.number(),
-  exp: z.number().optional(),
+  iat: positiveIntegerSchema("iat"),
+  exp: z.optional(positiveIntegerSchema("exp")),
 });
 
 export const userJwtSchema = jwtSchema.extend({
-  userId: z.string(),
-  cartId: z.string().optional(),
+  userId: uuidSchema("user id"),
+  cartId: z.optional(uuidSchema("cart id")),
 });
 
 export type UserJWT = z.infer<typeof userJwtSchema>;

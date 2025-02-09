@@ -2,7 +2,7 @@ import { ShippingMethod } from "@shipping-entity";
 import { db } from "@db";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingMethodsTable, shippingRatesTable } from "@schema";
-import { countryEnumSchema } from "@country-entity";
+import { countryCodeSchema } from "@global-entity";
 
 export const selectShippingMethod = async (
   id: string,
@@ -40,7 +40,7 @@ export const selectShippingMethod = async (
     rates: shippingMethodTemplate.rates.map((rate) => ({
       ...rate,
       countryCodes: rate.ratesToCountries.map((rateToCountry) =>
-        countryEnumSchema.parse(rateToCountry.countryCode),
+        countryCodeSchema.parse(rateToCountry.countryCode),
       ),
     })),
   };
@@ -76,7 +76,7 @@ export const selectShippingMethods = async (
     rates: shippingMethodTemplate.rates.map((rate) => ({
       ...rate,
       countryCodes: rate.ratesToCountries.map((rateToCountry) =>
-        countryEnumSchema.parse(rateToCountry.countryCode),
+        countryCodeSchema.parse(rateToCountry.countryCode),
       ),
     })),
   }));

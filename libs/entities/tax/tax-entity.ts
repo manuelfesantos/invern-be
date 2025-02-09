@@ -1,9 +1,19 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { taxesTable } from "@schema";
 import { z } from "zod";
-import { positiveIntegerSchema } from "@global-entity";
+import {
+  positiveIntegerSchema,
+  positiveNumberSchema,
+  requiredStringSchema,
+} from "@global-entity";
+import { countryCodeSchema } from "@global-entity";
 
-const baseTaxSchema = createSelectSchema(taxesTable);
+const baseTaxSchema = createSelectSchema(taxesTable, {
+  id: requiredStringSchema("tax id"),
+  countryCode: countryCodeSchema,
+  name: requiredStringSchema("tax name"),
+  rate: positiveNumberSchema("tax rate"),
+});
 export const insertTaxSchema = createInsertSchema(taxesTable).omit({
   id: true,
 });
@@ -14,11 +24,9 @@ export const clientTaxSchema = taxSchema.omit({
   id: true,
 });
 
-export const extendedClientTaxSchema = clientTaxSchema.merge(
-  z.object({
-    amount: positiveIntegerSchema("tax amount"),
-  }),
-);
+export const extendedClientTaxSchema = clientTaxSchema.extend({
+  amount: positiveIntegerSchema("tax amount"),
+});
 
 export type Tax = z.infer<typeof taxSchema>;
 

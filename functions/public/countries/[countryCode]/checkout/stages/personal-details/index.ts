@@ -8,11 +8,16 @@ import {
 import { getUserDetails, handleDetailsPost } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
-import { getClientCheckoutStages } from "@context-utils";
+import {
+  enableNextCheckoutStage,
+  getClientCheckoutStages,
+} from "@context-utils";
+import { CheckoutStageEnum } from "@checkout-session-entity";
 
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { userDetails, encryptedUserDetails } = await handleDetailsPost(body);
+  enableNextCheckoutStage(CheckoutStageEnum.PERSONAL_DETAILS);
   const response = protectedSuccessResponse.OK(
     "Successfully created user details",
     {
