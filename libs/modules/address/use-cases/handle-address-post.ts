@@ -5,10 +5,16 @@ import { encryptObject } from "@crypto-utils";
 import { z } from "zod";
 import { validateCartId } from "@cart-db";
 
+const addressPostPayloadSchema = z.object({
+  address: insertAddressSchema,
+  saveAddress: z.boolean().optional(),
+});
+
 export const handleAddressPost = async (
   body: unknown,
 ): Promise<{ address: Address; encryptedAddress: string }> => {
-  const insertAddress = insertAddressSchema.parse(body);
+  const { address: insertAddress, saveAddress } =
+    addressPostPayloadSchema.parse(body);
   const { country, cartId } = contextStore.context;
 
   await validateCartId(cartId);
@@ -22,19 +28,10 @@ export const handleAddressPost = async (
 
   const { userId } = contextStore.context;
   if (userId) {
-    if (shouldSaveAddress(body)) {
+    if (saveAddress) {
       await updateUser(userId, { address: encryptedAddress });
     }
   }
 
   return { address, encryptedAddress };
 };
-
-const shouldSaveAddress = (body: unknown): boolean => {
-  const { saveAddress } = saveAddressSchema.parse(body);
-  return saveAddress ?? false;
-};
-
-const saveAddressSchema = z.object({
-  saveAddress: z.boolean().optional(),
-});

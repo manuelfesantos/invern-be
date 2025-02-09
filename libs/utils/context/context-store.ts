@@ -13,7 +13,11 @@ class Context {
   private _address?: string;
   private _userDetails?: string;
   private _shippingMethod?: string;
-  private _firstCheckoutStage: CheckoutStage = firstStage;
+  private _firstCheckoutStage: CheckoutStage;
+
+  constructor() {
+    this._firstCheckoutStage = structuredClone(firstStage);
+  }
 
   get cartId(): string | undefined {
     return this._cartId;
