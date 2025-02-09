@@ -61,7 +61,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
       contextStore.context.remember = remember;
       contextStore.context.address = address;
       contextStore.context.userDetails = userDetails;
-      contextStore.context.shippingMethod = shippingMethod;
+      contextStore.context.shippingMethodId = shippingMethod;
     }
 
     return next();

@@ -1,6 +1,7 @@
 import { HttpMethodEnum } from "@http-entity";
 import Stripe from "stripe";
 import { logger } from "@logger-utils";
+import { errors } from "@error-handling-utils";
 
 const QUERY_INDEX = 1;
 
@@ -19,10 +20,7 @@ export const getBodyFromRequest = async (
     return body;
   } catch (error) {
     if (error instanceof Error) {
-      throw {
-        ...error,
-        cause: "UNABLE_TO_PARSE_BODY",
-      };
+      throw errors.UNABLE_TO_PARSE_BODY();
     }
   }
 };

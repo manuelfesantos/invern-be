@@ -1,4 +1,4 @@
-name: PR to Main Validation
+name: Validate PR to Main
 
 on:
   pull_request:

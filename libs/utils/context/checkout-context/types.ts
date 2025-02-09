@@ -7,6 +7,7 @@ export interface CheckoutStage {
   next?: CheckoutStage;
   showWhenLoggedIn?: boolean;
   isEnabled: boolean;
+  autoEnableNextStage?: boolean;
 }
 
 export const clientCheckoutStageSchema = z.object({

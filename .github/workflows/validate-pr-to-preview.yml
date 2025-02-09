@@ -1,9 +1,6 @@
-name: CI
+name: Validate PR to Preview
 
 on:
-  push:
-    branches:
-      - preview
   pull_request:
     branches:
       - preview
