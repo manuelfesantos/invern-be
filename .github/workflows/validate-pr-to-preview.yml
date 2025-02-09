@@ -83,4 +83,4 @@ jobs:
         run: npm ci
 
       - name: Run Type Check
-        run: npm run typecheck
+        run: npm run type-check
