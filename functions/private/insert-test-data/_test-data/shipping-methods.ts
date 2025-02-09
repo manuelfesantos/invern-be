@@ -1,6 +1,5 @@
 import { BaseShippingMethod, BaseShippingRate } from "@shipping-entity";
 import { getRandomUUID } from "@crypto-utils";
-import { CountryEnum, CountryEnumType } from "@country-entity";
 import {
   shippingMethodsTable,
   shippingRatesTable,
@@ -122,7 +121,7 @@ const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
 
 const getRatesToCountries = (
   shippingRates: BaseShippingRate[] = [],
-  country: CountryEnumType,
+  country: string,
 ): {
   shippingRateId: string;
   countryCode: string;
@@ -154,12 +153,9 @@ export const insertShippingMethods = async (): Promise<void> => {
   );
   const portugalRatesToCountries = getRatesToCountries(
     portugalShippingRates,
-    CountryEnum.PT,
+    "PT",
   );
-  const spainRatesToCountries = getRatesToCountries(
-    spainShippingRates,
-    CountryEnum.ES,
-  );
+  const spainRatesToCountries = getRatesToCountries(spainShippingRates, "ES");
   await Promise.all(
     [...portugalRatesToCountries, ...spainRatesToCountries].map(
       async (rateToCountry) => {

@@ -8,12 +8,17 @@ import {
 import { handleShippingMethodPost, getShippingMethods } from "@shipping-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
-import { getClientCheckoutStages } from "@context-utils";
+import {
+  enableNextCheckoutStage,
+  getClientCheckoutStages,
+} from "@context-utils";
+import { CheckoutStageEnum } from "@checkout-session-entity";
 
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { encryptedShippingMethod, shippingMethod } =
     await handleShippingMethodPost(body);
+  enableNextCheckoutStage(CheckoutStageEnum.SHIPPING);
   const response = protectedSuccessResponse.OK("Shipping method selected", {
     shippingMethod,
     availableCheckoutStages: getClientCheckoutStages(),

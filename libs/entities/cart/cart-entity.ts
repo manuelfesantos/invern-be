@@ -2,10 +2,18 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { cartsTable } from "@schema";
 import { z } from "zod";
 import { extendedLineItemSchema, lineItemSchema } from "@product-entity";
-import { positiveIntegerSchema } from "@global-entity";
+import {
+  booleanSchema,
+  positiveIntegerSchema,
+  uuidSchema,
+} from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 
-const baseCartSchema = createSelectSchema(cartsTable);
+const baseCartSchema = createSelectSchema(cartsTable, {
+  id: uuidSchema("cart id"),
+  lastModifiedAt: positiveIntegerSchema("cart last modified date"),
+  isLoggedIn: booleanSchema("cart logged in status"),
+});
 
 export const insertCartSchema = createInsertSchema(cartsTable).omit({
   id: true,
@@ -28,7 +36,7 @@ export const extendedCartSchema = cartDTOSchema.extend({
   grossPrice: positiveIntegerSchema("cart gross price"),
   netPrice: positiveIntegerSchema("cart net price"),
   taxes: extendedClientTaxSchema.array(),
-  isCheckoutPossible: z.boolean(),
+  isCheckoutPossible: booleanSchema("cart checkout possibility"),
 });
 
 export const toCartDTO = (cart: Cart): CartDTO => {

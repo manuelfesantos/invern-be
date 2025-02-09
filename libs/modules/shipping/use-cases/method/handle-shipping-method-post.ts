@@ -48,8 +48,12 @@ export const handleShippingMethodPost = async (
     rate: selectedRate,
   };
 
+  const savedShippingMethod = selectedShippingMethodSchema.parse(
+    selectedShippingMethod,
+  );
+
   return {
-    shippingMethod: selectedShippingMethodSchema.parse(selectedShippingMethod),
-    encryptedShippingMethod: await encryptObject(selectedShippingMethod),
+    shippingMethod: savedShippingMethod,
+    encryptedShippingMethod: await encryptObject(savedShippingMethod),
   };
 };

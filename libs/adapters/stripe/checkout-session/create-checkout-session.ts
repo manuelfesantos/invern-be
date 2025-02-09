@@ -11,15 +11,11 @@ export const createCheckoutSession = async (
   lineItems: LineItem[],
   origin?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
-  const { country, address } = contextStore.context;
+  const { country, address, userDetails, shippingMethod } =
+    contextStore.context;
   const clientId = getRandomUUID();
   return await stripe().checkout.sessions.create({
-    customer_creation: "always",
     expires_at: getFutureDate(SESSION_EXPIRY),
-    shipping_address_collection: {
-      allowed_countries: [country.code],
-    },
-    billing_address_collection: "auto",
     payment_method_types: ["paypal", "card"],
     mode: "payment",
     payment_intent_data: {
@@ -48,6 +44,8 @@ export const createCheckoutSession = async (
       stripeEnv: getStripeEnv(),
       clientId,
       address: address ?? null,
+      userDetails: userDetails ?? null,
+      shippingMethod: shippingMethod ?? null,
     },
   });
 };

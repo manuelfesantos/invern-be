@@ -2,7 +2,7 @@ import { shippingRatesTable } from "@schema";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { db } from "@db";
 import { ShippingRate } from "@shipping-entity";
-import { countryEnumSchema } from "@country-entity";
+import { countryCodeSchema } from "@global-entity";
 
 export const selectShippingRateById = async (
   id: string,
@@ -25,7 +25,7 @@ export const selectShippingRateById = async (
   return {
     ...shippingRateTemplate,
     countryCodes: shippingRateTemplate.ratesToCountries.map((rateToCountry) =>
-      countryEnumSchema.parse(rateToCountry.countryCode),
+      countryCodeSchema.parse(rateToCountry.countryCode),
     ),
   };
 };
@@ -58,7 +58,7 @@ export const selectShippingRates = async (
   return shippingRateTemplates.map((shippingRateTemplate) => ({
     ...shippingRateTemplate,
     countryCodes: shippingRateTemplate.ratesToCountries.map((rateToCountry) =>
-      countryEnumSchema.parse(rateToCountry.countryCode),
+      countryCodeSchema.parse(rateToCountry.countryCode),
     ),
   }));
 };

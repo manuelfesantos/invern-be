@@ -31,6 +31,7 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
       name: currentStage.name,
       isEnabled: currentStage.isEnabled,
       showWhenLoggedIn: currentStage.showWhenLoggedIn,
+      title: currentStage.title,
     });
     currentStage = currentStage.next;
   }
@@ -40,6 +41,19 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
     : stages;
 
   return stagesToShow.map((stage) => clientCheckoutStageSchema.parse(stage));
+};
+
+export const enableNextCheckoutStage = (stage: CheckoutStageEnumType): void => {
+  let currentStage = contextStore.context.firstCheckoutStage;
+  while (currentStage.name !== stage) {
+    if (!currentStage.next) {
+      throw new Error("Stage not found!");
+    }
+    currentStage = currentStage.next;
+  }
+  if (currentStage.next) {
+    currentStage.next.isEnabled = true;
+  }
 };
 
 export const enableCheckoutStage = (stage: CheckoutStageEnumType): void => {

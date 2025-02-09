@@ -4,10 +4,11 @@ import { updateUser } from "@user-db";
 import { encryptObject } from "@crypto-utils";
 import { z } from "zod";
 import { validateCartId } from "@cart-db";
+import { booleanSchema, requiredObjectSchema } from "@global-entity";
 
 const addressPostPayloadSchema = z.object({
-  address: insertAddressSchema,
-  saveAddress: z.boolean().optional(),
+  address: requiredObjectSchema("Address", insertAddressSchema.shape),
+  saveAddress: z.optional(booleanSchema("Save Address option")),
 });
 
 export const handleAddressPost = async (

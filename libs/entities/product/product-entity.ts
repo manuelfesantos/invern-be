@@ -4,6 +4,7 @@ import { z } from "zod";
 import { imageSchema } from "@image-entity";
 import {
   positiveIntegerSchema,
+  requiredObjectSchema,
   requiredStringSchema,
   uuidSchema,
 } from "@global-entity";
@@ -15,29 +16,41 @@ const priceDetailsSchema = z.object({
   taxes: extendedClientTaxSchema.array(),
 });
 
-const baseProductSchema = createSelectSchema(productsTable);
-export const insertProductSchema = createInsertSchema(productsTable).omit({
+const baseProductSchema = createSelectSchema(productsTable, {
+  id: uuidSchema("product id"),
+  name: requiredStringSchema("product name"),
+  description: requiredStringSchema("product description"),
+  priceInCents: positiveIntegerSchema("product price in cents"),
+  collectionId: uuidSchema("collection id"),
+  stock: positiveIntegerSchema("product stock"),
+  weight: positiveIntegerSchema("product weight"),
+});
+export const insertProductSchema = createInsertSchema(productsTable, {
+  id: uuidSchema("product id"),
+  name: requiredStringSchema("product name"),
+  description: requiredStringSchema("product description"),
+  priceInCents: positiveIntegerSchema("product price in cents"),
+  collectionId: uuidSchema("collection id"),
+  stock: positiveIntegerSchema("product stock"),
+  weight: positiveIntegerSchema("product weight"),
+}).omit({
   id: true,
 });
 
-export const productDetailsSchema = baseProductSchema.merge(
-  z.object({
-    images: z.array(imageSchema),
-  }),
-);
+export const productDetailsSchema = baseProductSchema.extend({
+  images: z.array(imageSchema),
+});
 
 export const productWithCollectionDetailsSchema = productDetailsSchema
   .omit({
     collectionId: true,
   })
-  .merge(
-    z.object({
-      collection: z.object({
-        name: requiredStringSchema("collection name"),
-        id: uuidSchema("collection name"),
-      }),
+  .extend({
+    collection: requiredObjectSchema("product collection", {
+      name: requiredStringSchema("collection name"),
+      id: uuidSchema("collection name"),
     }),
-  );
+  });
 
 export const extendedProductWithCollectionDetailsSchema =
   productWithCollectionDetailsSchema
@@ -48,11 +61,9 @@ export const extendedProductWithCollectionDetailsSchema =
 
 export const productSchema = baseProductSchema
   .omit({ collectionId: true, description: true })
-  .merge(
-    z.object({
-      images: imageSchema.array(),
-    }),
-  );
+  .extend({
+    images: imageSchema.array(),
+  });
 
 export const extendedProductSchema = productSchema
   .omit({ priceInCents: true })
@@ -62,11 +73,9 @@ export const extendedProductDetailsSchema = productDetailsSchema
   .omit({ priceInCents: true })
   .merge(priceDetailsSchema);
 
-export const lineItemSchema = productSchema.merge(
-  z.object({
-    quantity: positiveIntegerSchema("line item quantity"),
-  }),
-);
+export const lineItemSchema = productSchema.extend({
+  quantity: positiveIntegerSchema("line item quantity"),
+});
 
 export const lineItemErrorEnumSchema = z.enum(["NOT_ENOUGH_STOCK"]);
 

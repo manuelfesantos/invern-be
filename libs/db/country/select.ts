@@ -3,14 +3,13 @@ import {
   ClientCountry,
   clientCountrySchema,
   Country,
-  CountryEnumType,
   countrySchema,
 } from "@country-entity";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 
 export const getCountryByCode = async (
-  countryCode: CountryEnumType,
+  countryCode: string,
 ): Promise<Country | undefined> => {
   const countryTemplate = await db().query.countriesTable.findFirst({
     where: eq(countriesTable.code, countryCode),
@@ -30,7 +29,6 @@ export const getCountryByCode = async (
   if (!countryTemplate) {
     return;
   }
-
   return countrySchema.parse({
     ...countryTemplate,
     taxes: countryTemplate.taxes || [],
