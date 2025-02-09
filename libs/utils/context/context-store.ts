@@ -1,5 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { Country } from "@country-entity";
+import { CheckoutStage } from "./checkout-context/types";
+import { firstStage } from "./checkout-context/stages";
 
 class Context {
   private _cartId?: string;
@@ -11,6 +13,7 @@ class Context {
   private _address?: string;
   private _userDetails?: string;
   private _shippingMethod?: string;
+  private _firstCheckoutStage: CheckoutStage = firstStage;
 
   get cartId(): string | undefined {
     return this._cartId;
@@ -80,6 +83,10 @@ class Context {
   }
   set shippingMethod(value: string | undefined) {
     this._shippingMethod = value;
+  }
+
+  get firstCheckoutStage(): CheckoutStage {
+    return this._firstCheckoutStage;
   }
 }
 

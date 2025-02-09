@@ -3,12 +3,15 @@ import { contextStore } from "@context-utils";
 import { updateUser } from "@user-db";
 import { encryptObject } from "@crypto-utils";
 import { z } from "zod";
+import { validateCartId } from "@cart-db";
 
 export const handleAddressPost = async (
   body: unknown,
 ): Promise<{ address: Address; encryptedAddress: string }> => {
   const insertAddress = insertAddressSchema.parse(body);
-  const { country } = contextStore.context;
+  const { country, cartId } = contextStore.context;
+
+  await validateCartId(cartId);
 
   const address = {
     ...insertAddress,

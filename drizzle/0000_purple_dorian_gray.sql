@@ -73,6 +73,7 @@ CREATE TABLE `products` (
 	`stock` integer NOT NULL,
 	`collectionId` text NOT NULL,
 	`priceInCents` integer NOT NULL,
+	`weight` integer NOT NULL,
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -96,9 +97,24 @@ CREATE TABLE `productsToOrders` (
 --> statement-breakpoint
 CREATE TABLE `shippingMethods` (
 	`id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
+	`name` text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `shippingRates` (
+	`id` text PRIMARY KEY NOT NULL,
 	`priceInCents` integer NOT NULL,
-	`countryCode` text,
+	`minWeight` integer NOT NULL,
+	`maxWeight` integer NOT NULL,
+	`deliveryTime` integer NOT NULL,
+	`shippingMethodId` text NOT NULL,
+	FOREIGN KEY (`shippingMethodId`) REFERENCES `shippingMethods`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `shippingRatesToCountries` (
+	`shippingRateId` text NOT NULL,
+	`countryCode` text NOT NULL,
+	PRIMARY KEY(`countryCode`, `shippingRateId`),
+	FOREIGN KEY (`shippingRateId`) REFERENCES `shippingRates`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`countryCode`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
