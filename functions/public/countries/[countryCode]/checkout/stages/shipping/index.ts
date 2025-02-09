@@ -8,15 +8,16 @@ import {
 import { handleShippingMethodPost, getShippingMethods } from "@shipping-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
+import { getClientCheckoutStages } from "@context-utils";
 
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { encryptedShippingMethod, shippingMethod } =
     await handleShippingMethodPost(body);
-  const response = protectedSuccessResponse.OK(
-    "Shipping method selected",
+  const response = protectedSuccessResponse.OK("Shipping method selected", {
     shippingMethod,
-  );
+    availableCheckoutStages: getClientCheckoutStages(),
+  });
 
   setCookieInResponse(
     response,
@@ -31,6 +32,7 @@ const GET: PagesFunction = async () => {
   return protectedSuccessResponse.OK("Shipping methods", {
     shippingMethods,
     selectedShippingMethod,
+    availableCheckoutStages: getClientCheckoutStages(),
   });
 };
 

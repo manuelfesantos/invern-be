@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cd978772-8ad6-4033-aa6a-bd4c8e4cf3cc",
+  "id": "ecde78a2-a692-4b45-949d-faa8f5c562eb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -491,6 +491,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -658,6 +665,22 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "shippingRates": {
+      "name": "shippingRates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
         },
         "priceInCents": {
           "name": "priceInCents",
@@ -666,19 +689,90 @@
           "notNull": true,
           "autoincrement": false
         },
-        "countryCode": {
-          "name": "countryCode",
+        "minWeight": {
+          "name": "minWeight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "maxWeight": {
+          "name": "maxWeight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "deliveryTime": {
+          "name": "deliveryTime",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "shippingMethodId": {
+          "name": "shippingMethodId",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "shippingMethods_countryCode_countries_code_fk": {
-          "name": "shippingMethods_countryCode_countries_code_fk",
-          "tableFrom": "shippingMethods",
+        "shippingRates_shippingMethodId_shippingMethods_id_fk": {
+          "name": "shippingRates_shippingMethodId_shippingMethods_id_fk",
+          "tableFrom": "shippingRates",
+          "tableTo": "shippingMethods",
+          "columnsFrom": [
+            "shippingMethodId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "shippingRatesToCountries": {
+      "name": "shippingRatesToCountries",
+      "columns": {
+        "shippingRateId": {
+          "name": "shippingRateId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "countryCode": {
+          "name": "countryCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shippingRatesToCountries_shippingRateId_shippingRates_id_fk": {
+          "name": "shippingRatesToCountries_shippingRateId_shippingRates_id_fk",
+          "tableFrom": "shippingRatesToCountries",
+          "tableTo": "shippingRates",
+          "columnsFrom": [
+            "shippingRateId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "shippingRatesToCountries_countryCode_countries_code_fk": {
+          "name": "shippingRatesToCountries_countryCode_countries_code_fk",
+          "tableFrom": "shippingRatesToCountries",
           "tableTo": "countries",
           "columnsFrom": [
             "countryCode"
@@ -690,7 +784,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "shippingRatesToCountries_shippingRateId_countryCode_pk": {
+          "columns": [
+            "countryCode",
+            "shippingRateId"
+          ],
+          "name": "shippingRatesToCountries_shippingRateId_countryCode_pk"
+        }
+      },
       "uniqueConstraints": {}
     },
     "taxes": {

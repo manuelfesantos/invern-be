@@ -5,7 +5,7 @@ import { BaseShippingMethod } from "@shipping-entity";
 
 export const deleteShippingMethod = async (
   id: string,
-): Promise<BaseShippingMethod> => {
+): Promise<BaseShippingMethod | undefined> => {
   const [deletedShippingMethod] = await db()
     .delete(shippingMethodsTable)
     .where(eq(shippingMethodsTable.id, id))

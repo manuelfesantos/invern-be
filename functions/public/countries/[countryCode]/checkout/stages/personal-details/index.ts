@@ -8,13 +8,17 @@ import {
 import { getUserDetails, handleDetailsPost } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
+import { getClientCheckoutStages } from "@context-utils";
 
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { userDetails, encryptedUserDetails } = await handleDetailsPost(body);
   const response = protectedSuccessResponse.OK(
     "Successfully created user details",
-    userDetails,
+    {
+      userDetails,
+      availableCheckoutStages: getClientCheckoutStages(),
+    },
   );
   setCookieInResponse(
     response,
@@ -27,6 +31,7 @@ const GET: PagesFunction = async () => {
   const userDetails = await getUserDetails();
   return protectedSuccessResponse.OK("Successfully retrieved user details", {
     ...(userDetails && { personalDetails: userDetails }),
+    availableCheckoutStages: getClientCheckoutStages(),
   });
 };
 

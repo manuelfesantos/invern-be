@@ -1,13 +1,24 @@
 import { requestHandler } from "@decorator-utils";
-import { getAvailableCheckoutStages } from "@order-module";
 import { protectedSuccessResponse } from "@response-entity";
+// eslint-disable-next-line import/no-restricted-paths
+import { validateCartId } from "@cart-db";
+import { contextStore, getClientCheckoutStages } from "@context-utils";
+import { errors } from "@error-handling-utils";
 
 const GET: PagesFunction = async () => {
-  const availableCheckoutStages = await getAvailableCheckoutStages();
-  return protectedSuccessResponse.OK(
-    "Checkout stages",
-    availableCheckoutStages,
-  );
+  try {
+    const cart = await validateCartId(contextStore.context.cartId);
+    if (!cart.products?.length) {
+      throw errors.CART_IS_EMPTY();
+    }
+    return protectedSuccessResponse.OK("Checkout stages", {
+      availableCheckoutStages: getClientCheckoutStages(),
+    });
+  } catch (error) {
+    return protectedSuccessResponse.OK("Checkout stages", {
+      isCheckoutPossible: false,
+    });
+  }
 };
 
 export const onRequest = requestHandler({ GET });
