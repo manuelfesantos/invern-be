@@ -3,13 +3,16 @@ import { collectionsTable } from "@schema";
 import { z } from "zod";
 import { extendedProductSchema, productSchema } from "@product-entity";
 import { imageSchema } from "@image-entity";
+import { requiredStringSchema, uuidSchema } from "@global-entity";
 
-const baseCollectionSchema = createSelectSchema(collectionsTable);
-export const insertCollectionSchema = createSelectSchema(collectionsTable).omit(
-  {
-    id: true,
-  },
-);
+const baseCollectionSchema = createSelectSchema(collectionsTable, {
+  id: uuidSchema("collection id"),
+  name: requiredStringSchema("collection name"),
+  description: requiredStringSchema("collection description"),
+});
+export const insertCollectionSchema = baseCollectionSchema.omit({
+  id: true,
+});
 
 export const collectionDetailsSchema = baseCollectionSchema.merge(
   z.object({

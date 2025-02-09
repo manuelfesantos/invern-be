@@ -133,9 +133,7 @@ export const taxesTable = sqliteTable("taxes", {
 
 export const countriesTable = sqliteTable("countries", {
   name: text("name").notNull(),
-  code: text("code", { enum: ["PT", "ES"] })
-    .notNull()
-    .primaryKey(),
+  code: text("code").notNull().primaryKey(),
   locale: text("locale").notNull(),
   currencyCode: text("currencyCode")
     .notNull()

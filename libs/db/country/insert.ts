@@ -1,12 +1,12 @@
 import { db } from "@db";
 import { countriesTable } from "@schema";
-import { CountryEnumType, InsertCountry } from "@country-entity";
+import { InsertCountry } from "@country-entity";
 
 export const insertCountry = async (
   country: InsertCountry,
 ): Promise<
   {
-    code: CountryEnumType;
+    code: string;
   }[]
 > => {
   return db().insert(countriesTable).values(country).returning({

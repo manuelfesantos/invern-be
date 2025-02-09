@@ -5,7 +5,7 @@ import {
   requiredStringSchema,
   uuidSchema,
 } from "@global-entity";
-import { countryEnumSchema } from "@country-entity";
+import { countryCodeSchema } from "@global-entity";
 import { z } from "zod";
 
 export const baseShippingMethodSchema = createSelectSchema(
@@ -43,7 +43,7 @@ export const insertShippingRateSchema = baseShippingRateSchema.omit({
 export const shippingRateSchema = baseShippingRateSchema
   .omit({ shippingMethodId: true })
   .extend({
-    countryCodes: countryEnumSchema.array(),
+    countryCodes: countryCodeSchema.array(),
   });
 
 export const shippingMethodSchema = baseShippingMethodSchema.extend({

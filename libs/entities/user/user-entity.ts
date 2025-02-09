@@ -2,7 +2,12 @@ import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
 import { z } from "zod";
 import { cartSchema } from "@cart-entity";
-import { emailSchema, requiredStringSchema, uuidSchema } from "@global-entity";
+import {
+  emailSchema,
+  requiredObjectSchema,
+  requiredStringSchema,
+  uuidSchema,
+} from "@global-entity";
 import { addressSchema } from "@address-entity";
 
 export const DEFAULT_USER_VERSION = 1;
@@ -43,7 +48,7 @@ export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
-export const userDetailsSchema = z.object({
+export const userDetailsSchema = requiredObjectSchema("user details", {
   email: insertUserSchema.shape.email,
   firstName: insertUserSchema.shape.firstName,
   lastName: insertUserSchema.shape.lastName,

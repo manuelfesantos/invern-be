@@ -1,5 +1,5 @@
 import { getCountryByCountryCode } from "@country-module";
-import { countryEnumSchema } from "@country-entity";
+import { countryCodeSchema } from "@global-entity";
 import { errorResponse } from "@response-entity";
 import { getCredentials } from "@jwt-utils";
 import { contextStore } from "@context-utils";
@@ -32,7 +32,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
   async ({ data, next, request }) => {
     const { endpoint, countryCode } = data;
     const country = await getCountryByCountryCode(
-      countryEnumSchema.parse(countryCode?.toUpperCase()),
+      countryCodeSchema.parse(countryCode?.toUpperCase()),
     );
 
     if (!country) {
