@@ -11,12 +11,18 @@ import { CookieNameEnum } from "@http-entity";
 import {
   enableNextCheckoutStage,
   getClientCheckoutStages,
+  isCheckoutStageEnabled,
 } from "@context-utils";
 import { CheckoutStageEnum } from "@checkout-session-entity";
+import { errors } from "@error-handling-utils";
 
 const POST: PagesFunction = async ({ request }) => {
+  if (!isCheckoutStageEnabled(CheckoutStageEnum.SHIPPING)) {
+    throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
+  }
+
   const body = await getBodyFromRequest(request);
-  const { encryptedShippingMethod, shippingMethod } =
+  const { encryptedShippingMethodId, shippingMethod } =
     await handleShippingMethodPost(body);
   enableNextCheckoutStage(CheckoutStageEnum.SHIPPING);
   const response = protectedSuccessResponse.OK("Shipping method selected", {
@@ -26,12 +32,15 @@ const POST: PagesFunction = async ({ request }) => {
 
   setCookieInResponse(
     response,
-    getCookieHeader(CookieNameEnum.SHIPPING_METHOD, encryptedShippingMethod),
+    getCookieHeader(CookieNameEnum.SHIPPING_METHOD, encryptedShippingMethodId),
   );
   return response;
 };
 
 const GET: PagesFunction = async () => {
+  if (!isCheckoutStageEnabled(CheckoutStageEnum.SHIPPING)) {
+    throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
+  }
   const { shippingMethods, selectedShippingMethod } =
     await getShippingMethods();
   return protectedSuccessResponse.OK("Shipping methods", {

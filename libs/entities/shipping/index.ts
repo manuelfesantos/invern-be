@@ -41,7 +41,7 @@ export const insertShippingRateSchema = baseShippingRateSchema.omit({
 });
 
 export const shippingRateSchema = baseShippingRateSchema
-  .omit({ shippingMethodId: true })
+  .omit({ shippingMethodId: true, id: true })
   .extend({
     countryCodes: countryCodeSchema.array(),
   });

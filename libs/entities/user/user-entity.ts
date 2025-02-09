@@ -48,7 +48,7 @@ export const userToUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
-export const userDetailsSchema = requiredObjectSchema("user details", {
+export const userDetailsSchema = requiredObjectSchema("Personal details", {
   email: insertUserSchema.shape.email,
   firstName: insertUserSchema.shape.firstName,
   lastName: insertUserSchema.shape.lastName,

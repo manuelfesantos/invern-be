@@ -3,7 +3,6 @@ import { contextStore } from "@context-utils";
 import { updateUser } from "@user-db";
 import { encryptObject } from "@crypto-utils";
 import { z } from "zod";
-import { validateCartId } from "@cart-db";
 import { booleanSchema, requiredObjectSchema } from "@global-entity";
 
 const addressPostPayloadSchema = z.object({
@@ -16,9 +15,7 @@ export const handleAddressPost = async (
 ): Promise<{ address: Address; encryptedAddress: string }> => {
   const { address: insertAddress, saveAddress } =
     addressPostPayloadSchema.parse(body);
-  const { country, cartId } = contextStore.context;
-
-  await validateCartId(cartId);
+  const { country } = contextStore.context;
 
   const address = {
     ...insertAddress,

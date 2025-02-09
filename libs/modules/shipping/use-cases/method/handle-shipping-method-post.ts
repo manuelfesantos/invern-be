@@ -7,11 +7,9 @@ import { contextStore } from "@context-utils";
 import { selectShippingMethod } from "@shipping-db";
 import { validateCartId } from "@cart-db";
 import { errors } from "@error-handling-utils";
-import { toTotalWeight } from "@product-entity";
-import { encryptObject } from "@crypto-utils";
+import { encrypt } from "@crypto-utils";
 import { requiredStringSchema } from "@global-entity";
-
-const NO_WEIGHT = 0;
+import { getCartWeight } from "@cart-entity";
 
 const shippingMethodPostBodySchema = z.object({
   id: requiredStringSchema("shipping method id"),
@@ -21,12 +19,12 @@ export const handleShippingMethodPost = async (
   body: unknown,
 ): Promise<{
   shippingMethod: SelectedShippingMethod;
-  encryptedShippingMethod: string;
+  encryptedShippingMethodId: string;
 }> => {
   const { country, cartId } = contextStore.context;
   const { id } = shippingMethodPostBodySchema.parse(body);
   const cart = await validateCartId(cartId);
-  const weight = cart.products?.reduce(toTotalWeight, NO_WEIGHT);
+  const weight = getCartWeight(cart);
   const shippingMethod = await selectShippingMethod(id, weight);
   if (!shippingMethod) {
     throw errors.SHIPPING_METHOD_NOT_FOUND();
@@ -48,12 +46,8 @@ export const handleShippingMethodPost = async (
     rate: selectedRate,
   };
 
-  const savedShippingMethod = selectedShippingMethodSchema.parse(
-    selectedShippingMethod,
-  );
-
   return {
-    shippingMethod: savedShippingMethod,
-    encryptedShippingMethod: await encryptObject(savedShippingMethod),
+    shippingMethod: selectedShippingMethodSchema.parse(selectedShippingMethod),
+    encryptedShippingMethodId: await encrypt(shippingMethod.id),
   };
 };
