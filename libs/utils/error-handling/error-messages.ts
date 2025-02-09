@@ -72,4 +72,8 @@ export const errors = {
     new CustomError("Shipping rate not found", HttpStatusEnum.NOT_FOUND),
   UNAUTHORIZED: (message?: string): CustomError =>
     new CustomError(message || "Unauthorized", HttpStatusEnum.UNAUTHORIZED),
+  NOT_ALLOWED: (message?: string): CustomError =>
+    new CustomError(message || "Not allowed", HttpStatusEnum.FORBIDDEN),
+  UNABLE_TO_PARSE_BODY: (): CustomError =>
+    new CustomError("Unable to parse body", HttpStatusEnum.BAD_REQUEST),
 };

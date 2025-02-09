@@ -5,26 +5,23 @@ import {
 import { contextStore } from "@context-utils";
 import { errors } from "@error-handling-utils";
 import { validateCartId } from "@cart-db";
-import { toTotalWeight } from "@product-entity";
 import { selectShippingMethods } from "@shipping-db";
-import { decryptObjectString } from "@crypto-utils";
-
-const NO_WEIGHT = 0;
+import { decrypt } from "@crypto-utils";
+import { getCartWeight } from "@cart-entity";
 
 export const getShippingMethods = async (): Promise<{
   shippingMethods: SelectedShippingMethod[];
   selectedShippingMethod?: SelectedShippingMethod;
 }> => {
-  let selectedShippingMethod: SelectedShippingMethod | undefined;
-  const { cartId, country, shippingMethod } = contextStore.context;
+  let selectedShippingMethodId: string | undefined;
+  const { cartId, country, shippingMethodId } = contextStore.context;
   const cart = await validateCartId(cartId);
 
-  if (shippingMethod) {
-    selectedShippingMethod =
-      await decryptObjectString<SelectedShippingMethod>(shippingMethod);
+  if (shippingMethodId) {
+    selectedShippingMethodId = await decrypt(shippingMethodId);
   }
 
-  const weight = cart.products?.reduce(toTotalWeight, NO_WEIGHT);
+  const weight = getCartWeight(cart);
   const shippingMethodsFromDb = await selectShippingMethods(weight);
   if (!shippingMethodsFromDb || !shippingMethodsFromDb.length) {
     throw errors.SHIPPING_METHOD_NOT_FOUND();
@@ -42,6 +39,10 @@ export const getShippingMethods = async (): Promise<{
       rate: selectedRate,
     });
   });
+
+  const selectedShippingMethod = shippingMethods.find(
+    ({ id }) => id === selectedShippingMethodId,
+  );
 
   return {
     shippingMethods,

@@ -12,7 +12,7 @@ class Context {
   private _remember?: boolean;
   private _address?: string;
   private _userDetails?: string;
-  private _shippingMethod?: string;
+  private _shippingMethodId?: string;
   private _firstCheckoutStage: CheckoutStage;
 
   constructor() {
@@ -82,11 +82,11 @@ class Context {
     this._userDetails = value;
   }
 
-  get shippingMethod(): string | undefined {
-    return this._shippingMethod;
+  get shippingMethodId(): string | undefined {
+    return this._shippingMethodId;
   }
-  set shippingMethod(value: string | undefined) {
-    this._shippingMethod = value;
+  set shippingMethodId(value: string | undefined) {
+    this._shippingMethodId = value;
   }
 
   get firstCheckoutStage(): CheckoutStage {

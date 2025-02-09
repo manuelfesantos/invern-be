@@ -43,30 +43,50 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
   return stagesToShow.map((stage) => clientCheckoutStageSchema.parse(stage));
 };
 
-export const enableNextCheckoutStage = (stage: CheckoutStageEnumType): void => {
-  let currentStage = contextStore.context.firstCheckoutStage;
-  while (currentStage.name !== stage) {
-    if (!currentStage.next) {
-      throw new Error("Stage not found!");
-    }
-    currentStage = currentStage.next;
-  }
-  if (currentStage.next) {
-    currentStage.next.isEnabled = true;
+export const enableNextCheckoutStage = (stage: CheckoutStageEnumType): void =>
+  enableCheckoutStage(stage, true);
+
+export const enableCheckoutStage = (
+  stage: CheckoutStageEnumType,
+  next?: boolean,
+): void => {
+  const checkoutStage = getCheckoutStage(stage);
+  if (next) {
+    checkoutStage.next && handleEnableCheckoutStage(checkoutStage.next);
+  } else {
+    handleEnableCheckoutStage(checkoutStage);
   }
 };
 
-export const enableCheckoutStage = (stage: CheckoutStageEnumType): void => {
-  let currentStage = contextStore.context.firstCheckoutStage;
-  while (currentStage.name !== stage) {
-    if (!currentStage.next) {
-      throw new Error("Stage not found!");
-    }
-    currentStage = currentStage.next;
-  }
-  currentStage.isEnabled = true;
-};
 export const disableCheckoutStage = (stage: CheckoutStageEnumType): void => {
+  const checkoutStage = getCheckoutStage(stage);
+  handleDisableCheckoutStage(checkoutStage);
+};
+
+const handleEnableCheckoutStage = (stage: CheckoutStage): void => {
+  stage.isEnabled = true;
+  while (stage.autoEnableNextStage && stage.next) {
+    stage = stage.next;
+    stage.isEnabled = true;
+  }
+};
+
+const handleDisableCheckoutStage = (stage: CheckoutStage): void => {
+  stage.isEnabled = false;
+  while (stage.next) {
+    stage = stage.next;
+    stage.isEnabled = false;
+  }
+};
+
+export const isCheckoutStageEnabled = (
+  stage: CheckoutStageEnumType,
+): boolean => {
+  const checkoutStage = getCheckoutStage(stage);
+  return checkoutStage.isEnabled;
+};
+
+const getCheckoutStage = (stage: CheckoutStageEnumType): CheckoutStage => {
   let currentStage = contextStore.context.firstCheckoutStage;
   while (currentStage.name !== stage) {
     if (!currentStage.next) {
@@ -74,5 +94,5 @@ export const disableCheckoutStage = (stage: CheckoutStageEnumType): void => {
     }
     currentStage = currentStage.next;
   }
-  currentStage.isEnabled = false;
+  return currentStage;
 };

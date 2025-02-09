@@ -9,8 +9,15 @@ import { SESSION_EXPIRY } from "@timer-utils";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { Env } from "@request-entity";
+import { isCheckoutStageEnabled } from "@context-utils";
+import { CheckoutStageEnum } from "@checkout-session-entity";
+import { errors } from "@error-handling-utils";
 
 const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
+  if (!isCheckoutStageEnabled(CheckoutStageEnum.REVIEW)) {
+    throw errors.NOT_ALLOWED("Payment checkout stage is not enabled");
+  }
+
   initStripeClient(env.STRIPE_API_KEY);
 
   const { headers } = request;
