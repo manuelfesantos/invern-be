@@ -23,8 +23,8 @@ export const createCheckoutSession = async (
         stripeEnv: getStripeEnv(),
       },
     },
-    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}order?id=${clientId}`,
-    cancel_url: `${origin || frontendHost()}/cart`,
+    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order?id=${clientId}`,
+    cancel_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/cart`,
 
     line_items: lineItems.map((product) => {
       return {
