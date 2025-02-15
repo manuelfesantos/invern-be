@@ -55,15 +55,21 @@ export const purgeCache = async (
     },
   );
   if (response.status !== HttpStatusEnum.OK) {
-    logger().error("Failed to purge cache", LoggerUseCaseEnum.PURGE_CACHE, {
-      responseStatus: response.status,
+    logger().error("Failed to purge cache", {
+      useCase: LoggerUseCaseEnum.PURGE_CACHE,
+      data: {
+        responseStatus: response.status,
+      },
     });
     throw new Error(`Failed to purge cache for ${cacheKey}`);
   }
   const responseBody = await response.json();
-  logger().info(`purged cache for ${cacheKey}`, LoggerUseCaseEnum.PURGE_CACHE, {
-    responseStatus: response.status,
-    responseBody,
+  logger().info(`purged cache for ${cacheKey}`, {
+    useCase: LoggerUseCaseEnum.PURGE_CACHE,
+    data: {
+      responseStatus: response.status,
+      responseBody,
+    },
   });
 };
 

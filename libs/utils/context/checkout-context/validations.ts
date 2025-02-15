@@ -3,8 +3,8 @@ import { decrypt, decryptObjectString } from "@crypto-utils";
 import { addressSchema } from "@address-entity";
 import { userDetailsSchema } from "@user-entity";
 import {
-  CheckoutStageEnum,
-  CheckoutStageEnumType,
+  CheckoutStageNameEnum,
+  CheckoutStageName,
 } from "@checkout-session-entity";
 import { uuidSchema } from "@global-entity";
 
@@ -34,12 +34,9 @@ const isReviewValid = async (): Promise<boolean> => {
   return true;
 };
 
-export const validations: Record<
-  CheckoutStageEnumType,
-  () => Promise<boolean>
-> = {
-  [CheckoutStageEnum.ADDRESS]: isAddressValid,
-  [CheckoutStageEnum.PERSONAL_DETAILS]: isUserDetailsValid,
-  [CheckoutStageEnum.SHIPPING]: isShippingMethodValid,
-  [CheckoutStageEnum.REVIEW]: isReviewValid,
+export const validations: Record<CheckoutStageName, () => Promise<boolean>> = {
+  [CheckoutStageNameEnum.ADDRESS]: isAddressValid,
+  [CheckoutStageNameEnum.PERSONAL_DETAILS]: isUserDetailsValid,
+  [CheckoutStageNameEnum.SHIPPING]: isShippingMethodValid,
+  [CheckoutStageNameEnum.REVIEW]: isReviewValid,
 };

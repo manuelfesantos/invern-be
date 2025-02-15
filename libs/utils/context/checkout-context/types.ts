@@ -1,8 +1,8 @@
-import { CheckoutStageEnumType } from "@checkout-session-entity";
+import { CheckoutStageName } from "@checkout-session-entity";
 import { z } from "zod";
 
 export interface CheckoutStage {
-  name: CheckoutStageEnumType;
+  name: CheckoutStageName;
   title: string;
   next?: CheckoutStage;
   showWhenLoggedIn?: boolean;

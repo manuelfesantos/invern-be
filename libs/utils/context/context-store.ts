@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { Country } from "@country-entity";
 import { CheckoutStage } from "./checkout-context/types";
 import { firstStage } from "./checkout-context/stages";
+import { CheckoutStageName } from "@checkout-session-entity";
 
 class Context {
   private _cartId?: string;
@@ -14,6 +15,7 @@ class Context {
   private _userDetails?: string;
   private _shippingMethodId?: string;
   private _firstCheckoutStage: CheckoutStage;
+  private _currentCheckoutStage?: CheckoutStageName;
 
   constructor() {
     this._firstCheckoutStage = structuredClone(firstStage);
@@ -91,6 +93,13 @@ class Context {
 
   get firstCheckoutStage(): CheckoutStage {
     return this._firstCheckoutStage;
+  }
+
+  get currentCheckoutStage(): CheckoutStageName | undefined {
+    return this._currentCheckoutStage;
+  }
+  set currentCheckoutStage(value: CheckoutStageName) {
+    this._currentCheckoutStage = value;
   }
 }
 

@@ -1,15 +1,15 @@
 import { CheckoutStage } from "./types";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 
 const reviewStage: CheckoutStage = {
-  name: CheckoutStageEnum.REVIEW,
+  name: CheckoutStageNameEnum.REVIEW,
   title: "Review",
   showWhenLoggedIn: true,
   isEnabled: false,
 };
 
 const shippingStage: CheckoutStage = {
-  name: CheckoutStageEnum.SHIPPING,
+  name: CheckoutStageNameEnum.SHIPPING,
   title: "Shipping",
   next: reviewStage,
   showWhenLoggedIn: true,
@@ -17,7 +17,7 @@ const shippingStage: CheckoutStage = {
 };
 
 const addressStage: CheckoutStage = {
-  name: CheckoutStageEnum.ADDRESS,
+  name: CheckoutStageNameEnum.ADDRESS,
   title: "Address",
   next: shippingStage,
   showWhenLoggedIn: true,
@@ -25,7 +25,7 @@ const addressStage: CheckoutStage = {
 };
 
 const personalDetails: CheckoutStage = {
-  name: CheckoutStageEnum.PERSONAL_DETAILS,
+  name: CheckoutStageNameEnum.PERSONAL_DETAILS,
   title: "Personal Details",
   showWhenLoggedIn: false,
   next: addressStage,

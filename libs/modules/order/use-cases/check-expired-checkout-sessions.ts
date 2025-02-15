@@ -13,13 +13,12 @@ export const checkExpiredCheckoutSessions = async (): Promise<string> => {
     return "No sessions were expired";
   }
 
-  logger().info(
-    "Existing expired sessions",
-    LoggerUseCaseEnum.CHECK_EXPIRED_SESSIONS,
-    {
+  logger().info("Existing expired sessions", {
+    useCase: LoggerUseCaseEnum.CHECK_EXPIRED_SESSIONS,
+    data: {
       sessions: stringifyObject(expiredSessions),
     },
-  );
+  });
 
   for (const session of expiredSessions) {
     await retrieveProductsStockFromSession(session);
@@ -37,11 +36,10 @@ const retrieveProductsStockFromSession = async (
     await stockClient.update(product);
   }
 
-  logger().info(
-    "Success retrieving products Stock",
-    LoggerUseCaseEnum.RELEASE_PRODUCTS,
-    {
+  logger().info("Success retrieving products Stock", {
+    useCase: LoggerUseCaseEnum.RELEASE_PRODUCTS,
+    data: {
       releasedProducts: products,
     },
-  );
+  });
 };

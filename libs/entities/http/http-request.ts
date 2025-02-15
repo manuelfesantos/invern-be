@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { PagesFunction } from "@cloudflare/workers-types";
+import { Env } from "@request-entity";
 
 export const httpMethodsSchema = z.enum(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
@@ -29,3 +31,9 @@ export const CookieNameEnum = {
 } as const;
 
 export type CookieName = (typeof CookieNameEnum)[keyof typeof CookieNameEnum];
+
+export type Data = Record<string, unknown>;
+
+export type HandlerMethodMapper<T extends Data> = Partial<
+  Record<keyof typeof HttpMethodEnum, PagesFunction<Env, string, T>>
+>;

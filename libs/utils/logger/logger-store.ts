@@ -10,6 +10,7 @@ const DEBUG_LEVEL = 20;
 const INFO_LEVEL = 30;
 const WARNING_LEVEL = 40;
 const ERROR_LEVEL = 50;
+const NO_SPACE = 0;
 
 let loggerLevel: number = DEBUG_LEVEL;
 
@@ -17,27 +18,19 @@ export const setLoggerLevel = (level: number): void => {
   loggerLevel = level;
 };
 
+type LoggerAction = (
+  message: string,
+  additionalInfo: {
+    useCase: LoggerUseCase;
+    data?: object;
+  },
+) => void;
+
 interface LoggerStore extends Logger {
-  info: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  debug: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  warn: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
-  error: (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ) => void;
+  info: LoggerAction;
+  debug: LoggerAction;
+  warn: LoggerAction;
+  error: LoggerAction;
   addRedactedData: (...data: unknown[]) => void;
 }
 
@@ -54,47 +47,31 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
 
   const addRedactedLog = (data: string): void => {
     const redactedData = redactPropertiesFromData(JSON.parse(data));
-    logger.log(stringifyObject(redactedData));
+    logger.log(stringifyObject(redactedData, NO_SPACE));
   };
 
-  const info = (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ): void => {
+  const info: LoggerAction = (message, { useCase, data }): void => {
     if (loggerLevel <= INFO_LEVEL) {
       addRedactedLog(buildLogObject(INFO_LEVEL, message, useCase, data));
       localLogger.info(message, data);
     }
   };
 
-  const debug = (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ): void => {
+  const debug: LoggerAction = (message, { useCase, data }): void => {
     if (loggerLevel <= DEBUG_LEVEL) {
       addRedactedLog(buildLogObject(DEBUG_LEVEL, message, useCase, data));
       localLogger.debug(message, data);
     }
   };
 
-  const warn = (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ): void => {
+  const warn: LoggerAction = (message, { useCase, data }): void => {
     if (loggerLevel <= WARNING_LEVEL) {
       addRedactedLog(buildLogObject(WARNING_LEVEL, message, useCase, data));
       localLogger.warn(message, data);
     }
   };
 
-  const error = (
-    message: string,
-    useCase: LoggerUseCase,
-    data?: Record<string, unknown>,
-  ): void => {
+  const error: LoggerAction = (message, { useCase, data }): void => {
     if (loggerLevel <= ERROR_LEVEL) {
       addRedactedLog(buildLogObject(ERROR_LEVEL, message, useCase, data));
       localLogger.error(message, data);
