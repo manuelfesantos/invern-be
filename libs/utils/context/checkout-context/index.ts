@@ -13,14 +13,15 @@ import {
 import { CookieName } from "@http-entity";
 
 export const setupCheckoutStages = async (): Promise<void> => {
-  let stage = firstStage;
+  let stage: CheckoutStage = firstStage;
 
   enableCheckoutStage(stage.name);
-  while (stage?.next) {
+
+  while (stage.next) {
     if (await validations[stage.name]()) {
       enableCheckoutStage(stage.next.name);
     } else {
-      break;
+      return;
     }
     stage = stage.next;
   }
