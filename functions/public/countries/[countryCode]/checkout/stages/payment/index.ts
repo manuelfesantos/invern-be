@@ -2,19 +2,18 @@ import { protectedSuccessResponse } from "@response-entity";
 // eslint-disable-next-line import/no-restricted-paths
 import { initStripeClient } from "@stripe-adapter";
 import { getCookieHeader, setCookieInResponse } from "@http-utils";
-import { checkout } from "@order-module";
+import { getCheckoutSession } from "@order-module";
 import { encrypt } from "@crypto-utils";
 import { CookieNameEnum } from "@http-entity";
 import { SESSION_EXPIRY } from "@timer-utils";
-import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { Env } from "@request-entity";
-import { isCheckoutStageEnabled } from "@context-utils";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { isCheckoutStageEnabled, checkoutRequestHandler } from "@context-utils";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
 const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.REVIEW)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
     throw errors.NOT_ALLOWED("Payment checkout stage is not enabled");
   }
 
@@ -23,7 +22,7 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   const { headers } = request;
 
   const origin = headers.get("origin") || undefined;
-  const { url, checkoutSessionId } = await checkout(origin);
+  const { url, checkoutSessionId } = await getCheckoutSession(origin);
 
   const checkoutSessionToken = await encrypt(checkoutSessionId);
 
@@ -42,4 +41,4 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   return response;
 };
 
-export const onRequest = requestHandler({ GET });
+export const onRequest = checkoutRequestHandler({ GET }, null);

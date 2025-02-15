@@ -1,12 +1,16 @@
 import { contextStore } from "../context-store";
 import { validations } from "./validations";
 import { firstStage } from "./stages";
-import { CheckoutStageEnumType } from "@checkout-session-entity";
+import {
+  CheckoutStageName,
+  checkoutStageToCookie,
+} from "@checkout-session-entity";
 import {
   CheckoutStage,
   ClientCheckoutStage,
   clientCheckoutStageSchema,
 } from "./types";
+import { CookieName } from "@http-entity";
 
 export const setupCheckoutStages = async (): Promise<void> => {
   let stage = firstStage;
@@ -25,8 +29,8 @@ export const setupCheckoutStages = async (): Promise<void> => {
 export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
   const stages: CheckoutStage[] = [];
   const { isLoggedIn, firstCheckoutStage } = contextStore.context;
-  let currentStage = firstCheckoutStage;
-  while (currentStage.next) {
+  let currentStage: CheckoutStage | undefined = firstCheckoutStage;
+  while (currentStage) {
     stages.push({
       name: currentStage.name,
       isEnabled: currentStage.isEnabled,
@@ -35,7 +39,6 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
     });
     currentStage = currentStage.next;
   }
-  stages.push(currentStage);
   const stagesToShow = isLoggedIn
     ? stages.filter((stage) => stage.showWhenLoggedIn)
     : stages;
@@ -43,11 +46,11 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
   return stagesToShow.map((stage) => clientCheckoutStageSchema.parse(stage));
 };
 
-export const enableNextCheckoutStage = (stage: CheckoutStageEnumType): void =>
+export const enableNextCheckoutStage = (stage: CheckoutStageName): void =>
   enableCheckoutStage(stage, true);
 
 export const enableCheckoutStage = (
-  stage: CheckoutStageEnumType,
+  stage: CheckoutStageName,
   next?: boolean,
 ): void => {
   const checkoutStage = getCheckoutStage(stage);
@@ -58,9 +61,14 @@ export const enableCheckoutStage = (
   }
 };
 
-export const disableCheckoutStage = (stage: CheckoutStageEnumType): void => {
+export const disableCheckoutStage = (stage: CheckoutStageName): void => {
   const checkoutStage = getCheckoutStage(stage);
   handleDisableCheckoutStage(checkoutStage);
+};
+
+export const disableNextCheckoutStage = (stage: CheckoutStageName): void => {
+  const checkoutStage = getCheckoutStage(stage);
+  checkoutStage.next && handleDisableCheckoutStage(checkoutStage.next);
 };
 
 const handleEnableCheckoutStage = (stage: CheckoutStage): void => {
@@ -79,14 +87,12 @@ const handleDisableCheckoutStage = (stage: CheckoutStage): void => {
   }
 };
 
-export const isCheckoutStageEnabled = (
-  stage: CheckoutStageEnumType,
-): boolean => {
+export const isCheckoutStageEnabled = (stage: CheckoutStageName): boolean => {
   const checkoutStage = getCheckoutStage(stage);
   return checkoutStage.isEnabled;
 };
 
-const getCheckoutStage = (stage: CheckoutStageEnumType): CheckoutStage => {
+const getCheckoutStage = (stage: CheckoutStageName): CheckoutStage => {
   let currentStage = contextStore.context.firstCheckoutStage;
   while (currentStage.name !== stage) {
     if (!currentStage.next) {
@@ -96,3 +102,23 @@ const getCheckoutStage = (stage: CheckoutStageEnumType): CheckoutStage => {
   }
   return currentStage;
 };
+
+export const getRemoveCookieNamesFromInvalidCheckoutStage = (
+  invalidCheckoutStage: CheckoutStageName,
+): CookieName[] => {
+  const cookieNames: CookieName[] = [];
+  let checkoutStage: CheckoutStage | undefined =
+    getCheckoutStage(invalidCheckoutStage);
+
+  disableNextCheckoutStage(checkoutStage.name);
+
+  while (checkoutStage) {
+    const cookieName = checkoutStageToCookie[checkoutStage.name];
+    cookieName && cookieNames.push(cookieName);
+    checkoutStage = checkoutStage.next;
+  }
+
+  return cookieNames;
+};
+
+export * from "./error-handler";

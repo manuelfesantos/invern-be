@@ -11,16 +11,15 @@ export const invalidateCheckoutSession = async (
   const checkoutSession = await selectCheckoutSessionById(checkoutSessionId);
 
   if (!checkoutSession) {
-    logger().info(
-      `checkout session with id ${checkoutSessionId} not found`,
-      LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-    );
+    logger().info(`checkout session with id ${checkoutSessionId} not found`, {
+      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    });
     return;
   }
   if (checkoutSession.expiresAt < getCurrentTime()) {
     logger().info(
       `checkout session with id ${checkoutSessionId} already expired`,
-      LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      { useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION },
     );
     return;
   }
@@ -33,9 +32,10 @@ export const invalidateCheckoutSession = async (
 
   await expireCheckoutSession(checkoutSessionId);
 
-  logger().info(
-    "successfully expired checkout session",
-    LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-    { checkoutSessionId },
-  );
+  logger().info("successfully expired checkout session", {
+    useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    data: {
+      checkoutSessionId,
+    },
+  });
 };

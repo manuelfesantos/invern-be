@@ -7,15 +7,20 @@ import { Cart } from "@cart-entity";
 
 export const validateCartId = async (cartId?: string): Promise<Cart> => {
   if (!cartId) {
-    logger().error("No cart provided", LoggerUseCaseEnum.VALIDATE_CART_ID);
+    logger().error("No cart provided", {
+      useCase: LoggerUseCaseEnum.VALIDATE_CART_ID,
+    });
     throw errors.CART_NOT_PROVIDED();
   }
   const id = uuidSchema("cart id").parse(cartId);
   const cart = await selectCartById(id);
   const cartIsValid = cart !== undefined;
 
-  logger().info("Validating Cart Id", LoggerUseCaseEnum.VALIDATE_CART_ID, {
-    isValid: cartIsValid,
+  logger().info("Validating Cart Id", {
+    useCase: LoggerUseCaseEnum.VALIDATE_CART_ID,
+    data: {
+      isValid: cartIsValid,
+    },
   });
   if (!cartIsValid) {
     throw errors.CART_NOT_FOUND();

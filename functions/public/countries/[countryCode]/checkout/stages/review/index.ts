@@ -1,12 +1,11 @@
-import { requestHandler } from "@decorator-utils";
-import { isCheckoutStageEnabled } from "@context-utils";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { isCheckoutStageEnabled, checkoutRequestHandler } from "@context-utils";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 import { getCheckoutReview } from "@order-module";
 import { protectedSuccessResponse } from "@response-entity";
 
 const GET: PagesFunction = async () => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.REVIEW)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
     throw errors.NOT_ALLOWED("Review checkout stage is not enabled");
   }
 
@@ -22,4 +21,7 @@ const GET: PagesFunction = async () => {
   });
 };
 
-export const onRequest = requestHandler({ GET });
+export const onRequest = checkoutRequestHandler(
+  { GET },
+  CheckoutStageNameEnum.REVIEW,
+);

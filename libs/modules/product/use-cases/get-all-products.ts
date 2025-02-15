@@ -8,11 +8,12 @@ export const getAllProducts = async (
   search: string | null,
 ): Promise<ExtendedProduct[]> => {
   if (search) {
-    logger().info(
-      "getting products by search",
-      LoggerUseCaseEnum.GET_PRODUCT_LIST,
-      { search },
-    );
+    logger().info("getting products by search", {
+      useCase: LoggerUseCaseEnum.GET_PRODUCT_LIST,
+      data: {
+        search,
+      },
+    });
     const products = await getProductsBySearch(search);
     return products.map(extendProduct);
   }

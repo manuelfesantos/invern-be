@@ -1,5 +1,4 @@
 import { PagesFunction } from "@cloudflare/workers-types";
-import { requestHandler } from "@decorator-utils";
 import {
   getBodyFromRequest,
   getCookieHeader,
@@ -12,17 +11,18 @@ import {
   enableNextCheckoutStage,
   getClientCheckoutStages,
   isCheckoutStageEnabled,
+  checkoutRequestHandler,
 } from "@context-utils";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
 const POST: PagesFunction = async ({ request }) => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.PERSONAL_DETAILS)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
   const body = await getBodyFromRequest(request);
   const { userDetails, encryptedUserDetails } = await handleDetailsPost(body);
-  enableNextCheckoutStage(CheckoutStageEnum.PERSONAL_DETAILS);
+  enableNextCheckoutStage(CheckoutStageNameEnum.PERSONAL_DETAILS);
   const response = protectedSuccessResponse.OK(
     "Successfully created user details",
     {
@@ -38,7 +38,7 @@ const POST: PagesFunction = async ({ request }) => {
 };
 
 const GET: PagesFunction = async () => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.PERSONAL_DETAILS)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
   const userDetails = await getUserDetails();
@@ -48,4 +48,7 @@ const GET: PagesFunction = async () => {
   });
 };
 
-export const onRequest = requestHandler({ POST, GET });
+export const onRequest = checkoutRequestHandler(
+  { POST, GET },
+  CheckoutStageNameEnum.PERSONAL_DETAILS,
+);

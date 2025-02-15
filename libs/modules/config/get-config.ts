@@ -24,7 +24,9 @@ export const getConfig = async (
       const tokenIsValid = await verifyRefreshToken(refreshToken);
       const tokenPayload = await decodeJwt(refreshToken);
       if ("userId" in tokenPayload && tokenIsValid) {
-        logger().info("getting logged in config", LoggerUseCaseEnum.GET_CONFIG);
+        logger().info("getting logged in config", {
+          useCase: LoggerUseCaseEnum.GET_CONFIG,
+        });
         logger().addRedactedData({ userId: tokenPayload.userId });
         return await getLoggedInConfig(
           headers,
@@ -38,8 +40,11 @@ export const getConfig = async (
     }
   } catch (error) {
     if (error instanceof Error) {
-      logger().error(error.message, LoggerUseCaseEnum.GET_CONFIG, {
-        error: simplifyError(error),
+      logger().error(error.message, {
+        useCase: LoggerUseCaseEnum.GET_CONFIG,
+        data: {
+          error: simplifyError(error),
+        },
       });
     }
     return await loggedOutResponse(headers);

@@ -118,6 +118,7 @@ export const currenciesTable = sqliteTable("currencies", {
   name: text("name").notNull(),
   symbol: text("symbol").notNull(),
   rateToEuro: real("rateToEuro").notNull(),
+  stripeName: text("stripeName").notNull(),
 });
 
 export const taxesTable = sqliteTable("taxes", {
@@ -164,6 +165,14 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
   cartId: text("cartId").references(() => cartsTable.id, {
     onDelete: "cascade",
   }),
+  address: text("address").notNull(),
+  shippingMethodId: text("shippingAddressId").references(
+    () => shippingMethodsTable.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
+  personalDetails: text("personalDetails").notNull(),
 });
 
 export const shippingMethodsTable = sqliteTable("shippingMethods", {

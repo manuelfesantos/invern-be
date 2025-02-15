@@ -11,8 +11,12 @@ CREATE TABLE `checkoutSessions` (
 	`expiresAt` integer NOT NULL,
 	`userId` text,
 	`cartId` text,
+	`address` text NOT NULL,
+	`shippingAddressId` text,
+	`personalDetails` text NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`shippingAddressId`) REFERENCES `shippingMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `collections` (
@@ -33,7 +37,8 @@ CREATE TABLE `currencies` (
 	`currencyId` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`symbol` text NOT NULL,
-	`rateToEuro` real NOT NULL
+	`rateToEuro` real NOT NULL,
+	`stripeName` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `images` (

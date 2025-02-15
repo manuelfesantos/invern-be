@@ -1,5 +1,4 @@
 import { PagesFunction } from "@cloudflare/workers-types";
-import { requestHandler } from "@decorator-utils";
 import {
   getBodyFromRequest,
   getCookieHeader,
@@ -12,19 +11,20 @@ import {
   enableNextCheckoutStage,
   getClientCheckoutStages,
   isCheckoutStageEnabled,
+  checkoutRequestHandler,
 } from "@context-utils";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
 const POST: PagesFunction = async ({ request }) => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.SHIPPING)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
 
   const body = await getBodyFromRequest(request);
   const { encryptedShippingMethodId, shippingMethod } =
     await handleShippingMethodPost(body);
-  enableNextCheckoutStage(CheckoutStageEnum.SHIPPING);
+  enableNextCheckoutStage(CheckoutStageNameEnum.SHIPPING);
   const response = protectedSuccessResponse.OK("Shipping method selected", {
     shippingMethod,
     availableCheckoutStages: getClientCheckoutStages(),
@@ -38,7 +38,7 @@ const POST: PagesFunction = async ({ request }) => {
 };
 
 const GET: PagesFunction = async () => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.SHIPPING)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
   const { shippingMethods, selectedShippingMethod } =
@@ -50,4 +50,7 @@ const GET: PagesFunction = async () => {
   });
 };
 
-export const onRequest = requestHandler({ POST, GET });
+export const onRequest = checkoutRequestHandler(
+  { POST, GET },
+  CheckoutStageNameEnum.SHIPPING,
+);

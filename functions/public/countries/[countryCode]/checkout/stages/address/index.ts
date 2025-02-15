@@ -5,7 +5,6 @@ import {
   setCookieInResponse,
 } from "@http-utils";
 import { getAddress, handleAddressPost } from "@address-module";
-import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { CookieNameEnum } from "@http-entity";
 import {
@@ -13,19 +12,20 @@ import {
   enableNextCheckoutStage,
   getClientCheckoutStages,
   isCheckoutStageEnabled,
+  checkoutRequestHandler,
 } from "@context-utils";
-import { CheckoutStageEnum } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.ADDRESS)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
     throw errors.NOT_ALLOWED("Address checkout stage is not enabled");
   }
 
   const { address, encryptedAddress } = await handleAddressPost(body);
-  enableNextCheckoutStage(CheckoutStageEnum.ADDRESS);
+  enableNextCheckoutStage(CheckoutStageNameEnum.ADDRESS);
 
   contextStore.context.address = encryptedAddress;
 
@@ -43,7 +43,7 @@ const POST: PagesFunction = async ({ request }) => {
 };
 
 const GET: PagesFunction = async () => {
-  if (!isCheckoutStageEnabled(CheckoutStageEnum.ADDRESS)) {
+  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
     throw errors.NOT_ALLOWED("Address checkout stage is not enabled");
   }
   const address = await getAddress();
@@ -53,4 +53,7 @@ const GET: PagesFunction = async () => {
   });
 };
 
-export const onRequest = requestHandler({ POST, GET });
+export const onRequest = checkoutRequestHandler(
+  { POST, GET },
+  CheckoutStageNameEnum.ADDRESS,
+);

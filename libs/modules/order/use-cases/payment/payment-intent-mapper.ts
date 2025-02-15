@@ -40,10 +40,9 @@ export const mapPaymentIntentEvent = async (
 ): Promise<Payment> => {
   const paymentIntentType = paymentIntentTypeSchema.parse(eventType);
 
-  logger().info(
-    `Payment Intent Type: ${paymentIntentType}`,
-    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-  );
+  logger().info(`Payment Intent Type: ${paymentIntentType}`, {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+  });
 
   logger().addRedactedData({ paymentId: paymentIntent.id });
 

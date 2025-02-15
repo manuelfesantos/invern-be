@@ -27,10 +27,9 @@ const getCountries = async (): Promise<
   { data: ClientCountry[] } | undefined
 > => {
   if (!countriesBucket) {
-    logger().error(
-      "Countries bucket client not initialized",
-      LoggerUseCaseEnum.GET_R2_COUNTRIES,
-    );
+    logger().error("Countries bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.GET_R2_COUNTRIES,
+    });
     throw new Error("Countries bucket client not initialized");
   }
 
@@ -40,23 +39,21 @@ const getCountries = async (): Promise<
   }
   const countries = await bucketObject?.json();
 
-  logger().info(
-    "Got countries from bucket",
-    LoggerUseCaseEnum.GET_R2_COUNTRIES,
-    {
+  logger().info("Got countries from bucket", {
+    useCase: LoggerUseCaseEnum.GET_R2_COUNTRIES,
+    data: {
       countries,
     },
-  );
+  });
 
   return countryDataSchema.parse(countries);
 };
 
 const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
   if (!countriesBucket) {
-    logger().error(
-      "Countries bucket client not initialized",
-      LoggerUseCaseEnum.PUT_R2_COUNTRIES,
-    );
+    logger().error("Countries bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.PUT_R2_COUNTRIES,
+    });
     throw new Error("Countries bucket client not initialized");
   }
 
@@ -85,39 +82,35 @@ const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
 
       countriesUpdated = true;
 
-      logger().info(
-        "Updated countries in bucket",
-        LoggerUseCaseEnum.PUT_R2_COUNTRIES,
-        {
+      logger().info("Updated countries in bucket", {
+        useCase: LoggerUseCaseEnum.PUT_R2_COUNTRIES,
+        data: {
           countries,
         },
-      );
+      });
     } else {
-      logger().warn(
-        "Failed to acquire lock, trying again",
-        LoggerUseCaseEnum.PUT_R2_COUNTRIES,
-        {
+      logger().warn("Failed to acquire lock, trying again", {
+        useCase: LoggerUseCaseEnum.PUT_R2_COUNTRIES,
+        data: {
           countries,
         },
-      );
+      });
     }
   }
 };
 
 const deleteCountries = async (): Promise<void> => {
   if (!countriesBucket) {
-    logger().error(
-      "Countries bucket client not initialized",
-      LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
-    );
+    logger().error("Countries bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
+    });
     throw new Error("Countries bucket client not initialized");
   }
   await countriesBucket.delete(countriesKey);
 
-  logger().info(
-    "Deleted countries from bucket",
-    LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
-  );
+  logger().info("Deleted countries from bucket", {
+    useCase: LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
+  });
 };
 
 export const countriesClient = {

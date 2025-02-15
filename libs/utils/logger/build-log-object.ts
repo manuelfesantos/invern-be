@@ -5,7 +5,7 @@ export const buildLogObject = (
   level: number,
   message: string,
   useCase: LoggerUseCase,
-  data: Record<string, unknown> = {},
+  data: object = {},
 ): string => {
   return stringifyObject({
     level,

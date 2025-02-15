@@ -2,7 +2,7 @@ import { z, ZodError } from "zod";
 import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 /* eslint-disable import/no-restricted-paths */
-import { CustomError } from "@error-handling-utils";
+import { CheckoutError, CustomError } from "@error-handling-utils";
 import { localLogger, logger } from "@logger-utils";
 /* eslint-enable import/no-restricted-paths */
 
@@ -78,6 +78,12 @@ export const generateErrorResponse = (
   error: unknown,
   headers?: Record<string, string>,
 ): Response => {
+  if (error instanceof CheckoutError) {
+    const simplifiedError = simplifyError(error);
+    localLogger.error(simplifiedError);
+    logger().addRedactedData({ error: simplifiedError });
+    return error.errorResponse;
+  }
   if (error instanceof z.ZodError) {
     const zodError = simplifyZodError(error);
     localLogger.error(zodError);

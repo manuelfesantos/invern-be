@@ -15,8 +15,11 @@ export const decreaseProductsStock = async (
     )
     .reduce((acc, curr) => sql`${acc} ${curr}`)} ELSE stock END`;
 
-  logger().info("reserving products", LoggerUseCaseEnum.RESERVE_PRODUCTS, {
-    products,
+  logger().info("reserving products", {
+    useCase: LoggerUseCaseEnum.RESERVE_PRODUCTS,
+    data: {
+      products,
+    },
   });
 
   const updatedProducts = await db()
@@ -35,8 +38,11 @@ export const decreaseProductsStock = async (
       id: productsTable.id,
     });
 
-  logger().info("products reserved", LoggerUseCaseEnum.RESERVE_PRODUCTS, {
-    products: updatedProducts,
+  logger().info("products reserved", {
+    useCase: LoggerUseCaseEnum.RESERVE_PRODUCTS,
+    data: {
+      products: updatedProducts,
+    },
   });
 
   return updatedProducts;
@@ -53,8 +59,11 @@ export const increaseProductsStock = async (
     )
     .reduce((acc, curr) => sql`${acc} ${curr}`)} ELSE stock END`;
 
-  logger().info("releasing products", LoggerUseCaseEnum.RELEASE_PRODUCTS, {
-    products,
+  logger().info("releasing products", {
+    useCase: LoggerUseCaseEnum.RELEASE_PRODUCTS,
+    data: {
+      products,
+    },
   });
 
   return db()

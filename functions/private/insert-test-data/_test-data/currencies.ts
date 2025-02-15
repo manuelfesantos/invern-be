@@ -9,6 +9,7 @@ const currenciesList: InsertCurrency[] = [
     name: "Euro",
     symbol: "€",
     rateToEuro: 1,
+    stripeName: "eur",
   },
 ];
 
