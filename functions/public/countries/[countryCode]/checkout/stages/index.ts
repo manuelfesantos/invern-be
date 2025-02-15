@@ -5,8 +5,11 @@ import {
   checkoutRequestHandler,
   contextStore,
   getClientCheckoutStages,
+  getRemoveCookieNamesFromInvalidCheckoutStage,
 } from "@context-utils";
 import { errors } from "@error-handling-utils";
+import { deleteCookieFromResponse } from "@http-utils";
+import { CheckoutStageName } from "@checkout-session-entity";
 
 const GET: PagesFunction = async () => {
   try {
@@ -14,9 +17,24 @@ const GET: PagesFunction = async () => {
     if (!cart.products?.length) {
       throw errors.CART_IS_EMPTY();
     }
-    return protectedSuccessResponse.OK("Checkout stages", {
-      availableCheckoutStages: getClientCheckoutStages(),
+
+    const clientCheckoutStages = getClientCheckoutStages();
+    const lastEnabledCheckoutStage = clientCheckoutStages.findLast(
+      (stage) => stage.isEnabled,
+    );
+
+    const response = protectedSuccessResponse.OK("Checkout stages", {
+      availableCheckoutStages: clientCheckoutStages,
     });
+
+    if (lastEnabledCheckoutStage) {
+      getRemoveCookieNamesFromInvalidCheckoutStage(
+        lastEnabledCheckoutStage.name as CheckoutStageName,
+      ).forEach((cookie) => {
+        deleteCookieFromResponse(response, cookie);
+      });
+    }
+    return response;
   } catch (error) {
     return protectedSuccessResponse.OK("Checkout stages", {
       isCheckoutPossible: false,

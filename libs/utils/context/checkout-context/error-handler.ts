@@ -11,7 +11,11 @@ import {
   CheckoutStageName,
   checkoutStageToCookie,
 } from "@checkout-session-entity";
-import { errorResponse, protectedSuccessResponse } from "@response-entity";
+import {
+  errorResponse,
+  protectedSuccessResponse,
+  successResponse,
+} from "@response-entity";
 import { deleteCookieFromResponse } from "@http-utils";
 
 export const checkoutRequestHandler = <T extends Data>(
@@ -48,12 +52,11 @@ const errorHandler = (error: unknown): Response => {
     return response;
   }
   if (error instanceof Error) {
-    const response = protectedSuccessResponse.OK(
+    const response = successResponse.OK(
       error.message,
       {
         isCheckoutPossible: false,
       },
-      undefined,
       undefined,
       [error.message],
     );
