@@ -26,14 +26,25 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     remember === "true",
   );
 
-  if (checkoutSessionCookie) {
-    logger().info(
-      "deleting checkout session cookie",
-      LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-    );
-    initStripeClient(env.STRIPE_API_KEY);
+  const ignoreCheckoutSessionCookie = response.headers.get(
+    "ignore-checkout-session-cookie",
+  );
 
-    await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
+  if (!ignoreCheckoutSessionCookie) {
+    if (checkoutSessionCookie) {
+      logger().info("deleting checkout session cookie", {
+        useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      });
+      initStripeClient(env.STRIPE_API_KEY);
+
+      await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
+
+      deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
+    }
+  } else {
+    logger().info("ignoring checkout session cookie", {
+      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    });
 
     deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
   }

@@ -80,9 +80,12 @@ export const getUserVersionById = async (userId: string): Promise<number> => {
       version: true,
     },
   });
-  logger().info("user version", LoggerUseCaseEnum.GET_USER, {
-    userId,
-    version: user?.version,
+  logger().info("user version", {
+    useCase: LoggerUseCaseEnum.GET_USER,
+    data: {
+      userId,
+      version: user?.version,
+    },
   });
   return user?.version ?? NO_USER_VERSION;
 };

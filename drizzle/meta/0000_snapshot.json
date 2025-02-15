@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ecde78a2-a692-4b45-949d-faa8f5c562eb",
+  "id": "ad871c05-a928-44b2-af54-82631f273993",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -78,6 +78,27 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "shippingAddressId": {
+          "name": "shippingAddressId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "personalDetails": {
+          "name": "personalDetails",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -101,6 +122,19 @@
           "tableTo": "carts",
           "columnsFrom": [
             "cartId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "checkoutSessions_shippingAddressId_shippingMethods_id_fk": {
+          "name": "checkoutSessions_shippingAddressId_shippingMethods_id_fk",
+          "tableFrom": "checkoutSessions",
+          "tableTo": "shippingMethods",
+          "columnsFrom": [
+            "shippingAddressId"
           ],
           "columnsTo": [
             "id"
@@ -220,6 +254,13 @@
         "rateToEuro": {
           "name": "rateToEuro",
           "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stripeName": {
+          "name": "stripeName",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

@@ -1,8 +1,11 @@
-import { requestHandler } from "@decorator-utils";
 import { protectedSuccessResponse } from "@response-entity";
 // eslint-disable-next-line import/no-restricted-paths
 import { validateCartId } from "@cart-db";
-import { contextStore, getClientCheckoutStages } from "@context-utils";
+import {
+  checkoutRequestHandler,
+  contextStore,
+  getClientCheckoutStages,
+} from "@context-utils";
 import { errors } from "@error-handling-utils";
 
 const GET: PagesFunction = async () => {
@@ -21,4 +24,4 @@ const GET: PagesFunction = async () => {
   }
 };
 
-export const onRequest = requestHandler({ GET });
+export const onRequest = checkoutRequestHandler({ GET }, null);

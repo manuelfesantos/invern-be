@@ -17,8 +17,11 @@ export const insertOrder = async (
     userId: order.userId ? order.userId : null,
   };
 
-  logger().info("inserting order", LoggerUseCaseEnum.CREATE_ORDER, {
-    insertedOrder: insertOrder,
+  logger().info("inserting order", {
+    useCase: LoggerUseCaseEnum.CREATE_ORDER,
+    data: {
+      insertedOrder: insertOrder,
+    },
   });
 
   return db().insert(ordersTable).values(insertOrder).returning({

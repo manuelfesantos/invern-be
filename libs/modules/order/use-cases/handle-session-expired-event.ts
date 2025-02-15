@@ -14,11 +14,12 @@ export const handleSessionExpiredEvent = async (
   const [checkoutSession] = await popCheckoutSessionById(checkoutSessionId);
 
   if (!checkoutSession) {
-    logger().info(
-      "checkout session already expired",
-      LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-      { checkoutSessionId },
-    );
+    logger().info("checkout session already expired", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: {
+        checkoutSessionId,
+      },
+    });
     return successResponse.OK("session expiry already handled");
   }
 

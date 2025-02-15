@@ -26,14 +26,13 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
   );
   const { id } = (await getPaymentById(payment.id)) ?? {};
 
-  logger().info(
-    "Processing PaymentIntentSucceeded Event",
-    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-    {
+  logger().info("Processing PaymentIntentSucceeded Event", {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    data: {
       payment,
       id,
     },
-  );
+  });
 
   if (id) {
     const [updatedPayment] = await updatePayment(id, payment);
@@ -52,14 +51,13 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
   );
   const savedPayment = await getPaymentById(payment.id);
 
-  logger().info(
-    "Processing PaymentIntentCreated Event",
-    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-    {
+  logger().info("Processing PaymentIntentCreated Event", {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    data: {
       payment,
       savedPayment,
     },
-  );
+  });
 
   if (savedPayment) {
     if (savedPayment?.state !== PaymentIntentState.draft) {
@@ -82,14 +80,13 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
 
   const savedPayment = await getPaymentById(payment.id);
 
-  logger().info(
-    "Processing PaymentIntentProcessing Event",
-    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-    {
+  logger().info("Processing PaymentIntentProcessing Event", {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    data: {
       payment,
       savedPayment,
     },
-  );
+  });
 
   if (savedPayment) {
     if (
@@ -138,14 +135,13 @@ const handleFailedPayment = async (
   }
   const savedPayment = await getPaymentById(payment.id);
 
-  logger().info(
-    "Processing Failed Payment Event",
-    LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-    {
+  logger().info("Processing Failed Payment Event", {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    data: {
       payment,
       savedPayment,
     },
-  );
+  });
 
   if (savedPayment) {
     if (

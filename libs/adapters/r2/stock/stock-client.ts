@@ -24,10 +24,9 @@ const getStock = async (
   productId: string,
 ): Promise<{ data: number } | undefined> => {
   if (!stockBucket) {
-    logger().error(
-      "Stock bucket client not initialized",
-      LoggerUseCaseEnum.GET_R2_STOCK,
-    );
+    logger().error("Stock bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.GET_R2_STOCK,
+    });
     throw new Error("Stock bucket client not initialized");
   }
 
@@ -37,9 +36,12 @@ const getStock = async (
   }
   const productStock = await bucketObject?.json();
 
-  logger().info("Got stock from bucket", LoggerUseCaseEnum.GET_R2_STOCK, {
-    productId,
-    productStock,
+  logger().info("Got stock from bucket", {
+    useCase: LoggerUseCaseEnum.GET_R2_STOCK,
+    data: {
+      productId,
+      productStock,
+    },
   });
 
   return stockDataSchema.parse(productStock);
@@ -53,10 +55,9 @@ const updateStock = async ({
   stock: number;
 }): Promise<void> => {
   if (!stockBucket) {
-    logger().error(
-      "Stock bucket client not initialized",
-      LoggerUseCaseEnum.PUT_R2_STOCK,
-    );
+    logger().error("Stock bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+    });
     throw new Error("Stock bucket client not initialized");
   }
 
@@ -80,39 +81,56 @@ const updateStock = async ({
 
       stockUpdated = true;
 
-      logger().info("Updated stock in bucket", LoggerUseCaseEnum.PUT_R2_STOCK, {
-        productId,
-        stock,
+      logger().info("Updated stock in bucket", {
+        useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+        data: {
+          productId,
+          stock,
+        },
       });
     } else {
-      logger().warn(
-        "Failed to acquire lock, trying again",
-        LoggerUseCaseEnum.PUT_R2_STOCK,
-        {
+      logger().warn("Failed to acquire lock, trying again", {
+        useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+        data: {
           productId,
         },
-      );
+      });
     }
   }
 };
 
+const updateMany = async (
+  products: { id: string; stock: number }[],
+): Promise<void> => {
+  if (!stockBucket) {
+    logger().error("Stock bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+    });
+    throw new Error("Stock bucket client not initialized");
+  }
+
+  Promise.all(
+    products.map(async (product) => {
+      await updateStock(product);
+    }),
+  );
+};
+
 const deleteStock = async (productId: string): Promise<void> => {
   if (!stockBucket) {
-    logger().error(
-      "Stock bucket client not initialized",
-      LoggerUseCaseEnum.DELETE_R2_STOCK,
-    );
+    logger().error("Stock bucket client not initialized", {
+      useCase: LoggerUseCaseEnum.DELETE_R2_STOCK,
+    });
     throw new Error("Stock bucket client not initialized");
   }
   await stockBucket.delete(productId);
 
-  logger().info(
-    "Deleted stock from bucket",
-    LoggerUseCaseEnum.DELETE_R2_STOCK,
-    {
+  logger().info("Deleted stock from bucket", {
+    useCase: LoggerUseCaseEnum.DELETE_R2_STOCK,
+    data: {
       productId,
     },
-  );
+  });
 };
 
 export const stockClient = {
@@ -120,4 +138,5 @@ export const stockClient = {
   get: getStock,
   delete: deleteStock,
   update: updateStock,
+  updateMany,
 };
