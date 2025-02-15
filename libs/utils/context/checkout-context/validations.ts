@@ -1,6 +1,6 @@
 import { contextStore } from "@context-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
-import { addressSchema } from "@address-entity";
+import { Address, addressSchema } from "@address-entity";
 import { userDetailsSchema } from "@user-entity";
 import {
   CheckoutStageNameEnum,
@@ -9,9 +9,10 @@ import {
 import { uuidSchema } from "@global-entity";
 
 const isAddressValid = async (): Promise<boolean> => {
-  const { address: addressString } = contextStore.context;
+  const { address: addressString, country } = contextStore.context;
   if (!addressString) return false;
-  const address = await decryptObjectString(addressString);
+  const address = await decryptObjectString<Address>(addressString);
+  if (address.country !== country.code) return false;
   return addressSchema.safeParse(address).success;
 };
 
