@@ -4,6 +4,7 @@ import { errorResponse } from "@response-entity";
 import { getCredentials } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
+import { logCredentials } from "@logger-utils";
 
 const SECOND_INDEX = 1;
 
@@ -54,6 +55,8 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
         shippingMethod,
       } = await getCredentials(headers);
 
+      logCredentials(cartId, userId);
+
       contextStore.context.cartId = cartId;
       contextStore.context.userId = userId;
       contextStore.context.accessToken = accessToken;
@@ -63,7 +66,6 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
       contextStore.context.userDetails = userDetails;
       contextStore.context.shippingMethodId = shippingMethod;
     }
-
     return next();
   },
 );
