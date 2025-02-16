@@ -17,7 +17,7 @@ import { deleteCart, insertCartReturningAll } from "@cart-db";
 import { incrementUserVersion, updateUser } from "@user-db";
 import { popCheckoutSessionById } from "@checkout-session-db";
 import { getProductsFromString } from "../utils/get-products-from-string";
-import { logger } from "@logger-utils";
+import { logCredentials, logger } from "@logger-utils";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -49,6 +49,8 @@ export const getOrderFromSessionResult = async (
   }
 
   const { products: productsString, userId, cartId } = checkoutSession;
+
+  logCredentials(cartId, userId);
 
   if (!productsString) {
     throw new Error("No products found in checkout session");
