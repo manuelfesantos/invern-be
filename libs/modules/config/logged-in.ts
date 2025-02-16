@@ -14,10 +14,8 @@ export const getLoggedInConfig = async (
 
   let cartId: string | undefined = undefined;
 
-  if (userId) {
-    const user = await getUserById(userId);
-    cartId = user?.cart?.id;
-  }
+  const user = await getUserById(userId);
+  cartId = user?.cart?.id;
 
   const authSecret = await getAuthSecret(userId);
 

@@ -6,7 +6,6 @@ import {
 } from "../jwt-utils";
 import { errors } from "@error-handling-utils";
 import { getAnonymousToken } from "../get-anonymous-tokens";
-import { logger } from "@logger-utils";
 import { UserJWT } from "@jwt-entity";
 import {
   getAddressFromHeaders,
@@ -62,13 +61,6 @@ export const getCredentials = async (
   }
 };
 
-const logCredentials = (cartId?: string, userId?: string): void => {
-  logger().addRedactedData({
-    ...(cartId && { cartId }),
-    ...(userId && { userId }),
-  });
-};
-
 const handleLoggedInToken = (
   headers: Headers,
   token: UserJWT,
@@ -78,8 +70,6 @@ const handleLoggedInToken = (
   const { userId, cartId } = token;
   const { address, userDetails, shippingMethod } =
     getCheckoutCredentialsFromHeaders(headers);
-
-  logCredentials(cartId, userId);
 
   return {
     userId,
@@ -123,8 +113,6 @@ const handleLoggedInRefreshToken = async (
     cart = await insertCartReturningAll({ isLoggedIn: true });
     await updateUser(userId, { cartId: cart.id });
   }
-
-  logCredentials(cart.id, userId);
 
   const accessToken = await getLoggedInToken(userId, cart.id);
   return {

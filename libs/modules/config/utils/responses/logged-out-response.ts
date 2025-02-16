@@ -9,6 +9,7 @@ import { selectCartById } from "@cart-db";
 import { Cart, EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
 import { extendCart } from "@price-utils";
+import { logCredentials } from "@logger-utils";
 
 export const loggedOutResponse = async (
   headers: Headers,
@@ -20,6 +21,8 @@ export const loggedOutResponse = async (
   if (cartId) {
     cart = (await selectCartById(cartId)) || cart;
   }
+
+  logCredentials(cartId);
 
   const response = protectedSuccessResponse.OK(
     "success getting logged out config",

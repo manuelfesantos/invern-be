@@ -4,7 +4,7 @@ import { successResponse } from "@response-entity";
 import { stockClient } from "@r2-adapter";
 import { popCheckoutSessionById } from "@checkout-session-db";
 import { getProductsFromString } from "../utils/get-products-from-string";
-import { logger } from "@logger-utils";
+import { logger, logCredentials } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const handleSessionExpiredEvent = async (
@@ -23,7 +23,9 @@ export const handleSessionExpiredEvent = async (
     return successResponse.OK("session expiry already handled");
   }
 
-  const { products: productsString } = checkoutSession;
+  const { products: productsString, userId, cartId } = checkoutSession;
+
+  logCredentials(cartId, userId);
 
   if (!productsString) {
     throw new Error("No products found in checkout session");

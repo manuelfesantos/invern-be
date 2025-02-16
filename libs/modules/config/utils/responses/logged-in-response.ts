@@ -6,6 +6,7 @@ import { userDTOSchema } from "@user-entity";
 import { deleteCookieFromResponse, getCartIdFromHeaders } from "@http-utils";
 import { EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
+import { logCredentials } from "@logger-utils";
 
 export const loggedInResponse = async (
   headers: Headers,
@@ -14,6 +15,8 @@ export const loggedInResponse = async (
   cartId?: string,
   remember?: boolean,
 ): Promise<Response> => {
+  logCredentials(cartId, userId);
+
   const user = await getUserById(userId);
 
   if (!user) {
