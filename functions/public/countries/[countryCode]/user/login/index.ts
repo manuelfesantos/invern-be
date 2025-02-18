@@ -8,10 +8,10 @@ import { CookieNameEnum } from "@http-entity";
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
-  const { user, responseContext } = await login(body);
+  const { user, responseContext, cart } = await login(body);
   const response = protectedSuccessResponse.OK(
     "successfully logged in",
-    user,
+    { user, cart },
     undefined,
     responseContext,
   );

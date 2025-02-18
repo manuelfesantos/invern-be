@@ -7,7 +7,7 @@ export const buildResponse = (
   headers?: Record<string, string>,
 ): Response => {
   logger().addRedactedData({
-    responseData: data,
+    "response.body": data,
   });
   return Response.json(data, {
     ...maybeInit,

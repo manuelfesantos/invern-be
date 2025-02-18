@@ -5,7 +5,7 @@ export const logCredentials = (
   userId?: string | null,
 ): void => {
   logger().addRedactedData({
-    ...(cartId && { cartId }),
-    ...(userId && { userId }),
+    ...(cartId && { "cart.id": cartId }),
+    ...(userId && { "user.id": userId }),
   });
 };

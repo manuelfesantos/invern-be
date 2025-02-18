@@ -14,6 +14,7 @@ import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const POST: PagesFunction = async (context) => {
   const { request } = context;
@@ -32,8 +33,9 @@ export const POST: PagesFunction = async (context) => {
       return successResponse.OK("Unsupported event, ignoring request");
     }
 
-    logger().addRedactedData({
-      sessionExpired: stringifyObject(body),
+    logger().info("Session expired event received", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: { sessionExpired: stringifyObject(body) },
     });
 
     return await handleSessionExpiredEvent(sessionEvent);
@@ -51,8 +53,9 @@ export const POST: PagesFunction = async (context) => {
     return successResponse.OK("Unsupported event, ignoring request");
   }
 
-  logger().addRedactedData({
-    checkoutSessionResult: stringifyObject(body),
+  logger().info("Session completed event received", {
+    useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+    data: { checkoutSessionResult: stringifyObject(body) },
   });
   const clientOrder = await getOrderFromSessionResult(sessionEvent);
   await sendEmail(
@@ -60,8 +63,9 @@ export const POST: PagesFunction = async (context) => {
     "Checkout",
     `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
   );
-  logger().addRedactedData({
-    createdOrder: stringifyObject(clientOrder),
+  logger().info("Finished creating order after checkout session result", {
+    useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+    data: { createdOrder: stringifyObject(clientOrder) },
   });
   return successResponse.OK("success getting checkout-session", clientOrder);
 };
