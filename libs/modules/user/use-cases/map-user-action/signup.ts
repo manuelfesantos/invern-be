@@ -7,10 +7,13 @@ import { setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
+import { ExtendedCart, toCartDTO } from "@cart-entity";
+import { extendCart } from "@price-utils";
 
 interface ReturnType {
   user: UserDTO;
   responseContext: ResponseContext;
+  cart: ExtendedCart;
 }
 
 export const signup = async (body: unknown): Promise<ReturnType> => {
@@ -47,7 +50,14 @@ export const signup = async (body: unknown): Promise<ReturnType> => {
     contextStore.context.cartId,
   );
 
+  const { cart } = user;
+
+  if (!cart) {
+    throw errors.CART_NOT_FOUND();
+  }
+
   return {
+    cart: extendCart(toCartDTO(cart)),
     user: userToUserDTO(user),
     responseContext: { refreshToken, accessToken, remember },
   };

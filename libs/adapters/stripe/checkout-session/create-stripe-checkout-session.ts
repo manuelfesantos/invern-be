@@ -13,7 +13,7 @@ import { errors } from "@error-handling-utils";
 
 const FIRST_RATE = 0;
 
-export const createCheckoutSession = async (
+export const createStripeCheckoutSession = async (
   lineItems: LineItem[],
   shippingMethod: ShippingMethod,
   origin?: string,

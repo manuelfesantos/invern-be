@@ -6,11 +6,11 @@ import { deleteCookieFromResponse } from "@http-utils";
 import { CookieNameEnum } from "@http-entity";
 
 const POST: PagesFunction = async () => {
-  const { responseContext } = await logout();
+  const { responseContext, cart } = await logout();
 
   const response = protectedSuccessResponse.OK(
     "successfully logged out",
-    undefined,
+    { cart },
     undefined,
     responseContext,
   );

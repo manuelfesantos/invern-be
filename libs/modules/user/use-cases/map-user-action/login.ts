@@ -7,10 +7,14 @@ import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
+import { logCredentials } from "@logger-utils";
+import { ExtendedCart, toCartDTO } from "@cart-entity";
+import { extendCart } from "@price-utils";
 
 interface ReturnType {
   user: UserDTO;
   responseContext: ResponseContext;
+  cart: ExtendedCart;
 }
 
 export const login = async (body: unknown): Promise<ReturnType> => {
@@ -31,6 +35,14 @@ export const login = async (body: unknown): Promise<ReturnType> => {
   const { id: userId } = user;
   const { id: cartId } = user.cart ?? {};
 
+  logCredentials(cartId, userId);
+
+  if (!user.cart) {
+    throw errors.CART_NOT_FOUND();
+  }
+
+  const cart = toCartDTO(user.cart);
+
   const accessToken = await getLoggedInToken(userId, cartId);
   let refreshToken = await getAuthSecret(userId);
 
@@ -41,6 +53,7 @@ export const login = async (body: unknown): Promise<ReturnType> => {
 
   return {
     user: userToUserDTO(user),
+    cart: extendCart(cart),
     responseContext: {
       accessToken,
       refreshToken,
