@@ -1,4 +1,4 @@
-import { createCheckoutSession } from "@stripe-adapter";
+import { createStripeCheckoutSession } from "@stripe-adapter";
 import { increaseProductsStock } from "@product-db";
 import { errors } from "@error-handling-utils";
 import {
@@ -111,7 +111,7 @@ export const getCheckoutSession = async (
 
   await reserveLineItems(lineItems);
 
-  const session = await createCheckoutSession(
+  const session = await createStripeCheckoutSession(
     lineItems,
     shippingMethod,
     origin,

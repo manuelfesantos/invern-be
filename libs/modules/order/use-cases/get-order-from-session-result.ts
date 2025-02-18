@@ -40,7 +40,7 @@ export const getOrderFromSessionResult = async (
     await updatePayment(payment.id, { netAmount: payment.netAmount });
   }
 
-  const { clientId, address } = sessionResult.metadata ?? {};
+  const { clientId } = sessionResult.metadata ?? {};
 
   const [checkoutSession] = await popCheckoutSessionById(sessionResult.id);
 
@@ -48,7 +48,14 @@ export const getOrderFromSessionResult = async (
     throw new Error("Checkout session not found");
   }
 
-  const { products: productsString, userId, cartId } = checkoutSession;
+  const {
+    products: productsString,
+    userId,
+    cartId,
+    address,
+    personalDetails,
+    shippingMethodId,
+  } = checkoutSession;
 
   logCredentials(cartId, userId);
 
@@ -63,6 +70,8 @@ export const getOrderFromSessionResult = async (
     id: clientId,
     stripeId: sessionResult.id,
     snapshot: null,
+    personalDetails,
+    shippingMethodId,
   });
 
   await insertProductsToOrder(productsString, orderId);

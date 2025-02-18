@@ -15,7 +15,7 @@ export const getBodyFromRequest = async (
         ? await request.json()
         : undefined;
 
-    logger().addRedactedData(body);
+    logger().addRedactedData({ "request.body": body });
 
     return body;
   } catch (error) {

@@ -94,6 +94,13 @@ export const ordersTable = sqliteTable("orders", {
   paymentId: text("paymentId").references(() => paymentsTable.id, {
     onDelete: "cascade",
   }),
+  personalDetails: text("personalDetails").notNull(),
+  shippingMethodId: text("shippingMethodId").references(
+    () => shippingMethodsTable.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
   snapshot: text("snapshot"),
 });
 
