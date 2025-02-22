@@ -13,10 +13,14 @@ import { decrypt, decryptObjectString } from "@crypto-utils";
 import { extendCart } from "@price-utils";
 import { getUserById } from "@user-db";
 
+interface IsEditable {
+  isEditable: boolean;
+}
+
 interface CheckoutReviewReturnType {
-  personalDetails: UserDetails;
-  address: Address;
-  shippingMethod: SelectedShippingMethod;
+  personalDetails: UserDetails & IsEditable;
+  address: Address & IsEditable;
+  shippingMethod: SelectedShippingMethod & IsEditable;
   cart: ExtendedCart;
   totalPrice: number;
 }
@@ -62,9 +66,9 @@ export const getCheckoutReview =
       extendedCart.grossPrice + shippingMethod.rate.priceInCents;
 
     return {
-      address,
-      personalDetails,
-      shippingMethod,
+      address: { ...address, isEditable: true },
+      personalDetails: { ...personalDetails, isEditable: !userId },
+      shippingMethod: { ...shippingMethod, isEditable: true },
       cart: extendedCart,
       totalPrice,
     };
