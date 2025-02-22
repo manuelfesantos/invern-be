@@ -8,15 +8,16 @@ CREATE TABLE `checkoutSessions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`products` text NOT NULL,
 	`createdAt` text NOT NULL,
-	`expiresAt` integer NOT NULL,
+	`expiresAt` text NOT NULL,
 	`userId` text,
 	`cartId` text,
-	`address` text NOT NULL,
-	`shippingAddressId` text,
+	`shippingMethod` text NOT NULL,
 	`personalDetails` text NOT NULL,
+	`country` text NOT NULL,
+	`address` text NOT NULL,
+	`orderId` text NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`shippingAddressId`) REFERENCES `shippingMethods`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `collections` (
@@ -55,11 +56,16 @@ CREATE TABLE `orders` (
 	`stripeId` text NOT NULL,
 	`createdAt` text NOT NULL,
 	`userId` text,
-	`address` text NOT NULL,
 	`paymentId` text,
-	`snapshot` text,
+	`shippingTransactionId` text,
+	`address` text NOT NULL,
+	`country` text NOT NULL,
+	`personalDetails` text NOT NULL,
+	`shippingMethod` text NOT NULL,
+	`products` text NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`paymentId`) REFERENCES `payments`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`paymentId`) REFERENCES `payments`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`shippingTransactionId`) REFERENCES `shippingTransactions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `payments` (
@@ -91,15 +97,6 @@ CREATE TABLE `productsOnCarts` (
 	FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `productsToOrders` (
-	`orderId` text NOT NULL,
-	`productId` text NOT NULL,
-	`quantity` integer NOT NULL,
-	PRIMARY KEY(`orderId`, `productId`),
-	FOREIGN KEY (`orderId`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `shippingMethods` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL
@@ -121,6 +118,14 @@ CREATE TABLE `shippingRatesToCountries` (
 	PRIMARY KEY(`countryCode`, `shippingRateId`),
 	FOREIGN KEY (`shippingRateId`) REFERENCES `shippingRates`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`countryCode`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `shippingTransactions` (
+	`id` text PRIMARY KEY NOT NULL,
+	`status` text NOT NULL,
+	`createdAt` text NOT NULL,
+	`updatedAt` text NOT NULL,
+	`trackingUrl` text
 );
 --> statement-breakpoint
 CREATE TABLE `taxes` (

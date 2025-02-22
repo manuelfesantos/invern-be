@@ -1,6 +1,5 @@
 import { optional, z } from "zod";
-import { countryCodeSchema } from "@global-entity";
-import { requiredStringSchema } from "@global-entity";
+import { countryCodeSchema, requiredStringSchema } from "@global-entity";
 
 export const addressSchema = z.object({
   street: requiredStringSchema("street"),
@@ -11,7 +10,6 @@ export const addressSchema = z.object({
   province: optional(requiredStringSchema("province")),
   country: countryCodeSchema,
 });
-
 export const insertAddressSchema = addressSchema.omit({
   country: true,
 });

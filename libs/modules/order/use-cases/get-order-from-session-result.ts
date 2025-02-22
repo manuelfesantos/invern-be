@@ -1,80 +1,68 @@
 import { StripeSessionResult } from "@stripe-entity";
-import {
-  addToOrder,
-  checkIfOrderExists,
-  getOrderById,
-  insertOrder,
-} from "@order-db";
+import { checkIfOrderExists, getOrderById, insertOrder } from "@order-db";
 import {
   getPaymentById,
   insertPaymentReturningId,
   updatePayment,
 } from "@payment-db";
-import { getPaymentFromSessionResult } from "@payment-entity";
-import { ClientOrder, clientOrderSchema } from "@order-entity";
+import { getPaymentFromSessionResult, InsertPayment } from "@payment-entity";
+import {
+  BaseOrder,
+  ClientOrder,
+  clientOrderSchema,
+  insertOrderSchema,
+} from "@order-entity";
 import { errors } from "@error-handling-utils";
 import { deleteCart, insertCartReturningAll } from "@cart-db";
 import { incrementUserVersion, updateUser } from "@user-db";
 import { popCheckoutSessionById } from "@checkout-session-db";
-import { getProductsFromString } from "../utils/get-products-from-string";
 import { logCredentials, logger } from "@logger-utils";
+import { insertShippingTransaction } from "@shipping-transaction-db";
+import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
+import { getDateTime } from "@timer-utils";
+import { CheckoutSession } from "@checkout-session-entity";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
 ): Promise<ClientOrder> => {
-  const orderAlreadyExists = await checkIfOrderExists(sessionResult.id);
-
   logger().addRedactedData({ orderId: sessionResult.id });
 
-  if (orderAlreadyExists) {
-    throw errors.ORDER_ALREADY_EXISTS();
-  }
+  await validateIfOrderAlreadyExists(sessionResult.id);
 
-  const payment = getPaymentFromSessionResult(sessionResult);
-
-  const paymentExists = Boolean(await getPaymentById(payment.id));
-
-  if (!paymentExists) {
-    await insertPaymentReturningId(payment);
-  } else {
-    await updatePayment(payment.id, { netAmount: payment.netAmount });
-  }
-
-  const { clientId } = sessionResult.metadata ?? {};
-
-  const [checkoutSession] = await popCheckoutSessionById(sessionResult.id);
-
-  if (!checkoutSession) {
-    throw new Error("Checkout session not found");
-  }
+  const payment = await getPayment(sessionResult);
 
   const {
-    products: productsString,
+    products,
     userId,
     cartId,
     address,
     personalDetails,
-    shippingMethodId,
-  } = checkoutSession;
+    shippingMethod,
+    country,
+    orderId: clientId,
+  } = await getCheckoutSession(sessionResult.id);
 
   logCredentials(cartId, userId);
 
-  if (!productsString) {
-    throw new Error("No products found in checkout session");
-  }
-
-  const [{ orderId }] = await insertOrder({
-    address,
-    paymentId: payment.id,
-    userId: userId ?? null,
-    id: clientId,
-    stripeId: sessionResult.id,
-    snapshot: null,
-    personalDetails,
-    shippingMethodId,
+  const { id: shippingTransactionId } = await insertShippingTransaction({
+    status: ShippingTransactionStatusEnum.processing,
   });
 
-  await insertProductsToOrder(productsString, orderId);
+  const newOrder: BaseOrder = {
+    personalDetails,
+    shippingMethod,
+    country,
+    shippingTransactionId,
+    createdAt: getDateTime(),
+    id: clientId,
+    address,
+    products,
+    userId: userId ?? null,
+    stripeId: sessionResult.id,
+    paymentId: payment.id,
+  };
+
+  const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));
 
   const order = await getOrderById(orderId);
 
@@ -99,13 +87,38 @@ export const getOrderFromSessionResult = async (
   return clientOrderSchema.parse(order);
 };
 
-const insertProductsToOrder = async (
-  productsString: string,
-  orderId: string,
-): Promise<void> => {
-  if (orderId) {
-    const products = getProductsFromString(productsString);
+const validateIfOrderAlreadyExists = async (orderId: string): Promise<void> => {
+  const orderAlreadyExists = await checkIfOrderExists(orderId);
 
-    products.length && (await addToOrder(products, orderId));
+  if (orderAlreadyExists) {
+    throw errors.ORDER_ALREADY_EXISTS();
   }
+};
+
+const getPayment = async (
+  sessionResult: StripeSessionResult,
+): Promise<InsertPayment> => {
+  const payment = getPaymentFromSessionResult(sessionResult);
+
+  const paymentExists = Boolean(await getPaymentById(payment.id));
+
+  if (!paymentExists) {
+    await insertPaymentReturningId(payment);
+  } else {
+    await updatePayment(payment.id, { netAmount: payment.netAmount });
+  }
+
+  return payment;
+};
+
+const getCheckoutSession = async (
+  sessionId: string,
+): Promise<CheckoutSession> => {
+  const [checkoutSession] = await popCheckoutSessionById(sessionId);
+
+  if (!checkoutSession) {
+    throw new Error("Checkout session not found");
+  }
+
+  return checkoutSession;
 };
