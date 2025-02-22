@@ -1,4 +1,4 @@
-import { UserDetails } from "@user-entity";
+import { UserDetails, userDetailsSchema } from "@user-entity";
 import { Address } from "@address-entity";
 import {
   SelectedShippingMethod,
@@ -11,6 +11,7 @@ import { selectShippingMethod } from "@shipping-db";
 import { errors } from "@error-handling-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
 import { extendCart } from "@price-utils";
+import { getUserById } from "@user-db";
 
 interface CheckoutReviewReturnType {
   personalDetails: UserDetails;
@@ -27,12 +28,28 @@ export const getCheckoutReview =
       userDetails,
       shippingMethodId,
       cartId,
+      userId,
     } = contextStore.context;
+
+    let personalDetails: UserDetails | undefined = undefined;
     const cart = await validateCartId(cartId);
     const weight = getCartWeight(cart);
 
-    if (!addressString || !shippingMethodId || !userDetails) {
-      throw errors.NOT_ALLOWED("Missing required data");
+    if (userDetails) {
+      personalDetails = await decryptObjectString<UserDetails>(userDetails);
+    } else {
+      if (!userId) {
+        throw errors.NOT_ALLOWED("Missing personal details");
+      }
+      const user = await getUserById(userId);
+      personalDetails = userDetailsSchema.parse(user);
+    }
+
+    if (!addressString) {
+      throw errors.NOT_ALLOWED("Missing address");
+    }
+    if (!shippingMethodId) {
+      throw errors.NOT_ALLOWED("Missing shipping method");
     }
 
     const shippingMethod = await getShippingMethod(
@@ -40,7 +57,6 @@ export const getCheckoutReview =
       weight,
     );
     const address = await decryptObjectString<Address>(addressString);
-    const personalDetails = await decryptObjectString<UserDetails>(userDetails);
     const extendedCart = extendCart(toCartDTO(cart));
     const totalPrice =
       extendedCart.grossPrice + shippingMethod.rate.priceInCents;

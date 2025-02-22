@@ -68,6 +68,8 @@
       "@shipping-db": ["libs/db/shipping"],
       "@shipping-entity": ["libs/entities/shipping"],
       "@shipping-module": ["libs/modules/shipping"],
+      "@shipping-transaction-db": ["libs/db/shipping-transaction"],
+      "@shipping-transaction-entity": ["libs/entities/shipping-transaction"],
       "@string-utils": ["libs/utils/string"],
       "@stripe-adapter": ["libs/adapters/stripe"],
       "@stripe-entity": ["libs/entities/stripe"],

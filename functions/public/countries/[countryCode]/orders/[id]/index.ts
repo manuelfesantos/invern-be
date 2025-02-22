@@ -8,7 +8,7 @@ const GET: PagesFunction = async (context) => {
   const { id } = params;
   const order = await getOrder(id);
 
-  return successResponse.OK("Successfully got order", order);
+  return successResponse.OK("Successfully got order", { order });
 };
 
 export const onRequest = requestHandler({ GET });

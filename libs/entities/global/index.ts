@@ -1,6 +1,7 @@
 import { z, ZodEffects, ZodNumber, ZodString } from "zod";
 // eslint-disable-next-line import/no-restricted-paths
 import { isValidUUID } from "@crypto-utils";
+import { imageSchema } from "@image-entity";
 
 const ZERO_ELEMENTS = 0;
 
@@ -71,3 +72,10 @@ export const countryCodeSchema = requiredStringSchema("Country code")
   .refine((value) => /^[A-Z]+$/.test(value), {
     message: "Country code should be uppercase",
   });
+
+export const dateTimeSchema = (name: string): z.ZodString =>
+  stringSchema(name).datetime({
+    message: `${name} should be a valid date time`,
+  });
+
+export const image = imageSchema;

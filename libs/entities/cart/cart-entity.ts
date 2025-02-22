@@ -25,6 +25,10 @@ export const cartSchema = baseCartSchema.merge(
   }),
 );
 
+export const filledCartSchema = cartSchema.extend({
+  products: lineItemSchema.array(),
+});
+
 export const cartDTOSchema = cartSchema.omit({
   id: true,
   lastModifiedAt: true,
@@ -46,6 +50,8 @@ export const toCartDTO = (cart: Cart): CartDTO => {
 export type CartDTO = z.infer<typeof cartDTOSchema>;
 
 export type Cart = z.infer<typeof cartSchema>;
+
+export type FilledCart = z.infer<typeof filledCartSchema>;
 
 export type ExtendedCart = z.infer<typeof extendedCartSchema>;
 

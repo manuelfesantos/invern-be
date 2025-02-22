@@ -25,5 +25,10 @@ export const getFutureDate = (time: number): number =>
   time;
 
 export const getCurrentTime = (): number => {
-  return Date.now() / MILLISECONDS_IN_SECOND;
+  return Date.now();
+};
+
+export const getDateTime = (ms?: number): string => {
+  const date = ms ? new Date(ms) : new Date();
+  return date.toISOString();
 };

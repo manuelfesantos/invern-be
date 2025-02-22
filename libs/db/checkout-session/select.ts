@@ -1,4 +1,7 @@
-import { CheckoutSession } from "@checkout-session-entity";
+import {
+  CheckoutSession,
+  checkoutSessionSchema,
+} from "@checkout-session-entity";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { checkoutSessionsTable } from "@schema";
@@ -6,8 +9,10 @@ import { checkoutSessionsTable } from "@schema";
 export const selectCheckoutSessionById = async (
   id: string,
 ): Promise<CheckoutSession | undefined> =>
-  db()
-    .query.checkoutSessionsTable.findFirst({
-      where: eq(checkoutSessionsTable.id, id),
-    })
-    .execute();
+  checkoutSessionSchema.optional().parse(
+    await db()
+      .query.checkoutSessionsTable.findFirst({
+        where: eq(checkoutSessionsTable.id, id),
+      })
+      .execute(),
+  );

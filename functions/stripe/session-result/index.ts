@@ -1,5 +1,9 @@
 import { errorResponse, prepareError, successResponse } from "@response-entity";
-import { getBodyFromRequest, isStripeEnvValid } from "@http-utils";
+import {
+  deleteCookieFromResponse,
+  getBodyFromRequest,
+  isStripeEnvValid,
+} from "@http-utils";
 import { sendEmail } from "@mail-utils";
 import {
   isStripeEvent,
@@ -15,6 +19,7 @@ import { logger } from "@logger-utils";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { CookieNameEnum } from "@http-entity";
 
 export const POST: PagesFunction = async (context) => {
   const { request } = context;
@@ -67,7 +72,14 @@ export const POST: PagesFunction = async (context) => {
     useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
     data: { createdOrder: stringifyObject(clientOrder) },
   });
-  return successResponse.OK("success getting checkout-session", clientOrder);
+  const response = successResponse.OK(
+    "success getting checkout-session",
+    clientOrder,
+  );
+
+  deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+
+  return response;
 };
 
 export const onRequest = requestHandler({ POST });

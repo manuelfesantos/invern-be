@@ -1,27 +1,28 @@
 import { createStripeCheckoutSession } from "@stripe-adapter";
 import { increaseProductsStock } from "@product-db";
 import { errors } from "@error-handling-utils";
-import {
-  LineItem,
-  lineItemSchema,
-  productIdAndQuantityArraySchema,
-} from "@product-entity";
+import { LineItem, lineItemSchema } from "@product-entity";
 import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
 import { decreaseProductsStock } from "@product-db";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
-import { MILLISECONDS_IN_SECOND } from "@timer-utils";
+import { getDateTime, MILLISECONDS_IN_SECOND } from "@timer-utils";
 import { insertCheckoutSession } from "@checkout-session-db";
 import { contextStore } from "@context-utils";
-import { decrypt, decryptObjectString, encryptObject } from "@crypto-utils";
+import { decrypt, decryptObjectString, getRandomUUID } from "@crypto-utils";
 import { Country } from "@country-entity";
 import { Address } from "@address-entity";
 import { selectShippingMethod } from "@shipping-db";
-import { getCartWeight } from "@cart-entity";
+import { Cart, FilledCart, getCartWeight } from "@cart-entity";
 import { UserDetails, userDetailsSchema } from "@user-entity";
 import { getUserById } from "@user-db";
+import { SelectedShippingMethod } from "@shipping-entity";
+import {
+  CheckoutSession,
+  insertCheckoutSessionSchema,
+} from "@checkout-session-entity";
 
 interface CheckoutReturnType {
   url: string;
@@ -31,116 +32,66 @@ interface CheckoutReturnType {
 export const getCheckoutSession = async (
   origin?: string,
 ): Promise<CheckoutReturnType> => {
-  const { cartId, userId, address, country, shippingMethodId, userDetails } =
-    contextStore.context;
-  if (!cartId) {
-    logger().error("No cart provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.CART_NOT_PROVIDED();
-  }
-  if (!address) {
-    logger().error("No address provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.ADDRESS_NOT_PROVIDED();
-  }
-  if (!shippingMethodId) {
-    logger().error("No shipping method provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.SHIPPING_METHOD_NOT_FOUND();
-  }
+  const {
+    cartId,
+    userId,
+    address: addressString,
+    country,
+    shippingMethodId,
+    userDetails,
+  } = contextStore.context;
 
-  if (!userDetails && !userId) {
-    logger().error("No user details provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.USER_DETAILS_NOT_PROVIDED();
-  }
+  const address = await getValidatedAddressFromString(country, addressString);
 
-  await validateAddressCountry(address, country);
+  const cart = await getValidatedCart(cartId);
 
-  const cart = await validateCartId(cartId);
+  const personalDetails = await getPersonalDetails(userId, userDetails);
 
-  if (!cart?.products?.length) {
-    throw errors.CART_IS_EMPTY();
-  }
-
-  const lineItems = cart.products.map((product) =>
-    lineItemSchema.parse(product),
+  const selectedShippingMethod = await getSelectedShippingMethod(
+    cart,
+    country,
+    shippingMethodId,
   );
 
-  validateLineItems(lineItems);
+  await reserveLineItems(cart.products);
 
-  const shippingMethod = await selectShippingMethod(
-    await decrypt(shippingMethodId),
-    getCartWeight(cart),
-  );
+  const orderId = getRandomUUID();
 
-  if (!shippingMethod) {
-    logger().error("No shipping method provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.SHIPPING_METHOD_NOT_FOUND();
-  }
-
-  if (!shippingMethod.rates.length) {
-    logger().error("No shipping rates provided", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    });
-    throw errors.SHIPPING_RATE_NOT_FOUND();
-  }
-
-  let personalDetails: UserDetails;
-
-  if (userDetails) {
-    personalDetails = userDetailsSchema.parse(
-      await decryptObjectString(userDetails),
-    );
-  } else {
-    if (!userId) {
-      throw errors.USER_DETAILS_NOT_PROVIDED();
-    }
-    const user = await getUserById(userId);
-    if (!user) {
-      throw errors.USER_NOT_FOUND();
-    }
-    personalDetails = userDetailsSchema.parse(user);
-  }
-
-  await reserveLineItems(lineItems);
-
-  const session = await createStripeCheckoutSession(
-    lineItems,
-    shippingMethod,
+  const stripeCheckoutSession = await createStripeCheckoutSession(
+    cart.products,
+    selectedShippingMethod,
+    orderId,
     origin,
   );
 
-  const { url, expires_at, id, created } = session;
+  const { url, expires_at, id, created } = stripeCheckoutSession;
 
   if (!url) {
     throw new Error("Checkout session creation failed");
   }
 
-  const [checkoutSession] = await insertCheckoutSession({
+  const newCheckoutSession: CheckoutSession = {
     id,
+    orderId,
     userId: userId ?? null,
     cartId: cartId ?? null,
-    expiresAt: expires_at,
-    createdAt: new Date(
-      (created || Date.now()) / MILLISECONDS_IN_SECOND,
-    ).toISOString(),
-    products: productIdAndQuantityArraySchema.parse(lineItems),
-    shippingMethodId: shippingMethod.id,
+    expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
+    createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
+    products: cart.products,
+    shippingMethod: selectedShippingMethod,
     address: address,
-    personalDetails: await encryptObject(personalDetails),
-  });
+    personalDetails: personalDetails,
+    country: country,
+  };
+
+  const [checkoutSession] = await insertCheckoutSession(
+    insertCheckoutSessionSchema.parse(newCheckoutSession),
+  );
 
   logger().info("Finished creating checkout session", {
     useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
     data: {
-      sessionDetails: stringifyObject(session),
+      sessionDetails: stringifyObject(stripeCheckoutSession),
       checkoutSession,
     },
   });
@@ -161,6 +112,44 @@ const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
   }
 };
 
+const getValidatedAddressFromString = async (
+  country: Country,
+  addressString?: string,
+): Promise<Address> => {
+  if (!addressString) {
+    logger().error("No address provided", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    });
+    throw errors.ADDRESS_NOT_PROVIDED();
+  }
+
+  const address = await decryptObjectString<Address>(addressString);
+
+  if (address.country !== country.code) {
+    logger().error("Address country does not match the country of the user", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    });
+    throw errors.ADDRESS_COUNTRY_MISMATCH();
+  }
+  return address;
+};
+
+const getValidatedCart = async (cartId?: string): Promise<FilledCart> => {
+  const cart = await validateCartId(cartId);
+
+  if (!cart.products || !cart.products.length) {
+    throw errors.CART_IS_EMPTY();
+  }
+
+  const lineItems = cart.products.map((product) =>
+    lineItemSchema.parse(product),
+  );
+
+  validateLineItems(lineItems);
+
+  return { ...cart, products: lineItems };
+};
+
 const validateLineItems = (lineItems: LineItem[]): void => {
   const productsOutOfStock: { productId: string; stock: number }[] = [];
 
@@ -178,15 +167,69 @@ const validateLineItems = (lineItems: LineItem[]): void => {
   }
 };
 
-const validateAddressCountry = async (
-  address: string,
-  country: Country,
-): Promise<void> => {
-  const parsedAddress = await decryptObjectString<Address>(address);
-  if (parsedAddress.country !== country.code) {
-    logger().error("Address country does not match the country of the user", {
+const getPersonalDetails = async (
+  userId?: string,
+  userDetails?: string,
+): Promise<UserDetails> => {
+  if (!userDetails && !userId) {
+    logger().error("No user details provided", {
       useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
     });
-    throw errors.ADDRESS_COUNTRY_MISMATCH();
+    throw errors.USER_DETAILS_NOT_PROVIDED();
   }
+
+  if (userDetails) {
+    return userDetailsSchema.parse(await decryptObjectString(userDetails));
+  } else {
+    if (!userId) {
+      throw errors.USER_DETAILS_NOT_PROVIDED();
+    }
+    const user = await getUserById(userId);
+    if (!user) {
+      throw errors.USER_NOT_FOUND();
+    }
+
+    return userDetailsSchema.parse(user);
+  }
+};
+
+const getSelectedShippingMethod = async (
+  cart: Cart,
+  country: Country,
+  shippingMethodId?: string,
+): Promise<SelectedShippingMethod> => {
+  if (!shippingMethodId) {
+    logger().error("No shipping method provided", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    });
+    throw errors.SHIPPING_METHOD_NOT_FOUND();
+  }
+
+  const shippingMethod = await selectShippingMethod(
+    await decrypt(shippingMethodId),
+    getCartWeight(cart),
+  );
+
+  if (!shippingMethod) {
+    logger().error("No shipping method provided", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    });
+    throw errors.SHIPPING_METHOD_NOT_FOUND();
+  }
+
+  const selectedShippingRate = shippingMethod.rates.find((rate) =>
+    rate.countryCodes.includes(country.code),
+  );
+
+  if (!selectedShippingRate) {
+    logger().error("No shipping rates provided", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    });
+    throw errors.SHIPPING_RATE_NOT_FOUND();
+  }
+
+  return {
+    ...shippingMethod,
+    rate: selectedShippingRate,
+  };
 };

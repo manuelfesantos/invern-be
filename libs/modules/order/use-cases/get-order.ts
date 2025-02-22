@@ -3,7 +3,7 @@ import { errors } from "@error-handling-utils";
 import { HttpParams } from "@http-entity";
 import { logger } from "@logger-utils";
 import { extendOrder } from "@price-utils";
-import { ExtendedClientOrder } from "@order-entity";
+import { clientOrderSchema, ExtendedClientOrder } from "@order-entity";
 export const getOrder = async (
   orderId: HttpParams,
 ): Promise<ExtendedClientOrder> => {
@@ -16,5 +16,5 @@ export const getOrder = async (
     orderId: order.id,
   });
 
-  return extendOrder(order);
+  return extendOrder(clientOrderSchema.parse(order));
 };

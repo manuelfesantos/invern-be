@@ -1,4 +1,4 @@
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { createSelectSchema } from "drizzle-zod";
 import { paymentsTable } from "@schema";
 import { z } from "zod";
 import {
@@ -24,18 +24,11 @@ const basePaymentSchema = createSelectSchema(paymentsTable, {
   type: paymentMethodTypeSchema,
   state: paymentIntentStateSchema,
   createdAt: requiredStringSchema("payment created at date"),
-  netAmount: positiveIntegerSchema("payment net amount"),
+  netAmount: positiveIntegerSchema("payment net amount").optional(),
   grossAmount: positiveIntegerSchema("payment gross amount"),
 });
 
-export const insertPaymentSchema = createInsertSchema(paymentsTable, {
-  id: uuidSchema("payment id"),
-  type: paymentMethodTypeSchema,
-  state: paymentIntentStateSchema,
-  createdAt: requiredStringSchema("payment created at date"),
-  netAmount: positiveIntegerSchema("payment net amount"),
-  grossAmount: positiveIntegerSchema("payment gross amount"),
-}).omit({
+export const insertPaymentSchema = basePaymentSchema.omit({
   createdAt: true,
 });
 

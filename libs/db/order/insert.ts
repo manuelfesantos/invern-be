@@ -11,12 +11,6 @@ export const insertOrder = async (
     orderId: string;
   }[]
 > => {
-  const insertOrder = {
-    ...order,
-    createdAt: new Date().toISOString(),
-    userId: order.userId ? order.userId : null,
-  };
-
   logger().info("inserting order", {
     useCase: LoggerUseCaseEnum.CREATE_ORDER,
     data: {
@@ -24,7 +18,7 @@ export const insertOrder = async (
     },
   });
 
-  return db().insert(ordersTable).values(insertOrder).returning({
+  return db().insert(ordersTable).values(order).returning({
     orderId: ordersTable.id,
   });
 };
