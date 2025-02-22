@@ -2,7 +2,10 @@ import { deleteUser, getUser, updateUser } from "@user-module";
 import { protectedSuccessResponse, successResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
-import { getBodyFromRequest } from "@http-utils";
+import {
+  deleteCheckoutCookiesFromResponse,
+  getBodyFromRequest,
+} from "@http-utils";
 
 const GET: PagesFunction = async () => {
   const user = await getUser();
@@ -11,12 +14,14 @@ const GET: PagesFunction = async () => {
 
 const DELETE: PagesFunction = async () => {
   const { responseContext } = await deleteUser();
-  return protectedSuccessResponse.OK(
+  const response = protectedSuccessResponse.OK(
     "success deleting user",
     undefined,
     undefined,
     responseContext,
   );
+  deleteCheckoutCookiesFromResponse(response);
+  return response;
 };
 
 const PUT: PagesFunction = async ({ request }) => {

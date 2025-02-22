@@ -3,7 +3,6 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import { CheckoutSession } from "@checkout-session-entity";
-import { getProductsFromString } from "../utils/get-products-from-string";
 import { increaseProductsStock } from "@product-db";
 import { stockClient } from "@r2-adapter";
 
@@ -30,8 +29,7 @@ export const checkExpiredCheckoutSessions = async (): Promise<string> => {
 const retrieveProductsStockFromSession = async (
   session: CheckoutSession,
 ): Promise<void> => {
-  const products = getProductsFromString(session.products);
-  const updatedProducts = await increaseProductsStock(products);
+  const updatedProducts = await increaseProductsStock(session.products);
   for (const product of updatedProducts) {
     await stockClient.update(product);
   }
@@ -39,7 +37,7 @@ const retrieveProductsStockFromSession = async (
   logger().info("Success retrieving products Stock", {
     useCase: LoggerUseCaseEnum.RELEASE_PRODUCTS,
     data: {
-      releasedProducts: products,
+      releasedProducts: session.products,
     },
   });
 };

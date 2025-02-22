@@ -24,6 +24,7 @@ export interface Env {
   DOMAIN: string;
   ENCRYPTION_KEY: string;
   DEFAULT_IV: string;
+  SALT: string;
 }
 
 export type Credentials = {

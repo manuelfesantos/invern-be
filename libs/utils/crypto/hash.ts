@@ -3,11 +3,20 @@ import { encode } from "@encoding-utils";
 const SIXTEEN = 16;
 const TWO = 2;
 
+let salt: string | null = null;
+
+export const setSalt = (newSalt: string): void => {
+  salt = newSalt;
+};
+
 export const hashPassword = async (
   password: string,
   id: string,
 ): Promise<string> => {
-  return hashString(`${password}${id}`);
+  if (!salt) {
+    throw new Error("Salt is not set");
+  }
+  return hashString(`${password}${salt}${id}`);
 };
 
 const hashString = async (input: string): Promise<string> => {

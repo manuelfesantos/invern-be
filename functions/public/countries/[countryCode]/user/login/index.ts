@@ -2,7 +2,11 @@ import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { login } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
-import { deleteCookieFromResponse, getBodyFromRequest } from "@http-utils";
+import {
+  deleteCheckoutCookiesFromResponse,
+  deleteCookieFromResponse,
+  getBodyFromRequest,
+} from "@http-utils";
 import { CookieNameEnum } from "@http-entity";
 
 const POST: PagesFunction = async ({ request }) => {
@@ -17,6 +21,7 @@ const POST: PagesFunction = async ({ request }) => {
   );
 
   deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+  deleteCheckoutCookiesFromResponse(response);
 
   return response;
 };

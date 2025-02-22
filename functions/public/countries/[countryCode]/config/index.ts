@@ -1,4 +1,8 @@
-import { deleteCookieFromResponse, getCookies } from "@http-utils";
+import {
+  deleteCheckoutCookiesFromResponse,
+  deleteCookieFromResponse,
+  getCookies,
+} from "@http-utils";
 import { getConfig } from "@config-module";
 import { invalidateCheckoutSession } from "@order-module";
 import { decrypt } from "@crypto-utils";
@@ -26,11 +30,11 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     remember === "true",
   );
 
-  const ignoreCheckoutSessionCookie = response.headers.get(
-    "ignore-checkout-session-cookie",
-  );
+  const afterCheckoutHeader = request.headers.get("after-checkout");
 
-  if (!ignoreCheckoutSessionCookie) {
+  const afterCheckoutProcessing = afterCheckoutHeader === "true";
+
+  if (!afterCheckoutProcessing) {
     if (checkoutSessionCookie) {
       logger().info("deleting checkout session cookie", {
         useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
@@ -45,7 +49,8 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     logger().info("ignoring checkout session cookie", {
       useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
     });
-
+    deleteCheckoutCookiesFromResponse(response);
+    deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
     deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
   }
 

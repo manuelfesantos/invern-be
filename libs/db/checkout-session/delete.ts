@@ -1,8 +1,11 @@
 import { db } from "@db";
 import { checkoutSessionsTable } from "@schema";
 import { eq, lte } from "drizzle-orm";
-import { CheckoutSession } from "@checkout-session-entity";
-import { getCurrentTime } from "@timer-utils";
+import {
+  CheckoutSession,
+  checkoutSessionSchema,
+} from "@checkout-session-entity";
+import { getDateTime } from "@timer-utils";
 
 export const deleteCheckoutSessionById = async (
   id: string,
@@ -18,17 +21,25 @@ export const deleteCheckoutSessionById = async (
 export const popCheckoutSessionById = async (
   id: string,
 ): Promise<CheckoutSession[]> => {
-  return db()
-    .delete(checkoutSessionsTable)
-    .where(eq(checkoutSessionsTable.id, id))
-    .returning();
+  return checkoutSessionSchema
+    .array()
+    .parse(
+      await db()
+        .delete(checkoutSessionsTable)
+        .where(eq(checkoutSessionsTable.id, id))
+        .returning(),
+    );
 };
 
 export const popExpiredCheckoutSessions = async (): Promise<
   CheckoutSession[]
 > => {
-  return db()
-    .delete(checkoutSessionsTable)
-    .where(lte(checkoutSessionsTable.expiresAt, getCurrentTime()))
-    .returning();
+  return checkoutSessionSchema
+    .array()
+    .parse(
+      db()
+        .delete(checkoutSessionsTable)
+        .where(lte(checkoutSessionsTable.expiresAt, getDateTime()))
+        .returning(),
+    );
 };

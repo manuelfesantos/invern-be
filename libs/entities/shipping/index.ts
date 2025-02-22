@@ -4,8 +4,8 @@ import {
   positiveIntegerSchema,
   requiredStringSchema,
   uuidSchema,
+  countryCodeSchema,
 } from "@global-entity";
-import { countryCodeSchema } from "@global-entity";
 import { z } from "zod";
 
 export const baseShippingMethodSchema = createSelectSchema(

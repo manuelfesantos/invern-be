@@ -20,7 +20,7 @@ import {
 import { initCacheApiEmail } from "../libs/adapters/r2/utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
-import { initEncryptionKey, setDefaultIv } from "@crypto-utils";
+import { initEncryptionKey, setDefaultIv, setSalt } from "@crypto-utils";
 
 export const startLogger = middlewareRequestHandler(async (context) => {
   const { env, request } = context;
@@ -72,6 +72,7 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
     setDomain(env.DOMAIN);
     await initEncryptionKey(env.ENCRYPTION_KEY);
     setDefaultIv(env.DEFAULT_IV);
+    setSalt(env.SALT);
     stockClient.init(env.STOCK_BUCKET);
     countriesClient.init(env.COUNTRIES_BUCKET);
     return contextStore.run(() => withLogger(logger, next));

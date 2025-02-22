@@ -1,30 +1,22 @@
 import { stripe } from "../stripe-client";
 import { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
-import { getRandomUUID } from "@crypto-utils";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
 import { frontendHost, getStripeEnv } from "@http-utils";
 import { contextStore } from "@context-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { ShippingMethod } from "@shipping-entity";
-import { errors } from "@error-handling-utils";
-
-const FIRST_RATE = 0;
+import { SelectedShippingMethod } from "@shipping-entity";
 
 export const createStripeCheckoutSession = async (
   lineItems: LineItem[],
-  shippingMethod: ShippingMethod,
+  shippingMethod: SelectedShippingMethod,
+  orderId: string,
   origin?: string,
 ): Promise<Response<Stripe.Checkout.Session>> => {
   const { country } = contextStore.context;
-  const clientId = getRandomUUID();
-  const shippingRate = shippingMethod.rates[FIRST_RATE];
-
-  if (!shippingRate) {
-    throw errors.SHIPPING_RATE_NOT_FOUND();
-  }
+  const shippingRate = shippingMethod.rate;
 
   const checkoutSession: Stripe.Checkout.SessionCreateParams = {
     cancel_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/cart`,
@@ -46,7 +38,6 @@ export const createStripeCheckoutSession = async (
     }),
     metadata: {
       stripeEnv: getStripeEnv(),
-      clientId,
     },
     mode: "payment",
     payment_intent_data: {
@@ -77,7 +68,7 @@ export const createStripeCheckoutSession = async (
         },
       },
     ],
-    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order/${clientId}?ignoreCheckoutCookie=true`,
+    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order/${orderId}?ignoreCheckoutCookie=true`,
   };
 
   logger().info("Creating checkout session", {
