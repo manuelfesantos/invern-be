@@ -2,6 +2,7 @@ import { ClientOrder, ExtendedClientOrder } from "@order-entity";
 import { extendTaxes } from "./utils/extend-taxes";
 import { contextStore } from "@context-utils";
 import { extendLineItem } from "./utils/extend-line-item";
+import { getOrderStatus } from "./utils/get-order-status";
 
 const NO_PRICE = 0;
 
@@ -21,5 +22,6 @@ export const extendOrder = (order: ClientOrder): ExtendedClientOrder => {
     products: extendedProducts,
     taxes: extendedTaxes,
     currency: country.currency,
+    status: getOrderStatus(order),
   };
 };

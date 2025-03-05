@@ -11,7 +11,7 @@ import {
   updatePayment,
 } from "@payment-db";
 import { errors } from "@error-handling-utils";
-import { getOrderProductsByPaymentId } from "@order-db";
+import { getOrderProductsByPaymentId, updateOrder } from "@order-db";
 import { increaseProductsStock } from "@product-db";
 import { stockClient } from "@r2-adapter";
 import { logger } from "@logger-utils";
@@ -126,12 +126,15 @@ export const getPaymentFromPaymentIntentFailedEvent = async (
 const handleFailedPayment = async (
   payment: InsertPayment,
 ): Promise<Payment> => {
-  const products = await getOrderProductsByPaymentId(payment.id);
-  if (products.length) {
+  const { products, id } =
+    (await getOrderProductsByPaymentId(payment.id)) ?? {};
+
+  if (products && products.length && id) {
     const updatedProducts = await increaseProductsStock(products);
     for (const product of updatedProducts) {
       await stockClient.update(product);
     }
+    await updateOrder(id, { isCanceled: true });
   }
   const savedPayment = await getPaymentById(payment.id);
 

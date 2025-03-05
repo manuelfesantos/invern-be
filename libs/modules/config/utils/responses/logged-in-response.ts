@@ -7,6 +7,7 @@ import { deleteCookieFromResponse, getCartIdFromHeaders } from "@http-utils";
 import { EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
 import { logCredentials } from "@logger-utils";
+import { extendCart } from "@price-utils";
 
 export const loggedInResponse = async (
   headers: Headers,
@@ -31,7 +32,7 @@ export const loggedInResponse = async (
     "success getting logged in config",
     {
       user: userDTOSchema.parse(user),
-      cart: toCartDTO(user.cart || EMPTY_CART),
+      cart: extendCart(toCartDTO(user.cart || EMPTY_CART)),
     },
     undefined,
     { refreshToken, accessToken, remember },

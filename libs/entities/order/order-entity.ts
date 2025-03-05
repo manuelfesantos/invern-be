@@ -1,6 +1,5 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { ordersTable } from "@schema";
-import { z } from "zod";
 import { extendedProductSchema, lineItemSchema } from "@product-entity";
 import { addressSchema } from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
@@ -11,6 +10,16 @@ import { countrySchema } from "@country-entity";
 import { selectedShippingMethodSchema } from "@shipping-entity";
 import { userDetailsSchema } from "@user-entity";
 import { shippingTransactionSchema } from "@shipping-transaction-entity";
+import { z } from "zod";
+
+const orderStatusSchema = z.enum([
+  "processing_payment",
+  "packaging",
+  "shipping",
+  "completed",
+  "canceled",
+  "error",
+]);
 
 export const baseOrderSchema = createSelectSchema(ordersTable, {
   id: uuidSchema("order id"),
@@ -74,6 +83,7 @@ export const extendedClientOrderSchema = clientOrderSchema.extend({
   products: extendedProductSchema.array(),
   taxes: extendedClientTaxSchema.array(),
   currency: clientCurrencySchema,
+  status: orderStatusSchema,
 });
 
 export type ClientOrder = z.infer<typeof clientOrderSchema>;
@@ -86,3 +96,6 @@ export const invalidateCheckoutCookiePayloadSchema = z.object({
   checkoutSessionId: requiredStringSchema("checkout session id"),
   expiresAt: requiredStringSchema("expires at"),
 });
+
+export const OrderStatus = orderStatusSchema.Enum;
+export type OrderStatusType = z.infer<typeof orderStatusSchema>;
