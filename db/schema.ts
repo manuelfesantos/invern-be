@@ -103,6 +103,9 @@ export const ordersTable = sqliteTable("orders", {
   personalDetails: text("personalDetails").notNull(),
   shippingMethod: text("shippingMethod").notNull(),
   products: text("products").notNull(),
+  isCanceled: int("isCanceled", {
+    mode: "boolean",
+  }),
 });
 
 export const currenciesTable = sqliteTable("currencies", {

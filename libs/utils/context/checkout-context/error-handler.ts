@@ -22,15 +22,16 @@ export const checkoutRequestHandler = <T extends Data>(
   methodMapper: HandlerMethodMapper<T>,
   checkoutStage: CheckoutStageName | null,
 ): PagesFunction<Env, string, T> => {
-  return requestHandler(methodMapper, errorHandler, () =>
-    initializeCheckoutStage(checkoutStage),
-  );
+  return requestHandler(methodMapper, {
+    errorHandler,
+    preProcess: () => initializeCheckoutStage(checkoutStage),
+  });
 };
 
 export const checkoutMiddlewareRequestHandler = <T extends Data>(
   fn: PagesFunction<Env, string, T>,
 ): PagesFunction<Env, string, T> => {
-  return middlewareRequestHandler(fn, errorHandler);
+  return middlewareRequestHandler(fn, { errorHandler });
 };
 
 const errorHandler = (error: unknown): Response => {

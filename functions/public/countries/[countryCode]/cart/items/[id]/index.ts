@@ -1,5 +1,6 @@
 import { protectedSuccessResponse } from "@response-entity";
 import {
+  deleteShippingMethodCookieFromResponse,
   getBodyFromRequest,
   getCartIdCookieHeader,
   setCookieInResponse,
@@ -52,4 +53,12 @@ const DELETE: PagesFunction = async ({ params }) => {
   return response;
 };
 
-export const onRequest = requestHandler({ PUT, DELETE });
+export const onRequest = requestHandler(
+  { PUT, DELETE },
+  {
+    postProcess: (response) => {
+      deleteShippingMethodCookieFromResponse(response);
+      return response;
+    },
+  },
+);

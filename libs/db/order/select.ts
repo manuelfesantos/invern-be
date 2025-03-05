@@ -75,15 +75,19 @@ export const getOrderById = async (
 
 export const getOrderProductsByPaymentId = async (
   paymentId: string,
-): Promise<LineItem[]> => {
+): Promise<{ id: string; products: LineItem[] } | undefined> => {
   const order = await db().query.ordersTable.findFirst({
     where: eq(ordersTable.paymentId, paymentId),
     columns: {
       products: true,
+      id: true,
     },
   });
   if (!order) {
-    return [];
+    return;
   }
-  return baseOrderSchema.shape.products.parse(order.products);
+  return {
+    products: baseOrderSchema.shape.products.parse(order.products),
+    id: order.id,
+  };
 };
