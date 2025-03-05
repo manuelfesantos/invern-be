@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7ecc560a-22b1-435d-b0d2-bddbe7f1284a",
+  "id": "9ec6a619-63f1-4332-ac13-9a4e7de3f09b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -386,7 +386,7 @@
           "name": "shippingTransactionId",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "address": {
@@ -422,6 +422,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "isCanceled": {
+          "name": "isCanceled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },

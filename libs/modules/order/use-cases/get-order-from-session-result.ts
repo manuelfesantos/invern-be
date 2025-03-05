@@ -60,6 +60,7 @@ export const getOrderFromSessionResult = async (
     userId: userId ?? null,
     stripeId: sessionResult.id,
     paymentId: payment.id,
+    isCanceled: false,
   };
 
   const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));

@@ -53,6 +53,10 @@ export const deleteCookieFromResponse = (
   cookieName: CookieName,
 ): void => setCookieInResponse(response, deleteCookieHeader(cookieName));
 
+export const deleteShippingMethodCookieFromResponse = (
+  response: Response,
+): void => deleteCookieFromResponse(response, CookieNameEnum.SHIPPING_METHOD);
+
 export const deleteCheckoutCookiesFromResponse = (response: Response): void => {
   deleteCookieFromResponse(response, CookieNameEnum.ADDRESS);
   deleteCookieFromResponse(response, CookieNameEnum.USER_DETAILS);
