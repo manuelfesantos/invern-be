@@ -3,38 +3,66 @@ import {
   InsertPayment,
   PaymentIntentState,
   PaymentIntentStateType,
+  PaymentMethod,
   PaymentMethodType,
   paymentMethodTypeSchema,
 } from "@payment-entity";
-// eslint-disable-next-line import/no-restricted-paths
 import { errors } from "@error-handling-utils";
 import Stripe from "stripe";
+import { getPaymentMethod } from "@stripe-adapter";
 
 const VALUE_ZERO = 0;
 
 export const getPaymentFromSessionResult = (
   sessionResult: StripeSessionResult,
-): InsertPayment => {
-  return {
+): { payment: InsertPayment } => {
+  const payment: InsertPayment = {
     id: validatePaymentIntent(sessionResult.payment_intent),
-    type: PaymentMethodType.draft,
     grossAmount: validateAmount(sessionResult.amount_total),
     netAmount: validateAmount(sessionResult.amount_subtotal),
     state: PaymentIntentState.draft,
   };
+
+  return { payment };
 };
 
-export const getPaymentFromPaymentIntent = (
+export const getPaymentFromPaymentIntent = async (
   paymentIntent: PaymentIntent,
   type: PaymentIntentStateType,
-): InsertPayment => {
+): Promise<{ payment: InsertPayment; paymentMethod?: PaymentMethod }> => {
   const [paymentMethodType] = paymentIntent.payment_method_types;
-  return {
+
+  const paymentMethodId =
+    typeof paymentIntent.payment_method === "string"
+      ? paymentIntent.payment_method
+      : paymentIntent.payment_method?.id;
+
+  const payment: InsertPayment = {
     id: validatePaymentIntent(paymentIntent),
-    type: paymentMethodTypeSchema.parse(paymentMethodType),
     grossAmount: validateAmount(paymentIntent.amount),
     state: type,
+    paymentMethodId,
   };
+
+  if (!paymentMethodId) {
+    return { payment };
+  }
+
+  const paymentMethod: PaymentMethod = {
+    id: paymentMethodId,
+    type: paymentMethodTypeSchema.parse(paymentMethodType),
+  };
+
+  if (paymentMethod.type !== PaymentMethodType.card) {
+    return { payment, paymentMethod };
+  }
+
+  const stripePaymentMethod = await getPaymentMethod(paymentMethodId);
+
+  paymentMethod.brand = stripePaymentMethod.card?.brand;
+  paymentMethod.last4 = stripePaymentMethod.card?.last4;
+
+  return { payment, paymentMethod };
 };
 
 const validatePaymentIntent = (

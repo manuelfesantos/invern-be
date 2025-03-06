@@ -79,12 +79,16 @@ export const clientOrderSchema = orderSchema.omit({
   stripeId: true,
 });
 
-export const extendedClientOrderSchema = clientOrderSchema.extend({
-  products: extendedProductSchema.array(),
-  taxes: extendedClientTaxSchema.array(),
-  currency: clientCurrencySchema,
-  status: orderStatusSchema,
-});
+export const extendedClientOrderSchema = clientOrderSchema
+  .extend({
+    products: extendedProductSchema.array(),
+    taxes: extendedClientTaxSchema.array(),
+    currency: clientCurrencySchema,
+    status: orderStatusSchema,
+  })
+  .omit({
+    country: true,
+  });
 
 export type ClientOrder = z.infer<typeof clientOrderSchema>;
 export type ExtendedClientOrder = z.infer<typeof extendedClientOrderSchema>;

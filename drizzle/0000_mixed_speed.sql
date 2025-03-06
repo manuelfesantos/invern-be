@@ -69,13 +69,21 @@ CREATE TABLE `orders` (
 	FOREIGN KEY (`shippingTransactionId`) REFERENCES `shippingTransactions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `paymentMethods` (
+	`id` text PRIMARY KEY NOT NULL,
+	`type` text NOT NULL,
+	`issuer` text,
+	`last4` text
+);
+--> statement-breakpoint
 CREATE TABLE `payments` (
 	`id` text PRIMARY KEY NOT NULL,
 	`createdAt` text NOT NULL,
-	`type` text NOT NULL,
 	`state` text NOT NULL,
 	`netAmount` integer DEFAULT 0 NOT NULL,
-	`grossAmount` integer NOT NULL
+	`grossAmount` integer NOT NULL,
+	`paymentMethodId` text,
+	FOREIGN KEY (`paymentMethodId`) REFERENCES `paymentMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `products` (

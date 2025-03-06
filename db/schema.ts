@@ -141,12 +141,24 @@ export const countriesTable = sqliteTable("countries", {
 export const paymentsTable = sqliteTable("payments", {
   id: text("id").primaryKey(),
   createdAt: text("createdAt").notNull(),
-  type: text("type", { enum: ["draft", "card", "paypal"] }).notNull(),
   state: text("state", {
     enum: ["draft", "succeeded", "canceled", "created", "processing", "failed"],
   }).notNull(),
   netAmount: int("netAmount").notNull().default(VALUE_ZERO),
   grossAmount: int("grossAmount").notNull(),
+  paymentMethodId: text("paymentMethodId").references(
+    () => paymentMethodsTable.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
+});
+
+export const paymentMethodsTable = sqliteTable("paymentMethods", {
+  id: text("id").primaryKey(),
+  type: text("type", { enum: ["card", "paypal"] }).notNull(),
+  brand: text("issuer"),
+  last4: text("last4"),
 });
 
 export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
@@ -287,6 +299,13 @@ export const ordersRelations = relations(ordersTable, ({ one }) => ({
   }),
 }));
 
+export const paymentMethodsRelations = relations(
+  paymentMethodsTable,
+  ({ many }) => ({
+    payments: many(paymentsTable),
+  }),
+);
+
 export const currenciesRelations = relations(currenciesTable, ({ many }) => ({
   countries: many(countriesTable),
 }));
@@ -312,6 +331,10 @@ export const countriesRelations = relations(
 
 export const paymentsRelations = relations(paymentsTable, ({ one }) => ({
   orders: one(ordersTable),
+  paymentMethod: one(paymentMethodsTable, {
+    fields: [paymentsTable.paymentMethodId],
+    references: [paymentMethodsTable.id],
+  }),
 }));
 
 export const checkoutSessionsRelations = relations(
