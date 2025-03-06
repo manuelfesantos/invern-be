@@ -1,11 +1,11 @@
 import { StripeSessionResult } from "@stripe-entity";
-import { checkIfOrderExists, getOrderById, insertOrder } from "@order-db";
+import { checkIfOrderExists, selectOrderById, insertOrder } from "@order-db";
 import {
-  getPaymentById,
+  selectPaymentById,
   insertPaymentReturningId,
   updatePayment,
 } from "@payment-db";
-import { getPaymentFromSessionResult, InsertPayment } from "@payment-entity";
+import { InsertPayment } from "@payment-entity";
 import {
   BaseOrder,
   ClientOrder,
@@ -21,6 +21,7 @@ import { insertShippingTransaction } from "@shipping-transaction-db";
 import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
 import { CheckoutSession } from "@checkout-session-entity";
+import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -65,7 +66,7 @@ export const getOrderFromSessionResult = async (
 
   const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));
 
-  const order = await getOrderById(orderId);
+  const order = await selectOrderById(orderId);
 
   if (!order) {
     throw new Error("Unable to create order");
@@ -99,9 +100,9 @@ const validateIfOrderAlreadyExists = async (orderId: string): Promise<void> => {
 const getPayment = async (
   sessionResult: StripeSessionResult,
 ): Promise<InsertPayment> => {
-  const payment = getPaymentFromSessionResult(sessionResult);
+  const { payment } = getPaymentFromSessionResult(sessionResult);
 
-  const paymentExists = Boolean(await getPaymentById(payment.id));
+  const paymentExists = Boolean(await selectPaymentById(payment.id));
 
   if (!paymentExists) {
     await insertPaymentReturningId(payment);

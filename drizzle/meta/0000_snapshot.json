@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "9ec6a619-63f1-4332-ac13-9a4e7de3f09b",
+  "id": "1333714b-bd87-4970-a2f9-4ccb4461cb2b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -485,6 +485,43 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "paymentMethods": {
+      "name": "paymentMethods",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "issuer": {
+          "name": "issuer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last4": {
+          "name": "last4",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "payments": {
       "name": "payments",
       "columns": {
@@ -497,13 +534,6 @@
         },
         "createdAt": {
           "name": "createdAt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "type": {
-          "name": "type",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -530,10 +560,31 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "paymentMethodId": {
+          "name": "paymentMethodId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "payments_paymentMethodId_paymentMethods_id_fk": {
+          "name": "payments_paymentMethodId_paymentMethods_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "paymentMethods",
+          "columnsFrom": [
+            "paymentMethodId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
