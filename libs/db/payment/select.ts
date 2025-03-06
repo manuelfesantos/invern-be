@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { Payment } from "@payment-entity";
 import { db } from "@db";
 
-export const getPaymentById = async (
+export const selectPaymentById = async (
   paymentId: string,
 ): Promise<Payment | undefined> => {
   return db().query.paymentsTable.findFirst({

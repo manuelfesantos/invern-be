@@ -1,4 +1,8 @@
-import { ClientOrder, ExtendedClientOrder } from "@order-entity";
+import {
+  ClientOrder,
+  ExtendedClientOrder,
+  extendedClientOrderSchema,
+} from "@order-entity";
 import { extendTaxes } from "./utils/extend-taxes";
 import { contextStore } from "@context-utils";
 import { extendLineItem } from "./utils/extend-line-item";
@@ -17,11 +21,13 @@ export const extendOrder = (order: ClientOrder): ExtendedClientOrder => {
     country.taxes,
   );
 
-  return {
+  const extendedOrder: ExtendedClientOrder = {
     ...order,
     products: extendedProducts,
     taxes: extendedTaxes,
     currency: country.currency,
     status: getOrderStatus(order),
   };
+
+  return extendedClientOrderSchema.parse(extendedOrder);
 };

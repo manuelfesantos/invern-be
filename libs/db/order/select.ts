@@ -4,7 +4,7 @@ import { ordersTable } from "@schema";
 import { baseOrderSchema, ClientOrder } from "@order-entity";
 import { LineItem } from "@product-entity";
 
-export const getOrdersByUserId = async (
+export const selectOrdersByUserId = async (
   userId: string,
 ): Promise<ClientOrder[]> => {
   const ordersTemplate = await db().query.ordersTable.findMany({
@@ -13,7 +13,14 @@ export const getOrdersByUserId = async (
     },
     where: eq(ordersTable.userId, userId),
     with: {
-      payment: true,
+      payment: {
+        columns: {
+          paymentMethodId: false,
+        },
+        with: {
+          paymentMethod: true,
+        },
+      },
       shippingTransaction: true,
     },
   });
@@ -27,7 +34,7 @@ export const getOrdersByUserId = async (
   );
 };
 
-export const getOrderByStripeId = async (
+export const selectOrderByStripeId = async (
   stripeId: string,
 ): Promise<ClientOrder | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
@@ -36,7 +43,14 @@ export const getOrderByStripeId = async (
       paymentId: false,
     },
     with: {
-      payment: true,
+      payment: {
+        columns: {
+          paymentMethodId: false,
+        },
+        with: {
+          paymentMethod: true,
+        },
+      },
       shippingTransaction: true,
     },
   });
@@ -50,7 +64,7 @@ export const getOrderByStripeId = async (
   );
 };
 
-export const getOrderById = async (
+export const selectOrderById = async (
   id: string,
 ): Promise<ClientOrder | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
@@ -59,7 +73,14 @@ export const getOrderById = async (
       paymentId: false,
     },
     with: {
-      payment: true,
+      payment: {
+        columns: {
+          paymentMethodId: false,
+        },
+        with: {
+          paymentMethod: true,
+        },
+      },
       shippingTransaction: true,
     },
   });
@@ -73,7 +94,7 @@ export const getOrderById = async (
   );
 };
 
-export const getOrderProductsByPaymentId = async (
+export const selectOrderProductsByPaymentId = async (
   paymentId: string,
 ): Promise<{ id: string; products: LineItem[] } | undefined> => {
   const order = await db().query.ordersTable.findFirst({
