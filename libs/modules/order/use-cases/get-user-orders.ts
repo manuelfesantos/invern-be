@@ -1,6 +1,6 @@
 import { selectOrdersByUserId } from "@order-db";
 import { errors } from "@error-handling-utils";
-import { extendOrder } from "@price-utils";
+import { extendOrder } from "@extender-utils";
 import { ExtendedClientOrder } from "@order-entity";
 
 export const getUserOrders = async (

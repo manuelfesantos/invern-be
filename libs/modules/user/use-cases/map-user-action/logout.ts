@@ -2,7 +2,7 @@ import { getAnonymousTokens } from "@jwt-utils";
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
 import { ResponseContext } from "@http-entity";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 
 interface ReturnType {

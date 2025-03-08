@@ -9,7 +9,7 @@ import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
 import { ExtendedCart, toCartDTO } from "@cart-entity";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 
 interface ReturnType {
   user: UserDTO;

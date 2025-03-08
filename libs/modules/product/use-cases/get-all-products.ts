@@ -1,6 +1,6 @@
 import { getProducts, getProductsBySearch } from "@product-db";
 import { logger } from "@logger-utils";
-import { extendProduct } from "@price-utils";
+import { extendProduct } from "@extender-utils";
 import { ExtendedProduct } from "@product-entity";
 import { LoggerUseCaseEnum } from "@logger-entity";
 

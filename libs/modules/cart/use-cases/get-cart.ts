@@ -1,5 +1,5 @@
 import { selectCartById } from "@cart-db";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 import { contextStore } from "@context-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 

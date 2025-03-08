@@ -10,7 +10,7 @@ import { validateCartId } from "@cart-db";
 import { selectShippingMethod } from "@shipping-db";
 import { errors } from "@error-handling-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 import { getUserById } from "@user-db";
 
 interface IsEditable {
