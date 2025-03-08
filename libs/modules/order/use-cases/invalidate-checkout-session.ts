@@ -19,7 +19,12 @@ export const invalidateCheckoutSession = async (
   if (new Date(checkoutSession.expiresAt).getDate() < getCurrentTime()) {
     logger().info(
       `checkout session with id ${checkoutSessionId} already expired`,
-      { useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION },
+      {
+        useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+        data: {
+          expirationDate: new Date(checkoutSession.expiresAt).getDate(),
+        },
+      },
     );
     return;
   }
