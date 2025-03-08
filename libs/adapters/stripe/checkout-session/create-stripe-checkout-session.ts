@@ -68,7 +68,7 @@ export const createStripeCheckoutSession = async (
         },
       },
     ],
-    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order/${orderId}?after-checkout=true`,
+    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order?id=${orderId}&after-checkout=true`,
   };
 
   logger().info("Creating checkout session", {
