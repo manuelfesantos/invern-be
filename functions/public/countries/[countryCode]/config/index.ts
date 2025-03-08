@@ -34,8 +34,8 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
 
   const afterCheckoutProcessing = afterCheckoutHeader === "true";
 
-  if (!afterCheckoutProcessing) {
-    if (checkoutSessionCookie) {
+  if (checkoutSessionCookie) {
+    if (!afterCheckoutProcessing) {
       logger().info("deleting checkout session cookie", {
         useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
       });
@@ -44,14 +44,14 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
       await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
 
       deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
+    } else {
+      logger().info("ignoring checkout session cookie", {
+        useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      });
+      deleteCheckoutCookiesFromResponse(response);
+      deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+      deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
     }
-  } else {
-    logger().info("ignoring checkout session cookie", {
-      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-    });
-    deleteCheckoutCookiesFromResponse(response);
-    deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
-    deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
   }
 
   return response;
