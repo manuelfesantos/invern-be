@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { ordersTable } from "@schema";
-import { extendedProductSchema, lineItemSchema } from "@product-entity";
+import { extendedLineItemSchema, lineItemSchema } from "@product-entity";
 import { addressSchema } from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
@@ -81,7 +81,7 @@ export const clientOrderSchema = orderSchema.omit({
 
 export const extendedClientOrderSchema = clientOrderSchema
   .extend({
-    products: extendedProductSchema.array(),
+    products: extendedLineItemSchema.array(),
     taxes: extendedClientTaxSchema.array(),
     currency: clientCurrencySchema,
     status: orderStatusSchema,
