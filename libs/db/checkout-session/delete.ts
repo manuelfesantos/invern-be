@@ -37,7 +37,7 @@ export const popExpiredCheckoutSessions = async (): Promise<
   return checkoutSessionSchema
     .array()
     .parse(
-      db()
+      await db()
         .delete(checkoutSessionsTable)
         .where(lte(checkoutSessionsTable.expiresAt, getDateTime()))
         .returning(),

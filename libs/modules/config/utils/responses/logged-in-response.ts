@@ -7,7 +7,7 @@ import { deleteCookieFromResponse, getCartIdFromHeaders } from "@http-utils";
 import { EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
 import { logCredentials } from "@logger-utils";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 
 export const loggedInResponse = async (
   headers: Headers,

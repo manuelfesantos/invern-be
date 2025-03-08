@@ -8,7 +8,7 @@ import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
 import { ExtendedCart, toCartDTO } from "@cart-entity";
-import { extendCart } from "@price-utils";
+import { extendCart } from "@extender-utils";
 
 interface ReturnType {
   user: UserDTO;

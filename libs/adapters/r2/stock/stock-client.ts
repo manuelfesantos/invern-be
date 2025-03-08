@@ -109,7 +109,7 @@ const updateMany = async (
     throw new Error("Stock bucket client not initialized");
   }
 
-  Promise.all(
+  await Promise.all(
     products.map(async (product) => {
       await updateStock(product);
     }),

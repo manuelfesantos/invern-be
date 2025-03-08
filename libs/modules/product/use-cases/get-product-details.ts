@@ -2,7 +2,7 @@ import { getProductById } from "@product-db";
 import { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
-import { extendProductDetails } from "@price-utils";
+import { extendProductDetails } from "@extender-utils";
 import { selectCollectionById } from "@collection-db";
 import {
   ExtendedProductWithCollectionDetails,
