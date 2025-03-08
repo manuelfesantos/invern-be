@@ -16,13 +16,13 @@ export const invalidateCheckoutSession = async (
     });
     return;
   }
-  if (new Date(checkoutSession.expiresAt).getDate() < getCurrentTime()) {
+  if (new Date(checkoutSession.expiresAt).getTime() < getCurrentTime()) {
     logger().info(
       `checkout session with id ${checkoutSessionId} already expired`,
       {
         useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
         data: {
-          expirationDate: new Date(checkoutSession.expiresAt).getDate(),
+          expirationDate: new Date(checkoutSession.expiresAt),
         },
       },
     );
