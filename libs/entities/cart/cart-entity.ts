@@ -41,6 +41,7 @@ export const extendedCartSchema = cartDTOSchema.extend({
   netPrice: positiveIntegerSchema("cart net price"),
   taxes: extendedClientTaxSchema.array(),
   isCheckoutPossible: booleanSchema("cart checkout possibility"),
+  issues: z.string().array().optional(),
 });
 
 export const toCartDTO = (cart: Cart): CartDTO => {

@@ -15,16 +15,16 @@ export const extendLineItem = (
   lineItem: LineItem,
   country: Country,
 ): ExtendedLineItem => {
-  const errors: LineItemError[] = [];
+  const issues: LineItemError[] = [];
   const extendedTaxes = extendTaxes(lineItem.priceInCents, country.taxes);
 
   const taxedPrice = getTaxedPrice(extendedTaxes);
 
   if (lineItem.quantity > lineItem.stock) {
-    errors.push({
+    issues.push({
       message:
         lineItem.stock > NO_STOCK
-          ? `There is not enough stock for this product. Current stock: ${lineItem.stock}`
+          ? `Not enough stock. Current stock: ${lineItem.stock}`
           : "Product is out of stock",
       type: LineItemErrorEnum.NOT_ENOUGH_STOCK,
     });
@@ -35,7 +35,7 @@ export const extendLineItem = (
     netPrice: lineItem.priceInCents,
     grossPrice: lineItem.priceInCents + taxedPrice,
     taxes: extendedTaxes,
-    ...(errors.length && { errors }),
+    ...(issues.length && { issues }),
   };
 
   return extendedLineItemSchema.parse(extendedLineItem);
