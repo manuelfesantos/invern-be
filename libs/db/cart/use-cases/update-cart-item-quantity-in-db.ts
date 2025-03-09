@@ -19,7 +19,8 @@ export const updateCartItemQuantityInDb = async (
   const shouldUpdateProduct = cartQuantity && finalQuantity > NO_QUANTITY;
   const shouldDeleteProduct = cartQuantity && finalQuantity <= NO_QUANTITY;
   const invalidCase = !cartQuantity && finalQuantity <= NO_QUANTITY;
-  const notEnoughStock = product.stock < finalQuantity;
+  const notEnoughStock =
+    quantity > NO_QUANTITY && product.stock < finalQuantity;
 
   if (notEnoughStock) {
     throw errors.PRODUCT_OUT_OF_STOCK(product.stock);
