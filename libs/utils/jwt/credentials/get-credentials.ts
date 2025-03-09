@@ -9,6 +9,7 @@ import { getAnonymousToken } from "../get-anonymous-tokens";
 import { UserJWT } from "@jwt-entity";
 import {
   getAddressFromHeaders,
+  getCustomerEmailFromHeaders,
   getRememberValue,
   getShippingMethodFromHeaders,
   getTokensFromHeaders,
@@ -68,12 +69,13 @@ const handleLoggedInToken = (
 ): Credentials => {
   const remember = getRememberValue(headers);
   const { userId, cartId } = token;
-  const { address, userDetails, shippingMethod } =
+  const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
 
   return {
     userId,
     cartId,
+    customerEmail,
     refreshToken,
     remember,
     address,
@@ -87,9 +89,16 @@ const handleLoggedOutToken = async (
   refreshToken: string,
 ): Promise<Credentials> => {
   const cartId = getCartIdFromHeaders(headers);
-  const { address, userDetails, shippingMethod } =
+  const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
-  return { refreshToken, cartId, address, userDetails, shippingMethod };
+  return {
+    refreshToken,
+    cartId,
+    address,
+    userDetails,
+    shippingMethod,
+    customerEmail,
+  };
 };
 
 const handleLoggedInRefreshToken = async (
@@ -106,7 +115,7 @@ const handleLoggedInRefreshToken = async (
   }
 
   let { cart } = await getUserById(userId);
-  const { address, userDetails, shippingMethod } =
+  const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
 
   if (!cart) {
@@ -119,6 +128,7 @@ const handleLoggedInRefreshToken = async (
     userId,
     cartId: cart.id,
     accessToken,
+    customerEmail,
     refreshToken,
     remember,
     address,
@@ -133,7 +143,7 @@ const handleLoggedOutRefreshToken = async (
 ): Promise<Credentials> => {
   const accessToken = await getAnonymousToken();
   const cartId = getCartIdFromHeaders(headers);
-  const { address, userDetails, shippingMethod } =
+  const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
   return {
     accessToken,
@@ -142,14 +152,21 @@ const handleLoggedOutRefreshToken = async (
     address,
     userDetails,
     shippingMethod,
+    customerEmail,
   };
 };
 
 const getCheckoutCredentialsFromHeaders = (
   headers: Headers,
-): { address?: string; userDetails?: string; shippingMethod?: string } => {
+): {
+  address?: string;
+  userDetails?: string;
+  shippingMethod?: string;
+  customerEmail?: string;
+} => {
   const address = getAddressFromHeaders(headers);
   const userDetails = getUserDetailsFromHeaders(headers);
   const shippingMethod = getShippingMethodFromHeaders(headers);
-  return { address, userDetails, shippingMethod };
+  const customerEmail = getCustomerEmailFromHeaders(headers);
+  return { address, userDetails, shippingMethod, customerEmail };
 };

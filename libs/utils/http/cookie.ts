@@ -40,6 +40,9 @@ export const getRememberCookieHeader = (): string =>
     getFutureDate(TOKEN_COOKIE_MAX_AGE),
   );
 
+export const getCustomerEmailCookieHeader = (email: string): string =>
+  getCookieHeader(CookieNameEnum.CUSTOMER_EMAIL, email);
+
 export const deleteCookieHeader = (cookieName: CookieName): string =>
   getCookieHeader(cookieName, "", NO_MAX_AGE);
 
@@ -47,6 +50,11 @@ export const setCartIdCookieInResponse = (
   response: Response,
   cartId: string,
 ): void => setCookieInResponse(response, getCartIdCookieHeader(cartId));
+
+export const setCustomerEmailCookieInResponse = (
+  response: Response,
+  email: string,
+): void => setCookieInResponse(response, getCustomerEmailCookieHeader(email));
 
 export const deleteCookieFromResponse = (
   response: Response,

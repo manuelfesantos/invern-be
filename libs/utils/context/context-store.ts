@@ -16,6 +16,7 @@ class Context {
   private _shippingMethodId?: string;
   private _firstCheckoutStage: CheckoutStage;
   private _currentCheckoutStage?: CheckoutStageName;
+  private _customerEmail?: string;
 
   constructor() {
     this._firstCheckoutStage = structuredClone(firstStage);
@@ -100,6 +101,13 @@ class Context {
   }
   set currentCheckoutStage(value: CheckoutStageName) {
     this._currentCheckoutStage = value;
+  }
+
+  get customerEmail(): string | undefined {
+    return this._customerEmail;
+  }
+  set customerEmail(value: string | undefined) {
+    this._customerEmail = value;
   }
 }
 

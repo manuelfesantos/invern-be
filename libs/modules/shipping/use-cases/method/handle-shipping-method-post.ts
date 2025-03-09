@@ -9,7 +9,8 @@ import { validateCartId } from "@cart-db";
 import { errors } from "@error-handling-utils";
 import { encrypt } from "@crypto-utils";
 import { requiredStringSchema } from "@global-entity";
-import { getCartWeight } from "@cart-entity";
+import { getCartWeight, toCartDTO } from "@cart-entity";
+import { extendCart } from "@extender-utils";
 
 const shippingMethodPostBodySchema = z.object({
   id: requiredStringSchema("shipping method id"),
@@ -24,6 +25,17 @@ export const handleShippingMethodPost = async (
   const { country, cartId } = contextStore.context;
   const { id } = shippingMethodPostBodySchema.parse(body);
   const cart = await validateCartId(cartId);
+
+  if (!cart.products?.length) {
+    throw errors.CART_IS_EMPTY();
+  }
+
+  const extendedCart = extendCart(toCartDTO(cart));
+
+  if (extendedCart.issues && extendedCart.issues.length) {
+    throw errors.CART_HAS_ISSUES(extendedCart.issues);
+  }
+
   const weight = getCartWeight(cart);
   const shippingMethod = await selectShippingMethod(id, weight);
   if (!shippingMethod) {

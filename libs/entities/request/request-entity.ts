@@ -30,6 +30,7 @@ export interface Env {
 export type Credentials = {
   userId?: string;
   cartId?: string;
+  customerEmail?: string;
   accessToken?: string;
   refreshToken: string;
   remember?: boolean;
