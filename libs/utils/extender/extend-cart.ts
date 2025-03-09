@@ -8,17 +8,22 @@ import { contextStore } from "@context-utils";
 const VALUE_ZERO = 0;
 
 export const extendCart = (cart: CartDTO): ExtendedCart => {
+  const issues: string[] = [];
   const { country } = contextStore.context;
   const extendedProducts = (cart.products || []).map((product) =>
     extendLineItem(product, country),
   );
 
-  const productsHaveErrors = extendedProducts.some(({ errors }) =>
-    Boolean(errors),
+  const productsHaveIssues = extendedProducts.some(({ issues }) =>
+    Boolean(issues),
   );
 
   const isCheckoutPossible =
-    !productsHaveErrors && extendedProducts.length > VALUE_ZERO;
+    !productsHaveIssues && extendedProducts.length > VALUE_ZERO;
+
+  if (productsHaveIssues) {
+    issues.push("Some products have issues");
+  }
 
   const netPrice = getCartNetPrice(extendedProducts);
 
@@ -33,6 +38,7 @@ export const extendCart = (cart: CartDTO): ExtendedCart => {
     netPrice,
     grossPrice: netPrice + taxedPrice,
     isCheckoutPossible,
+    ...(issues.length && { issues }),
   };
   return extendedCartSchema.parse(extendedCart);
 };

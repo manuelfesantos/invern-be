@@ -92,7 +92,7 @@ export const extendedLineItemSchema = lineItemSchema
     netPrice: positiveIntegerSchema("line item net price"),
     grossPrice: positiveIntegerSchema("line item gross price"),
     taxes: extendedClientTaxSchema.array(),
-    errors: z.array(lineItemErrorSchema).optional(),
+    issues: z.array(lineItemErrorSchema).optional(),
   });
 
 export const productIdAndQuantitySchema = z.object({
