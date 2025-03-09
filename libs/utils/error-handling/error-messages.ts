@@ -56,6 +56,11 @@ export const errors = {
     new CustomError("Products are required", HttpStatusEnum.BAD_REQUEST),
   CART_IS_EMPTY: (): CustomError =>
     new CustomError("Cart is empty", HttpStatusEnum.CONFLICT),
+  CART_HAS_ISSUES: (issues: string[]): CustomError =>
+    new CustomError(
+      `Cart has issues: ${issues.join(", ")}`,
+      HttpStatusEnum.BAD_REQUEST,
+    ),
   INVALID_PAYMENT: (issue: string): CustomError =>
     new CustomError(`Invalid payment: ${issue}`, HttpStatusEnum.BAD_REQUEST),
   ORDER_ALREADY_EXISTS: (): CustomError =>
@@ -68,6 +73,11 @@ export const errors = {
     new CustomError("Order not found", HttpStatusEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): CustomError =>
     new CustomError("Orders not found", HttpStatusEnum.NOT_FOUND),
+  NO_EMAIL_PROVIDED_WHILE_GETTING_ORDER: (): CustomError =>
+    new CustomError(
+      "Missing email for order fetching",
+      HttpStatusEnum.UNPROCESSABLE_ENTITY,
+    ),
   SHIPPING_METHOD_NOT_FOUND: (): CustomError =>
     new CustomError("Shipping method not found", HttpStatusEnum.NOT_FOUND),
   SHIPPING_RATE_NOT_FOUND: (): CustomError =>

@@ -37,3 +37,11 @@ export const getShippingMethodFromHeaders = (
   const { [CookieNameEnum.SHIPPING_METHOD]: shippingMethod } = cookies;
   return shippingMethod;
 };
+
+export const getCustomerEmailFromHeaders = (
+  headers: Headers,
+): string | undefined => {
+  const cookies = getCookies(headers);
+  const { [CookieNameEnum.CUSTOMER_EMAIL]: email } = cookies;
+  return email;
+};

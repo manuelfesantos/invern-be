@@ -37,7 +37,7 @@ export const checkoutMiddlewareRequestHandler = <T extends Data>(
 const errorHandler = (error: unknown): Response => {
   const { currentCheckoutStage } = contextStore.context;
   if (error instanceof Error && currentCheckoutStage) {
-    const cookiesToRemove = getCookiesToRemove(currentCheckoutStage);
+    const cookiesToRemove = getCheckoutCookiesToRemove(currentCheckoutStage);
     const response = protectedSuccessResponse.OK(
       error.message,
       {
@@ -74,7 +74,7 @@ const errorHandler = (error: unknown): Response => {
   return response;
 };
 
-const getCookiesToRemove = (
+const getCheckoutCookiesToRemove = (
   checkoutStageName: CheckoutStageName,
 ): CookieName[] =>
   getRemoveCookieNamesFromInvalidCheckoutStage(checkoutStageName);

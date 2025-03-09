@@ -53,6 +53,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
         address,
         userDetails,
         shippingMethod,
+        customerEmail,
       } = await getCredentials(headers);
 
       logCredentials(cartId, userId);
@@ -65,6 +66,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
       contextStore.context.address = address;
       contextStore.context.userDetails = userDetails;
       contextStore.context.shippingMethodId = shippingMethod;
+      contextStore.context.customerEmail = customerEmail;
     }
     return next();
   },

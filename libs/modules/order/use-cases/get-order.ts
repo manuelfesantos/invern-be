@@ -4,8 +4,11 @@ import { HttpParams } from "@http-entity";
 import { logger } from "@logger-utils";
 import { extendOrder } from "@extender-utils";
 import { clientOrderSchema, ExtendedClientOrder } from "@order-entity";
+import { contextStore } from "@context-utils";
+import { decrypt } from "@crypto-utils";
 export const getOrder = async (
   orderId: HttpParams,
+  email?: string,
 ): Promise<ExtendedClientOrder> => {
   const order = await selectOrderById(orderId as string);
   if (!order) {
@@ -15,6 +18,28 @@ export const getOrder = async (
   logger().addRedactedData({
     orderId: order.id,
   });
+
+  if (order.userId) {
+    const { userId } = contextStore.context;
+    if (!userId || userId !== order.userId) {
+      throw errors.UNAUTHORIZED();
+    }
+  } else {
+    if (email) {
+      if (email !== order.personalDetails.email) {
+        throw errors.UNAUTHORIZED();
+      }
+    } else {
+      const { customerEmail: encryptedEmail } = contextStore.context;
+      if (!encryptedEmail) {
+        throw errors.NO_EMAIL_PROVIDED_WHILE_GETTING_ORDER();
+      }
+      const cookieEmail = await decrypt(encryptedEmail);
+      if (cookieEmail !== order.personalDetails.email) {
+        throw errors.NO_EMAIL_PROVIDED_WHILE_GETTING_ORDER();
+      }
+    }
+  }
 
   return extendOrder(clientOrderSchema.parse(order));
 };

@@ -15,7 +15,7 @@ import { decrypt, decryptObjectString, getRandomUUID } from "@crypto-utils";
 import { Country } from "@country-entity";
 import { Address } from "@address-entity";
 import { selectShippingMethod } from "@shipping-db";
-import { Cart, FilledCart, getCartWeight } from "@cart-entity";
+import { Cart, FilledCart, getCartWeight, toCartDTO } from "@cart-entity";
 import { UserDetails, userDetailsSchema } from "@user-entity";
 import { getUserById } from "@user-db";
 import { SelectedShippingMethod } from "@shipping-entity";
@@ -23,6 +23,7 @@ import {
   CheckoutSession,
   insertCheckoutSessionSchema,
 } from "@checkout-session-entity";
+import { extendCart } from "@extender-utils";
 
 interface CheckoutReturnType {
   url: string;
@@ -139,6 +140,12 @@ const getValidatedCart = async (cartId?: string): Promise<FilledCart> => {
 
   if (!cart.products || !cart.products.length) {
     throw errors.CART_IS_EMPTY();
+  }
+
+  const extendedCart = extendCart(toCartDTO(cart));
+
+  if (extendedCart.issues && extendedCart.issues.length) {
+    throw errors.CART_HAS_ISSUES(extendedCart.issues);
   }
 
   const lineItems = cart.products.map((product) =>

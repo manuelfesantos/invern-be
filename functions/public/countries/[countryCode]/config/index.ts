@@ -2,10 +2,11 @@ import {
   deleteCheckoutCookiesFromResponse,
   deleteCookieFromResponse,
   getCookies,
+  setCustomerEmailCookieInResponse,
 } from "@http-utils";
 import { getConfig } from "@config-module";
 import { invalidateCheckoutSession } from "@order-module";
-import { decrypt } from "@crypto-utils";
+import { decrypt, decryptObjectString, encrypt } from "@crypto-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 // eslint-disable-next-line import/no-restricted-paths
@@ -14,6 +15,7 @@ import { CookieNameEnum } from "@http-entity";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { Env } from "@request-entity";
+import { UserDetails } from "@user-entity";
 
 const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   const cookies = getCookies(request.headers);
@@ -22,6 +24,7 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     [CookieNameEnum.REFRESH_TOKEN]: refreshToken,
     [CookieNameEnum.CHECKOUT_SESSION]: checkoutSessionCookie,
     [CookieNameEnum.REMEMBER]: remember,
+    [CookieNameEnum.USER_DETAILS]: encryptedUserDetails,
   } = cookies;
 
   const response = await getConfig(
@@ -30,29 +33,44 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     remember === "true",
   );
 
+  if (!checkoutSessionCookie) {
+    return response;
+  }
+
   const afterCheckoutHeader = request.headers.get("after-checkout");
 
   const afterCheckoutProcessing = afterCheckoutHeader === "true";
 
-  if (checkoutSessionCookie) {
-    if (!afterCheckoutProcessing) {
-      logger().info("deleting checkout session cookie", {
-        useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-      });
-      initStripeClient(env.STRIPE_API_KEY);
+  if (afterCheckoutProcessing) {
+    logger().info("ignoring checkout session cookie", {
+      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+    });
 
-      await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
-
-      deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
-    } else {
-      logger().info("ignoring checkout session cookie", {
-        useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-      });
-      deleteCheckoutCookiesFromResponse(response);
-      deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
-      deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
+    if (encryptedUserDetails) {
+      const userDetails =
+        await decryptObjectString<UserDetails>(encryptedUserDetails);
+      setCustomerEmailCookieInResponse(
+        response,
+        await encrypt(userDetails.email),
+      );
     }
+
+    deleteCheckoutCookiesFromResponse(response);
+    deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
+    deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
+
+    return response;
   }
+
+  logger().info("deleting checkout session cookie", {
+    useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+  });
+
+  initStripeClient(env.STRIPE_API_KEY);
+
+  await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
+
+  deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
 
   return response;
 };

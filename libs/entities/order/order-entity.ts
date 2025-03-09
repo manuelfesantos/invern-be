@@ -64,7 +64,7 @@ export const insertOrderSchema = createInsertSchema(ordersTable, {
 });
 
 export const orderSchema = baseOrderSchema
-  .omit({ userId: true, paymentId: true, shippingTransactionId: true })
+  .omit({ paymentId: true, shippingTransactionId: true })
   .extend({
     products: z.array(lineItemSchema),
     address: addressSchema,
@@ -77,6 +77,7 @@ export const orderSchema = baseOrderSchema
 
 export const clientOrderSchema = orderSchema.omit({
   stripeId: true,
+  userId: true,
 });
 
 export const extendedClientOrderSchema = clientOrderSchema

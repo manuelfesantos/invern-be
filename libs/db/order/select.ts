@@ -1,12 +1,12 @@
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { ordersTable } from "@schema";
-import { baseOrderSchema, ClientOrder } from "@order-entity";
+import { baseOrderSchema, ClientOrder, Order } from "@order-entity";
 import { LineItem } from "@product-entity";
 
 export const selectOrdersByUserId = async (
   userId: string,
-): Promise<ClientOrder[]> => {
+): Promise<Order[]> => {
   const ordersTemplate = await db().query.ordersTable.findMany({
     columns: {
       paymentId: false,
@@ -66,7 +66,7 @@ export const selectOrderByStripeId = async (
 
 export const selectOrderById = async (
   id: string,
-): Promise<ClientOrder | undefined> => {
+): Promise<Order | undefined> => {
   const orderTemplate = await db().query.ordersTable.findFirst({
     where: eq(ordersTable.id, id),
     columns: {
