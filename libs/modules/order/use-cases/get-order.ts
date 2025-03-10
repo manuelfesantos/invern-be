@@ -22,12 +22,12 @@ export const getOrder = async (
   if (order.userId) {
     const { userId } = contextStore.context;
     if (!userId || userId !== order.userId) {
-      throw errors.UNAUTHORIZED();
+      throw errors.UNAUTHORIZED("User does not match order");
     }
   } else {
     if (email) {
       if (email !== order.personalDetails.email) {
-        throw errors.UNAUTHORIZED();
+        throw errors.UNAUTHORIZED("Email does not match order");
       }
     } else {
       const { customerEmail: encryptedEmail } = contextStore.context;

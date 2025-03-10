@@ -1,4 +1,4 @@
-import { getUserByEmail } from "@user-db";
+import { getUserByEmail, updateUser } from "@user-db";
 import { User, UserDTO, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
@@ -8,8 +8,9 @@ import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
-import { ExtendedCart, toCartDTO } from "@cart-entity";
+import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
+import { insertCart } from "@cart-db";
 
 interface ReturnType {
   user: UserDTO;
@@ -38,7 +39,12 @@ export const login = async (body: unknown): Promise<ReturnType> => {
   logCredentials(cartId, userId);
 
   if (!user.cart) {
-    throw errors.CART_NOT_FOUND();
+    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+    await updateUser(userId, { cartId: newCartId });
+    user.cart = {
+      ...EMPTY_CART,
+      id: newCartId,
+    };
   }
 
   const cart = toCartDTO(user.cart);
