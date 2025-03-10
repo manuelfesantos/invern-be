@@ -18,25 +18,25 @@ export const insertImages = async (
     .map((product, index) => [
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-1.jpeg`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-1.webp`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-2.jpeg`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-2.webp`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-3.jpeg`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-3.webp`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-4.jpeg`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-4.webp`,
         alt: product.name,
         collectionId: undefined,
       },
