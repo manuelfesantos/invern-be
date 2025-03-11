@@ -19,7 +19,7 @@ export const hashPassword = async (
   return hashString(`${password}${salt}${id}`);
 };
 
-const hashString = async (input: string): Promise<string> => {
+export const hashString = async (input: string): Promise<string> => {
   const data = encode(input);
 
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);

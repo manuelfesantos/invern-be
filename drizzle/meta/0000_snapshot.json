@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7bee4713-101d-40b6-b136-7d1998fa0c1b",
+  "id": "fd2bd00d-aeed-44ca-9418-89c09342f321",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -1055,6 +1055,13 @@
           "name": "users_cartId_unique",
           "columns": [
             "cartId"
+          ],
+          "isUnique": true
+        },
+        "users_googleUserId_unique": {
+          "name": "users_googleUserId_unique",
+          "columns": [
+            "googleUserId"
           ],
           "isUnique": true
         }

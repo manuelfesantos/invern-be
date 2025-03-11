@@ -62,6 +62,8 @@ const checkoutUseCasesSchema = [
   "CHECK_EXPIRED_SESSIONS",
 ] as const;
 
+const oauthUseCasesSchema = ["OAUTH_GOOGLE_CALLBACK"];
+
 const loggerUseCasesSchema = z.enum([
   ...configUseCasesSchema,
   ...cartUseCasesSchema,
@@ -71,6 +73,7 @@ const loggerUseCasesSchema = z.enum([
   ...r2BucketUseCasesSchema,
   ...responseUseCasesSchema,
   ...checkoutUseCasesSchema,
+  ...oauthUseCasesSchema,
 ]);
 
 export const LoggerUseCaseEnum = loggerUseCasesSchema.enum;

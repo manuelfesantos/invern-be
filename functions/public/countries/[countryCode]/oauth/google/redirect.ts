@@ -14,10 +14,10 @@ const GET: PagesFunction<Env> = async ({ env }) => {
   const { country } = contextStore.context;
   const { GOOGLE_CLIENT_ID } = env;
   const oauthToken = await encrypt(Date.now().toString());
-  const state = { country: country.code, oauthToken };
+  const state = { country: country.code.toLowerCase(), oauthToken };
   const params = (await import("query-string")).default.stringify({
     client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: `${frontendHost()}/api/user/oauth/google/callback`,
+    redirect_uri: `${frontendHost()}/api/oauth/google`,
     response_type: "code",
     scope: "openid email profile",
     include_granted_scopes: "true",
@@ -30,7 +30,14 @@ const GET: PagesFunction<Env> = async ({ env }) => {
 
   setCookieInResponse(
     response,
-    getCookieHeader(CookieNameEnum.OAUTH_TOKEN, oauthToken),
+    getCookieHeader(
+      CookieNameEnum.OAUTH_TOKEN,
+      oauthToken,
+      undefined,
+      undefined,
+      undefined,
+      false,
+    ),
   );
 
   return response;
