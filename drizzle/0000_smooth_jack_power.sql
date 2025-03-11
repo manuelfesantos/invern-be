@@ -162,4 +162,5 @@ CREATE TABLE `users` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
 CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_cartId_unique` ON `users` (`cartId`);
+CREATE UNIQUE INDEX `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_googleUserId_unique` ON `users` (`googleUserId`);

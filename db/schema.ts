@@ -41,7 +41,7 @@ export const usersTable = sqliteTable("users", {
   })
     .notNull()
     .default(false),
-  googleUserId: text("googleUserId"),
+  googleUserId: text("googleUserId").unique(),
 });
 
 export const collectionsTable = sqliteTable("collections", {

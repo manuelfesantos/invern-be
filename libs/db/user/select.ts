@@ -11,7 +11,7 @@ import { Address } from "@address-entity";
 const NO_USER_VERSION = 0;
 
 const selectUser = async (
-  where: "id" | "email" | "cartId",
+  where: "id" | "email" | "cartId" | "googleUserId",
   selection: string,
 ): Promise<User | undefined> => {
   const userTemplate = await db().query.usersTable.findFirst({
@@ -71,6 +71,12 @@ export const selectUserById = async (userId: string): Promise<User> => {
     throw errors.USER_NOT_FOUND();
   }
   return user;
+};
+
+export const selectUserByGoogleUserId = async (
+  googleUserId: string,
+): Promise<User | undefined> => {
+  return await selectUser("googleUserId", googleUserId);
 };
 
 export const selectUserVersionById = async (
