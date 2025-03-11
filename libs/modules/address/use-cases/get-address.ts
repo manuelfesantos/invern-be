@@ -1,6 +1,6 @@
 import { contextStore } from "@context-utils";
 import { Address } from "@address-entity";
-import { getUserById } from "@user-db";
+import { selectUserById } from "@user-db";
 import { decryptObjectString } from "@crypto-utils";
 
 export const getAddress = async (): Promise<Address | undefined> => {
@@ -17,6 +17,6 @@ export const getAddress = async (): Promise<Address | undefined> => {
 const getAddressFromUser = async (
   userId: string,
 ): Promise<Address | undefined> => {
-  const { address } = await getUserById(userId);
+  const { address } = await selectUserById(userId);
   return address ?? undefined;
 };

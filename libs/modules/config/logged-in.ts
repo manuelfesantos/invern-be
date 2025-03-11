@@ -2,7 +2,7 @@ import { UserJWT } from "@jwt-entity";
 import { loggedInResponse } from "./utils/responses/logged-in-response";
 import { loggedOutResponse } from "./utils/responses/logged-out-response";
 import { getAuthSecret } from "@kv-adapter";
-import { getUserById } from "@user-db";
+import { selectUserById } from "@user-db";
 
 export const getLoggedInConfig = async (
   headers: Headers,
@@ -14,7 +14,7 @@ export const getLoggedInConfig = async (
 
   let cartId: string | undefined = undefined;
 
-  const user = await getUserById(userId);
+  const user = await selectUserById(userId);
   cartId = user?.cart?.id;
 
   const authSecret = await getAuthSecret(userId);

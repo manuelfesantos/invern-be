@@ -25,6 +25,9 @@ export interface Env {
   ENCRYPTION_KEY: string;
   DEFAULT_IV: string;
   SALT: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_REDIRECT_URI: string;
 }
 
 export type Credentials = {

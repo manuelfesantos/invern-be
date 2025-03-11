@@ -1,5 +1,5 @@
 import { signupBodySchema } from "./types/map-user-action";
-import { insertUser, getUserByEmail, getUserById } from "@user-db";
+import { insertUser, selectUserByEmail, selectUserById } from "@user-db";
 import { insertCart, updateCart } from "@cart-db";
 import { errors } from "@error-handling-utils";
 import { UserDTO, userToUserDTO } from "@user-entity";
@@ -40,7 +40,7 @@ export const signup = async (body: unknown): Promise<ReturnType> => {
     ...parsedBody,
     cartId: contextStore.context.cartId,
   });
-  const user = await getUserById(userId);
+  const user = await selectUserById(userId);
 
   const refreshToken = await getLoggedInRefreshToken(userId);
   await setAuthSecret(userId, refreshToken);
@@ -64,7 +64,7 @@ export const signup = async (body: unknown): Promise<ReturnType> => {
 };
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {
-  const userExists = Boolean(await getUserByEmail(email));
+  const userExists = Boolean(await selectUserByEmail(email));
   if (userExists) {
     throw errors.EMAIL_ALREADY_TAKEN();
   }

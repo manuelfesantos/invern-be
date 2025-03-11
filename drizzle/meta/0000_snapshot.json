@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1333714b-bd87-4970-a2f9-4ccb4461cb2b",
+  "id": "7bee4713-101d-40b6-b136-7d1998fa0c1b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -994,14 +994,14 @@
           "name": "lastName",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "password": {
           "name": "password",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "version": {
@@ -1029,6 +1029,21 @@
         },
         "address": {
           "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isOauth": {
+          "name": "isOauth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "googleUserId": {
+          "name": "googleUserId",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

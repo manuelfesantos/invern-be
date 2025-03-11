@@ -24,8 +24,8 @@ export const usersTable = sqliteTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull(),
   firstName: text("firstName").notNull(),
-  lastName: text("lastName").notNull(),
-  password: text("password").notNull(),
+  lastName: text("lastName"),
+  password: text("password"),
   version: int("version").notNull().default(DEFAULT_VERSION),
   role: text("role", { enum: ["ADMIN", "USER"] })
     .notNull()
@@ -36,6 +36,12 @@ export const usersTable = sqliteTable("users", {
       onDelete: "set null",
     }),
   address: text("address"),
+  isOauth: int("isOauth", {
+    mode: "boolean",
+  })
+    .notNull()
+    .default(false),
+  googleUserId: text("googleUserId"),
 });
 
 export const collectionsTable = sqliteTable("collections", {

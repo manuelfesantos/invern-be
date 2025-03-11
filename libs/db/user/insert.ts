@@ -15,7 +15,12 @@ export const insertUser = async (
     id: getRandomUUID(),
   };
 
-  insertUser.password = await hashPassword(insertUser.password, insertUser.id);
+  if (insertUser.password) {
+    insertUser.password = await hashPassword(
+      insertUser.password,
+      insertUser.id,
+    );
+  }
 
   return db().insert(usersTable).values(insertUser).returning({
     userId: usersTable.id,

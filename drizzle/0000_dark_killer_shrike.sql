@@ -149,12 +149,14 @@ CREATE TABLE `users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,
 	`firstName` text NOT NULL,
-	`lastName` text NOT NULL,
-	`password` text NOT NULL,
+	`lastName` text,
+	`password` text,
 	`version` integer DEFAULT 1 NOT NULL,
 	`role` text DEFAULT 'USER' NOT NULL,
 	`cartId` text,
 	`address` text,
+	`isOauth` integer DEFAULT false NOT NULL,
+	`googleUserId` text,
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint

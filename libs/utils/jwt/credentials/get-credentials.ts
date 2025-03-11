@@ -18,7 +18,7 @@ import {
 import { getCartIdFromHeaders } from "@http-utils";
 /* eslint-disable import/no-restricted-paths */
 import { getAuthSecret } from "@kv-adapter";
-import { getUserById, updateUser } from "@user-db";
+import { selectUserById, updateUser } from "@user-db";
 import { insertCartReturningAll } from "@cart-db";
 /* eslint-enable import/no-restricted-paths */
 import { Credentials } from "@request-entity";
@@ -114,7 +114,7 @@ const handleLoggedInRefreshToken = async (
     throw errors.UNAUTHORIZED();
   }
 
-  let { cart } = await getUserById(userId);
+  let { cart } = await selectUserById(userId);
   const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
 

@@ -3,7 +3,7 @@ import { updateEmail } from "./update-email";
 import { updatePassword } from "./update-password";
 import { updateName } from "./update-name";
 import { errors } from "@error-handling-utils";
-import { getUserById, incrementUserVersion } from "@user-db";
+import { selectUserById, incrementUserVersion } from "@user-db";
 import { contextStore } from "@context-utils";
 import { UserDTO, userDTOSchema } from "@user-entity";
 import { updateAddress } from "./update-address";
@@ -30,6 +30,6 @@ export const updateUser = async (body: unknown): Promise<UserDTO> => {
   }
   await incrementUserVersion(userId);
 
-  const updatedUser = await getUserById(userId);
+  const updatedUser = await selectUserById(userId);
   return userDTOSchema.parse(updatedUser);
 };
