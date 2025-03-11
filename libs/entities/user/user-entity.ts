@@ -3,6 +3,7 @@ import { usersTable } from "@schema";
 import { z } from "zod";
 import { cartSchema } from "@cart-entity";
 import {
+  booleanSchema,
   emailSchema,
   requiredObjectSchema,
   requiredStringSchema,
@@ -20,6 +21,8 @@ export const baseUserSchema = createInsertSchema(usersTable, {
   email: emailSchema("user mail"),
   firstName: requiredStringSchema("user first name"),
   lastName: requiredStringSchema("user last name"),
+  googleUserId: requiredStringSchema("google user id").optional(),
+  isOauth: booleanSchema("user is oauth").default(false),
 });
 
 export const insertUserSchema = baseUserSchema.omit({

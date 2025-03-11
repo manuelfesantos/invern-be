@@ -10,7 +10,7 @@ import { Address } from "@address-entity";
 
 const NO_USER_VERSION = 0;
 
-const getUser = async (
+const selectUser = async (
   where: "id" | "email" | "cartId",
   selection: string,
 ): Promise<User | undefined> => {
@@ -59,21 +59,23 @@ const getUser = async (
   };
 };
 
-export const getUserByEmail = async (
+export const selectUserByEmail = async (
   email: string,
 ): Promise<User | undefined> => {
-  return await getUser("email", email);
+  return await selectUser("email", email);
 };
 
-export const getUserById = async (userId: string): Promise<User> => {
-  const user = await getUser("id", userId);
+export const selectUserById = async (userId: string): Promise<User> => {
+  const user = await selectUser("id", userId);
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
   return user;
 };
 
-export const getUserVersionById = async (userId: string): Promise<number> => {
+export const selectUserVersionById = async (
+  userId: string,
+): Promise<number> => {
   const user = await db().query.usersTable.findFirst({
     where: eq(usersTable.id, userId),
     columns: {

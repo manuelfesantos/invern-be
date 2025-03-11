@@ -17,7 +17,7 @@ import { Address } from "@address-entity";
 import { selectShippingMethod } from "@shipping-db";
 import { Cart, FilledCart, getCartWeight, toCartDTO } from "@cart-entity";
 import { UserDetails, userDetailsSchema } from "@user-entity";
-import { getUserById } from "@user-db";
+import { selectUserById } from "@user-db";
 import { SelectedShippingMethod } from "@shipping-entity";
 import {
   CheckoutSession,
@@ -191,7 +191,7 @@ const getPersonalDetails = async (
     if (!userId) {
       throw errors.USER_DETAILS_NOT_PROVIDED();
     }
-    const user = await getUserById(userId);
+    const user = await selectUserById(userId);
     if (!user) {
       throw errors.USER_NOT_FOUND();
     }

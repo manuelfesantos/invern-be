@@ -9,8 +9,8 @@ export const errors = {
       "Invalid username or password",
       HttpStatusEnum.UNAUTHORIZED,
     ),
-  USER_NOT_FOUND: (): CustomError =>
-    new CustomError("User not found", HttpStatusEnum.NOT_FOUND),
+  USER_NOT_FOUND: (errorMessage?: string): CustomError =>
+    new CustomError(errorMessage ?? "User not found", HttpStatusEnum.NOT_FOUND),
   USER_DETAILS_NOT_PROVIDED: (): CustomError =>
     new CustomError("User details not provided", HttpStatusEnum.BAD_REQUEST),
   PRODUCT_NOT_IN_CART: (): CustomError =>

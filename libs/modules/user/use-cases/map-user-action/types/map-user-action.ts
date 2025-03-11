@@ -18,7 +18,12 @@ export const loginBodySchema = z.object({
 
 export const signupBodySchema = insertUserSchema
   .omit({ cartId: true })
-  .merge(z.object({ remember: z.boolean().default(false) }));
+  .merge(
+    z.object({
+      remember: z.boolean().default(false),
+      password: requiredStringSchema("user password"),
+    }),
+  );
 
 export interface UserActionReturnType {
   shouldRemoveCartId?: boolean;

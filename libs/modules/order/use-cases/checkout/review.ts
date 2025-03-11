@@ -11,7 +11,7 @@ import { selectShippingMethod } from "@shipping-db";
 import { errors } from "@error-handling-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
 import { extendCart } from "@extender-utils";
-import { getUserById } from "@user-db";
+import { selectUserById } from "@user-db";
 
 interface IsEditable {
   isEditable: boolean;
@@ -45,7 +45,7 @@ export const getCheckoutReview =
       if (!userId) {
         throw errors.NOT_ALLOWED("Missing personal details");
       }
-      const user = await getUserById(userId);
+      const user = await selectUserById(userId);
       personalDetails = userDetailsSchema.parse(user);
     }
 

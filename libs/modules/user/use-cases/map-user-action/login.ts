@@ -1,4 +1,4 @@
-import { getUserByEmail, updateUser } from "@user-db";
+import { selectUserByEmail, updateUser } from "@user-db";
 import { User, UserDTO, userToUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
@@ -69,7 +69,7 @@ export const login = async (body: unknown): Promise<ReturnType> => {
 };
 
 const getUser = async (email: string): Promise<User> => {
-  const user = await getUserByEmail(email);
+  const user = await selectUserByEmail(email);
   if (!user) {
     throw errors.INVALID_CREDENTIALS();
   }

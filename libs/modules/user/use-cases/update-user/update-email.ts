@@ -1,4 +1,4 @@
-import { getUserByEmail, updateUser } from "@user-db";
+import { selectUserByEmail, updateUser } from "@user-db";
 import { errors } from "@error-handling-utils";
 
 export const updateEmail = async (id: string, email: string): Promise<void> => {
@@ -7,7 +7,7 @@ export const updateEmail = async (id: string, email: string): Promise<void> => {
 };
 
 const checkIfEmailIsTaken = async (email: string): Promise<void> => {
-  const user = await getUserByEmail(email);
+  const user = await selectUserByEmail(email);
   if (user) {
     throw errors.EMAIL_ALREADY_TAKEN();
   }
