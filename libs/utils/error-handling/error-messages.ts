@@ -52,6 +52,11 @@ export const errors = {
       "The following product ids are invalid: " + ids,
       HttpStatusEnum.BAD_REQUEST,
     ),
+  MISSING_CHECKOUT_SESSION_PRODUCTS: (): CustomError =>
+    new CustomError(
+      "Missing products in checkout session",
+      HttpStatusEnum.INTERNAL_SERVER_ERROR,
+    ),
   PRODUCTS_ARE_REQUIRED: (): CustomError =>
     new CustomError("Products are required", HttpStatusEnum.BAD_REQUEST),
   CART_IS_EMPTY: (): CustomError =>

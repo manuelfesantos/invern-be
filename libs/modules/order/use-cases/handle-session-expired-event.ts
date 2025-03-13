@@ -27,9 +27,8 @@ export const handleSessionExpiredEvent = async (
   logCredentials(cartId, userId);
 
   const updatedProducts = await increaseProductsStock(products);
-  for (const product of updatedProducts) {
-    await stockClient.update(product);
-  }
+  await stockClient.updateMany(updatedProducts);
+
   return successResponse.OK(
     "success getting checkout-session expired. ",
     products,
