@@ -1,20 +1,25 @@
 import { expireCheckoutSession } from "@stripe-adapter";
-import { selectCheckoutSessionById } from "@checkout-session-db";
+import {
+  deleteCheckoutSessionById,
+  selectCheckoutSessionById,
+} from "@checkout-session-db";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { errors } from "@error-handling-utils";
 import { getCurrentTime } from "@timer-utils";
+import { increaseProductsStock } from "@product-db";
+import { stockClient } from "@r2-adapter";
 
 export const invalidateCheckoutSession = async (
   checkoutSessionId: string,
-): Promise<void> => {
+): Promise<boolean> => {
   const checkoutSession = await selectCheckoutSessionById(checkoutSessionId);
 
   if (!checkoutSession) {
     logger().info(`checkout session with id ${checkoutSessionId} not found`, {
       useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
     });
-    return;
+    return false;
   }
   if (new Date(checkoutSession.expiresAt).getTime() < getCurrentTime()) {
     logger().info(
@@ -26,21 +31,38 @@ export const invalidateCheckoutSession = async (
         },
       },
     );
-    return;
+    return false;
   }
 
-  const productsString = checkoutSession.products;
+  const { products } = checkoutSession;
 
-  if (!productsString) {
-    throw errors.PRODUCTS_ARE_REQUIRED();
+  if (!products || !products.length) {
+    throw errors.MISSING_CHECKOUT_SESSION_PRODUCTS();
   }
 
-  await expireCheckoutSession(checkoutSessionId);
+  try {
+    await expireCheckoutSession(checkoutSessionId);
 
-  logger().info("successfully expired checkout session", {
-    useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
-    data: {
-      checkoutSessionId,
-    },
-  });
+    logger().info("successfully expired checkout session", {
+      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      data: {
+        checkoutSessionId,
+      },
+    });
+
+    await deleteCheckoutSessionById(checkoutSessionId);
+
+    const updatedProducts = await increaseProductsStock(products);
+    await stockClient.updateMany(updatedProducts);
+  } catch (error) {
+    logger().error("error expiring checkout session", {
+      useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
+      data: {
+        checkoutSessionId,
+        error,
+      },
+    });
+  }
+
+  return true;
 };

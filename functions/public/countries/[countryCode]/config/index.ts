@@ -27,6 +27,16 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
     [CookieNameEnum.USER_DETAILS]: encryptedUserDetails,
   } = cookies;
 
+  const afterCheckoutHeader = request.headers.get("after-checkout");
+
+  const afterCheckoutProcessing = afterCheckoutHeader === "true";
+
+  if (checkoutSessionCookie && !afterCheckoutProcessing) {
+    initStripeClient(env.STRIPE_API_KEY);
+
+    await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
+  }
+
   const response = await getConfig(
     request.headers,
     refreshToken,
@@ -36,10 +46,6 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   if (!checkoutSessionCookie) {
     return response;
   }
-
-  const afterCheckoutHeader = request.headers.get("after-checkout");
-
-  const afterCheckoutProcessing = afterCheckoutHeader === "true";
 
   if (afterCheckoutProcessing) {
     logger().info("ignoring checkout session cookie", {
@@ -65,10 +71,6 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   logger().info("deleting checkout session cookie", {
     useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,
   });
-
-  initStripeClient(env.STRIPE_API_KEY);
-
-  await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
 
   deleteCookieFromResponse(response, CookieNameEnum.CHECKOUT_SESSION);
 
