@@ -2,6 +2,7 @@ import { getProductById } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { insertCart, removeCartItemInDb } from "@cart-db";
 import { contextStore } from "@context-utils";
+import { logCredentials } from "@logger-utils";
 
 export const removeCartItem = async (productId: string): Promise<string> => {
   const product = await getProductById(productId);
@@ -15,6 +16,7 @@ export const removeCartItem = async (productId: string): Promise<string> => {
   if (!cartId) {
     [{ cartId }] = await insertCart({ isLoggedIn: false });
     contextStore.context.cartId = cartId;
+    logCredentials(cartId);
   }
 
   await removeCartItemInDb(cartId, productId);
