@@ -79,6 +79,7 @@ export const getOrderFromSessionResult = async (
         isLoggedIn: true,
       });
       await updateUser(userId, { cartId: newCartId });
+      logCredentials(newCartId);
     }
   }
 

@@ -6,6 +6,7 @@ import {
   updateCartLastModifiedDate,
 } from "@cart-db";
 import { contextStore } from "@context-utils";
+import { logCredentials } from "@logger-utils";
 
 export const updateCartItemQuantity = async (
   productId: string,
@@ -21,6 +22,7 @@ export const updateCartItemQuantity = async (
   if (!cartId) {
     [{ cartId }] = await insertCart({ isLoggedIn: false });
     contextStore.context.cartId = cartId;
+    logCredentials(cartId);
   }
 
   await updateCartItemQuantityInDb(cartId, product, quantity);
