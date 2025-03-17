@@ -11,7 +11,8 @@ export const getBodyFromRequest = async (
   try {
     const body =
       request.method === HttpMethodEnum.POST ||
-      request.method === HttpMethodEnum.PUT
+      request.method === HttpMethodEnum.PUT ||
+      request.method === HttpMethodEnum.PATCH
         ? await request.json()
         : undefined;
 
