@@ -7,7 +7,12 @@ import {
 } from "@http-utils";
 import { z } from "zod";
 import { integerSchema } from "@global-entity";
-import { updateCartItemQuantity, removeCartItem, getCart } from "@cart-module";
+import {
+  patchCartItemQuantity,
+  updateCartItemQuantity,
+  removeCartItem,
+  getCart,
+} from "@cart-module";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { contextStore } from "@context-utils";
@@ -22,6 +27,24 @@ const PUT: PagesFunction = async ({ request, params }) => {
   const body = await getBodyFromRequest(request);
   const { quantity } = cartItemUpdateBodySchema.parse(body);
   const cartId = await updateCartItemQuantity(productId as string, quantity);
+  const cart = await getCart();
+  const response = protectedSuccessResponse.OK(
+    "Successfully updated product quantity in cart",
+    cart,
+  );
+
+  if (contextStore.context.isLoggedOut) {
+    setCookieInResponse(response, getCartIdCookieHeader(cartId));
+  }
+  return response;
+};
+
+const PATCH: PagesFunction = async ({ request, params }) => {
+  const { id: productId } = params;
+
+  const body = await getBodyFromRequest(request);
+  const { quantity } = cartItemUpdateBodySchema.parse(body);
+  const cartId = await patchCartItemQuantity(productId as string, quantity);
   const cart = await getCart();
   const response = protectedSuccessResponse.OK(
     "Successfully updated product quantity in cart",
@@ -54,7 +77,7 @@ const DELETE: PagesFunction = async ({ params }) => {
 };
 
 export const onRequest = requestHandler(
-  { PUT, DELETE },
+  { PUT, DELETE, PATCH },
   {
     postProcess: (response) => {
       deleteShippingMethodCookieFromResponse(response);

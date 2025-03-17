@@ -6,11 +6,13 @@ import { Product } from "@product-entity";
 
 const NO_QUANTITY = 0;
 
-export const updateCartItemQuantityInDb = async (
+export const patchCartItemQuantityInDb = async (
   cartId: string,
   product: Product,
   quantity: number,
 ): Promise<void> => {
+  if (quantity === NO_QUANTITY) return;
+
   const cartQuantity = await getProductQuantityInCart(product.id, cartId);
 
   const finalQuantity = cartQuantity + quantity;
@@ -37,6 +39,33 @@ export const updateCartItemQuantityInDb = async (
   } else if (shouldUpdateProduct) {
     await updateProductQuantityInCart(product.id, cartId, finalQuantity);
   }
+};
+
+export const updateCartItemQuantityInDb = async (
+  cartId: string,
+  product: Product,
+  quantity: number,
+): Promise<void> => {
+  if (quantity > product.stock) {
+    throw errors.PRODUCT_OUT_OF_STOCK(product.stock);
+  }
+
+  const cartQuantity = await getProductQuantityInCart(product.id, cartId);
+
+  if (quantity === cartQuantity) {
+    return;
+  }
+
+  if (cartQuantity === NO_QUANTITY) {
+    await insertProductInCart(product.id, cartId, quantity);
+  }
+
+  if (quantity === NO_QUANTITY) {
+    await deleteProductFromCart(product.id, cartId);
+    return;
+  }
+
+  await updateProductQuantityInCart(product.id, cartId, quantity);
 };
 
 const getProductQuantityInCart = async (

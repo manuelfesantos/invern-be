@@ -1,19 +1,18 @@
 import { getProductById } from "@product-db";
 import { errors } from "@error-handling-utils";
-import { contextStore } from "@context-utils";
 import {
   insertCart,
-  updateCartItemQuantityInDb,
+  patchCartItemQuantityInDb,
   updateCartLastModifiedDate,
 } from "@cart-db";
+import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
 
-export const updateCartItemQuantity = async (
+export const patchCartItemQuantity = async (
   productId: string,
   quantity: number,
 ): Promise<string> => {
   const product = await getProductById(productId);
-
   if (!product) {
     throw errors.PRODUCT_NOT_FOUND();
   }
@@ -26,7 +25,7 @@ export const updateCartItemQuantity = async (
     logCredentials(cartId);
   }
 
-  await updateCartItemQuantityInDb(cartId, product, quantity);
+  await patchCartItemQuantityInDb(cartId, product, quantity);
 
   await updateCartLastModifiedDate(cartId);
 
