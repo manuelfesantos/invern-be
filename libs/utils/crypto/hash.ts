@@ -1,22 +1,23 @@
 import { encode } from "@encoding-utils";
+import { ENV } from "@env-utils";
 
 const SIXTEEN = 16;
 const TWO = 2;
 
 let salt: string | null = null;
 
-export const setSalt = (newSalt: string): void => {
-  salt = newSalt;
+const getSalt = (): string => {
+  if (!salt) {
+    salt = ENV.SALT;
+  }
+  return salt;
 };
 
 export const hashPassword = async (
   password: string,
   id: string,
 ): Promise<string> => {
-  if (!salt) {
-    throw new Error("Salt is not set");
-  }
-  return hashString(`${password}${salt}${id}`);
+  return hashString(`${password}${getSalt()}${id}`);
 };
 
 export const hashString = async (input: string): Promise<string> => {

@@ -5,18 +5,13 @@ import { buildLogObject } from "./build-log-object";
 import { localLogger } from "./local-logger";
 import { redactPropertiesFromData } from "./redact-properties-from-data";
 import { stringifyObject } from "@string-utils";
+import { ENV } from "@env-utils";
 
 const DEBUG_LEVEL = 20;
 const INFO_LEVEL = 30;
 const WARNING_LEVEL = 40;
 const ERROR_LEVEL = 50;
 const NO_SPACE = 0;
-
-let loggerLevel: number = DEBUG_LEVEL;
-
-export const setLoggerLevel = (level: number): void => {
-  loggerLevel = level;
-};
 
 type LoggerAction = (
   message: string,
@@ -40,6 +35,8 @@ interface LoggerInstance extends LoggerStore {
 }
 
 const buildLoggerInstance = (logger: Logger): LoggerInstance => {
+  const { LOGGER_LEVEL } = ENV;
+  const loggerLevel = LOGGER_LEVEL ? Number(LOGGER_LEVEL) : DEBUG_LEVEL;
   const addRedactedData = (...data: unknown[]): void => {
     const redactedData = data.map((data) => redactPropertiesFromData(data));
     logger.addData(...redactedData);

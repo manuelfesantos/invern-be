@@ -1,53 +1,33 @@
-import { frontendHost } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { HttpMethodEnum, HttpStatusEnum } from "@http-entity";
-
-let cacheApiKey: string | null = null;
-let zoneId: string | null = null;
-let cacheApiEmail: string | null = null;
-
-export const initCacheApiKey = (apiKey: string): void => {
-  if (!cacheApiKey) {
-    cacheApiKey = apiKey;
-  }
-};
-
-export const initCacheApiEmail = (email: string): void => {
-  if (!cacheApiEmail) {
-    cacheApiEmail = email;
-  }
-};
-
-export const initZoneId = (id: string): void => {
-  if (!zoneId) {
-    zoneId = id;
-  }
-};
+import { ENV } from "@env-utils";
 
 export const purgeCache = async (
   cacheKey: string | string[],
 ): Promise<void> => {
-  if (!cacheApiKey) {
+  const { ZONE_ID, CACHE_API_KEY, CACHE_API_EMAIL } = ENV;
+
+  if (!CACHE_API_KEY) {
     throw new Error("Cache API key not set");
   }
 
-  if (!zoneId) {
+  if (!ZONE_ID) {
     throw new Error("Zone ID not set");
   }
 
-  if (!cacheApiEmail) {
+  if (!CACHE_API_EMAIL) {
     throw new Error("Cache API email not set");
   }
 
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
+    `https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache`,
     {
       method: HttpMethodEnum.POST,
       headers: {
         "Content-Type": "application/json",
-        "X-Auth-Key": cacheApiKey,
-        "X-Auth-Email": cacheApiEmail,
+        "X-Auth-Key": CACHE_API_KEY,
+        "X-Auth-Email": CACHE_API_EMAIL,
       },
       body: JSON.stringify({
         files: getFiles(cacheKey),
@@ -82,9 +62,9 @@ export const getFiles = (
   if (Array.isArray(cacheKey)) {
     return cacheKey.map((key) => ({
       url: key,
-      headers: { origin: frontendHost() },
+      headers: { origin: ENV.FRONTEND_HOST },
     }));
   }
 
-  return [{ url: cacheKey, headers: { origin: frontendHost() } }];
+  return [{ url: cacheKey, headers: { origin: ENV.FRONTEND_HOST } }];
 };

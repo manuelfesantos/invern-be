@@ -1,29 +1,37 @@
 import { decode, encode } from "@encoding-utils";
+import { ENV } from "@env-utils";
 
 const NUMBER_ZERO = 0;
 
 let encryptionKey: CryptoKey | null = null;
-let defaultIV: string = "L6zT8dEo4R1gVb";
+let defaultIV: string | null = null;
 
-export const initEncryptionKey = async (key: string): Promise<void> => {
-  encryptionKey = await importKey(key);
+const getDefaultIV = (): string => {
+  if (!defaultIV) {
+    const { DEFAULT_IV } = ENV;
+    if (DEFAULT_IV) {
+      defaultIV = DEFAULT_IV;
+    } else {
+      defaultIV = "L6zT8dEo4R1gVb";
+    }
+  }
+  return defaultIV;
 };
 
-export const setDefaultIv = (iv?: string): void => {
-  if (iv) {
-    defaultIV = iv;
+const getEncryptionKey = async (): Promise<CryptoKey> => {
+  if (encryptionKey) {
+    return encryptionKey;
   }
+  encryptionKey = await importKey(ENV.ENCRYPTION_KEY);
+  return encryptionKey;
 };
 
 export const encrypt = async (data: string, iv?: string): Promise<string> => {
-  if (!encryptionKey) {
-    throw Error("EncryptionKey is not initiated!");
-  }
   const dataBuffer = encode(data);
 
   const encryptedData = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: encode(iv ?? defaultIV) },
-    encryptionKey,
+    { name: "AES-GCM", iv: encode(iv ?? getDefaultIV()) },
+    await getEncryptionKey(),
     dataBuffer,
   );
 
@@ -34,14 +42,11 @@ export const decrypt = async (
   encryptedDataBase64: string,
   iv?: string,
 ): Promise<string> => {
-  if (!encryptionKey) {
-    throw Error("EncryptionKey is not initiated!");
-  }
   const encryptedData = base64ToArrayBuffer(encryptedDataBase64);
 
   const decryptedData = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: encode(iv ?? defaultIV) },
-    encryptionKey,
+    { name: "AES-GCM", iv: encode(iv ?? getDefaultIV()) },
+    await getEncryptionKey(),
     encryptedData,
   );
 

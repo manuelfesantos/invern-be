@@ -4,48 +4,42 @@ import {
   TOKEN_COOKIE_MAX_AGE,
   TOKEN_EXPIRY,
 } from "@timer-utils";
-import { getRefreshTokenSecret, getTokenSecret } from "./token-secret";
 import { decrypt, encrypt } from "@crypto-utils";
 import { CookieNameEnum } from "@http-entity";
-import { getDomain } from "@http-utils";
+import jwt from "@tsndr/cloudflare-worker-jwt";
+import { ENV } from "@env-utils";
 
 export const signJwt = async (
   payload: object,
   secretKey: string,
 ): Promise<string> =>
   encrypt(
-    await import("@tsndr/cloudflare-worker-jwt").then((jwt) =>
-      jwt.sign({ ...payload }, secretKey, {
-        algorithm: "HS512",
-      }),
-    ),
+    await jwt.sign({ ...payload }, secretKey, {
+      algorithm: "HS512",
+    }),
   );
 
 export const verifyJwt = async (
   encodedToken: string,
   secretKey: string,
 ): Promise<boolean> =>
-  await import("@tsndr/cloudflare-worker-jwt").then(async (jwt) =>
-    jwt.verify(await decrypt(encodedToken), secretKey, {
-      algorithm: "HS512",
-    }),
-  );
+  await jwt.verify(await decrypt(encodedToken), secretKey, {
+    algorithm: "HS512",
+  });
 
 export const verifyAccessToken = async (
   encodedToken: string,
-): Promise<boolean> => await verifyJwt(encodedToken, getTokenSecret());
+): Promise<boolean> => await verifyJwt(encodedToken, ENV.TOKEN_SECRET);
 
 export const verifyRefreshToken = async (
   encodedToken: string,
-): Promise<boolean> => await verifyJwt(encodedToken, getRefreshTokenSecret());
+): Promise<boolean> => await verifyJwt(encodedToken, ENV.REFRESH_TOKEN_SECRET);
 
 export const decodeJwt = async (
   encodedToken: string,
 ): Promise<UserJWT | JWT> => {
   const token = await decrypt(encodedToken);
-  const tokenPayload = (await import("@tsndr/cloudflare-worker-jwt")).decode(
-    token,
-  ).payload;
+  const tokenPayload = jwt.decode(token).payload;
   const userJwtAttempt = userJwtSchema.safeParse(tokenPayload);
   if (userJwtAttempt.success) {
     return userJwtAttempt.data;
@@ -54,7 +48,7 @@ export const decodeJwt = async (
 };
 
 export const getTokenCookie = (token: string, remember?: boolean): string =>
-  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${getDomain()}; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${ENV.DOMAIN}; SameSite=Strict; ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
 
 export const getLoggedInToken = async (
   userId: string,
@@ -62,9 +56,9 @@ export const getLoggedInToken = async (
 ): Promise<string> =>
   await signJwt(
     { userId, cartId, exp: getFutureDate(TOKEN_EXPIRY) },
-    getTokenSecret(),
+    ENV.TOKEN_SECRET,
   );
 
 export const getLoggedInRefreshToken = async (
   userId: string,
-): Promise<string> => await signJwt({ userId }, getRefreshTokenSecret());
+): Promise<string> => await signJwt({ userId }, ENV.REFRESH_TOKEN_SECRET);

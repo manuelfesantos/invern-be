@@ -6,14 +6,10 @@ import { logger } from "@logger-utils";
 import { isStripeEvent, isStripePaymentIntent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { requestHandler } from "@decorator-utils";
-import { Env } from "@request-entity";
 // eslint-disable-next-line import/no-restricted-paths
-import { initStripeClient } from "@stripe-adapter";
 
-const POST: PagesFunction<Env> = async (context) => {
-  const { request, env } = context;
-
-  initStripeClient(env.STRIPE_API_KEY);
+const POST: PagesFunction = async (context) => {
+  const { request } = context;
 
   const body = await getBodyFromRequest(request);
 
