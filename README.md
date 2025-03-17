@@ -1,26 +1,288 @@
 # Invern Spirit Backend
 
-## Get Started
+## Overview
+Invern Spirit Backend is the server-side component of the Invern Spirit ecommerce application, designed to handle the core business logic, data management, and API endpoints. This backend service ensures seamless communication between the frontend interface and the underlying database, providing a robust foundation for the application's functionality.
 
-To startup on this repo after cloning it, run the following command:
+## Features
+- **API Endpoints**: Provides a set of RESTful API endpoints for client applications to interact with the system.
+- **Database Integration**: Utilizes a relational database to store and manage application data efficiently.
+- **Authentication**: Implements user authentication mechanisms to secure access to the application's resources.
+- **Validation**: Includes data validation to ensure the integrity and reliability of the information processed.
+- **Payment Gateway Integration**: Integrates with payment gateways to facilitate secure transactions within the application.
+- **Order Management**: Manages the lifecycle of orders, from creation to fulfillment, to provide a seamless shopping experience.
+- **Product Catalog**: Maintains a catalog of products with detailed information to enable product discovery and selection.
+- **Inventory Management**: Tracks product inventory levels to prevent stock outs and manage supply chain operations.
+- **User Management**: Manages user accounts, profiles and access rights to personalize the user experience.
+- **Monitoring and Observability**: Generates logs to provide insights into application health, sales performance and customer behavior.
 
-```npm run init```
+## Technologies Used
+- **Cloudflare Workers**: Serverless platform for deploying and running server-side code in a distributed network.
+- **Node.js**: JavaScript runtime environment that executes the server-side code.
+- **TypeScript**: Superset of JavaScript that adds static typing, enhancing code quality and maintainability.
+- **Drizzle ORM**: Lightweight TypeScript ORM for interacting with the relational database.
+- **Zod**: TypeScript-first schema validation library with static type inference, providing robust data validation and type checking throughout the application.
+- **Jest**: Testing framework used to write and run unit tests, ensuring code reliability.
+- **Husky**: Git hooks manager that enforces code quality checks before commits and pushes.
 
-This installs all dependencies, starts up husky and builds the local database.
+## Getting Started
+Follow these instructions to set up and run the project on your local machine.
 
-### Setting up the environment variables
-An example of the environment variables needed for the project can be found in the `.env.example` file. You can create a `.dev.vars` file in the root of the project and copy the contents of the `.env.example` file into it. You can then replace the values with the appropriate values, following the instructions in the `.env.example` file.
+### Prerequisites
+- **Node.js**: Ensure you have Node.js installed. You can download it from the official website.
+- **npm**: Node.js package manager, which comes bundled with Node.js.
 
-## Running the app
+### Installation
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/manuelfesantos/invern-be.git
+   ```
 
-To run the app locally, you can run the following command:
+2. **Navigate to the Project Directory**:
+   ```bash
+   cd invern-be
+   ```
 
-```npm run local```
+3. **Initialize the Project**:
+   ```bash
+   npm run init
+   ```
+   This command installs all dependencies, sets up Husky for Git hooks, and initializes the local database.
 
-After starting the local server, you should setup all the needed data for the project:
+### Environment Variables
+The application requires specific environment variables to function correctly.
 
-- Make a GET request to the endpoint `private/insert-test-data` so that the test data is inserted in the database.
-- Make a POST request to the endpoint `private/stock/setup` so that the stock bucket is setup locally. Make sure to add the secretKey in the request body with the `SETUP_STOCK_SECRET` value from your `.dev.vars` file.
+1. **Create a .dev.vars File**:
+   ```bash
+   cp .env.example .dev.vars
+   ```
+
+2. **Configure the Variables**:
+   Open the `.dev.vars` file and replace the placeholder values with your actual configuration settings.
+
+## Running the Application
+**Start the Development Server**:
+```bash
+npm run local
+```
+This command starts the server in development mode, enabling features like hot-reloading for efficient development.
+
+### First-Time Setup
+When running the application for the first time, you need to complete two additional steps:
+
+1. **Populate the Database**:
+   Make a POST request to:
+   ```
+   /private/insert-test-data
+   ```
+   Include a JSON body with the `secretKey` property matching the value in your `INSERT_TEST_DATA_SECRET` environment variable:
+   ```json
+   {
+     "secretKey": "your-insert-test-data-secret-value"
+   }
+   ```
+   This will populate your database with the necessary initial data.
 
 
+2. **Initialize Stock Bucket**:
+   Make a POST request to:
+   ```
+   /private/stock/setup
+   ```
+   Include a JSON body with the `secretKey` property matching the value in your `SETUP_STOCK_SECRET` environment variable:
+   ```json
+   {
+     "secretKey": "your-setup-stock-secret-value"
+   }
+   ```
+   This will initialize the local stock bucket required for the application to function properly.
 
+## API Overview
+
+### Authentication
+
+Many endpoints require authentication with a JWT token provided in the `Authorization` header:
+
+```
+Authorization: Bearer {access-token}
+```
+
+### Public Endpoints
+
+#### Countries
+
+| Endpoint                         | Method | Description                        |
+|----------------------------------|--------|------------------------------------|
+| `/public/countries`              | GET    | Retrieve all available countries   |
+| `/public/countries/:countryCode` | GET    | Get details for a specific country |
+
+#### Configuration
+
+| Endpoint                                | Method | Description                                                                                                         |
+|-----------------------------------------|--------|---------------------------------------------------------------------------------------------------------------------|
+| `/public/countries/:countryCode/config` | GET    | Get initial values for interacting with the API, including shopping cart, user if logged in and authorization token |
+
+#### Products
+
+| Endpoint                                      | Method | Description                                     |
+|-----------------------------------------------|--------|-------------------------------------------------|
+| `/public/countries/:countryCode/products`     | GET    | Get all products (supports search parameter)    |
+| `/public/countries/:countryCode/products/:id` | GET    | Get detailed information for a specific product |
+
+#### Collections
+
+| Endpoint                                         | Method | Description                                        |
+|--------------------------------------------------|--------|----------------------------------------------------|
+| `/public/countries/:countryCode/collections`     | GET    | Get all product collections                        |
+| `/public/countries/:countryCode/collections/:id` | GET    | Get detailed information for a specific collection |
+
+#### Cart Management
+
+*Authentication required*
+
+| Endpoint                                               | Method | Description                                                         |
+|--------------------------------------------------------|--------|---------------------------------------------------------------------|
+| `/public/countries/:countryCode/cart`                  | GET    | Retrieve the current user's cart                                    |
+| `/public/countries/:countryCode/cart/items/:productId` | PATCH  | Add a quantity to a product in the cart (requires quantity in body) |
+| `/public/countries/:countryCode/cart/items/:productId` | PUT    | Update product quantity in cart (requires quantity in body)         |
+| `/public/countries/:countryCode/cart/items/:productId` | DELETE | Remove a product from the cart                                      |
+
+#### Checkout Process
+
+*Authentication required*
+
+| Endpoint                                         | Method | Description                   |
+|--------------------------------------------------|--------|-------------------------------|
+| `/public/countries/:countryCode/checkout/stages` | GET    | Get available checkout stages |
+
+##### Personal Details
+
+| Endpoint                                                          | Method | Description                                          |
+|-------------------------------------------------------------------|--------|------------------------------------------------------|
+| `/public/countries/:countryCode/checkout/stages/personal-details` | GET    | Get user's personal details                          |
+| `/public/countries/:countryCode/checkout/stages/personal-details` | POST   | Save personal details (first name, last name, email) |
+
+##### Address
+
+| Endpoint                                                 | Method | Description                       |
+|----------------------------------------------------------|--------|-----------------------------------|
+| `/public/countries/:countryCode/checkout/stages/address` | GET    | Get saved address information     |
+| `/public/countries/:countryCode/checkout/stages/address` | POST   | Create or update shipping address |
+
+##### Shipping
+
+| Endpoint                                                  | Method | Description                                    |
+|-----------------------------------------------------------|--------|------------------------------------------------|
+| `/public/countries/:countryCode/checkout/stages/shipping` | GET    | Get available shipping methods                 |
+| `/public/countries/:countryCode/checkout/stages/shipping` | POST   | Select a shipping method (requires ID in body) |
+
+##### Payment
+
+| Endpoint                                                 | Method | Description             |
+|----------------------------------------------------------|--------|-------------------------|
+| `/public/countries/:countryCode/checkout/stages/payment` | GET    | Get payment session url |
+
+##### Review
+
+| Endpoint                                                | Method | Description                                               |
+|---------------------------------------------------------|--------|-----------------------------------------------------------|
+| `/public/countries/:countryCode/checkout/stages/review` | GET    | Get order review information before proceeding to payment |
+
+#### User Management
+
+*Authorization Required*
+
+##### Authentication
+
+| Endpoint                                     | Method | Description                  |
+|----------------------------------------------|--------|------------------------------|
+| `/public/countries/:countryCode/user/signup` | POST   | Create a new user account    |
+| `/public/countries/:countryCode/user/login`  | POST   | Login to an existing account |
+| `/public/countries/:countryCode/user/logout` | POST   | Log out current user         |
+
+##### User Profile
+
+| Endpoint                              | Method | Description              |
+|---------------------------------------|--------|--------------------------|
+| `/public/countries/:countryCode/user` | GET    | Get current user profile |
+| `/public/countries/:countryCode/user` | PUT    | Update user information  |
+| `/public/countries/:countryCode/user` | DELETE | Delete user account      |
+
+#### Orders
+
+*Authentication required*
+
+| Endpoint                                    | Method | Description                      |
+|---------------------------------------------|--------|----------------------------------|
+| `/public/countries/:countryCode/orders`     | GET    | Get all orders for current user  |
+| `/public/countries/:countryCode/orders/:id` | GET    | Get details for a specific order |
+
+### Private Endpoints
+
+*These endpoints are for administrative or internal use only*
+
+#### Stock Management
+
+| Endpoint                    | Method | Description                         |
+|-----------------------------|--------|-------------------------------------|
+| `/private/stock/:productId` | GET    | Get stock information for a product |
+| `/private/stock/setup`      | POST   | Initialize stock management system  |
+
+#### Test Data
+
+| Endpoint                    | Method | Description                 |
+|-----------------------------|--------|-----------------------------|
+| `/private/insert-test-data` | POST   | Add test data to the system |
+
+### Response Format
+
+Responses typically follow a standard format:
+
+```json
+{
+  "message": "Action description",
+  "data": { ... }
+}
+```
+
+Failed requests will return:
+
+```json
+{
+  "issues": [
+    "Error 1 description",
+    "Error 2 description"
+  ]
+}
+```
+
+### Authentication Flow
+
+1. Frontend calls config endpoint to get initial authorization tokens
+2. User is now able to interact with shopping cart, checkout and order
+2. User signs up or logs in using the appropriate endpoints
+2. Upon successful authentication, the API returns a logged in access token
+3. The logged in access token is used to access user-specific endpoints (user profile, orders, etc.)
+
+## Testing
+To run the test suite, execute:
+```bash
+npm test
+```
+This command runs all unit tests using Jest, ensuring that the application's functionalities work as intended.
+
+## Contributing
+We welcome contributions to enhance the Invern Spirit Backend. To contribute:
+
+1. **Fork the Repository**: Click the "Fork" button on the GitHub page to create a personal copy of the repository.
+2. **Create a New Branch**: Use a descriptive name for your branch.
+3. **Make Changes**: Implement your features or bug fixes.
+4. **Run Tests**: Ensure all tests pass before committing your changes.
+5. **Commit Changes**: Write clear and concise commit messages.
+6. **Push to GitHub**: Push your changes to your forked repository.
+7. **Submit a Pull Request**: Describe your changes and submit the pull request for review.
+
+## License
+This project is licensed under the MIT License. For more details, refer to the LICENSE file.
+
+## Acknowledgements
+We extend our gratitude to all contributors and open-source projects that have made this project possible.
