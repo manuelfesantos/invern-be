@@ -1,7 +1,7 @@
 import { parse } from "cookie";
 import { CookieName, CookieNameEnum, HttpHeaderEnum } from "@http-entity";
 import { getFutureDate, NO_MAX_AGE, TOKEN_COOKIE_MAX_AGE } from "@timer-utils";
-import { getDomain } from "./request.utils";
+import { ENV } from "@env-utils";
 
 export const getCookieHeader = (
   name: CookieName,
@@ -13,7 +13,7 @@ export const getCookieHeader = (
   domain?: string,
   path: string = "/",
 ): string =>
-  `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? "SameSite=Strict;" : ""} Domain=${domain || getDomain()}; ${path ? `Path=${path};` : ""}`;
+  `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? "SameSite=Strict;" : ""} Domain=${domain || ENV.DOMAIN}; ${path ? `Path=${path};` : ""}`;
 
 export const getCartIdFromHeaders = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);

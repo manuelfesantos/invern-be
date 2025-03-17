@@ -3,11 +3,11 @@ import { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
-import { frontendHost, getStripeEnv } from "@http-utils";
 import { contextStore } from "@context-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { SelectedShippingMethod } from "@shipping-entity";
+import { ENV } from "@env-utils";
 
 export const createStripeCheckoutSession = async (
   lineItems: LineItem[],
@@ -19,7 +19,7 @@ export const createStripeCheckoutSession = async (
   const shippingRate = shippingMethod.rate;
 
   const checkoutSession: Stripe.Checkout.SessionCreateParams = {
-    cancel_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/cart`,
+    cancel_url: `${origin || ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/cart`,
     expires_at: getFutureDate(SESSION_EXPIRY),
 
     line_items: lineItems.map((product) => {
@@ -37,12 +37,12 @@ export const createStripeCheckoutSession = async (
       };
     }),
     metadata: {
-      stripeEnv: getStripeEnv(),
+      stripeEnv: ENV.STRIPE_ENV,
     },
     mode: "payment",
     payment_intent_data: {
       metadata: {
-        stripeEnv: getStripeEnv(),
+        stripeEnv: ENV.STRIPE_ENV,
       },
     },
     payment_method_types: ["paypal", "card"],
@@ -68,7 +68,7 @@ export const createStripeCheckoutSession = async (
         },
       },
     ],
-    success_url: `${origin || frontendHost()}/${country.code.toLowerCase()}/order?id=${orderId}&after-checkout=true`,
+    success_url: `${origin || ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/order?id=${orderId}&after-checkout=true`,
   };
 
   logger().info("Creating checkout session", {

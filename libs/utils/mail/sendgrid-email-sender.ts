@@ -1,10 +1,6 @@
 import { stringifyObject } from "@string-utils";
 import { HttpMethodEnum } from "@http-entity";
-
-let sendGridApiKey: string = "";
-export const initSendgrid = (apiKey: string): void => {
-  sendGridApiKey = apiKey;
-};
+import { ENV } from "@env-utils";
 
 export const sendEmail = async (
   to: string,
@@ -40,7 +36,7 @@ export const sendEmail = async (
       ],
     }),
     headers: {
-      Authorization: `Bearer ${sendGridApiKey}`,
+      Authorization: `Bearer ${ENV.SENDGRID_API_KEY}`,
       "Content-Type": "application/json",
     },
     method: HttpMethodEnum.POST,

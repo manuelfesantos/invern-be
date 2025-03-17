@@ -4,36 +4,31 @@ import { acquireLock, getCacheKey, purgeCache, releaseLock } from "../utils";
 import { stringifyObject } from "@string-utils";
 import { z } from "zod";
 import { ClientCountry, clientCountrySchema } from "@country-entity";
-import { countriesHost } from "@http-utils";
+import { ENV } from "@env-utils";
 
 const COUNTRY_LOCK_TTL = 3000;
 const MAX_RETRIES = 3;
 const countriesKey = "countries";
 const countriesLockKey = "countries-lock";
 
-let countriesBucket: R2Bucket | null = null;
+let _countriesBucket: R2Bucket | null = null;
 
 const countryDataSchema = z.object({
   data: z.array(clientCountrySchema),
 });
 
-const init = (bucket: R2Bucket): void => {
-  if (!countriesBucket) {
-    countriesBucket = bucket;
+const getCountriesBucket = (): R2Bucket => {
+  if (!_countriesBucket) {
+    _countriesBucket = ENV.COUNTRIES_BUCKET;
   }
+
+  return _countriesBucket;
 };
 
 const getCountries = async (): Promise<
   { data: ClientCountry[] } | undefined
 > => {
-  if (!countriesBucket) {
-    logger().error("Countries bucket client not initialized", {
-      useCase: LoggerUseCaseEnum.GET_R2_COUNTRIES,
-    });
-    throw new Error("Countries bucket client not initialized");
-  }
-
-  const bucketObject = await countriesBucket.get(countriesKey);
+  const bucketObject = await getCountriesBucket().get(countriesKey);
   if (!bucketObject) {
     return undefined;
   }
@@ -50,12 +45,7 @@ const getCountries = async (): Promise<
 };
 
 const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
-  if (!countriesBucket) {
-    logger().error("Countries bucket client not initialized", {
-      useCase: LoggerUseCaseEnum.PUT_R2_COUNTRIES,
-    });
-    throw new Error("Countries bucket client not initialized");
-  }
+  const countriesBucket = getCountriesBucket();
 
   let countriesUpdated = false;
   let retries = 0;
@@ -73,7 +63,7 @@ const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
         countriesKey,
         stringifyObject({ data: countries }),
       );
-      const cacheKey = getCacheKey(countriesHost(), countriesKey);
+      const cacheKey = getCacheKey(ENV.COUNTRIES_HOST, countriesKey);
       if (cacheKey) {
         await purgeCache(cacheKey);
       }
@@ -100,13 +90,7 @@ const updateCountries = async (countries: ClientCountry[]): Promise<void> => {
 };
 
 const deleteCountries = async (): Promise<void> => {
-  if (!countriesBucket) {
-    logger().error("Countries bucket client not initialized", {
-      useCase: LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
-    });
-    throw new Error("Countries bucket client not initialized");
-  }
-  await countriesBucket.delete(countriesKey);
+  await getCountriesBucket().delete(countriesKey);
 
   logger().info("Deleted countries from bucket", {
     useCase: LoggerUseCaseEnum.DELETE_R2_COUNTRIES,
@@ -114,7 +98,6 @@ const deleteCountries = async (): Promise<void> => {
 };
 
 export const countriesClient = {
-  init,
   get: getCountries,
   delete: deleteCountries,
   update: updateCountries,

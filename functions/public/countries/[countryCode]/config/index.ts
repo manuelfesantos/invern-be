@@ -9,15 +9,12 @@ import { invalidateCheckoutSession } from "@order-module";
 import { decrypt, decryptObjectString, encrypt } from "@crypto-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-// eslint-disable-next-line import/no-restricted-paths
-import { initStripeClient } from "@stripe-adapter";
 import { CookieNameEnum } from "@http-entity";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
-import { Env } from "@request-entity";
 import { UserDetails } from "@user-entity";
 
-const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
+const GET: PagesFunction = async ({ request }): Promise<Response> => {
   const cookies = getCookies(request.headers);
 
   const {
@@ -32,8 +29,6 @@ const GET: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
   const afterCheckoutProcessing = afterCheckoutHeader === "true";
 
   if (checkoutSessionCookie && !afterCheckoutProcessing) {
-    initStripeClient(env.STRIPE_API_KEY);
-
     await invalidateCheckoutSession(await decrypt(checkoutSessionCookie));
   }
 

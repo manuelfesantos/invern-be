@@ -1,10 +1,9 @@
-//@ts-expect-error no types
 import { google } from "worker-auth-providers";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
 import { Env } from "@request-entity";
-import { frontendHost, getCookies, setCookieInResponse } from "@http-utils";
+import { getCookies, setCookieInResponse } from "@http-utils";
 import { InsertUser, User, userSchema } from "@user-entity";
 import {
   getLoggedInRefreshToken,
@@ -26,6 +25,7 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { hashString } from "@crypto-utils";
+import { ENV } from "@env-utils";
 /* eslint-enable import/no-restricted-paths */
 
 const FIRST_NAME = 0;
@@ -40,19 +40,6 @@ interface GoogleUserResponse {
   family_name: string;
   picture: string;
   locale: string;
-}
-
-export interface OAuthTokens {
-  access_token: string;
-  token_type: string;
-  scope: string;
-  expires_in: number;
-  refresh_token: string;
-}
-
-interface GoogleCallBackResponse {
-  user: GoogleUserResponse;
-  tokens: OAuthTokens;
 }
 
 const getUser = async (
@@ -159,10 +146,10 @@ const GET: PagesFunction<Env> = async ({ request, env }) => {
   const options = {
     clientId: env.GOOGLE_CLIENT_ID,
     clientSecret: env.GOOGLE_CLIENT_SECRET,
-    redirectUrl: frontendHost() + env.GOOGLE_REDIRECT_URI,
+    redirectUrl: ENV.FRONTEND_HOST + env.GOOGLE_REDIRECT_URI,
   };
 
-  const { user: providerUser } = await google.users<GoogleCallBackResponse>({
+  const { user: providerUser } = await google.users({
     options,
     request,
   });

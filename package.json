@@ -1,5 +1,6 @@
 {
   "name": "invern-be",
+  "type": "module",
   "version": "1.0.0",
   "description": "Invern Spirit Backend",
   "main": "functions/index.ts",
@@ -42,6 +43,7 @@
   },
   "dependencies": {
     "@cloudflare/pages-plugin-honeycomb": "^1.0.4",
+    "@libsql/client": "^0.15.0",
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "cookie": "^1.0.2",
     "drizzle-orm": "^0.30.10",

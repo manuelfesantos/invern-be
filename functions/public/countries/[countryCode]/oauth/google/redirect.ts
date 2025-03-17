@@ -1,23 +1,21 @@
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
 import { Env } from "@request-entity";
-import {
-  frontendHost,
-  getCookieHeader,
-  setCookieInResponse,
-} from "@http-utils";
+import { getCookieHeader, setCookieInResponse } from "@http-utils";
 import { contextStore } from "@context-utils";
 import { encrypt } from "@crypto-utils";
 import { CookieNameEnum } from "@http-entity";
+import queryString from "query-string";
+import { ENV } from "@env-utils";
 
 const GET: PagesFunction<Env> = async ({ env }) => {
   const { country } = contextStore.context;
   const { GOOGLE_CLIENT_ID } = env;
   const oauthToken = await encrypt(Date.now().toString());
   const state = { country: country.code.toLowerCase(), oauthToken };
-  const params = (await import("query-string")).default.stringify({
+  const params = queryString.stringify({
     client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: `${frontendHost()}/api/oauth/google`,
+    redirect_uri: `${ENV.FRONTEND_HOST}/api/oauth/google`,
     response_type: "code",
     scope: "openid email profile",
     include_granted_scopes: "true",
