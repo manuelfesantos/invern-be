@@ -1,11 +1,7 @@
 import { getProductById } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
-import {
-  insertCart,
-  updateCartItemQuantityInDb,
-  updateCartLastModifiedDate,
-} from "@cart-db";
+import { insertCart, updateCartItemQuantityInDb } from "@cart-db";
 import { logCredentials } from "@logger-utils";
 
 export const updateCartItemQuantity = async (
@@ -27,8 +23,6 @@ export const updateCartItemQuantity = async (
   }
 
   await updateCartItemQuantityInDb(cartId, product, quantity);
-
-  await updateCartLastModifiedDate(cartId);
 
   return cartId;
 };
