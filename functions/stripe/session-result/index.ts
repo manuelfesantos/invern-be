@@ -64,7 +64,7 @@ export const POST: PagesFunction = async (context) => {
   });
   const clientOrder = await getOrderFromSessionResult(sessionEvent);
   await sendEmail(
-    sessionEvent.customer_details?.email || "",
+    clientOrder.personalDetails.email || "",
     "Checkout",
     `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
   );
