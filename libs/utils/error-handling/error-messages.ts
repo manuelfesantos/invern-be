@@ -34,6 +34,8 @@ export const errors = {
       `The following product ids don't have enough stock: ${products.map(({ productId, stock }) => `${productId} with stock ${stock}`).join(", ")}`,
       HttpStatusEnum.BAD_REQUEST,
     ),
+  INVALID_PRODUCT_QUANTITY: (): CustomError =>
+    new CustomError(`Invalid product quantity`, HttpStatusEnum.BAD_REQUEST),
   COLLECTION_NOT_FOUND: (): CustomError =>
     new CustomError("Collection not found", HttpStatusEnum.NOT_FOUND),
   ADDRESS_NOT_PROVIDED: (): CustomError =>

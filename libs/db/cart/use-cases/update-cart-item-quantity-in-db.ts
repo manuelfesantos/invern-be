@@ -1,19 +1,18 @@
 import { db } from "@db";
-import { productsToCartsTable } from "@schema";
+import { cartsTable, productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";
 import { errors } from "@error-handling-utils";
 import { Product } from "@product-entity";
-import { logger } from "@logger-utils";
-import { LoggerUseCaseEnum } from "@logger-entity";
 
 const NO_QUANTITY = 0;
+const FIRST_INDEX = 0;
 
 export const patchCartItemQuantityInDb = async (
   cartId: string,
   product: Product,
   quantity: number,
-): Promise<void> => {
-  if (quantity === NO_QUANTITY) return;
+): Promise<number> => {
+  if (quantity === NO_QUANTITY) throw errors.INVALID_PRODUCT_QUANTITY();
 
   const cartQuantity = await getProductQuantityInCart(product.id, cartId);
 
@@ -36,11 +35,15 @@ export const patchCartItemQuantityInDb = async (
 
   if (shouldInsertProduct) {
     await insertProductInCart(product.id, cartId, finalQuantity);
+    return quantity;
   } else if (shouldDeleteProduct) {
     await deleteProductFromCart(product.id, cartId);
+    return NO_QUANTITY;
   } else if (shouldUpdateProduct) {
     await updateProductQuantityInCart(product.id, cartId, finalQuantity);
+    return finalQuantity;
   }
+  throw errors.PRODUCT_NOT_IN_CART();
 };
 
 export const updateCartItemQuantityInDb = async (
@@ -74,7 +77,6 @@ const getProductQuantityInCart = async (
   productId: string,
   cartId: string,
 ): Promise<number> => {
-  const start = performance.now();
   const result = await db().query.productsToCartsTable.findFirst({
     where: and(
       eq(productsToCartsTable.productId, productId),
@@ -84,13 +86,7 @@ const getProductQuantityInCart = async (
       quantity: true,
     },
   });
-  const end = performance.now();
-  logger().info("Get product query time", {
-    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
-    data: {
-      queryTime: end - start,
-    },
-  });
+
   return result?.quantity || NO_QUANTITY;
 };
 
@@ -99,53 +95,56 @@ const insertProductInCart = async (
   cartId: string,
   quantity: number,
 ): Promise<void> => {
-  const start = performance.now();
-  await db()
-    .insert(productsToCartsTable)
-    .values({ productId, cartId, quantity });
-  const end = performance.now();
-  logger().info("Insert product query time", {
-    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
-    data: {
-      queryTime: end - start,
-    },
-  });
+  await db().batch([
+    db().insert(productsToCartsTable).values({ productId, cartId, quantity }),
+    db()
+      .update(cartsTable)
+      .set({ lastModifiedAt: Date.now() })
+      .where(eq(cartsTable.id, cartId)),
+  ]);
 };
 
 const updateProductQuantityInCart = async (
   productId: string,
   cartId: string,
   quantity: number,
-): Promise<void> => {
-  const start = performance.now();
-  await db()
-    .update(productsToCartsTable)
-    .set({ quantity })
-    .where(
-      and(
-        eq(productsToCartsTable.productId, productId),
-        eq(productsToCartsTable.cartId, cartId),
-      ),
-    );
-  const end = performance.now();
-  logger().info("Update product query time", {
-    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
-    data: {
-      queryTime: end - start,
-    },
-  });
+): Promise<number> => {
+  const newQuantity = await db().batch([
+    db()
+      .update(productsToCartsTable)
+      .set({ quantity })
+      .where(
+        and(
+          eq(productsToCartsTable.productId, productId),
+          eq(productsToCartsTable.cartId, cartId),
+        ),
+      )
+      .returning({ quantity: productsToCartsTable.quantity }),
+    db()
+      .update(cartsTable)
+      .set({ lastModifiedAt: Date.now() })
+      .where(eq(cartsTable.id, cartId)),
+  ]);
+
+  return newQuantity[FIRST_INDEX][FIRST_INDEX].quantity;
 };
 
 const deleteProductFromCart = async (
   productId: string,
   cartId: string,
 ): Promise<void> => {
-  await db()
-    .delete(productsToCartsTable)
-    .where(
-      and(
-        eq(productsToCartsTable.productId, productId),
-        eq(productsToCartsTable.cartId, cartId),
+  await db().batch([
+    db()
+      .delete(productsToCartsTable)
+      .where(
+        and(
+          eq(productsToCartsTable.productId, productId),
+          eq(productsToCartsTable.cartId, cartId),
+        ),
       ),
-    );
+    db()
+      .update(cartsTable)
+      .set({ lastModifiedAt: Date.now() })
+      .where(eq(cartsTable.id, cartId)),
+  ]);
 };

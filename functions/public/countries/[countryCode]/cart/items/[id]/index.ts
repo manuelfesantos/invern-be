@@ -26,16 +26,26 @@ const PUT: PagesFunction = async ({ request, params }) => {
 
   const body = await getBodyFromRequest(request);
   const { quantity } = cartItemUpdateBodySchema.parse(body);
-  const cartId = await updateCartItemQuantity(productId as string, quantity);
+
+  const cartIdPromise = updateCartItemQuantity(productId as string, quantity);
   const cart = await getCart();
+
+  cart.products = cart.products.map((product) => {
+    if (product.id === productId) {
+      product.quantity = quantity;
+    }
+    return product;
+  });
+
   const response = protectedSuccessResponse.OK(
     "Successfully updated product quantity in cart",
     cart,
   );
 
   if (contextStore.context.isLoggedOut) {
-    setCookieInResponse(response, getCartIdCookieHeader(cartId));
+    setCookieInResponse(response, getCartIdCookieHeader(await cartIdPromise));
   }
+
   return response;
 };
 
@@ -44,8 +54,25 @@ const PATCH: PagesFunction = async ({ request, params }) => {
 
   const body = await getBodyFromRequest(request);
   const { quantity } = cartItemUpdateBodySchema.parse(body);
-  const cartId = await patchCartItemQuantity(productId as string, quantity);
-  const cart = await getCart();
+
+  const patchCartItemQuantityPromise = patchCartItemQuantity(
+    productId as string,
+    quantity,
+  );
+  const cartPromise = getCart();
+
+  const [{ id: cartId, newQuantity }, cart] = await Promise.all([
+    patchCartItemQuantityPromise,
+    cartPromise,
+  ]);
+
+  cart.products = cart.products.map((product) => {
+    if (product.id === productId) {
+      product.quantity = newQuantity;
+    }
+    return product;
+  });
+
   const response = protectedSuccessResponse.OK(
     "Successfully updated product quantity in cart",
     cart,
@@ -60,9 +87,11 @@ const PATCH: PagesFunction = async ({ request, params }) => {
 const DELETE: PagesFunction = async ({ params }) => {
   const { id: productId } = params;
 
-  const cartId = await removeCartItem(productId as string);
+  const cartIdPromise = removeCartItem(productId as string);
 
   const cart = await getCart();
+
+  cart.products = cart.products.filter((product) => product.id !== productId);
 
   const response = protectedSuccessResponse.OK(
     "successfully removed item from cart",
@@ -70,7 +99,7 @@ const DELETE: PagesFunction = async ({ params }) => {
   );
 
   if (contextStore.context.isLoggedOut) {
-    setCookieInResponse(response, getCartIdCookieHeader(cartId));
+    setCookieInResponse(response, getCartIdCookieHeader(await cartIdPromise));
   }
 
   return response;
