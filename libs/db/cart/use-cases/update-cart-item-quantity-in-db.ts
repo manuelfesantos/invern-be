@@ -3,6 +3,8 @@ import { productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";
 import { errors } from "@error-handling-utils";
 import { Product } from "@product-entity";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 const NO_QUANTITY = 0;
 
@@ -72,6 +74,7 @@ const getProductQuantityInCart = async (
   productId: string,
   cartId: string,
 ): Promise<number> => {
+  const start = performance.now();
   const result = await db().query.productsToCartsTable.findFirst({
     where: and(
       eq(productsToCartsTable.productId, productId),
@@ -81,7 +84,13 @@ const getProductQuantityInCart = async (
       quantity: true,
     },
   });
-
+  const end = performance.now();
+  logger().info("Get product query time", {
+    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
+    data: {
+      queryTime: end - start,
+    },
+  });
   return result?.quantity || NO_QUANTITY;
 };
 
@@ -90,9 +99,17 @@ const insertProductInCart = async (
   cartId: string,
   quantity: number,
 ): Promise<void> => {
+  const start = performance.now();
   await db()
     .insert(productsToCartsTable)
     .values({ productId, cartId, quantity });
+  const end = performance.now();
+  logger().info("Insert product query time", {
+    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
+    data: {
+      queryTime: end - start,
+    },
+  });
 };
 
 const updateProductQuantityInCart = async (
@@ -100,6 +117,7 @@ const updateProductQuantityInCart = async (
   cartId: string,
   quantity: number,
 ): Promise<void> => {
+  const start = performance.now();
   await db()
     .update(productsToCartsTable)
     .set({ quantity })
@@ -109,6 +127,13 @@ const updateProductQuantityInCart = async (
         eq(productsToCartsTable.cartId, cartId),
       ),
     );
+  const end = performance.now();
+  logger().info("Update product query time", {
+    useCase: LoggerUseCaseEnum.GET_PRODUCT_QUANTITY_IN_CART,
+    data: {
+      queryTime: end - start,
+    },
+  });
 };
 
 const deleteProductFromCart = async (

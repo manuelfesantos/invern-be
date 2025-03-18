@@ -39,9 +39,11 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
 
     const { tracer: logger } = data.honeycomb;
     const country = request.headers.get("country");
+    const clientDataCenter = request.headers.get("x-data-center");
     const dataCenter = request.cf?.colo;
 
     logger.addData({
+      clientDataCenter,
       dataCenter,
       country: country || request.cf?.country,
     });
