@@ -2,7 +2,6 @@ import { google } from "worker-auth-providers";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
-import { Env } from "@request-entity";
 import { getCookies, setCookieInResponse } from "@http-utils";
 import { InsertUser, User, userSchema } from "@user-entity";
 import {
@@ -123,7 +122,7 @@ const getUser = async (
   };
 };
 
-const GET: PagesFunction<Env> = async ({ request, env }) => {
+const GET: PagesFunction = async ({ request }) => {
   const cookies = getCookies(request.headers);
   const { [CookieNameEnum.OAUTH_TOKEN]: oauthTokenCookie } = cookies;
   const url = new URL(request.url);
@@ -144,9 +143,9 @@ const GET: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const options = {
-    clientId: env.GOOGLE_CLIENT_ID,
-    clientSecret: env.GOOGLE_CLIENT_SECRET,
-    redirectUrl: ENV.FRONTEND_HOST + env.GOOGLE_REDIRECT_URI,
+    clientId: ENV.GOOGLE_CLIENT_ID,
+    clientSecret: ENV.GOOGLE_CLIENT_SECRET,
+    redirectUrl: ENV.FRONTEND_HOST + ENV.GOOGLE_REDIRECT_URI,
   };
 
   const { user: providerUser } = await google.users({

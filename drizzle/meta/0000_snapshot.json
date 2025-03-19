@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fd2bd00d-aeed-44ca-9418-89c09342f321",
+  "id": "6e6042df-79cb-4c84-8e1a-6beb063411f4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
@@ -32,7 +32,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "checkoutSessions": {
       "name": "checkoutSessions",
@@ -145,7 +146,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "collections": {
       "name": "collections",
@@ -175,7 +177,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "countries": {
       "name": "countries",
@@ -226,7 +229,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "currencies": {
       "name": "currencies",
@@ -270,7 +274,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "images": {
       "name": "images",
@@ -342,7 +347,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "orders": {
       "name": "orders",
@@ -483,7 +489,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "paymentMethods": {
       "name": "paymentMethods",
@@ -520,7 +527,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "payments": {
       "name": "payments",
@@ -586,7 +594,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "products": {
       "name": "products",
@@ -658,7 +667,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "productsOnCarts": {
       "name": "productsOnCarts",
@@ -723,7 +733,8 @@
           "name": "productsOnCarts_cartId_productId_pk"
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "shippingMethods": {
       "name": "shippingMethods",
@@ -746,7 +757,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "shippingRates": {
       "name": "shippingRates",
@@ -811,7 +823,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "shippingRatesToCountries": {
       "name": "shippingRatesToCountries",
@@ -863,13 +876,14 @@
       "compositePrimaryKeys": {
         "shippingRatesToCountries_shippingRateId_countryCode_pk": {
           "columns": [
-            "countryCode",
-            "shippingRateId"
+            "shippingRateId",
+            "countryCode"
           ],
           "name": "shippingRatesToCountries_shippingRateId_countryCode_pk"
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "shippingTransactions": {
       "name": "shippingTransactions",
@@ -913,7 +927,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "taxes": {
       "name": "taxes",
@@ -964,7 +979,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "users": {
       "name": "users",
@@ -1082,13 +1098,18 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
+  "views": {},
   "enums": {},
   "_meta": {
     "schemas": {},
     "tables": {},
     "columns": {}
+  },
+  "internal": {
+    "indexes": {}
   }
 }

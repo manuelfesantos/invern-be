@@ -10,3 +10,4 @@ out
 mock-frontend
 coverage
 bun.lock
+turso

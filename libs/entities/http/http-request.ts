@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { PagesFunction } from "@cloudflare/workers-types";
-import { Env } from "@request-entity";
+import { Env } from "@env-entity";
 
 export const httpMethodsSchema = z.enum(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
