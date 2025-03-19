@@ -28,16 +28,6 @@ export interface Env {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_REDIRECT_URI: string;
+  TURSO_CONNECTION_URL: string;
+  TURSO_AUTH_TOKEN: string;
 }
-
-export type Credentials = {
-  userId?: string;
-  cartId?: string;
-  customerEmail?: string;
-  accessToken?: string;
-  refreshToken: string;
-  remember?: boolean;
-  address?: string;
-  userDetails?: string;
-  shippingMethod?: string;
-};

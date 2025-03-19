@@ -51,6 +51,7 @@ CREATE TABLE `images` (
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
 CREATE TABLE `orders` (
 	`id` text PRIMARY KEY NOT NULL,
 	`stripeId` text NOT NULL,
@@ -69,6 +70,7 @@ CREATE TABLE `orders` (
 	FOREIGN KEY (`shippingTransactionId`) REFERENCES `shippingTransactions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
 CREATE TABLE `paymentMethods` (
 	`id` text PRIMARY KEY NOT NULL,
 	`type` text NOT NULL,
@@ -124,7 +126,7 @@ CREATE TABLE `shippingRates` (
 CREATE TABLE `shippingRatesToCountries` (
 	`shippingRateId` text NOT NULL,
 	`countryCode` text NOT NULL,
-	PRIMARY KEY(`countryCode`, `shippingRateId`),
+	PRIMARY KEY(`shippingRateId`, `countryCode`),
 	FOREIGN KEY (`shippingRateId`) REFERENCES `shippingRates`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`countryCode`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
@@ -160,7 +162,5 @@ CREATE TABLE `users` (
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
 CREATE UNIQUE INDEX `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
 CREATE UNIQUE INDEX `users_googleUserId_unique` ON `users` (`googleUserId`);
