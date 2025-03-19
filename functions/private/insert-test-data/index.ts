@@ -4,14 +4,13 @@ import { getBodyFromRequest } from "@http-utils";
 import { z } from "zod";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
-import { Env } from "@request-entity";
 import { ENV } from "@env-utils";
 
 const testDataRequestBodySchema = z.object({
   secretKey: z.string(),
 });
 
-const POST: PagesFunction<Env> = async ({ request }): Promise<Response> => {
+const POST: PagesFunction = async ({ request }): Promise<Response> => {
   const body = await getBodyFromRequest(request);
 
   const { secretKey } = testDataRequestBodySchema.parse(body);

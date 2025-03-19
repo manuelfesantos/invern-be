@@ -17,7 +17,8 @@
     "local": "npx wrangler pages dev functions --d1 INVERN_DB=e5193edd-54a6-4b15-8e67-d0bd12b9afd2 --kv=AUTH_KV --compatibility-date=2024-04-26 --compatibility-flag=nodejs_compat --show-interactive-dev-session=false",
     "prepare": "husky",
     "db:generate": "npx drizzle-kit generate",
-    "type-check": "npx tsc --noEmit"
+    "type-check": "npx tsc --noEmit",
+    "local-db": "turso dev --db-file turso/local.db"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +30,7 @@
     "@types/jest": "^29.5.12",
     "@types/stripe-v3": "^3.1.33",
     "@types/uuid": "^9.0.8",
-    "drizzle-kit": "^0.21.2",
+    "drizzle-kit": "^0.30.5",
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.7.0",
     "eslint-plugin-import": "^2.31.0",
@@ -46,7 +47,8 @@
     "@libsql/client": "^0.15.0",
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "cookie": "^1.0.2",
-    "drizzle-orm": "^0.30.10",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.40.1",
     "drizzle-zod": "^0.5.1",
     "query-string": "^9.1.1",
     "short-uuid": "^5.2.0",

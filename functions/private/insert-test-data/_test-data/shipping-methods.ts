@@ -144,26 +144,17 @@ export const insertShippingMethods = async (): Promise<void> => {
   const spainShippingRates = getSpainShippingRates(
     shippingMethods[FIRST_INDEX].id,
   );
-  await Promise.all(
-    [...portugalShippingRates, ...spainShippingRates].map(
-      async (shippingRate) => {
-        await db().insert(shippingRatesTable).values(shippingRate).execute();
-      },
-    ),
-  );
+  await db()
+    .insert(shippingRatesTable)
+    .values([...portugalShippingRates, ...spainShippingRates])
+    .execute();
   const portugalRatesToCountries = getRatesToCountries(
     portugalShippingRates,
     "PT",
   );
   const spainRatesToCountries = getRatesToCountries(spainShippingRates, "ES");
-  await Promise.all(
-    [...portugalRatesToCountries, ...spainRatesToCountries].map(
-      async (rateToCountry) => {
-        await db()
-          .insert(shippingRatesToCountriesTable)
-          .values(rateToCountry)
-          .execute();
-      },
-    ),
-  );
+  await db()
+    .insert(shippingRatesToCountriesTable)
+    .values([...portugalRatesToCountries, ...spainRatesToCountries])
+    .execute();
 };

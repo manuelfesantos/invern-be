@@ -5,9 +5,9 @@ import { z } from "zod";
 import { stockClient } from "@r2-adapter";
 import { getProducts } from "@product-db";
 /* eslint-enable import/no-restricted-paths */
-import { Env } from "@request-entity";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
+import { ENV } from "@env-utils";
 
 const bodySchema = z.object({
   secretKey: z.string(),
@@ -15,10 +15,10 @@ const bodySchema = z.object({
 
 const NO_STOCK = 0;
 
-const POST: PagesFunction<Env> = async ({ request, env }) => {
+const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { secretKey } = bodySchema.parse(body);
-  if (!secretKey || secretKey !== env.SETUP_STOCK_SECRET) {
+  if (!secretKey || secretKey !== ENV.SETUP_STOCK_SECRET) {
     return errorResponse.UNAUTHORIZED();
   }
 

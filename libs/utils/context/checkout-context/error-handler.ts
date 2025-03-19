@@ -1,7 +1,7 @@
 import { PagesFunction } from "@cloudflare/workers-types";
 import { middlewareRequestHandler, requestHandler } from "@decorator-utils";
 import { CookieName, Data, HandlerMethodMapper } from "@http-entity";
-import { Env } from "@request-entity";
+import { Env } from "@env-entity";
 import {
   contextStore,
   getClientCheckoutStages,

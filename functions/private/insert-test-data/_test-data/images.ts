@@ -55,9 +55,7 @@ export const insertImages = async (
     collections,
     "Contour",
   );
-  for (const image of imagesList) {
-    await db().insert(imagesTable).values(image);
-  }
+  await db().insert(imagesTable).values(imagesList);
 };
 
 const indexToProductNumber = (index: number): number =>

@@ -1,4 +1,4 @@
-import { Env } from "@request-entity";
+import { Env } from "@env-entity";
 
 class EnvironmentService {
   private static instance: EnvironmentService;
@@ -23,14 +23,6 @@ class EnvironmentService {
 
   initialize(env: Env): void {
     this._env = env;
-  }
-
-  get HONEYCOMB_API_KEY(): string {
-    return this.var("HONEYCOMB_API_KEY");
-  }
-
-  get HONEYCOMB_DATASET(): string {
-    return this.var("HONEYCOMB_DATASET");
   }
 
   get STRIPE_API_KEY(): string {
@@ -139,6 +131,14 @@ class EnvironmentService {
 
   get AUTH_KV(): KVNamespace {
     return this.var("AUTH_KV");
+  }
+
+  get TURSO_CONNECTION_URL(): string {
+    return this.var("TURSO_CONNECTION_URL");
+  }
+
+  get TURSO_AUTH_TOKEN(): string {
+    return this.var("TURSO_AUTH_TOKEN");
   }
 }
 
