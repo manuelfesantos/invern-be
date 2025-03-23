@@ -2,13 +2,12 @@ import { errors } from "@error-handling-utils";
 import {
   deleteProductFromCart,
   insertProductInCart,
-  selectProductQuantityInCart,
+  selectProductStockAndQuantityInCart,
   updateProductQuantityInCart,
 } from "@cart-db";
 import { CartOperation, CartOperationEnum } from "@cart-entity";
 import { isPositive, isZero } from "@number-utils";
 import { getCartId } from "./utils/get-cart-id";
-import { getProductStock } from "./utils/get-product-stock";
 
 const NO_QUANTITY = 0;
 
@@ -16,15 +15,14 @@ export const patchCartItemQuantity = async (
   productId: string,
   quantity: number,
 ): Promise<{ id: string; newQuantity: number }> => {
-  const productStock = await getProductStock(productId);
-
   const cartId = await getCartId();
+
+  const { stock, quantity: cartQuantity } =
+    await selectProductStockAndQuantityInCart(productId, cartId);
 
   if (isZero(quantity)) throw errors.INVALID_PRODUCT_QUANTITY();
 
-  const cartQuantity = await selectProductQuantityInCart(productId, cartId);
-
-  const cartOperation = getCartOperation(quantity, cartQuantity, productStock);
+  const cartOperation = getCartOperation(quantity, cartQuantity, stock);
 
   const newQuantity = await cartOperationMap[cartOperation](
     productId,
