@@ -2,27 +2,25 @@ import { errors } from "@error-handling-utils";
 import {
   deleteProductFromCart,
   insertProductInCart,
-  selectProductQuantityInCart,
   updateProductQuantityInCart,
+  selectProductStockAndQuantityInCart,
 } from "@cart-db";
 import { CartOperation, CartOperationEnum } from "@cart-entity";
 import { isZero } from "@number-utils";
-import { getProductStock } from "./utils/get-product-stock";
 import { getCartId } from "./utils/get-cart-id";
 
 export const updateCartItemQuantity = async (
   productId: string,
   quantity: number,
 ): Promise<string> => {
-  const productStock = await getProductStock(productId);
-
   const cartId = await getCartId();
 
-  if (quantity > productStock) {
-    throw errors.PRODUCT_OUT_OF_STOCK(productStock);
-  }
+  const { stock, quantity: cartQuantity } =
+    await selectProductStockAndQuantityInCart(productId, cartId);
 
-  const cartQuantity = await selectProductQuantityInCart(productId, cartId);
+  if (quantity > stock) {
+    throw errors.PRODUCT_OUT_OF_STOCK(stock);
+  }
 
   if (quantity === cartQuantity) {
     return cartId;
