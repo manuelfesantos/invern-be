@@ -3,7 +3,7 @@ import { eq, inArray, like, or } from "drizzle-orm";
 import { productsTable } from "@schema";
 import { Product, ProductDetails } from "@product-entity";
 
-export const getProducts = async (): Promise<Product[]> => {
+export const selectProducts = async (): Promise<Product[]> => {
   return db().query.productsTable.findMany({
     columns: {
       description: false,
@@ -21,7 +21,7 @@ export const getProducts = async (): Promise<Product[]> => {
   });
 };
 
-export const getProductById = async (
+export const selectProductById = async (
   productId: string,
 ): Promise<ProductDetails | undefined> => {
   return db().query.productsTable.findFirst({
@@ -37,7 +37,19 @@ export const getProductById = async (
   });
 };
 
-export const getProductsByCollectionId = async (
+export const selectProductStockById = async (
+  productId: string,
+): Promise<number | undefined> => {
+  const product = await db().query.productsTable.findFirst({
+    where: eq(productsTable.id, productId),
+    columns: {
+      stock: true,
+    },
+  });
+  return product?.stock;
+};
+
+export const selectProductsByCollectionId = async (
   collectionId: string,
 ): Promise<Product[]> => {
   return db().query.productsTable.findMany({
@@ -54,7 +66,7 @@ export const getProductsByCollectionId = async (
   });
 };
 
-export const getProductsBySearch = async (
+export const selectProductsBySearch = async (
   search: string,
 ): Promise<Product[]> => {
   return db().query.productsTable.findMany({
@@ -74,7 +86,7 @@ export const getProductsBySearch = async (
   });
 };
 
-export const getProductsByProductIds = async (
+export const selectProductsByProductIds = async (
   productIds: string[],
 ): Promise<Product[]> => {
   return db().query.productsTable.findMany({

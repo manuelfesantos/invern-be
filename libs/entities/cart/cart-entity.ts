@@ -9,6 +9,8 @@ import {
 } from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 
+const cartOperationSchema = z.enum(["ADD", "REMOVE", "UPDATE"]);
+
 const baseCartSchema = createSelectSchema(cartsTable, {
   id: uuidSchema("cart id"),
   lastModifiedAt: positiveIntegerSchema("cart last modified date"),
@@ -57,6 +59,10 @@ export type FilledCart = z.infer<typeof filledCartSchema>;
 export type ExtendedCart = z.infer<typeof extendedCartSchema>;
 
 export type InsertCart = z.infer<typeof insertCartSchema>;
+
+export const CartOperationEnum = cartOperationSchema.Enum;
+
+export type CartOperation = z.infer<typeof cartOperationSchema>;
 
 export const EMPTY_CART: Cart = {
   products: [],

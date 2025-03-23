@@ -1,4 +1,4 @@
-import { getProductById } from "@product-db";
+import { selectProductById } from "@product-db";
 import { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
@@ -13,7 +13,7 @@ export const getProductDetails = async (
   id: HttpParams,
 ): Promise<ExtendedProductWithCollectionDetails> => {
   const productId = uuidSchema("product id").parse(id);
-  const product = await getProductById(productId);
+  const product = await selectProductById(productId);
   if (!product) {
     throw errors.PRODUCT_NOT_FOUND();
   }

@@ -1,4 +1,4 @@
-import { getProducts, getProductsBySearch } from "@product-db";
+import { selectProducts, selectProductsBySearch } from "@product-db";
 import { logger } from "@logger-utils";
 import { extendProduct } from "@extender-utils";
 import { ExtendedProduct } from "@product-entity";
@@ -14,9 +14,9 @@ export const getAllProducts = async (
         search,
       },
     });
-    const products = await getProductsBySearch(search);
+    const products = await selectProductsBySearch(search);
     return products.map(extendProduct);
   }
-  const products = await getProducts();
+  const products = await selectProducts();
   return products.map(extendProduct);
 };
