@@ -5,6 +5,8 @@ import { getCredentials } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { logCredentials } from "@logger-utils";
+import { countryCache } from "@cache-utils";
+import { Country } from "@country-entity";
 
 const SECOND_INDEX = 1;
 
@@ -31,13 +33,25 @@ const getCountry = middlewareRequestHandler(async ({ request, next, data }) => {
 
 const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
   async ({ data, next, request }) => {
-    const { endpoint, countryCode } = data;
-    const country = await getCountryByCountryCode(
-      countryCodeSchema.parse(countryCode?.toUpperCase()),
+    const { endpoint, countryCode: maybeCountryCode } = data;
+
+    const countryCode = countryCodeSchema.parse(
+      maybeCountryCode?.toUpperCase(),
     );
 
-    if (!country) {
-      return errorResponse.BAD_REQUEST("Country is not supported");
+    let country: Country;
+
+    const cachedCountry = countryCache.get(countryCode);
+
+    if (cachedCountry) {
+      country = cachedCountry;
+    } else {
+      const maybeCountry = await getCountryByCountryCode(countryCode);
+      if (!maybeCountry) {
+        return errorResponse.BAD_REQUEST("Country is not supported");
+      }
+      country = maybeCountry;
+      countryCache.add(country);
     }
 
     contextStore.context.country = country;

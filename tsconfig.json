@@ -19,6 +19,7 @@
       "@address-entity": ["libs/entities/address"],
       "@address-module": ["libs/modules/address"],
       "@auth-utils": ["libs/utils/auth"],
+      "@cache-utils": ["libs/utils/cache"],
       "@cart-db": ["libs/db/cart"],
       "@cart-entity": ["libs/entities/cart"],
       "@cart-module": ["libs/modules/cart"],
