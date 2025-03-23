@@ -1,11 +1,14 @@
 import { deleteProductFromCart } from "@cart-db";
-import { CartDTO, toCartDTO } from "@cart-entity";
+import { ExtendedCart, toCartDTO } from "@cart-entity";
 import { getCartId } from "./utils/get-cart-id";
+import { extendCart } from "@extender-utils";
 
-export const removeCartItem = async (productId: string): Promise<CartDTO> => {
+export const removeCartItem = async (
+  productId: string,
+): Promise<ExtendedCart> => {
   const cartId = await getCartId();
 
   const cart = await deleteProductFromCart(productId, cartId);
 
-  return toCartDTO(cart);
+  return extendCart(toCartDTO(cart));
 };
