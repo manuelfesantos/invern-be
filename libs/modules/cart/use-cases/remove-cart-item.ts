@@ -1,25 +1,11 @@
-import { selectProductById } from "@product-db";
-import { errors } from "@error-handling-utils";
-import { insertCart, removeCartItemInDb } from "@cart-db";
-import { contextStore } from "@context-utils";
-import { logCredentials } from "@logger-utils";
+import { deleteProductFromCart } from "@cart-db";
+import { CartDTO, toCartDTO } from "@cart-entity";
+import { getCartId } from "./utils/get-cart-id";
 
-export const removeCartItem = async (productId: string): Promise<string> => {
-  const product = await selectProductById(productId);
+export const removeCartItem = async (productId: string): Promise<CartDTO> => {
+  const cartId = await getCartId();
 
-  if (!product) {
-    throw errors.PRODUCT_NOT_FOUND;
-  }
+  const cart = await deleteProductFromCart(productId, cartId);
 
-  let { cartId } = contextStore.context;
-
-  if (!cartId) {
-    [{ cartId }] = await insertCart({ isLoggedIn: false });
-    contextStore.context.cartId = cartId;
-    logCredentials(cartId);
-  }
-
-  await removeCartItemInDb(cartId, productId);
-
-  return cartId;
+  return toCartDTO(cart);
 };

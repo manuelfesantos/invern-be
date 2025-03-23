@@ -1,15 +1,16 @@
 import { db } from "@db";
 import { cartsTable, productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";
-
-const FIRST_INDEX = 0;
+import { cartFromRawQueryResult, selectCartRawQuery } from "../select";
+import { errors } from "@error-handling-utils";
+import { Cart } from "@cart-entity";
 
 export const updateProductQuantityInCart = async (
   productId: string,
   cartId: string,
   quantity: number,
-): Promise<number> => {
-  const newQuantity = await db().batch([
+): Promise<Cart> => {
+  const [, , cartQueryResult] = await db().batch([
     db()
       .update(productsToCartsTable)
       .set({ quantity })
@@ -24,7 +25,9 @@ export const updateProductQuantityInCart = async (
       .update(cartsTable)
       .set({ lastModifiedAt: Date.now() })
       .where(eq(cartsTable.id, cartId)),
+    selectCartRawQuery(cartId),
   ]);
 
-  return newQuantity[FIRST_INDEX][FIRST_INDEX].quantity;
+  if (!cartQueryResult) throw errors.CART_NOT_FOUND();
+  return cartFromRawQueryResult(cartQueryResult);
 };

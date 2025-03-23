@@ -1,12 +1,15 @@
 import { db } from "@db";
 import { cartsTable, productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";
+import { cartFromRawQueryResult, selectCartRawQuery } from "../select";
+import { errors } from "@error-handling-utils";
+import { Cart } from "@cart-entity";
 
 export const deleteProductFromCart = async (
   productId: string,
   cartId: string,
-): Promise<void> => {
-  await db().batch([
+): Promise<Cart> => {
+  const [, , cartQueryResult] = await db().batch([
     db()
       .delete(productsToCartsTable)
       .where(
@@ -19,5 +22,9 @@ export const deleteProductFromCart = async (
       .update(cartsTable)
       .set({ lastModifiedAt: Date.now() })
       .where(eq(cartsTable.id, cartId)),
+    selectCartRawQuery(cartId),
   ]);
+
+  if (!cartQueryResult) throw errors.CART_NOT_FOUND();
+  return cartFromRawQueryResult(cartQueryResult);
 };
