@@ -7,18 +7,19 @@ import {
 } from "@cart-db";
 import {
   Cart,
-  CartDTO,
   CartOperation,
   CartOperationEnum,
+  ExtendedCart,
   toCartDTO,
 } from "@cart-entity";
 import { isZero } from "@number-utils";
 import { getCartId } from "./utils/get-cart-id";
+import { extendCart } from "@extender-utils";
 
 export const updateCartItemQuantity = async (
   productId: string,
   quantity: number,
-): Promise<CartDTO> => {
+): Promise<ExtendedCart> => {
   const cartId = await getCartId();
 
   const { stock, quantity: cartQuantity } =
@@ -36,7 +37,7 @@ export const updateCartItemQuantity = async (
     quantity,
   );
 
-  return toCartDTO(cart);
+  return extendCart(toCartDTO(cart));
 };
 
 const getCartOperation = (
