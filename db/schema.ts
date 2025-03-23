@@ -1,4 +1,5 @@
 import {
+  index,
   int,
   primaryKey,
   real,
@@ -62,16 +63,20 @@ export const productsTable = sqliteTable("products", {
   weight: int("weight").notNull(),
 });
 
-export const imagesTable = sqliteTable("images", {
-  url: text("url").notNull().primaryKey(),
-  alt: text("alt").notNull(),
-  productId: text("productId")
-    .notNull()
-    .references(() => productsTable.id, { onDelete: "cascade" }),
-  collectionId: text("collectionId")
-    .unique()
-    .references(() => collectionsTable.id, { onDelete: "set null" }),
-});
+export const imagesTable = sqliteTable(
+  "images",
+  {
+    url: text("url").notNull().primaryKey(),
+    alt: text("alt").notNull(),
+    productId: text("productId")
+      .notNull()
+      .references(() => productsTable.id, { onDelete: "cascade" }),
+    collectionId: text("collectionId")
+      .unique()
+      .references(() => collectionsTable.id, { onDelete: "set null" }),
+  },
+  (t) => [index("productId_index").on(t.productId)],
+);
 
 export const productsToCartsTable = sqliteTable(
   "productsOnCarts",

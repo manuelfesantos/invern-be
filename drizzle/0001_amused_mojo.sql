@@ -1,0 +1,1 @@
+CREATE INDEX `productId_index` ON `images` (`productId`);
