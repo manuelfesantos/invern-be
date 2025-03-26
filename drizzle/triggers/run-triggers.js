@@ -64,6 +64,6 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 const folderPath = __dirname;
 
 console.log(`Executing SQL files in folder: ${folderPath}`);
-const tursoUrl = "http://127.0.0.1:8080";
+const tursoUrl = "invern-db-preview";
 
 executeSqlFiles(folderPath, tursoUrl);

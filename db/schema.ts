@@ -134,7 +134,7 @@ export const ordersTable = sqliteTable("orders", {
 
 export const currenciesTable = sqliteTable("currencies", {
   ...baseResource,
-  code: text("currencyId").primaryKey(),
+  code: text("code").primaryKey(),
   name: text("name").notNull(),
   symbol: text("symbol").notNull(),
   rateToEuro: real("rateToEuro").notNull(),
