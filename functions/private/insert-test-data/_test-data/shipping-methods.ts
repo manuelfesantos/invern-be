@@ -151,12 +151,7 @@ export const insertShippingMethods = async (): Promise<void> => {
   }));
   await db()
     .insert(shippingRatesTable)
-    .values(
-      [...portugalShippingRates, ...spainShippingRates].map((rate) => ({
-        ...rate,
-        id: getRandomUUID(),
-      })),
-    )
+    .values([...portugalShippingRates, ...spainShippingRates])
     .execute();
   const portugalRatesToCountries = getRatesToCountries(
     portugalShippingRates,
