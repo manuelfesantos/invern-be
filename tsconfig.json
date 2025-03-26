@@ -36,7 +36,7 @@
       "@crypto-utils": ["libs/utils/crypto"],
       "@currency-entity": ["libs/entities/currency"],
       "@db": ["libs/db"],
-      "@db-schema": ["db"],
+      "@db-schema": ["db/schema"],
       "@decorator-utils": ["libs/utils/decorator"],
       "@encoding-utils": ["libs/utils/encoding"],
       "@env-entity": ["libs/entities/env"],

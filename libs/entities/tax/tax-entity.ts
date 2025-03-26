@@ -2,6 +2,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { taxesTable } from "@schema";
 import { z } from "zod";
 import {
+  dateTimeSchema,
   positiveIntegerSchema,
   positiveNumberSchema,
   requiredStringSchema,
@@ -13,6 +14,8 @@ const baseTaxSchema = createSelectSchema(taxesTable, {
   countryCode: countryCodeSchema,
   name: requiredStringSchema("tax name"),
   rate: positiveNumberSchema("tax rate"),
+  createdAt: dateTimeSchema("tax created at date"),
+  lastModifiedAt: dateTimeSchema("tax last modified at date"),
 });
 export const insertTaxSchema = createInsertSchema(taxesTable).omit({
   id: true,
@@ -22,6 +25,8 @@ export const taxSchema = baseTaxSchema.omit({ countryCode: true });
 
 export const clientTaxSchema = taxSchema.omit({
   id: true,
+  createdAt: true,
+  lastModifiedAt: true,
 });
 
 export const extendedClientTaxSchema = clientTaxSchema.extend({

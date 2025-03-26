@@ -20,7 +20,14 @@ export default [
     },
     rules: {
       "no-console": "error",
-      "@typescript-eslint/explicit-function-return-type": "error",
+      "@typescript-eslint/explicit-function-return-type": [
+        "error",
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+          allowHigherOrderFunctions: true,
+        },
+      ],
       "@typescript-eslint/no-magic-numbers": "error",
       "@typescript-eslint/no-restricted-imports": [
         "error",
@@ -89,6 +96,12 @@ export default [
           ignoreRegExpLiterals: true,
         },
       ],
+    },
+  },
+  {
+    files: ["libs/db/**/*.ts"],
+    rules: {
+      "@typescript-eslint/explicit-function-return-type": "off",
     },
   },
 ];

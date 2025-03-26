@@ -11,6 +11,7 @@ import { logCredentials } from "@logger-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
 import { insertCart } from "@cart-db";
+import { withTransaction } from "@db";
 
 interface ReturnType {
   user: UserDTO;
@@ -18,55 +19,57 @@ interface ReturnType {
   cart: ExtendedCart;
 }
 
-export const login = async (body: unknown): Promise<ReturnType> => {
-  const { isLoggedIn } = contextStore.context;
+export const login = withTransaction(
+  async (body: unknown): Promise<ReturnType> => {
+    const { isLoggedIn } = contextStore.context;
 
-  if (isLoggedIn) {
-    throw errors.UNAUTHORIZED("already logged in");
-  }
+    if (isLoggedIn) {
+      throw errors.UNAUTHORIZED("already logged in");
+    }
 
-  const parsedBody = loginBodySchema.parse(body);
+    const parsedBody = loginBodySchema.parse(body);
 
-  const { email, password, remember } = parsedBody;
+    const { email, password, remember } = parsedBody;
 
-  const user = await getUser(email);
+    const user = await getUser(email);
 
-  await validatePassword(password, user);
+    await validatePassword(password, user);
 
-  const { id: userId } = user;
-  const { id: cartId } = user.cart ?? {};
+    const { id: userId } = user;
+    const { id: cartId } = user.cart ?? {};
 
-  logCredentials(cartId, userId);
+    logCredentials(cartId, userId);
 
-  if (!user.cart) {
-    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
-    await updateUser(userId, { cartId: newCartId });
-    user.cart = {
-      ...EMPTY_CART,
-      id: newCartId,
+    if (!user.cart) {
+      const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+      await updateUser(userId, { cartId: newCartId });
+      user.cart = {
+        ...EMPTY_CART,
+        id: newCartId,
+      };
+    }
+
+    const cart = toCartDTO(user.cart);
+
+    const accessToken = await getLoggedInToken(userId, cartId);
+    let refreshToken = await getAuthSecret(userId);
+
+    if (!refreshToken) {
+      refreshToken = await getLoggedInRefreshToken(userId);
+      await setAuthSecret(userId, refreshToken);
+    }
+
+    return {
+      user: userToUserDTO(user),
+      cart: extendCart(cart),
+      responseContext: {
+        accessToken,
+        refreshToken,
+        remember,
+      },
     };
-  }
-
-  const cart = toCartDTO(user.cart);
-
-  const accessToken = await getLoggedInToken(userId, cartId);
-  let refreshToken = await getAuthSecret(userId);
-
-  if (!refreshToken) {
-    refreshToken = await getLoggedInRefreshToken(userId);
-    await setAuthSecret(userId, refreshToken);
-  }
-
-  return {
-    user: userToUserDTO(user),
-    cart: extendCart(cart),
-    responseContext: {
-      accessToken,
-      refreshToken,
-      remember,
-    },
-  };
-};
+  },
+);
 
 const getUser = async (email: string): Promise<User> => {
   const user = await selectUserByEmail(email);

@@ -11,6 +11,7 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { withRetry } from "./utils/retry-payment";
 import Stripe from "stripe";
+import { withTransaction } from "@db";
 
 const paymentIntentEventMap = {
   "payment_intent.created": getPaymentFromPaymentIntentCreatedEvent,
@@ -34,20 +35,22 @@ const paymentIntentTypeSchema = z.enum(
   },
 );
 
-export const mapPaymentIntentEvent = async (
-  paymentIntent: Stripe.PaymentIntent,
-  eventType: Stripe.Event.Type,
-): Promise<Payment> => {
-  const paymentIntentType = paymentIntentTypeSchema.parse(eventType);
+export const mapPaymentIntentEvent = withTransaction(
+  async (
+    paymentIntent: Stripe.PaymentIntent,
+    eventType: Stripe.Event.Type,
+  ): Promise<Payment> => {
+    const paymentIntentType = paymentIntentTypeSchema.parse(eventType);
 
-  logger().info(`Payment Intent Type: ${paymentIntentType}`, {
-    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-  });
+    logger().info(`Payment Intent Type: ${paymentIntentType}`, {
+      useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    });
 
-  logger().addRedactedData({ paymentId: paymentIntent.id });
+    logger().addRedactedData({ paymentId: paymentIntent.id });
 
-  return await withRetry(
-    paymentIntent,
-    paymentIntentEventMap[paymentIntentType],
-  );
-};
+    return await withRetry(
+      paymentIntent,
+      paymentIntentEventMap[paymentIntentType],
+    );
+  },
+);

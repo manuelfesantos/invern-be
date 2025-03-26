@@ -5,6 +5,7 @@ import {
   requiredStringSchema,
   uuidSchema,
   countryCodeSchema,
+  dateTimeSchema,
 } from "@global-entity";
 import { z } from "zod";
 
@@ -13,10 +14,17 @@ export const baseShippingMethodSchema = createSelectSchema(
   {
     name: requiredStringSchema("shipping method name"),
     id: uuidSchema("shipping method id"),
+    createdAt: dateTimeSchema("shipping method created at date"),
+    lastModifiedAt: dateTimeSchema("shipping method last modified at date"),
   },
 );
 
 export const insertShippingMethodSchema = baseShippingMethodSchema.omit({
+  createdAt: true,
+  lastModifiedAt: true,
+});
+
+export const essentialShippingMethodSchema = insertShippingMethodSchema.omit({
   id: true,
 });
 
@@ -26,10 +34,15 @@ export type ShippingMethod = z.infer<typeof shippingMethodSchema>;
 export type SelectedShippingMethod = z.infer<
   typeof selectedShippingMethodSchema
 >;
+export type EssentialShippingMethod = z.infer<
+  typeof essentialShippingMethodSchema
+>;
 
 export const baseShippingRateSchema = createSelectSchema(shippingRatesTable, {
   shippingMethodId: baseShippingMethodSchema.shape.id,
   id: uuidSchema("shipping rate id"),
+  createdAt: dateTimeSchema("shipping rate created at date"),
+  lastModifiedAt: dateTimeSchema("shipping rate last modified at date"),
   priceInCents: positiveIntegerSchema("price in cents"),
   minWeight: positiveIntegerSchema("min weight"),
   maxWeight: positiveIntegerSchema("max weight"),
@@ -38,6 +51,8 @@ export const baseShippingRateSchema = createSelectSchema(shippingRatesTable, {
 
 export const insertShippingRateSchema = baseShippingRateSchema.omit({
   id: true,
+  createdAt: true,
+  lastModifiedAt: true,
 });
 
 export const shippingRateSchema = baseShippingRateSchema

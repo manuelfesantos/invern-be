@@ -111,6 +111,5 @@ const deleteStock = async (productId: string): Promise<void> => {
 export const stockClient = {
   get: getStock,
   delete: deleteStock,
-  update: updateStock,
   updateMany,
 };

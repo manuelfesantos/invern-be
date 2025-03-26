@@ -2,6 +2,7 @@ import { db } from "@db";
 import { eq, inArray, like, or } from "drizzle-orm";
 import { productsTable } from "@schema";
 import { Product, ProductDetails } from "@product-entity";
+import { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
 
 export const selectProducts = async (): Promise<Product[]> => {
   return db().query.productsTable.findMany({
@@ -37,17 +38,15 @@ export const selectProductById = async (
   });
 };
 
-export const selectProductStockById = async (
+export const selectProductStockById = (
   productId: string,
-): Promise<number | undefined> => {
-  const product = await db().query.productsTable.findFirst({
+): SQLiteRelationalQuery<"async", { stock: number } | undefined> =>
+  db().query.productsTable.findFirst({
     where: eq(productsTable.id, productId),
     columns: {
       stock: true,
     },
   });
-  return product?.stock;
-};
 
 export const selectProductsByCollectionId = async (
   collectionId: string,

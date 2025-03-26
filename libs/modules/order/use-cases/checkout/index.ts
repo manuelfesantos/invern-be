@@ -24,84 +24,85 @@ import {
   insertCheckoutSessionSchema,
 } from "@checkout-session-entity";
 import { extendCart } from "@extender-utils";
+import { withTransaction } from "@db";
 
 interface CheckoutReturnType {
   url: string;
   checkoutSessionId: string;
 }
 
-export const getCheckoutSession = async (
-  origin?: string,
-): Promise<CheckoutReturnType> => {
-  const {
-    cartId,
-    userId,
-    address: addressString,
-    country,
-    shippingMethodId,
-    userDetails,
-  } = contextStore.context;
+export const getCheckoutSession = withTransaction(
+  async (origin?: string): Promise<CheckoutReturnType> => {
+    const {
+      cartId,
+      userId,
+      address: addressString,
+      country,
+      shippingMethodId,
+      userDetails,
+    } = contextStore.context;
 
-  const address = await getValidatedAddressFromString(country, addressString);
+    const address = await getValidatedAddressFromString(country, addressString);
 
-  const cart = await getValidatedCart(cartId);
+    const cart = await getValidatedCart(cartId);
 
-  const personalDetails = await getPersonalDetails(userId, userDetails);
+    const personalDetails = await getPersonalDetails(userId, userDetails);
 
-  const selectedShippingMethod = await getSelectedShippingMethod(
-    cart,
-    country,
-    shippingMethodId,
-  );
+    const selectedShippingMethod = await getSelectedShippingMethod(
+      cart,
+      country,
+      shippingMethodId,
+    );
 
-  await reserveLineItems(cart.products);
+    await reserveLineItems(cart.products);
 
-  const orderId = getRandomUUID();
+    const orderId = getRandomUUID();
 
-  const stripeCheckoutSession = await createStripeCheckoutSession(
-    cart.products,
-    selectedShippingMethod,
-    orderId,
-    origin,
-  );
+    const stripeCheckoutSession = await createStripeCheckoutSession(
+      cart.products,
+      selectedShippingMethod,
+      orderId,
+      origin,
+    );
 
-  const { url, expires_at, id, created } = stripeCheckoutSession;
+    const { url, expires_at, id, created } = stripeCheckoutSession;
 
-  if (!url) {
-    throw new Error("Checkout session creation failed");
-  }
+    if (!url) {
+      throw new Error("Checkout session creation failed");
+    }
 
-  const newCheckoutSession: CheckoutSession = {
-    id,
-    orderId,
-    userId: userId ?? null,
-    cartId: cartId ?? null,
-    expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
-    createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
-    products: cart.products,
-    shippingMethod: selectedShippingMethod,
-    address: address,
-    personalDetails: personalDetails,
-    country: country,
-  };
+    const newCheckoutSession: CheckoutSession = {
+      id,
+      orderId,
+      userId: userId ?? null,
+      cartId: cartId ?? null,
+      expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
+      createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
+      products: cart.products,
+      shippingMethod: selectedShippingMethod,
+      address: address,
+      personalDetails: personalDetails,
+      country: country,
+    };
 
-  const [checkoutSession] = await insertCheckoutSession(
-    insertCheckoutSessionSchema.parse(newCheckoutSession),
-  );
+    const [checkoutSession] = await insertCheckoutSession(
+      insertCheckoutSessionSchema.parse(newCheckoutSession),
+    );
 
-  logger().info("Finished creating checkout session", {
-    useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-    data: {
-      sessionDetails: stringifyObject(stripeCheckoutSession),
-      checkoutSession,
-    },
-  });
+    logger().info("Finished creating checkout session", {
+      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+      data: {
+        sessionDetails: stringifyObject(stripeCheckoutSession),
+        checkoutSession,
+      },
+    });
 
-  return {
-    url,
-    checkoutSessionId: id,
-  };
-};
+    return {
+      url,
+      checkoutSessionId: id,
+    };
+  },
+);
 
 const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
   const updatedLineItems = await decreaseProductsStock(lineItems);

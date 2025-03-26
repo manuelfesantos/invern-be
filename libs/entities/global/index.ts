@@ -73,8 +73,8 @@ export const countryCodeSchema = requiredStringSchema("Country code")
     message: "Country code should be uppercase",
   });
 
-export const dateTimeSchema = (name: string): z.ZodString =>
-  stringSchema(name).datetime({
+export const dateTimeSchema = (name: string): z.ZodEffects<ZodString> =>
+  stringSchema(name).refine((value) => !isNaN(Date.parse(value)), {
     message: `${name} should be a valid date time`,
   });
 

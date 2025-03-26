@@ -1,3 +1,6 @@
+const FIRST_CHARACTER = 0;
+const LAST_CHARACTER = -1;
+
 const TWO_WEEKS = 2;
 const THIRTY_MINUTES = 30;
 const FIFTEEN_MINUTES = 15;
@@ -30,5 +33,5 @@ export const getCurrentTime = (): number => {
 
 export const getDateTime = (ms?: number): string => {
   const date = ms ? new Date(ms) : new Date();
-  return date.toISOString();
+  return date.toISOString().slice(FIRST_CHARACTER, LAST_CHARACTER);
 };

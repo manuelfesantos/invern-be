@@ -1,4 +1,8 @@
-import { BaseShippingMethod, BaseShippingRate } from "@shipping-entity";
+import {
+  BaseShippingRate,
+  EssentialShippingMethod,
+  InsertShippingRate,
+} from "@shipping-entity";
 import { getRandomUUID } from "@crypto-utils";
 import {
   shippingMethodsTable,
@@ -7,19 +11,18 @@ import {
 } from "@schema";
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
+import { getDateTime } from "@timer-utils";
 
 const FIRST_INDEX = 0;
 
-const getShippingMethods = (): BaseShippingMethod[] => [
+const getShippingMethods = (): EssentialShippingMethod[] => [
   {
-    id: getRandomUUID(),
     name: "Batch Logistics",
   },
 ];
 
-const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
+const getPortugalShippingRates = (methodId: string): InsertShippingRate[] => [
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 406,
     minWeight: 0,
@@ -27,7 +30,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 3000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 426,
     minWeight: 3000,
@@ -35,7 +37,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 5000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 449,
     minWeight: 5000,
@@ -43,7 +44,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 10000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 572,
     minWeight: 10000,
@@ -51,7 +51,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 15000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 606,
     minWeight: 15000,
@@ -59,7 +58,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 20000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 736,
     minWeight: 20000,
@@ -67,7 +65,6 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 25000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 775,
     minWeight: 25000,
@@ -76,9 +73,8 @@ const getPortugalShippingRates = (methodId: string): BaseShippingRate[] => [
   },
 ];
 
-const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
+const getSpainShippingRates = (methodId: string): InsertShippingRate[] => [
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 608,
     minWeight: 0,
@@ -86,7 +82,6 @@ const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 1000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 691,
     minWeight: 1000,
@@ -94,7 +89,6 @@ const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 5000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 818,
     minWeight: 5000,
@@ -102,7 +96,6 @@ const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 10000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 1186,
     minWeight: 10000,
@@ -110,7 +103,6 @@ const getSpainShippingRates = (methodId: string): BaseShippingRate[] => [
     maxWeight: 15000,
   },
   {
-    id: getRandomUUID(),
     shippingMethodId: methodId,
     priceInCents: 1494,
     minWeight: 15000,
@@ -132,7 +124,10 @@ const getRatesToCountries = (
   }));
 
 export const insertShippingMethods = async (): Promise<void> => {
-  const shippingMethods = getShippingMethods();
+  const shippingMethods = getShippingMethods().map((method) => ({
+    ...method,
+    id: getRandomUUID(),
+  }));
   await Promise.all(
     shippingMethods.map(async (shippingMethod) => {
       await db().insert(shippingMethodsTable).values(shippingMethod).execute();
@@ -140,13 +135,28 @@ export const insertShippingMethods = async (): Promise<void> => {
   );
   const portugalShippingRates = getPortugalShippingRates(
     shippingMethods[FIRST_INDEX].id,
-  );
+  ).map((rate) => ({
+    ...rate,
+    id: getRandomUUID(),
+    createdAt: getDateTime(),
+    lastModifiedAt: getDateTime(),
+  }));
   const spainShippingRates = getSpainShippingRates(
     shippingMethods[FIRST_INDEX].id,
-  );
+  ).map((rate) => ({
+    ...rate,
+    id: getRandomUUID(),
+    createdAt: getDateTime(),
+    lastModifiedAt: getDateTime(),
+  }));
   await db()
     .insert(shippingRatesTable)
-    .values([...portugalShippingRates, ...spainShippingRates])
+    .values(
+      [...portugalShippingRates, ...spainShippingRates].map((rate) => ({
+        ...rate,
+        id: getRandomUUID(),
+      })),
+    )
     .execute();
   const portugalRatesToCountries = getRatesToCountries(
     portugalShippingRates,

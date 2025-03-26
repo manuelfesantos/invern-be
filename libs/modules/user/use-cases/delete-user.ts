@@ -3,12 +3,13 @@ import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
 import { ResponseContext } from "@http-entity";
 import { getAnonymousTokens } from "@jwt-utils";
+import { withTransaction } from "@db";
 
 interface ReturnType {
   responseContext: ResponseContext;
 }
 
-export const deleteUser = async (): Promise<ReturnType> => {
+export const deleteUser = withTransaction(async (): Promise<ReturnType> => {
   const { userId } = contextStore.context;
 
   if (!userId) {
@@ -19,4 +20,4 @@ export const deleteUser = async (): Promise<ReturnType> => {
   return {
     responseContext: await getAnonymousTokens(),
   };
-};
+});

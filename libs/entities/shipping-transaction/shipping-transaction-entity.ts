@@ -13,14 +13,14 @@ export const shippingTransactionSchema = createInsertSchema(
     status: shippingTransactionStatusEnumSchema,
     createdAt: dateTimeSchema("shippingTransaction created at"),
     trackingUrl: urlSchema("tracking url"),
-    updatedAt: dateTimeSchema("shippingTransaction updated at"),
+    lastModifiedAt: dateTimeSchema("shippingTransaction updated at"),
   },
 );
 
 export const insertShippingTransactionSchema = shippingTransactionSchema.omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
+  lastModifiedAt: true,
 });
 
 export type InsertShippingTransaction = z.infer<

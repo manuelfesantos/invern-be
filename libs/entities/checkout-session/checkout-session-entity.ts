@@ -39,6 +39,7 @@ export const checkoutSessionSchema = createSelectSchema(checkoutSessionsTable, {
   id: insertCheckoutSessionSchema.shape.id,
   cartId: insertCheckoutSessionSchema.shape.cartId,
   createdAt: insertCheckoutSessionSchema.shape.createdAt,
+  lastModifiedAt: insertCheckoutSessionSchema.shape.lastModifiedAt,
   userId: insertCheckoutSessionSchema.shape.userId,
   expiresAt: insertCheckoutSessionSchema.shape.expiresAt,
   products: requiredStringSchema("checkout products").transform((value) =>

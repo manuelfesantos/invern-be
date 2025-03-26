@@ -3,15 +3,23 @@ import { collectionsTable } from "@schema";
 import { z } from "zod";
 import { extendedProductSchema, productSchema } from "@product-entity";
 import { imageSchema } from "@image-entity";
-import { requiredStringSchema, uuidSchema } from "@global-entity";
+import {
+  dateTimeSchema,
+  requiredStringSchema,
+  uuidSchema,
+} from "@global-entity";
 
 const baseCollectionSchema = createSelectSchema(collectionsTable, {
   id: uuidSchema("collection id"),
   name: requiredStringSchema("collection name"),
   description: requiredStringSchema("collection description"),
+  lastModifiedAt: dateTimeSchema("collection last modified date"),
+  createdAt: dateTimeSchema("collection creation date"),
 });
 export const insertCollectionSchema = baseCollectionSchema.omit({
   id: true,
+  lastModifiedAt: true,
+  createdAt: true,
 });
 
 export const collectionDetailsSchema = baseCollectionSchema.merge(

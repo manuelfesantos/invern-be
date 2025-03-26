@@ -2,6 +2,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { paymentMethodsTable, paymentsTable } from "@schema";
 import { z } from "zod";
 import {
+  dateTimeSchema,
   positiveIntegerSchema,
   requiredStringSchema,
   uuidSchema,
@@ -25,7 +26,8 @@ export const PaymentIntentState = paymentIntentStateSchema.Enum;
 const basePaymentSchema = createSelectSchema(paymentsTable, {
   id: uuidSchema("payment id"),
   state: paymentIntentStateSchema,
-  createdAt: requiredStringSchema("payment created at date"),
+  createdAt: dateTimeSchema("payment created at date"),
+  lastModifiedAt: dateTimeSchema("payment last modified at date"),
   netAmount: positiveIntegerSchema("payment net amount").optional(),
   grossAmount: positiveIntegerSchema("payment gross amount"),
   paymentMethodId: requiredStringSchema("payment method id").optional(),
@@ -36,6 +38,8 @@ export const basePaymentMethodSchema = createSelectSchema(paymentMethodsTable, {
   type: paymentMethodTypeSchema,
   brand: requiredStringSchema("payment method brand").optional(),
   last4: requiredStringSchema("payment method last 4").optional(),
+  createdAt: dateTimeSchema("payment method created at date"),
+  lastModifiedAt: dateTimeSchema("payment method last modified at date"),
 });
 
 export const insertPaymentMethodSchema = createInsertSchema(
@@ -46,7 +50,10 @@ export const insertPaymentMethodSchema = createInsertSchema(
     brand: basePaymentMethodSchema.shape.brand,
     last4: basePaymentMethodSchema.shape.last4,
   },
-);
+).omit({
+  createdAt: true,
+  lastModifiedAt: true,
+});
 
 export const clientPaymentMethodSchema = basePaymentMethodSchema.omit({
   id: true,
@@ -54,6 +61,7 @@ export const clientPaymentMethodSchema = basePaymentMethodSchema.omit({
 
 export const insertPaymentSchema = basePaymentSchema.omit({
   createdAt: true,
+  lastModifiedAt: true,
 });
 
 export const paymentSchema = basePaymentSchema;

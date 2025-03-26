@@ -1,9 +1,9 @@
 import { PaymentIntent, StripeSessionResult } from "@stripe-entity";
 import {
   InsertPayment,
+  InsertPaymentMethod,
   PaymentIntentState,
   PaymentIntentStateType,
-  PaymentMethod,
   PaymentMethodType,
   paymentMethodTypeSchema,
 } from "@payment-entity";
@@ -29,7 +29,7 @@ export const getPaymentFromSessionResult = (
 export const getPaymentFromPaymentIntent = async (
   paymentIntent: PaymentIntent,
   type: PaymentIntentStateType,
-): Promise<{ payment: InsertPayment; paymentMethod?: PaymentMethod }> => {
+): Promise<{ payment: InsertPayment; paymentMethod?: InsertPaymentMethod }> => {
   const [paymentMethodType] = paymentIntent.payment_method_types;
 
   const paymentMethodId =
@@ -48,7 +48,7 @@ export const getPaymentFromPaymentIntent = async (
     return { payment };
   }
 
-  const paymentMethod: PaymentMethod = {
+  const paymentMethod: InsertPaymentMethod = {
     id: paymentMethodId,
     type: paymentMethodTypeSchema.parse(paymentMethodType),
   };

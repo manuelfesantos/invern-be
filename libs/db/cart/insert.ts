@@ -12,7 +12,6 @@ export const insertCart = async ({
 }): Promise<{ cartId: string }[]> => {
   const insertCart = {
     id: getRandomUUID(),
-    lastModifiedAt: Date.now(),
     isLoggedIn,
   };
 
@@ -28,7 +27,6 @@ export const insertCartReturningAll = async ({
 }): Promise<Cart> => {
   const insertCart = {
     id: getRandomUUID(),
-    lastModifiedAt: Date.now(),
     isLoggedIn,
   };
   const returnedCart = (

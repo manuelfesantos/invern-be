@@ -6,6 +6,8 @@ import { ENV } from "@env-utils";
 export const purgeCache = async (
   cacheKey: string | string[],
 ): Promise<void> => {
+  if (ENV.ENV === "local") return;
+
   const { ZONE_ID, CACHE_API_KEY, CACHE_API_EMAIL } = ENV;
 
   if (!CACHE_API_KEY) {
