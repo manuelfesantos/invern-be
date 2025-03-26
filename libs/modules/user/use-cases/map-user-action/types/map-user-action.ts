@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { insertUserSchema, UserDTO } from "@user-entity";
+import { insertUserSchema } from "@user-entity";
 import { emailSchema, requiredStringSchema } from "@global-entity";
-import { ResponseContext } from "@http-entity";
 
 export const userActionSchema = z.enum(["login", "signup", "logout"], {
   message: "invalid action",
@@ -16,18 +15,9 @@ export const loginBodySchema = z.object({
   remember: z.boolean().default(false),
 });
 
-export const signupBodySchema = insertUserSchema
-  .omit({ cartId: true })
-  .merge(
-    z.object({
-      remember: z.boolean().default(false),
-      password: requiredStringSchema("user password"),
-    }),
-  );
-
-export interface UserActionReturnType {
-  shouldRemoveCartId?: boolean;
-  shouldDeleteRemember?: boolean;
-  user?: UserDTO;
-  responseContext: ResponseContext;
-}
+export const signupBodySchema = insertUserSchema.omit({ cartId: true }).merge(
+  z.object({
+    remember: z.boolean().default(false),
+    password: requiredStringSchema("user password"),
+  }),
+);

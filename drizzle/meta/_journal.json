@@ -15,6 +15,20 @@
       "when": 1742691098566,
       "tag": "0001_amused_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1742925604843,
+      "tag": "0002_pink_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1742926608954,
+      "tag": "0003_ordinary_komodo",
+      "breakpoints": true
     }
   ]
 }

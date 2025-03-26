@@ -27,9 +27,7 @@ const POST: PagesFunction = async ({ request }) => {
     stock: stock || NO_STOCK,
   }));
 
-  const productUpdates = products.map((product) => stockClient.update(product));
-
-  await Promise.all(productUpdates);
+  await stockClient.updateMany(products);
 
   return successResponse.OK("success setting up stock in bucket");
 };

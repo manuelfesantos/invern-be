@@ -3,16 +3,25 @@ import { countriesTable } from "@schema";
 import { z } from "zod";
 import { clientCurrencySchema, currencyCodeSchema } from "@currency-entity";
 import { clientTaxSchema, taxSchema } from "@tax-entity";
-import { requiredStringSchema, countryCodeSchema } from "@global-entity";
+import {
+  requiredStringSchema,
+  countryCodeSchema,
+  dateTimeSchema,
+} from "@global-entity";
 
 const baseCountrySchema = createSelectSchema(countriesTable, {
   name: requiredStringSchema("Country name"),
   code: countryCodeSchema,
   currencyCode: currencyCodeSchema,
   locale: requiredStringSchema("Country locale"),
+  createdAt: dateTimeSchema("Country creation date"),
+  lastModifiedAt: dateTimeSchema("Country last modified date"),
 });
 
-export const insertCountrySchema = baseCountrySchema;
+export const insertCountrySchema = baseCountrySchema.omit({
+  createdAt: true,
+  lastModifiedAt: true,
+});
 
 export const countrySchema = baseCountrySchema
   .omit({

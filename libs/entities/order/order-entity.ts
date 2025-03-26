@@ -5,7 +5,11 @@ import { addressSchema } from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 import { clientCurrencySchema } from "@currency-entity";
-import { requiredStringSchema, uuidSchema } from "@global-entity";
+import {
+  dateTimeSchema,
+  requiredStringSchema,
+  uuidSchema,
+} from "@global-entity";
 import { countrySchema } from "@country-entity";
 import { selectedShippingMethodSchema } from "@shipping-entity";
 import { userDetailsSchema } from "@user-entity";
@@ -26,7 +30,8 @@ export const baseOrderSchema = createSelectSchema(ordersTable, {
   userId: z.optional(uuidSchema("user id")),
   paymentId: z.optional(requiredStringSchema("payment id")),
   stripeId: requiredStringSchema("stripe id"),
-  createdAt: requiredStringSchema("created at"),
+  createdAt: dateTimeSchema("order creation date"),
+  lastModifiedAt: dateTimeSchema("order last modified date"),
   products: requiredStringSchema("products").transform((value) =>
     lineItemSchema.array().parse(JSON.parse(value)),
   ),

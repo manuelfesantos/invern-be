@@ -4,6 +4,7 @@ import { z } from "zod";
 import { extendedLineItemSchema, lineItemSchema } from "@product-entity";
 import {
   booleanSchema,
+  dateTimeSchema,
   positiveIntegerSchema,
   uuidSchema,
 } from "@global-entity";
@@ -13,7 +14,8 @@ const cartOperationSchema = z.enum(["ADD", "REMOVE", "UPDATE"]);
 
 const baseCartSchema = createSelectSchema(cartsTable, {
   id: uuidSchema("cart id"),
-  lastModifiedAt: positiveIntegerSchema("cart last modified date"),
+  createdAt: dateTimeSchema("cart creation date"),
+  lastModifiedAt: dateTimeSchema("cart last modified date"),
   isLoggedIn: booleanSchema("cart logged in status"),
 });
 
@@ -35,6 +37,7 @@ export const cartDTOSchema = cartSchema.omit({
   id: true,
   lastModifiedAt: true,
   isLoggedIn: true,
+  createdAt: true,
 });
 
 export const extendedCartSchema = cartDTOSchema.extend({
@@ -66,7 +69,8 @@ export type CartOperation = z.infer<typeof cartOperationSchema>;
 
 export const EMPTY_CART: Cart = {
   products: [],
-  lastModifiedAt: Date.now(),
+  createdAt: new Date().toISOString(),
+  lastModifiedAt: new Date().toISOString(),
   id: "",
   isLoggedIn: false,
 };

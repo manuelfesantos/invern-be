@@ -1,9 +1,9 @@
 import { PaymentIntent } from "@stripe-entity";
 import {
   InsertPayment,
+  InsertPaymentMethod,
   Payment,
   PaymentIntentState,
-  PaymentMethod,
 } from "@payment-entity";
 import {
   selectPaymentById,
@@ -149,9 +149,8 @@ const handleFailedPayment = async (
 
   if (products && products.length && id) {
     const updatedProducts = await increaseProductsStock(products);
-    for (const product of updatedProducts) {
-      await stockClient.update(product);
-    }
+    await stockClient.updateMany(updatedProducts);
+
     await updateOrder(id, { isCanceled: true });
   }
   const savedPayment = await selectPaymentById(payment.id);
@@ -180,7 +179,7 @@ const handleFailedPayment = async (
 };
 
 const savePaymentMethod = async (
-  paymentMethod?: PaymentMethod,
+  paymentMethod?: InsertPaymentMethod,
 ): Promise<void> => {
   if (!paymentMethod) {
     return;

@@ -1,5 +1,5 @@
 import {
-  BaseShippingMethod,
+  EssentialShippingMethod,
   InsertShippingMethod,
   ShippingMethod,
 } from "@shipping-entity";
@@ -8,9 +8,9 @@ import { db } from "@db";
 import { shippingMethodsTable } from "@schema";
 
 export const insertShippingMethod = async (
-  insertShippingMethod: InsertShippingMethod,
+  insertShippingMethod: EssentialShippingMethod,
 ): Promise<ShippingMethod> => {
-  const shippingMethod: BaseShippingMethod = {
+  const shippingMethod: InsertShippingMethod = {
     ...insertShippingMethod,
     id: getRandomUUID(),
   };

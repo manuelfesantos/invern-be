@@ -22,73 +22,75 @@ import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
 import { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
+import { withTransaction } from "@db";
 
-export const getOrderFromSessionResult = async (
-  sessionResult: StripeSessionResult,
-): Promise<ClientOrder> => {
-  logger().addRedactedData({ orderId: sessionResult.id });
+export const getOrderFromSessionResult = withTransaction(
+  async (sessionResult: StripeSessionResult): Promise<ClientOrder> => {
+    logger().addRedactedData({ orderId: sessionResult.id });
 
-  await validateIfOrderAlreadyExists(sessionResult.id);
+    await validateIfOrderAlreadyExists(sessionResult.id);
 
-  const payment = await getPayment(sessionResult);
+    const payment = await getPayment(sessionResult);
 
-  const {
-    products,
-    userId,
-    cartId,
-    address,
-    personalDetails,
-    shippingMethod,
-    country,
-    orderId: clientId,
-  } = await getCheckoutSession(sessionResult.id);
+    const {
+      products,
+      userId,
+      cartId,
+      address,
+      personalDetails,
+      shippingMethod,
+      country,
+      orderId: clientId,
+    } = await getCheckoutSession(sessionResult.id);
 
-  logCredentials(cartId, userId);
+    logCredentials(cartId, userId);
 
-  const { id: shippingTransactionId } = await insertShippingTransaction({
-    status: ShippingTransactionStatusEnum.processing,
-  });
+    const { id: shippingTransactionId } = await insertShippingTransaction({
+      status: ShippingTransactionStatusEnum.processing,
+    });
 
-  const newOrder: BaseOrder = {
-    personalDetails,
-    shippingMethod,
-    country,
-    shippingTransactionId,
-    createdAt: getDateTime(),
-    id: clientId,
-    address,
-    products,
-    userId: userId ?? null,
-    stripeId: sessionResult.id,
-    paymentId: payment.id,
-    isCanceled: false,
-  };
+    const newOrder: BaseOrder = {
+      personalDetails,
+      shippingMethod,
+      country,
+      shippingTransactionId,
+      createdAt: getDateTime(),
+      lastModifiedAt: getDateTime(),
+      id: clientId,
+      address,
+      products,
+      userId: userId ?? null,
+      stripeId: sessionResult.id,
+      paymentId: payment.id,
+      isCanceled: false,
+    };
 
-  const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));
+    const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));
 
-  const order = await selectOrderById(orderId);
+    const order = await selectOrderById(orderId);
 
-  if (!order) {
-    throw new Error("Unable to create order");
-  }
-
-  if (cartId) {
-    await deleteCart(cartId);
-    if (userId) {
-      const { id: newCartId } = await insertCartReturningAll({
-        isLoggedIn: true,
-      });
-      await updateUser(userId, { cartId: newCartId });
-      logCredentials(newCartId);
+    if (!order) {
+      throw new Error("Unable to create order");
     }
-  }
 
-  if (userId) {
-    await incrementUserVersion(userId);
-  }
+    if (cartId) {
+      await deleteCart(cartId);
+      if (userId) {
+        const { id: newCartId } = await insertCartReturningAll({
+          isLoggedIn: true,
+        });
+        await updateUser(userId, { cartId: newCartId });
+        logCredentials(newCartId);
+      }
+    }
 
-  return clientOrderSchema.parse(order);
-};
+    if (userId) {
+      await incrementUserVersion(userId);
+    }
+
+    return clientOrderSchema.parse(order);
+  },
+);
 
 const validateIfOrderAlreadyExists = async (orderId: string): Promise<void> => {
   const orderAlreadyExists = await checkIfOrderExists(orderId);

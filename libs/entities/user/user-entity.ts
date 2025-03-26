@@ -4,6 +4,7 @@ import { z } from "zod";
 import { cartSchema } from "@cart-entity";
 import {
   booleanSchema,
+  dateTimeSchema,
   emailSchema,
   requiredObjectSchema,
   requiredStringSchema,
@@ -15,6 +16,8 @@ export const DEFAULT_USER_VERSION = 1;
 
 export const baseUserSchema = createInsertSchema(usersTable, {
   id: uuidSchema("user id"),
+  createdAt: dateTimeSchema("user creation date"),
+  lastModifiedAt: dateTimeSchema("user last modified date"),
   password: requiredStringSchema("user password"),
   version: z.number().default(DEFAULT_USER_VERSION),
   role: z.enum(["ADMIN", "USER"]).default("USER"),

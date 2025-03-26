@@ -42,6 +42,7 @@ class EnvironmentService {
   }
 
   get STOCK_HOST(): string {
+    if (this.var("ENV") === "local") return "";
     return this.var("STOCK_HOST");
   }
 

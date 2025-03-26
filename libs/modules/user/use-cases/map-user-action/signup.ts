@@ -9,6 +9,8 @@ import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
 import { ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
+import { localLogger } from "@logger-utils";
+import { withTransaction } from "@db";
 
 interface ReturnType {
   user: UserDTO;
@@ -16,52 +18,56 @@ interface ReturnType {
   cart: ExtendedCart;
 }
 
-export const signup = async (body: unknown): Promise<ReturnType> => {
-  const { isLoggedIn, cartId } = contextStore.context;
+export const signup = withTransaction(
+  async (body: unknown): Promise<ReturnType> => {
+    const { isLoggedIn, cartId } = contextStore.context;
 
-  if (isLoggedIn) {
-    throw errors.UNAUTHORIZED("already logged in");
-  }
+    localLogger.info("signup", { isLoggedIn, cartId });
 
-  const parsedBody = signupBodySchema.parse(body);
+    if (isLoggedIn) {
+      throw errors.UNAUTHORIZED("already logged in");
+    }
 
-  const { remember } = parsedBody;
+    const parsedBody = signupBodySchema.parse(body);
 
-  await validateThatEmailIsUnique(parsedBody.email);
+    const { remember } = parsedBody;
 
-  if (!cartId) {
-    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
-    contextStore.context.cartId = newCartId;
-  } else {
-    await updateCart(cartId, { isLoggedIn: true });
-  }
+    await validateThatEmailIsUnique(parsedBody.email);
 
-  const [{ userId }] = await insertUser({
-    ...parsedBody,
-    cartId: contextStore.context.cartId,
-  });
-  const user = await selectUserById(userId);
+    if (!cartId) {
+      const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+      contextStore.context.cartId = newCartId;
+    } else {
+      await updateCart(cartId, { isLoggedIn: true });
+    }
 
-  const refreshToken = await getLoggedInRefreshToken(userId);
-  await setAuthSecret(userId, refreshToken);
+    const [{ userId }] = await insertUser({
+      ...parsedBody,
+      cartId: contextStore.context.cartId,
+    });
+    const user = await selectUserById(userId);
 
-  const accessToken = await getLoggedInToken(
-    userId,
-    contextStore.context.cartId,
-  );
+    const refreshToken = await getLoggedInRefreshToken(userId);
+    await setAuthSecret(userId, refreshToken);
 
-  const { cart } = user;
+    const accessToken = await getLoggedInToken(
+      userId,
+      contextStore.context.cartId,
+    );
 
-  if (!cart) {
-    throw errors.CART_NOT_FOUND();
-  }
+    const { cart } = user;
 
-  return {
-    cart: extendCart(toCartDTO(cart)),
-    user: userToUserDTO(user),
-    responseContext: { refreshToken, accessToken, remember },
-  };
-};
+    if (!cart) {
+      throw errors.CART_NOT_FOUND();
+    }
+
+    return {
+      cart: extendCart(toCartDTO(cart)),
+      user: userToUserDTO(user),
+      responseContext: { refreshToken, accessToken, remember },
+    };
+  },
+);
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {
   const userExists = Boolean(await selectUserByEmail(email));

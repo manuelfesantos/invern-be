@@ -1,9 +1,9 @@
 import { errors } from "@error-handling-utils";
 import {
-  deleteProductFromCart,
-  insertProductInCart,
-  updateProductQuantityInCart,
-  selectProductStockAndQuantityInCart,
+  addProductOperation,
+  removeProductOperation,
+  selectProductStockAndQuantityOperation,
+  updateProductQuantityOperation,
 } from "@cart-db";
 import {
   Cart,
@@ -23,7 +23,7 @@ export const updateCartItemQuantity = async (
   const cartId = await getCartId();
 
   const { stock, quantity: cartQuantity } =
-    await selectProductStockAndQuantityInCart(productId, cartId);
+    await selectProductStockAndQuantityOperation(productId, cartId);
 
   if (quantity > stock) {
     throw errors.PRODUCT_OUT_OF_STOCK(stock);
@@ -59,7 +59,7 @@ const cartOperationMap: Record<
   CartOperation,
   (productId: string, cartId: string, quantity: number) => Promise<Cart>
 > = {
-  [CartOperationEnum.ADD]: insertProductInCart,
-  [CartOperationEnum.REMOVE]: deleteProductFromCart,
-  [CartOperationEnum.UPDATE]: updateProductQuantityInCart,
+  [CartOperationEnum.ADD]: addProductOperation,
+  [CartOperationEnum.REMOVE]: removeProductOperation,
+  [CartOperationEnum.UPDATE]: updateProductQuantityOperation,
 };

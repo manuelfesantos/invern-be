@@ -6,23 +6,36 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 const DEFAULT_VERSION = 1;
 const VALUE_ZERO = 0;
 
 //-----------------------------------SCHEMA-----------------------------------//
 
-export const cartsTable = sqliteTable("carts", {
+const baseResource = {
+  createdAt: text("createdAt")
+    .notNull()
+    .default(sql`(strftime('%Y-%m-%dT%H:%M:%f', 'now'))`),
+  lastModifiedAt: text("lastModifiedAt")
+    .notNull()
+    .default(sql`(strftime('%Y-%m-%dT%H:%M:%f', 'now'))`),
+};
+
+const baseResourceWithId = {
+  ...baseResource,
   id: text("id").primaryKey(),
-  lastModifiedAt: int("lastModifiedAt").notNull(),
+};
+
+export const cartsTable = sqliteTable("carts", {
+  ...baseResourceWithId,
   isLoggedIn: int("isLoggedIn", {
     mode: "boolean",
   }).notNull(),
 });
 
 export const usersTable = sqliteTable("users", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   email: text("email").notNull(),
   firstName: text("firstName").notNull(),
   lastName: text("lastName"),
@@ -46,13 +59,13 @@ export const usersTable = sqliteTable("users", {
 });
 
 export const collectionsTable = sqliteTable("collections", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   name: text("name").notNull(),
   description: text("description").notNull(),
 });
 
 export const productsTable = sqliteTable("products", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   name: text("name").notNull(),
   description: text("description").notNull(),
   stock: int("stock").notNull(),
@@ -66,6 +79,7 @@ export const productsTable = sqliteTable("products", {
 export const imagesTable = sqliteTable(
   "images",
   {
+    ...baseResource,
     url: text("url").notNull().primaryKey(),
     alt: text("alt").notNull(),
     productId: text("productId")
@@ -95,9 +109,8 @@ export const productsToCartsTable = sqliteTable(
 );
 
 export const ordersTable = sqliteTable("orders", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   stripeId: text("stripeId").unique().notNull(),
-  createdAt: text("createdAt").notNull(),
   userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
@@ -120,6 +133,7 @@ export const ordersTable = sqliteTable("orders", {
 });
 
 export const currenciesTable = sqliteTable("currencies", {
+  ...baseResource,
   code: text("currencyId").primaryKey(),
   name: text("name").notNull(),
   symbol: text("symbol").notNull(),
@@ -128,7 +142,7 @@ export const currenciesTable = sqliteTable("currencies", {
 });
 
 export const taxesTable = sqliteTable("taxes", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   name: text("name").notNull(),
   rate: int("rate"),
   countryCode: text("countryId")
@@ -139,6 +153,7 @@ export const taxesTable = sqliteTable("taxes", {
 });
 
 export const countriesTable = sqliteTable("countries", {
+  ...baseResource,
   name: text("name").notNull(),
   code: text("code").notNull().primaryKey(),
   locale: text("locale").notNull(),
@@ -150,8 +165,7 @@ export const countriesTable = sqliteTable("countries", {
 });
 
 export const paymentsTable = sqliteTable("payments", {
-  id: text("id").primaryKey(),
-  createdAt: text("createdAt").notNull(),
+  ...baseResourceWithId,
   state: text("state", {
     enum: ["draft", "succeeded", "canceled", "created", "processing", "failed"],
   }).notNull(),
@@ -166,16 +180,15 @@ export const paymentsTable = sqliteTable("payments", {
 });
 
 export const paymentMethodsTable = sqliteTable("paymentMethods", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   type: text("type", { enum: ["card", "paypal"] }).notNull(),
   brand: text("issuer"),
   last4: text("last4"),
 });
 
 export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   products: text("products").notNull(),
-  createdAt: text("createdAt").notNull(),
   expiresAt: text("expiresAt").notNull(),
   userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
@@ -191,12 +204,12 @@ export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
 });
 
 export const shippingMethodsTable = sqliteTable("shippingMethods", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   name: text("name").notNull(),
 });
 
 export const shippingRatesTable = sqliteTable("shippingRates", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   priceInCents: int("priceInCents").notNull(),
   minWeight: int("minWeight").notNull(),
   maxWeight: int("maxWeight").notNull(),
@@ -229,12 +242,10 @@ export const shippingRatesToCountriesTable = sqliteTable(
 );
 
 export const shippingTransactionsTable = sqliteTable("shippingTransactions", {
-  id: text("id").primaryKey(),
+  ...baseResourceWithId,
   status: text("status", {
     enum: ["processing", "shipped", "delivered", "canceled"],
   }).notNull(),
-  createdAt: text("createdAt").notNull(),
-  updatedAt: text("updatedAt").notNull(),
   trackingUrl: text("trackingUrl"),
 });
 

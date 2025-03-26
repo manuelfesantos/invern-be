@@ -1,8 +1,9 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { productsTable } from "@schema";
 import { z } from "zod";
-import { imageSchema } from "@image-entity";
+import { imageDTOSchema, imageSchema } from "@image-entity";
 import {
+  dateTimeSchema,
   positiveIntegerSchema,
   requiredObjectSchema,
   requiredStringSchema,
@@ -24,6 +25,8 @@ const baseProductSchema = createSelectSchema(productsTable, {
   collectionId: uuidSchema("collection id"),
   stock: positiveIntegerSchema("product stock"),
   weight: positiveIntegerSchema("product weight"),
+  createdAt: dateTimeSchema("product creation date"),
+  lastModifiedAt: dateTimeSchema("product last modified date"),
 });
 export const insertProductSchema = createInsertSchema(productsTable, {
   id: uuidSchema("product id"),
@@ -62,7 +65,7 @@ export const extendedProductWithCollectionDetailsSchema =
 export const productSchema = baseProductSchema
   .omit({ collectionId: true, description: true })
   .extend({
-    images: imageSchema.array(),
+    images: imageDTOSchema.array(),
   });
 
 export const extendedProductSchema = productSchema
@@ -73,9 +76,14 @@ export const extendedProductDetailsSchema = productDetailsSchema
   .omit({ priceInCents: true })
   .merge(priceDetailsSchema);
 
-export const lineItemSchema = productSchema.extend({
-  quantity: positiveIntegerSchema("line item quantity"),
-});
+export const lineItemSchema = productSchema
+  .omit({
+    createdAt: true,
+    lastModifiedAt: true,
+  })
+  .extend({
+    quantity: positiveIntegerSchema("line item quantity"),
+  });
 
 export const lineItemErrorEnumSchema = z.enum(["NOT_ENOUGH_STOCK"]);
 
