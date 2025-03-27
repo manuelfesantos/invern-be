@@ -1,6 +1,5 @@
 import { StripeSessionResult } from "@stripe-entity";
 import { increaseProductsStock } from "@product-db";
-import { successResponse } from "@response-entity";
 import { stockClient } from "@r2-adapter";
 import { popCheckoutSessionById } from "@checkout-session-db";
 import { logger, logCredentials } from "@logger-utils";
@@ -8,7 +7,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { withTransaction } from "@db";
 
 export const handleSessionExpiredEvent = withTransaction(
-  async (event: StripeSessionResult): Promise<Response> => {
+  async (event: StripeSessionResult): Promise<string> => {
     const { id: checkoutSessionId } = event;
     const [checkoutSession] = await popCheckoutSessionById(checkoutSessionId);
 
@@ -19,7 +18,7 @@ export const handleSessionExpiredEvent = withTransaction(
           checkoutSessionId,
         },
       });
-      return successResponse.OK("session expiry already handled");
+      return "checkout session already expired";
     }
 
     const { products, userId, cartId } = checkoutSession;
@@ -29,9 +28,6 @@ export const handleSessionExpiredEvent = withTransaction(
     const updatedProducts = await increaseProductsStock(products);
     await stockClient.updateMany(updatedProducts);
 
-    return successResponse.OK(
-      "success getting checkout-session expired. ",
-      products,
-    );
+    return "checkout session successfully expired";
   },
 );

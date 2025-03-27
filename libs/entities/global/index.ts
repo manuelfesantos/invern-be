@@ -19,7 +19,7 @@ export const requiredStringSchema = (
   });
 
 export const emailSchema = (name: string): ZodString =>
-  stringSchema(name).email({ message: `${name} is and invalid email` });
+  stringSchema(name).email({ message: `${name} is an invalid email` });
 
 export const uuidSchema = (
   name: string,
@@ -27,7 +27,7 @@ export const uuidSchema = (
   stringSchema(name).refine(isValidUUID, `${name} is an invalid uuid`);
 
 export const urlSchema = (name: string): ZodString =>
-  stringSchema(name).url({ message: `${name} is and invalid url` });
+  stringSchema(name).url({ message: `${name} is an invalid url` });
 
 const numberSchema = (name: string): ZodNumber =>
   z.number({

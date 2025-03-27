@@ -1,0 +1,1866 @@
+{
+  "name": "Invern Backend",
+  "version": "1",
+  "items": [
+    {
+      "type": "folder",
+      "name": "Private",
+      "items": [
+        {
+          "type": "folder",
+          "name": "Countries",
+          "items": [
+            {
+              "type": "http",
+              "name": "Setup Countries Bucket",
+              "seq": 1,
+              "request": {
+                "url": "{{base-url}}/private/countries/setup",
+                "method": "POST",
+                "headers": [
+                  {
+                    "name": "x-auth-key",
+                    "value": "{{cloudflare-auth-key}}",
+                    "enabled": true
+                  },
+                  {
+                    "name": "X-Auth-Email",
+                    "value": "{{cloudflare-auth-email}}",
+                    "enabled": true
+                  }
+                ],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"secretKey\": \"{{setup-countries-secret}}\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Stock",
+          "items": [
+            {
+              "type": "http",
+              "name": "Get Stock",
+              "seq": 1,
+              "request": {
+                "url": "{{base-url}}/private/stock/:productId",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  },
+                  {
+                    "name": "User-Agent",
+                    "value": "insomnia/9.3.3",
+                    "enabled": true
+                  }
+                ],
+                "params": [
+                  {
+                    "name": "productId",
+                    "value": "w3wc12N4zJLAmHU9mdEFuf",
+                    "type": "path",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"secretKey\": \"{{setup-stock-secret}}\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {
+                  "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                },
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Setup Stock",
+              "seq": 2,
+              "request": {
+                "url": "{{base-url}}/private/stock/setup",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"secretKey\": \"{{setup-stock-secret}}\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "Test Data",
+          "items": [
+            {
+              "type": "http",
+              "name": "Add Test Data",
+              "seq": 1,
+              "request": {
+                "url": "{{base-url}}/private/insert-test-data",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\"secretKey\": \"MGQ1YzFmMzAtMTA4OC00YzBhLTk2ZjktYWE4NTY2MThkMzQy\"}",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Utils",
+      "items": [
+        {
+          "type": "http",
+          "name": "Check Expired Sessions",
+          "seq": 4,
+          "request": {
+            "url": "https://check-expired-sessions.invernspirit.workers.dev/",
+            "method": "GET",
+            "headers": [],
+            "params": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "auth": {
+              "mode": "none"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Get Countries From Bucket",
+          "seq": 3,
+          "request": {
+            "url": "https://countries-preview.invernspirit.com/countries",
+            "method": "GET",
+            "headers": [],
+            "params": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "auth": {
+              "mode": "none"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Get Stock (R2)",
+          "seq": 1,
+          "request": {
+            "url": "https://stock-preview.invernspirit.com/eYxQpvkJ8998j1zJVuLir8",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "accept-language",
+                "value": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
+                "enabled": true
+              },
+              {
+                "name": "origin",
+                "value": "https://www.invernspirit.com",
+                "enabled": true
+              },
+              {
+                "name": "user-agent",
+                "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                "enabled": true
+              },
+              {
+                "name": "sec-ch-ua",
+                "value": "\"Google Chrome\";v=\"129\", \"Not=A?Brand\";v=\"8\", \"Chromium\";v=\"129\"",
+                "enabled": false
+              },
+              {
+                "name": "sec-ch-ua-platform",
+                "value": "\"Windows\"",
+                "enabled": false
+              },
+              {
+                "name": "cache-control",
+                "value": "no-cache",
+                "enabled": false
+              },
+              {
+                "name": "pragma",
+                "value": "no-cache",
+                "enabled": false
+              },
+              {
+                "name": "accept-encoding",
+                "value": "gzip, deflate, br, zstd",
+                "enabled": false
+              },
+              {
+                "name": "accept",
+                "value": "*/*",
+                "enabled": false
+              },
+              {
+                "name": "priority",
+                "value": "u=1, i",
+                "enabled": false
+              },
+              {
+                "name": "referer",
+                "value": "https://www.invernspirit.com/",
+                "enabled": false
+              },
+              {
+                "name": "sec-ch-ua-mobile",
+                "value": "?0",
+                "enabled": false
+              },
+              {
+                "name": "sec-fetch-dest",
+                "value": "empty",
+                "enabled": false
+              },
+              {
+                "name": "sec-fetch-mode",
+                "value": "cors",
+                "enabled": false
+              },
+              {
+                "name": "sec-fetch-site",
+                "value": "same-site",
+                "enabled": false
+              }
+            ],
+            "params": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "auth": {
+              "mode": "none"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Purge Cache",
+          "seq": 2,
+          "request": {
+            "url": "https://api.cloudflare.com/client/v4/zones/65aba9d21047a252e4aab80082bd30b1/purge_cache",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "X-Auth-Key",
+                "value": "754a0f05b93271ade5e8ae8edc8fb05e5453a",
+                "enabled": true
+              },
+              {
+                "name": "X-Auth-Email",
+                "value": "invernspirit@gmail.com",
+                "enabled": true
+              }
+            ],
+            "params": [],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"files\": [\n    {\n      \"url\": \"https://stock-preview.invernspirit.com/eYxQpvkJ8998j1zJVuLir8\",\n      \"headers\": {\n        \"origin\": \"https://www.invernspirit.com\"\n      }\n    }\n  ]\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "auth": {
+              "mode": "none"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Public",
+      "items": [
+        {
+          "type": "folder",
+          "name": "Countries",
+          "items": [
+            {
+              "type": "http",
+              "name": "Get Config",
+              "seq": 3,
+              "request": {
+                "url": "{{base-url}}/public/countries/:countryCode/config",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "enabled": true
+                  },
+                  {
+                    "name": "User-Agent",
+                    "value": "insomnia/9.3.3",
+                    "enabled": true
+                  },
+                  {
+                    "name": "after-checkout",
+                    "value": "true",
+                    "enabled": true
+                  }
+                ],
+                "params": [
+                  {
+                    "name": "countryCode",
+                    "value": "pt",
+                    "type": "path",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "json": "{}",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {
+                  "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                },
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Countries",
+              "seq": 1,
+              "request": {
+                "url": "{{base-url}}/public/countries",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "insomnia/9.2.0",
+                    "enabled": true
+                  }
+                ],
+                "params": [],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {
+                  "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                },
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Get Country by Code",
+              "seq": 2,
+              "request": {
+                "url": "{{base-url}}/public/countries/:countryCode",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "User-Agent",
+                    "value": "insomnia/9.2.0",
+                    "enabled": true
+                  }
+                ],
+                "params": [
+                  {
+                    "name": "countryCode",
+                    "value": "es",
+                    "type": "path",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {
+                  "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                },
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Test",
+              "seq": 4,
+              "request": {
+                "url": "{{base-url}}/public/countries/:countryCode/test",
+                "method": "GET",
+                "headers": [],
+                "params": [
+                  {
+                    "name": "countryCode",
+                    "value": "pt",
+                    "type": "path",
+                    "enabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "none",
+                  "formUrlEncoded": [],
+                  "multipartForm": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "auth": {
+                  "mode": "none"
+                }
+              }
+            },
+            {
+              "type": "folder",
+              "name": "Cart",
+              "root": {
+                "request": {
+                  "headers": [
+                    {
+                      "name": "Authorization",
+                      "value": "Bearer {{access-token}}",
+                      "enabled": true,
+                      "uid": "t0xuSVoNW5eGhn4raAIGW"
+                    }
+                  ]
+                },
+                "meta": {
+                  "name": "Cart"
+                }
+              },
+              "items": [
+                {
+                  "type": "http",
+                  "name": "Get Cart",
+                  "seq": 1,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/cart",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "Content-Type",
+                        "value": "application/json",
+                        "enabled": true
+                      },
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      },
+                      {
+                        "name": "action",
+                        "value": "get",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "folder",
+                  "name": "Items",
+                  "items": [
+                    {
+                      "type": "http",
+                      "name": "Patch Product In Cart",
+                      "seq": 2,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/cart/items/:productId",
+                        "method": "PATCH",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.0.0",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "add",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "productId",
+                            "value": "12v5c1uztaqpus8XNYNJtG",
+                            "type": "path",
+                            "enabled": true
+                          },
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "json",
+                          "json": "{\n  \"quantity\": 2\n}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    },
+                    {
+                      "type": "http",
+                      "name": "Remove Product From Cart",
+                      "seq": 1,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/cart/items/:productId",
+                        "method": "DELETE",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.0.0",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "remove",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "productId",
+                            "value": "12v5c1uztaqpus8XNYNJtG",
+                            "type": "path",
+                            "enabled": true
+                          },
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "json",
+                          "json": "{\n  \"id\": \"hpSV7qMBNaB6q5baJTG6Ga\",\n  \"quantity\": 3\n}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    },
+                    {
+                      "type": "http",
+                      "name": "Update Product In Cart",
+                      "seq": 3,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/cart/items/:productId",
+                        "method": "PUT",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.0.0",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "add",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "productId",
+                            "value": "12v5c1uztaqpus8XNYNJtG",
+                            "type": "path",
+                            "enabled": true
+                          },
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "json",
+                          "json": "{\n  \"quantity\": 2\n}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "folder",
+              "name": "Checkout",
+              "root": {
+                "request": {
+                  "headers": [
+                    {
+                      "name": "Authorization",
+                      "value": "Bearer {{access-token}}",
+                      "enabled": true,
+                      "uid": "zWCM4Mye3MZWUCyH04DyN"
+                    }
+                  ]
+                },
+                "meta": {
+                  "name": "Checkout"
+                }
+              },
+              "items": [
+                {
+                  "type": "folder",
+                  "name": "Steps",
+                  "items": [
+                    {
+                      "type": "http",
+                      "name": "Get Available Checkout Stages",
+                      "seq": 1,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/checkout/stages",
+                        "method": "GET",
+                        "headers": [],
+                        "params": [
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "none",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {},
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    },
+                    {
+                      "type": "folder",
+                      "name": "Payment",
+                      "items": [
+                        {
+                          "type": "http",
+                          "name": "Get Payment Checkout Session",
+                          "seq": 1,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/payment",
+                            "method": "GET",
+                            "headers": [
+                              {
+                                "name": "Content-Type",
+                                "value": "application/json",
+                                "enabled": true
+                              },
+                              {
+                                "name": "User-Agent",
+                                "value": "insomnia/9.1.0",
+                                "enabled": true
+                              },
+                              {
+                                "name": "cartId",
+                                "value": "a3bc4b1a-22de-49e9-ab3f-c2f3188862c7",
+                                "enabled": false
+                              }
+                            ],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "pt",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "none",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {
+                              "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                            },
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "folder",
+                      "name": "Personal Details",
+                      "items": [
+                        {
+                          "type": "http",
+                          "name": "Get Personal Details",
+                          "seq": 2,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/personal-details",
+                            "method": "GET",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "none",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        },
+                        {
+                          "type": "http",
+                          "name": "Save Personal Details",
+                          "seq": 1,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/personal-details",
+                            "method": "POST",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "pt",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "json",
+                              "json": "{\n  \"personalDetails\": {\n    \"firstName\": \"Manuel\",\n    \"lastName\": \"Santos\",\n    \"email\": \"manuelfesantos123@gmail.com\"\n  }\n}",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "folder",
+                      "name": "Review",
+                      "items": [
+                        {
+                          "type": "http",
+                          "name": "Get Checkout Review",
+                          "seq": 1,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/review",
+                            "method": "GET",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "none",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "folder",
+                      "name": "Shipping",
+                      "items": [
+                        {
+                          "type": "http",
+                          "name": "Get Shipping Methods",
+                          "seq": 2,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/shipping",
+                            "method": "GET",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "none",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        },
+                        {
+                          "type": "http",
+                          "name": "Select Shipping Rate",
+                          "seq": 1,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/shipping",
+                            "method": "POST",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "json",
+                              "json": "{\n  \"id\": \"vq1qVFHwFQxb8P6XXDYQvV\"\n}",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "folder",
+                      "name": "Address",
+                      "items": [
+                        {
+                          "type": "http",
+                          "name": "Create Address",
+                          "seq": 1,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/address",
+                            "method": "POST",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "json",
+                              "json": "{\n  \"address\": {\n    \"street\": \"12345 Yoloooo\",\n    \"houseNumber\": \"21 Abraço\",\n    \"postalCode\": \"2126-432\",\n    \"city\": \"Lisbona\",\n    \"province\": \"Toriala\"\n  },\n  \"saveAddress\": false\n}",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        },
+                        {
+                          "type": "http",
+                          "name": "Get Address",
+                          "seq": 2,
+                          "request": {
+                            "url": "{{base-url}}/public/countries/:countryCode/checkout/stages/address",
+                            "method": "GET",
+                            "headers": [],
+                            "params": [
+                              {
+                                "name": "countryCode",
+                                "value": "PT",
+                                "type": "path",
+                                "enabled": true
+                              }
+                            ],
+                            "body": {
+                              "mode": "none",
+                              "formUrlEncoded": [],
+                              "multipartForm": []
+                            },
+                            "script": {},
+                            "vars": {},
+                            "assertions": [],
+                            "tests": "",
+                            "auth": {
+                              "mode": "none"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "folder",
+              "name": "Collections",
+              "items": [
+                {
+                  "type": "http",
+                  "name": "Get All Collections",
+                  "seq": 1,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/collections",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.1.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "http",
+                  "name": "Get Collection Details",
+                  "seq": 2,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/collections/:id",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.1.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      },
+                      {
+                        "name": "id",
+                        "value": "9bekuxMKGrRTKvZqNYZdDV",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "folder",
+              "name": "Orders",
+              "root": {
+                "request": {
+                  "headers": [
+                    {
+                      "name": "Authorization",
+                      "value": "Bearer {{access-token}}",
+                      "enabled": true,
+                      "uid": "lIaLkbf6FqI3f105gOBbx"
+                    }
+                  ]
+                },
+                "meta": {
+                  "name": "Orders"
+                }
+              },
+              "items": [
+                {
+                  "type": "http",
+                  "name": "Get Order",
+                  "seq": 1,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/orders/:id",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      },
+                      {
+                        "name": "x-user-email",
+                        "value": "manuelfesantos@gmail.com",
+                        "enabled": false
+                      },
+                      {
+                        "name": "getVersion",
+                        "value": "true",
+                        "enabled": false
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      },
+                      {
+                        "name": "id",
+                        "value": "w3ChBD7SjeReRrNSwSSsa3",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "http",
+                  "name": "Get User Orders",
+                  "seq": 2,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/orders",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "folder",
+              "name": "Products",
+              "items": [
+                {
+                  "type": "http",
+                  "name": "Get All Products",
+                  "seq": 1,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/products",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "search",
+                        "value": "earth",
+                        "type": "query",
+                        "enabled": false
+                      },
+                      {
+                        "name": "countryCode",
+                        "value": "pt",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "http",
+                  "name": "Get Product Details",
+                  "seq": 2,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/products/:id",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.1.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "pt",
+                        "type": "path",
+                        "enabled": true
+                      },
+                      {
+                        "name": "id",
+                        "value": "nPn6WYEMz1NK2B61hmrWsb",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "folder",
+              "name": "User",
+              "root": {
+                "request": {
+                  "headers": [
+                    {
+                      "name": "Authorization",
+                      "value": "Bearer {{access-token}}",
+                      "enabled": true,
+                      "uid": "XobXrJf0WipmoKGprM5uc"
+                    }
+                  ]
+                },
+                "meta": {
+                  "name": "User"
+                }
+              },
+              "items": [
+                {
+                  "type": "http",
+                  "name": "Delete User",
+                  "seq": 2,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/user",
+                    "method": "DELETE",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "http",
+                  "name": "Get User",
+                  "seq": 1,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/user",
+                    "method": "GET",
+                    "headers": [
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "pt",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "none",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "http",
+                  "name": "Update User",
+                  "seq": 3,
+                  "request": {
+                    "url": "{{base-url}}/public/countries/:countryCode/user",
+                    "method": "PUT",
+                    "headers": [
+                      {
+                        "name": "Content-Type",
+                        "value": "application/json",
+                        "enabled": true
+                      },
+                      {
+                        "name": "User-Agent",
+                        "value": "insomnia/9.0.0",
+                        "enabled": true
+                      },
+                      {
+                        "name": "action",
+                        "value": "update-email",
+                        "enabled": true
+                      }
+                    ],
+                    "params": [
+                      {
+                        "name": "countryCode",
+                        "value": "PT",
+                        "type": "path",
+                        "enabled": true
+                      }
+                    ],
+                    "body": {
+                      "mode": "json",
+                      "json": "{\n  \"email\": \"manuelfesantos123@gmail.com\",\n  \"address\": {\n    \"apartment\": \"123\"\n  }\n}",
+                      "formUrlEncoded": [],
+                      "multipartForm": []
+                    },
+                    "script": {
+                      "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                    },
+                    "vars": {},
+                    "assertions": [],
+                    "tests": "",
+                    "auth": {
+                      "mode": "none"
+                    }
+                  }
+                },
+                {
+                  "type": "folder",
+                  "name": "Auth",
+                  "items": [
+                    {
+                      "type": "http",
+                      "name": "Login",
+                      "seq": 2,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/user/login",
+                        "method": "POST",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.0.0",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "login",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "countryCode",
+                            "value": "pt",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "json",
+                          "json": "{\n  \"email\": \"manuelfesantos@gmail.com\",\n  \"password\": \"N0th1ng123\",\n  \"remember\": true\n}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    },
+                    {
+                      "type": "http",
+                      "name": "Logout",
+                      "seq": 1,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/user/logout",
+                        "method": "POST",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.3.3",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "logout",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "none",
+                          "json": "{}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    },
+                    {
+                      "type": "http",
+                      "name": "Signup",
+                      "seq": 3,
+                      "request": {
+                        "url": "{{base-url}}/public/countries/:countryCode/user/signup",
+                        "method": "POST",
+                        "headers": [
+                          {
+                            "name": "Content-Type",
+                            "value": "application/json",
+                            "enabled": true
+                          },
+                          {
+                            "name": "User-Agent",
+                            "value": "insomnia/9.0.0",
+                            "enabled": true
+                          },
+                          {
+                            "name": "action",
+                            "value": "signup",
+                            "enabled": true
+                          }
+                        ],
+                        "params": [
+                          {
+                            "name": "countryCode",
+                            "value": "PT",
+                            "type": "path",
+                            "enabled": true
+                          }
+                        ],
+                        "body": {
+                          "mode": "json",
+                          "json": "{\n  \"firstName\": \"Manuel\", \n  \"lastName\": \"Santos\",\n  \"email\": \"manuelfesantos@gmail.com\",\n  \"password\": \"N0th1ng123\"\n}",
+                          "formUrlEncoded": [],
+                          "multipartForm": []
+                        },
+                        "script": {
+                          "res": "data = res.getBody();\nif(data.data && data.data.accessToken) {\n  bru.setEnvVar(\"access-token\",data.data.accessToken);\n}\n"
+                        },
+                        "vars": {},
+                        "assertions": [],
+                        "tests": "",
+                        "auth": {
+                          "mode": "none"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "http",
+      "name": "Deploy Spirit-0",
+      "seq": 2,
+      "request": {
+        "url": "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/da878570-dbf5-4742-a5f9-94504abdf553",
+        "method": "POST",
+        "headers": [],
+        "params": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "auth": {
+          "mode": "none"
+        }
+      }
+    }
+  ],
+  "activeEnvironmentUid": "bQZJ2WB2itzUnjgk67UrU",
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "access-token",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "base-url",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-key",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-email",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "setup-stock-secret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "setup-countries-secret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "INVERN-LOCAL"
+    },
+    {
+      "variables": [
+        {
+          "name": "access-token",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "base-url",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-key",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-email",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "setup-stock-secret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "setup-countries-secret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "INVERN-PREVIEW"
+    },
+    {
+      "variables": [
+        {
+          "name": "base-url",
+          "value": "https://api.invernspirit.com",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "access-token",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-key",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "cloudflare-auth-email",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "setup-stock-secret",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "setup-countries-secret",
+          "value": "",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        }
+      ],
+      "name": "INVERN-PROD"
+    }
+  ],
+  "root": {
+    "request": {
+      "headers": []
+    }
+  },
+  "brunoConfig": {
+    "version": "1",
+    "name": "INVERN_BE",
+    "type": "collection",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ]
+  }
+}

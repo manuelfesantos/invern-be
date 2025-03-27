@@ -1,2 +1,1 @@
 export { stockClient } from "./stock";
-export { countriesClient } from "./countries";

@@ -5,7 +5,10 @@ export interface Env {
   STRIPE_API_KEY: string;
   STRIPE_ENV: string;
   SENDGRID_API_KEY: string;
+  SENDGRID_DOMAIN: string;
+  SENDGRID_NAME: string;
   AUTH_KV: KVNamespace;
+  FORGOT_KV: KVNamespace;
   TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
   FRONTEND_HOST: string;

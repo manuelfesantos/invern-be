@@ -1,10 +1,10 @@
-CREATE TABLE `carts` (
+CREATE TABLE IF NOT EXISTS `carts` (
 	`id` text PRIMARY KEY NOT NULL,
 	`lastModifiedAt` integer NOT NULL,
 	`isLoggedIn` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `checkoutSessions` (
+CREATE TABLE IF NOT EXISTS `checkoutSessions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`products` text NOT NULL,
 	`createdAt` text NOT NULL,
@@ -20,13 +20,13 @@ CREATE TABLE `checkoutSessions` (
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `collections` (
+CREATE TABLE IF NOT EXISTS `collections` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`description` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `countries` (
+CREATE TABLE IF NOT EXISTS `countries` (
 	`name` text NOT NULL,
 	`code` text PRIMARY KEY NOT NULL,
 	`locale` text NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `countries` (
 	FOREIGN KEY (`currencyCode`) REFERENCES `currencies`(`currencyId`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `currencies` (
+CREATE TABLE IF NOT EXISTS `currencies` (
 	`currencyId` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`symbol` text NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE `currencies` (
 	`stripeName` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `images` (
+CREATE TABLE IF NOT EXISTS `images` (
 	`url` text PRIMARY KEY NOT NULL,
 	`alt` text NOT NULL,
 	`productId` text NOT NULL,
@@ -51,8 +51,8 @@ CREATE TABLE `images` (
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
-CREATE TABLE `orders` (
+CREATE UNIQUE INDEX IF NOT EXISTS `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `orders` (
 	`id` text PRIMARY KEY NOT NULL,
 	`stripeId` text NOT NULL,
 	`createdAt` text NOT NULL,
@@ -70,15 +70,15 @@ CREATE TABLE `orders` (
 	FOREIGN KEY (`shippingTransactionId`) REFERENCES `shippingTransactions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
-CREATE TABLE `paymentMethods` (
+CREATE UNIQUE INDEX IF NOT EXISTS `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `paymentMethods` (
 	`id` text PRIMARY KEY NOT NULL,
 	`type` text NOT NULL,
 	`issuer` text,
 	`last4` text
 );
 --> statement-breakpoint
-CREATE TABLE `payments` (
+CREATE TABLE IF NOT EXISTS `payments` (
 	`id` text PRIMARY KEY NOT NULL,
 	`createdAt` text NOT NULL,
 	`state` text NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE `payments` (
 	FOREIGN KEY (`paymentMethodId`) REFERENCES `paymentMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS `products` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`description` text NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE `products` (
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `productsOnCarts` (
+CREATE TABLE IF NOT EXISTS `productsOnCarts` (
 	`cartId` text NOT NULL,
 	`productId` text NOT NULL,
 	`quantity` integer NOT NULL,
@@ -108,12 +108,12 @@ CREATE TABLE `productsOnCarts` (
 	FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `shippingMethods` (
+CREATE TABLE IF NOT EXISTS `shippingMethods` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `shippingRates` (
+CREATE TABLE IF NOT EXISTS `shippingRates` (
 	`id` text PRIMARY KEY NOT NULL,
 	`priceInCents` integer NOT NULL,
 	`minWeight` integer NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE `shippingRates` (
 	FOREIGN KEY (`shippingMethodId`) REFERENCES `shippingMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `shippingRatesToCountries` (
+CREATE TABLE IF NOT EXISTS `shippingRatesToCountries` (
 	`shippingRateId` text NOT NULL,
 	`countryCode` text NOT NULL,
 	PRIMARY KEY(`shippingRateId`, `countryCode`),
@@ -131,7 +131,7 @@ CREATE TABLE `shippingRatesToCountries` (
 	FOREIGN KEY (`countryCode`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `shippingTransactions` (
+CREATE TABLE IF NOT EXISTS `shippingTransactions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`status` text NOT NULL,
 	`createdAt` text NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE `shippingTransactions` (
 	`trackingUrl` text
 );
 --> statement-breakpoint
-CREATE TABLE `taxes` (
+CREATE TABLE IF NOT EXISTS `taxes` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`rate` integer,
@@ -147,7 +147,7 @@ CREATE TABLE `taxes` (
 	FOREIGN KEY (`countryId`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,
 	`firstName` text NOT NULL,
@@ -162,5 +162,5 @@ CREATE TABLE `users` (
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_googleUserId_unique` ON `users` (`googleUserId`);
+CREATE UNIQUE INDEX IF NOT EXISTS `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS `users_googleUserId_unique` ON `users` (`googleUserId`);
