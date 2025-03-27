@@ -31,6 +31,8 @@ export const patchCartItemQuantity = async (
 
   const finalQuantity = Math.max(cartQuantity + quantity, NO_QUANTITY);
 
+  if (finalQuantity > stock) throw errors.PRODUCT_OUT_OF_STOCK(stock);
+
   const cartOperation = getCartOperation(
     quantity,
     cartQuantity,

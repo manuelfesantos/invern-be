@@ -23,6 +23,9 @@ import { getDateTime } from "@timer-utils";
 import { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
 import { withTransaction } from "@db";
+import { sendEmail } from "@sendgrid-adapter";
+import { LoggerUseCaseEnum } from "@logger-entity";
+import { stringifyObject } from "@string-utils";
 
 export const getOrderFromSessionResult = withTransaction(
   async (sessionResult: StripeSessionResult): Promise<ClientOrder> => {
@@ -88,7 +91,28 @@ export const getOrderFromSessionResult = withTransaction(
       await incrementUserVersion(userId);
     }
 
-    return clientOrderSchema.parse(order);
+    const clientOrder = clientOrderSchema.parse(order);
+
+    logger().info("Finished creating order after checkout session result", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: { createdOrder: stringifyObject(clientOrder) },
+    });
+
+    if (!personalDetails.email) {
+      logger().warn("Email not found in personal details", {
+        useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+        data: { personalDetails: stringifyObject(personalDetails) },
+      });
+      return clientOrder;
+    }
+
+    await sendEmail({
+      to: personalDetails.email || "",
+      subject: "Checkout",
+      text: `Thank you for purchasing with Invern Spirit, your order's total is ${sessionResult.amount_total}`,
+    });
+
+    return clientOrder;
   },
 );
 

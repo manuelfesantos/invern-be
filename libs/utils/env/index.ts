@@ -141,6 +141,18 @@ class EnvironmentService {
   get TURSO_AUTH_TOKEN(): string {
     return this.var("TURSO_AUTH_TOKEN");
   }
+
+  get SENDGRID_DOMAIN(): string {
+    return this.var("SENDGRID_DOMAIN");
+  }
+
+  get SENDGRID_NAME(): string {
+    return this.var("SENDGRID_NAME");
+  }
+
+  get FORGOT_KV(): KVNamespace {
+    return this.var("FORGOT_KV");
+  }
 }
 
 export const ENV = EnvironmentService.getInstance();

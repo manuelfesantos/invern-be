@@ -1,14 +1,8 @@
 import { errorResponse, prepareError, successResponse } from "@response-entity";
+import { getBodyFromRequest, isStripeEnvValid } from "@http-utils";
 import {
-  deleteCookieFromResponse,
-  getBodyFromRequest,
-  isStripeEnvValid,
-} from "@http-utils";
-import { sendEmail } from "@mail-utils";
-import {
-  isStripeEvent,
-  isStripeSessionCompletedEvent,
   isStripeSessionExpiredEvent,
+  isStripeSessionResultEvent,
 } from "@stripe-entity";
 import {
   getOrderFromSessionResult,
@@ -19,34 +13,12 @@ import { logger } from "@logger-utils";
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { CookieNameEnum } from "@http-entity";
 
 export const POST: PagesFunction = async (context) => {
   const { request } = context;
   const body = await getBodyFromRequest(request);
 
-  if (!isStripeEvent(body)) {
-    return errorResponse.BAD_REQUEST(
-      prepareError("Invalid checkout session result"),
-    );
-  }
-
-  if (isStripeSessionExpiredEvent(body)) {
-    const { object: sessionEvent } = body.data;
-
-    if (!isStripeEnvValid(sessionEvent)) {
-      return successResponse.OK("Unsupported event, ignoring request");
-    }
-
-    logger().info("Session expired event received", {
-      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-      data: { sessionExpired: stringifyObject(body) },
-    });
-
-    return await handleSessionExpiredEvent(sessionEvent);
-  }
-
-  if (!isStripeSessionCompletedEvent(body)) {
+  if (!isStripeSessionResultEvent(body)) {
     return errorResponse.BAD_REQUEST(
       prepareError("Invalid checkout session result"),
     );
@@ -58,28 +30,25 @@ export const POST: PagesFunction = async (context) => {
     return successResponse.OK("Unsupported event, ignoring request");
   }
 
+  // Handle session expired event
+  if (isStripeSessionExpiredEvent(body)) {
+    logger().info("Session expired event received", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: { sessionExpired: stringifyObject(body) },
+    });
+
+    const message = await handleSessionExpiredEvent(sessionEvent);
+    return successResponse.OK(message);
+  }
+
+  // Handle session completed event
   logger().info("Session completed event received", {
     useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
     data: { checkoutSessionResult: stringifyObject(body) },
   });
   const clientOrder = await getOrderFromSessionResult(sessionEvent);
-  await sendEmail(
-    clientOrder.personalDetails.email || "",
-    "Checkout",
-    `Thank you for purchasing with Invern Spirit, your order's total is ${sessionEvent.amount_total}`,
-  );
-  logger().info("Finished creating order after checkout session result", {
-    useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-    data: { createdOrder: stringifyObject(clientOrder) },
-  });
-  const response = successResponse.OK(
-    "success getting checkout-session",
-    clientOrder,
-  );
 
-  deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
-
-  return response;
+  return successResponse.OK("success getting checkout-session", clientOrder);
 };
 
 export const onRequest = requestHandler({ POST });

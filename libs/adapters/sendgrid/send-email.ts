@@ -2,18 +2,28 @@ import { stringifyObject } from "@string-utils";
 import { HttpMethodEnum } from "@http-entity";
 import { ENV } from "@env-utils";
 
-export const sendEmail = async (
-  to: string,
-  subject: string,
-  text: string,
-): Promise<Response> => {
+interface SendEmailContext {
+  to: string;
+  subject: string;
+  text: string;
+  from?: string;
+  fromName?: string;
+}
+
+export const sendEmail = async ({
+  to,
+  subject,
+  text,
+  from = "info",
+  fromName,
+}: SendEmailContext): Promise<Response> => {
   return await fetch("https://api.sendgrid.com/v3/mail/send", {
     body: stringifyObject({
       personalizations: [
         {
           from: {
-            email: "info@invernspirit.com",
-            name: "Invern Spirit",
+            email: `${from}@${ENV.SENDGRID_DOMAIN}`,
+            name: fromName || ENV.SENDGRID_NAME,
           },
           to: [
             {
@@ -24,8 +34,8 @@ export const sendEmail = async (
         },
       ],
       from: {
-        email: "info@invernspirit.com",
-        name: "Invern Spirit",
+        email: `${from}@${ENV.SENDGRID_DOMAIN}`,
+        name: fromName || ENV.SENDGRID_NAME,
       },
       subject,
       content: [

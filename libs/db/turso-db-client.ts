@@ -55,7 +55,8 @@ export function db(
     dbClient = getDbClient();
   }
   if (canUseTransaction) {
-    return txStorage.getStore() || dbClient;
+    const tx = txStorage.getStore();
+    return tx || dbClient;
   }
   return dbClient;
 }

@@ -19,6 +19,7 @@ Invern Spirit Backend is the server-side component of the Invern Spirit ecommerc
 - **Cloudflare Workers**: Serverless platform for deploying and running server-side code in a distributed network.
 - **Node.js**: JavaScript runtime environment that executes the server-side code.
 - **TypeScript**: Superset of JavaScript that adds static typing, enhancing code quality and maintainability.
+- **Turso/SQLite**: Embedded SQL database engine that provides lightweight and efficient data storage.
 - **Drizzle ORM**: Lightweight TypeScript ORM for interacting with the relational database.
 - **Zod**: TypeScript-first schema validation library with static type inference, providing robust data validation and type checking throughout the application.
 - **Jest**: Testing framework used to write and run unit tests, ensuring code reliability.
@@ -30,6 +31,7 @@ Follow these instructions to set up and run the project on your local machine.
 ### Prerequisites
 - **Node.js**: Ensure you have Node.js installed. You can download it from the official website.
 - **npm**: Node.js package manager, which comes bundled with Node.js.
+- **Docker**: Install Docker to run the local database server using a containerized environment.
 
 ### Installation
 1. **Clone the Repository**:
@@ -46,7 +48,7 @@ Follow these instructions to set up and run the project on your local machine.
    ```bash
    npm run init
    ```
-   This command installs all dependencies, sets up Husky for Git hooks, and initializes the local database.
+   This command installs all dependencies, sets up Husky for Git hooks, and pulls the turso docker image from the remote registry.
 
 ### Environment Variables
 The application requires specific environment variables to function correctly.
@@ -62,9 +64,9 @@ The application requires specific environment variables to function correctly.
 ## Running the Application
 **Start the Development Server**:
 ```bash
-npm run local
+npm run start
 ```
-This command starts the server in development mode, enabling features like hot-reloading for efficient development.
+This command starts the local database server and the local application server in development mode, enabling features like hot-reloading for efficient development.
 
 ### First-Time Setup
 When running the application for the first time, you need to complete two additional steps:
@@ -240,7 +242,7 @@ Responses typically follow a standard format:
 ```json
 {
   "message": "Action description",
-  "data": { ... }
+  "data": { "key": "value" }
 }
 ```
 
