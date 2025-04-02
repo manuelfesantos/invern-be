@@ -3,7 +3,7 @@ import { z } from "zod";
 import { emailSchema } from "@global-entity";
 import { handleForgotPassword } from "@user-module";
 import { requestHandler } from "@decorator-utils";
-import { successResponse } from "@response-entity";
+import { protectedSuccessResponse } from "@response-entity";
 
 const forgotPasswordBodySchema = z.object({
   email: emailSchema("customer email"),
@@ -15,7 +15,7 @@ const POST: PagesFunction = async ({ request }) => {
 
   await handleForgotPassword(email);
 
-  return successResponse.OK("Email sent successfully");
+  return protectedSuccessResponse.OK("Email sent successfully");
 };
 
 export const onRequest = requestHandler({ POST });

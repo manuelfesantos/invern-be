@@ -2,12 +2,14 @@
 import { execSync, spawn } from "child_process";
 
 // Function to execute shell commands synchronously
-function executeCommand(command, options = {}) {
+function executeCommand(command, options = {}, ignoreError = false) {
   try {
     console.log(`Executing: ${command}`);
     execSync(command, { stdio: "inherit", ...options });
   } catch (error) {
+    if (ignoreError) return;
     console.error(`Error executing command: ${command}`);
+    console.error(error);
     process.exit(1);
   }
 }
@@ -28,26 +30,18 @@ process.on("SIGTERM", stopContainer);
 process.on("exit", stopContainer);
 
 // Execute the migration
-executeCommand("npx drizzle-kit migrate");
+executeCommand("npx drizzle-kit migrate", {}, true);
 
 // Run the triggers script
 executeCommand("node drizzle/triggers/run-triggers.js");
 
 // Start the development server
-const devServer = spawn(
-  "npx",
-  [
-    "wrangler",
-    "pages",
-    "dev",
-    "functions",
-    "--show-interactive-dev-session=false",
-  ],
-  { stdio: "inherit" },
+executeCommand(
+  "npx wrangler pages dev functions --show-interactive-dev-session=false",
 );
 
 // Handle termination signals to stop the development server gracefully
-devServer.on("close", (code) => {
+process.on("close", (code) => {
   console.log(`Dev server exited with code ${code}`);
   stopContainer();
 });
