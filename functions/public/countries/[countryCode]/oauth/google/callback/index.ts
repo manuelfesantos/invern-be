@@ -166,7 +166,7 @@ const GET: PagesFunction = async ({ request }) => {
     },
   );
 
-  setCookieInResponse(response, getTokenCookie(refreshToken));
+  setCookieInResponse(response, getTokenCookie(refreshToken, true));
 
   return response;
 };
