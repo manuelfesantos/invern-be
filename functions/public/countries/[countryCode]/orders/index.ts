@@ -1,4 +1,4 @@
-import { successResponse } from "@response-entity";
+import { protectedSuccessResponse } from "@response-entity";
 import { getUserOrders } from "@order-module";
 import { requestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
@@ -14,7 +14,9 @@ const GET: PagesFunction = async () => {
 
   const orders = getUserOrders(userId);
 
-  return successResponse.OK("Successfully got user orders", orders);
+  return protectedSuccessResponse.OK("Successfully got user orders", {
+    orders,
+  });
 };
 
 export const onRequest = requestHandler({ GET });
