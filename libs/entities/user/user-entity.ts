@@ -48,6 +48,11 @@ export const userDTOSchema = userSchema.omit({
   role: true,
   id: true,
   cart: true,
+  googleUserId: true,
+  isOauth: true,
+  createdAt: true,
+  lastModifiedAt: true,
+  version: true,
 });
 
 export const userToUserDTO = (user: User): UserDTO => {

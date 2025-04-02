@@ -11,9 +11,9 @@
     "lint": "npx eslint functions/** libs/**",
     "build-remote-db": "npx drizzle-kit migrate && node drizzle/triggers/run-triggers.js",
     "build-preview-db": "npx drizzle-kit migrate & node drizzle/triggers/run-triggers.js",
-    "query-local": "turso db shell http://127.0.0.1:8080",
+    "query-local": "node ./scripts/query-local.js",
     "query-remote": "turso db shell invern-db",
-    "query-preview": "turso db shell invern-db-preview",
+    "query-preview": "node ./scripts/query-remote.js preview",
     "prepare": "husky",
     "db:generate": "npx drizzle-kit generate",
     "type-check": "npx tsc --noEmit"

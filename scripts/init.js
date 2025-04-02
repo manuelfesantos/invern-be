@@ -1,4 +1,5 @@
 /* eslint-disable */
+
 import { execSync } from "child_process";
 
 // Function to execute shell commands synchronously
@@ -12,15 +13,34 @@ function executeCommand(command) {
   }
 }
 
-// Step 1: Install npm dependencies
+// Function to check if a Docker container exists
+function containerExists(containerName) {
+  try {
+    execSync(`docker container inspect "${containerName}"`, {
+      stdio: "ignore",
+    });
+    return true; // Container exists
+  } catch (error) {
+    return false; // Container does not exist
+  }
+}
+
+// Proceed with your other commands
 executeCommand("npm install");
 
-// Step 2: Pull the latest libsql-server image from GitHub Container Registry
-executeCommand("docker pull ghcr.io/tursodatabase/libsql-server:latest");
+const CONTAINER_NAME = "turso-db";
 
-// Step 3: Create a Docker container named 'turso-db' with port 8080 exposed
-executeCommand(
-  "docker create --name turso-db -p 8080:8080 ghcr.io/tursodatabase/libsql-server:latest",
-);
-
-console.log("Setup completed successfully.");
+// Check if the container exists
+if (containerExists(CONTAINER_NAME)) {
+  console.log(`Container '${CONTAINER_NAME}' already exists.`);
+  // Optionally, remove the existing container
+  // executeCommand(`docker container rm "${CONTAINER_NAME}"`);
+} else {
+  console.log(
+    `Container '${CONTAINER_NAME}' does not exist. Creating a new one.`,
+  );
+  // Create the new container
+  executeCommand(
+    `docker container create --name "${CONTAINER_NAME}" -p 8080:8080 ghcr.io/tursodatabase/libsql-server:latest`,
+  );
+}
