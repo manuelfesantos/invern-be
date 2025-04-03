@@ -2,7 +2,11 @@ import { google } from "worker-auth-providers";
 import { PagesFunction } from "@cloudflare/workers-types";
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
-import { getCookies, setCookieInResponse } from "@http-utils";
+import {
+  getCookies,
+  getRememberCookieHeader,
+  setCookieInResponse,
+} from "@http-utils";
 import { InsertUser, User, userSchema } from "@user-entity";
 import {
   getLoggedInRefreshToken,
@@ -167,6 +171,7 @@ const GET: PagesFunction = async ({ request }) => {
   );
 
   setCookieInResponse(response, getTokenCookie(refreshToken, true));
+  setCookieInResponse(response, getRememberCookieHeader());
 
   return response;
 };
