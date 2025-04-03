@@ -12,7 +12,7 @@ const GET: PagesFunction = async () => {
     throw errors.UNAUTHORIZED();
   }
 
-  const orders = getUserOrders(userId);
+  const orders = await getUserOrders(userId);
 
   return protectedSuccessResponse.OK("Successfully got user orders", {
     orders,

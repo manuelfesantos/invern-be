@@ -1,8 +1,4 @@
-import {
-  deleteForgotPasswordSecret,
-  getForgotPasswordSecret,
-  setAuthSecret,
-} from "@kv-adapter";
+import { deleteForgotPasswordSecret, setAuthSecret } from "@kv-adapter";
 import { validateSecret } from "./utils/validate-secret";
 import { selectUserByEmail, updateUser } from "@user-db";
 import { errors } from "@error-handling-utils";
@@ -16,8 +12,7 @@ export const resetForgottenPassword = async (
 ): Promise<void> => {
   const user = await selectUserByEmail(email);
   if (!user) throw errors.USER_NOT_FOUND();
-  const forgotSecret = await getForgotPasswordSecret(email);
-  validateSecret(forgotSecret, code);
+  await validateSecret(email, code);
   await updateUser(user.id, {
     password: await hashPassword(password, user.id),
   });

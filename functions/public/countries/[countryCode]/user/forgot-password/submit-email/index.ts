@@ -1,7 +1,7 @@
 import { getBodyFromRequest } from "@http-utils";
 import { z } from "zod";
 import { emailSchema } from "@global-entity";
-import { handleForgotPassword } from "@user-module";
+import { submitEmail } from "@user-module";
 import { requestHandler } from "@decorator-utils";
 import { protectedSuccessResponse } from "@response-entity";
 
@@ -13,7 +13,7 @@ const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { email } = forgotPasswordBodySchema.parse(body);
 
-  await handleForgotPassword(email);
+  await submitEmail(email);
 
   return protectedSuccessResponse.OK("Email sent successfully");
 };

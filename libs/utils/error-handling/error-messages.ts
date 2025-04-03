@@ -96,18 +96,14 @@ export const errors = {
   UNABLE_TO_PARSE_BODY: (): CustomError =>
     new CustomError("Unable to parse body", HttpStatusEnum.BAD_REQUEST),
   FORGOT_SECRET_NOT_FOUND: (): CustomError =>
-    new CustomError(
-      "Forgot password secret not found",
-      HttpStatusEnum.NOT_FOUND,
-    ),
+    new CustomError("Verification code not found", HttpStatusEnum.NOT_FOUND),
   INVALID_FORGOT_SECRET: (): CustomError =>
-    new CustomError(
-      "Invalid forgot password secret",
-      HttpStatusEnum.UNAUTHORIZED,
-    ),
+    new CustomError("Invalid verification code", HttpStatusEnum.UNAUTHORIZED),
   FORGOT_SECRET_EXPIRED: (): CustomError =>
+    new CustomError("Verification code expired", HttpStatusEnum.UNAUTHORIZED),
+  FORGOT_SECRET_EXHAUSTED: (): CustomError =>
     new CustomError(
-      "Forgot password secret expired",
+      "Verification code exhausted. Please try again in ",
       HttpStatusEnum.UNAUTHORIZED,
     ),
 };
