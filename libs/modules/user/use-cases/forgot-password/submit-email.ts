@@ -15,10 +15,12 @@ import { ENV } from "@env-utils";
 import { contextStore } from "@context-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-
-const MAX_EMAILS_SENT = 3;
-const ONE_EMAIL_SENT_ATTEMPT = 1;
-const NO_ATTEMPTS_LEFT = 0;
+import {
+  MAX_EMAILS_SENT,
+  NO_ATTEMPTS_LEFT,
+  ONE_ATTEMPT,
+  SECRET_EXPIRY_MINUTES,
+} from "./utils/values";
 
 export const submitEmail = async (email: string): Promise<void> => {
   const { country } = contextStore.context;
@@ -54,12 +56,12 @@ const getPasswordResetCode = async (user: User): Promise<string> => {
   }
 
   if (secretIsExhausted(forgotSecret)) {
-    throw errors.FORGOT_SECRET_EXHAUSTED();
+    throw errors.FORGOT_SECRET_EXHAUSTED(SECRET_EXPIRY_MINUTES);
   }
 
   await setForgotPasswordSecret(user.email, {
     ...forgotSecret,
-    emailsSent: forgotSecret.emailsSent + ONE_EMAIL_SENT_ATTEMPT,
+    emailsSent: forgotSecret.emailsSent + ONE_ATTEMPT,
   });
   return forgotSecret.code;
 };

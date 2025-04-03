@@ -10,7 +10,16 @@ export const getForgotPasswordSecret = async (
     useCase: LoggerUseCaseEnum.GET_FORGOT_PASSWORD_SECRET,
   });
   const secretKey = await ENV.FORGOT_KV.get(key);
-  if (!secretKey) return null;
+  if (!secretKey) {
+    logger().info(`no forgot password secret found for key ${key}`, {
+      useCase: LoggerUseCaseEnum.GET_FORGOT_PASSWORD_SECRET,
+    });
+    return null;
+  }
+
+  logger().info(`found forgot password secret for key ${key}`, {
+    useCase: LoggerUseCaseEnum.GET_FORGOT_PASSWORD_SECRET,
+  });
 
   return forgotSecretBodySchema.parse(JSON.parse(secretKey));
 };

@@ -1,9 +1,7 @@
 import { errors } from "@error-handling-utils";
 import { getDateTime } from "@timer-utils";
 import { getForgotPasswordSecret, setForgotPasswordSecret } from "@kv-adapter";
-
-const ONE_ATTEMPT = 1;
-const NO_ATTEMPTS = 0;
+import { NO_ATTEMPTS_LEFT, ONE_ATTEMPT, SECRET_EXPIRY_MINUTES } from "./values";
 
 export const validateSecret = async (
   key: string,
@@ -11,8 +9,8 @@ export const validateSecret = async (
 ): Promise<void> => {
   const secret = await getForgotPasswordSecret(key);
   if (!secret) throw errors.FORGOT_SECRET_NOT_FOUND();
-  if (secret.attemptsLeft <= NO_ATTEMPTS) {
-    throw errors.FORGOT_SECRET_EXHAUSTED();
+  if (secret.attemptsLeft <= NO_ATTEMPTS_LEFT) {
+    throw errors.FORGOT_SECRET_EXHAUSTED(SECRET_EXPIRY_MINUTES);
   }
   if (secret.code !== code) {
     await setForgotPasswordSecret(key, {

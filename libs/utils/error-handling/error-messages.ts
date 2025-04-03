@@ -101,9 +101,9 @@ export const errors = {
     new CustomError("Invalid verification code", HttpStatusEnum.UNAUTHORIZED),
   FORGOT_SECRET_EXPIRED: (): CustomError =>
     new CustomError("Verification code expired", HttpStatusEnum.UNAUTHORIZED),
-  FORGOT_SECRET_EXHAUSTED: (): CustomError =>
+  FORGOT_SECRET_EXHAUSTED: (waitingMinutes: number): CustomError =>
     new CustomError(
-      "Verification code exhausted. Please try again in ",
+      `Verification code exhausted. Please try again in ${waitingMinutes} minutes`,
       HttpStatusEnum.UNAUTHORIZED,
     ),
 };
