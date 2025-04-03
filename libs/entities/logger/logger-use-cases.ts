@@ -31,6 +31,7 @@ const userUseCasesSchema = [
   "UPDATE_USER_PASSWORD",
   "UPDATE_USER_EMAIL",
   "UPDATE_USER_NAME",
+  "FORGOT_PASSWORD",
 ] as const;
 
 const orderUseCasesSchema = [
@@ -42,14 +43,16 @@ const orderUseCasesSchema = [
 
 const r2BucketUseCasesSchema = [
   "GET_R2_STOCK",
-  "GET_R2_COUNTRIES",
   "PUT_R2_STOCK",
-  "PUT_R2_COUNTRIES",
   "DELETE_R2_STOCK",
-  "DELETE_R2_COUNTRIES",
   "INIT_R2_STOCK_BUCKET",
-  "INIT_R2_COUNTRIES_BUCKET",
   "PURGE_CACHE",
+] as const;
+
+const forgotPasswordSecretKvSchema = [
+  "PUT_FORGOT_PASSWORD_SECRET",
+  "GET_FORGOT_PASSWORD_SECRET",
+  "DELETE_FORGOT_PASSWORD_SECRET",
 ] as const;
 
 const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
@@ -64,6 +67,8 @@ const checkoutUseCasesSchema = [
 
 const oauthUseCasesSchema = ["OAUTH_GOOGLE_CALLBACK"];
 
+const emailUseCasesSchema = ["SEND_EMAIL"] as const;
+
 const loggerUseCasesSchema = z.enum([
   ...configUseCasesSchema,
   ...cartUseCasesSchema,
@@ -74,6 +79,8 @@ const loggerUseCasesSchema = z.enum([
   ...responseUseCasesSchema,
   ...checkoutUseCasesSchema,
   ...oauthUseCasesSchema,
+  ...forgotPasswordSecretKvSchema,
+  ...emailUseCasesSchema,
 ]);
 
 export const LoggerUseCaseEnum = loggerUseCasesSchema.enum;

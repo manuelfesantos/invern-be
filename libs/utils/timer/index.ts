@@ -25,6 +25,7 @@ export const TOKEN_COOKIE_MAX_AGE = SECONDS_IN_WEEK * TWO_WEEKS;
 export const TOKEN_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 export const SESSION_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;
 export const FORGOT_SECRET_EXPIRY = SECONDS_IN_MINUTE * TEN_MINUTES;
+export const FORGOT_SECRET_LOCKED_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 
 export const getFutureDate = (
   time: number,
@@ -42,3 +43,5 @@ export const getDateTime = (ms?: number): string => {
   const date = ms ? new Date(ms) : new Date();
   return date.toISOString().slice(FIRST_CHARACTER, LAST_CHARACTER);
 };
+
+export const isDateInFuture = (date: string): boolean => date > getDateTime();

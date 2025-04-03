@@ -1,37 +1,95 @@
 import { selectUserByEmail } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { sendEmail } from "@sendgrid-adapter";
-import { generateRandomSixDigitCode } from "@number-utils";
-import { FORGOT_SECRET_EXPIRY, getDateTime, getFutureDate } from "@timer-utils";
-import { ForgotSecretBody } from "@user-entity";
-import { setForgotPasswordSecret } from "@kv-adapter";
+import { generateRandomEightDigitCode } from "@number-utils";
+import {
+  FORGOT_SECRET_EXPIRY,
+  getDateTime,
+  getFutureDate,
+  isDateInFuture,
+} from "@timer-utils";
+import { ForgotSecretBody, User } from "@user-entity";
+import { getForgotPasswordSecret, setForgotPasswordSecret } from "@kv-adapter";
 import queryString from "query-string";
 import { ENV } from "@env-utils";
 import { contextStore } from "@context-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
-export const handleForgotPassword = async (email: string): Promise<void> => {
+const MAX_EMAILS_SENT = 3;
+const ONE_EMAIL_SENT_ATTEMPT = 1;
+const NO_ATTEMPTS_LEFT = 0;
+
+export const submitEmail = async (email: string): Promise<void> => {
   const { country } = contextStore.context;
   const user = await selectUserByEmail(email);
 
   if (!user) throw errors.USER_NOT_FOUND();
 
-  const code = generateRandomSixDigitCode();
+  logger().info("requesting password reset for user", {
+    useCase: LoggerUseCaseEnum.FORGOT_PASSWORD,
+    data: { user },
+  });
 
-  const forgotSecretBody: ForgotSecretBody = {
-    code,
-    expiresAt: getDateTime(getFutureDate(FORGOT_SECRET_EXPIRY, "milliseconds")),
-  };
-
-  await setForgotPasswordSecret(user.email, forgotSecretBody);
+  const code = await getPasswordResetCode(user);
 
   const queryParams = queryString.stringify({
     email: user.email,
     code,
+    "validate-code": true,
   });
 
   await sendEmail({
     to: user.email,
     subject: "Reset password",
-    text: `Hi ${user.firstName}, here's your password reset code: ${code}. This code will expire in 5 minutes. You can also click on this link to reset your password: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/reset-password?${queryParams}`,
+    text: `Hi ${user.firstName}, here's your password reset code: ${code}. This code will expire in 10 minutes. You can also click on this link to reset your password: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/forgot-password?${queryParams}`,
   });
 };
+
+const getPasswordResetCode = async (user: User): Promise<string> => {
+  const forgotSecret = await getForgotPasswordSecret(user.email);
+
+  if (!forgotSecret || secretIsExpired(forgotSecret)) {
+    return await generateNewSecretCode(user.email);
+  }
+
+  if (secretIsExhausted(forgotSecret)) {
+    throw errors.FORGOT_SECRET_EXHAUSTED();
+  }
+
+  await setForgotPasswordSecret(user.email, {
+    ...forgotSecret,
+    emailsSent: forgotSecret.emailsSent + ONE_EMAIL_SENT_ATTEMPT,
+  });
+  return forgotSecret.code;
+};
+
+const generateNewSecretCode = async (email: string): Promise<string> => {
+  const code = generateRandomEightDigitCode();
+  const expiresAt = getDateTime(
+    getFutureDate(FORGOT_SECRET_EXPIRY, "milliseconds"),
+  );
+
+  logger().info("generated code for password reset", {
+    useCase: LoggerUseCaseEnum.FORGOT_PASSWORD,
+    data: { expiresAt },
+  });
+
+  const forgotSecretBody: ForgotSecretBody = {
+    code,
+    expiresAt: getDateTime(getFutureDate(FORGOT_SECRET_EXPIRY, "milliseconds")),
+    attemptsLeft: 5,
+    emailsSent: 1,
+  };
+
+  await setForgotPasswordSecret(email, forgotSecretBody);
+
+  return code;
+};
+
+const secretIsExpired = (secret: ForgotSecretBody): boolean =>
+  !isDateInFuture(secret.expiresAt);
+
+const secretIsExhausted = (secret: ForgotSecretBody): boolean =>
+  secret.attemptsLeft <= NO_ATTEMPTS_LEFT ||
+  secret.emailsSent >= MAX_EMAILS_SENT;
