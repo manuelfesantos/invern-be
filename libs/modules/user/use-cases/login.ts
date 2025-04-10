@@ -1,8 +1,7 @@
 import { selectUserByEmail, updateUser } from "@user-db";
-import { User, UserDTO, userToUserDTO } from "@user-entity";
+import { User, UserDTO, toUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
-import { loginBodySchema } from "./types/map-user-action";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
@@ -12,12 +11,20 @@ import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
 import { insertCart } from "@cart-db";
 import { withTransaction } from "@db";
+import { z } from "zod";
+import { emailSchema, requiredStringSchema } from "@global-entity";
 
 interface ReturnType {
   user: UserDTO;
   responseContext: ResponseContext;
   cart: ExtendedCart;
 }
+
+export const loginBodySchema = z.object({
+  email: emailSchema("user mail"),
+  password: requiredStringSchema("user password"),
+  remember: z.boolean().default(false),
+});
 
 export const login = withTransaction(
   async (body: unknown): Promise<ReturnType> => {
@@ -60,7 +67,7 @@ export const login = withTransaction(
     }
 
     return {
-      user: userToUserDTO(user),
+      user: toUserDTO(user),
       cart: extendCart(cart),
       responseContext: {
         accessToken,

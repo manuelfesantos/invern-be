@@ -108,7 +108,7 @@ const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
   const updatedLineItems = await decreaseProductsStock(lineItems);
   try {
     await stockClient.updateMany(updatedLineItems);
-  } catch (error) {
+  } catch {
     const updatedProducts = await increaseProductsStock(lineItems);
     await stockClient.updateMany(updatedProducts);
   }

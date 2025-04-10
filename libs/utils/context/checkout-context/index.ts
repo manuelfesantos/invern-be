@@ -56,7 +56,9 @@ export const enableCheckoutStage = (
 ): void => {
   const checkoutStage = getCheckoutStage(stage);
   if (next) {
-    checkoutStage.next && handleEnableCheckoutStage(checkoutStage.next);
+    if (checkoutStage.next) {
+      handleEnableCheckoutStage(checkoutStage.next);
+    }
   } else {
     handleEnableCheckoutStage(checkoutStage);
   }
@@ -69,7 +71,9 @@ export const disableCheckoutStage = (stage: CheckoutStageName): void => {
 
 export const disableNextCheckoutStage = (stage: CheckoutStageName): void => {
   const checkoutStage = getCheckoutStage(stage);
-  checkoutStage.next && handleDisableCheckoutStage(checkoutStage.next);
+  if (checkoutStage.next) {
+    handleDisableCheckoutStage(checkoutStage.next);
+  }
 };
 
 const handleEnableCheckoutStage = (stage: CheckoutStage): void => {
@@ -115,7 +119,9 @@ export const getRemoveCookieNamesFromInvalidCheckoutStage = (
 
   while (checkoutStage) {
     const cookieName = checkoutStageToCookie[checkoutStage.name];
-    cookieName && cookieNames.push(cookieName);
+    if (cookieName) {
+      cookieNames.push(cookieName);
+    }
     checkoutStage = checkoutStage.next;
   }
 

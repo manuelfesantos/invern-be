@@ -1,5 +1,13 @@
-/* eslint-disable */
-import { execSync, spawn } from "child_process";
+import { execSync } from "child_process";
+
+const args = process.argv.slice(2);
+
+const protocol = args[0] || "http";
+
+if (!["http", "https"].includes(protocol)) {
+  console.error("Invalid protocol. Use 'http' or 'https'.");
+  process.exit(1);
+}
 
 // Function to execute shell commands synchronously
 function executeCommand(command, options = {}, ignoreError = false) {
@@ -37,7 +45,7 @@ executeCommand("node drizzle/triggers/run-triggers.js");
 
 // Start the development server
 executeCommand(
-  "npx wrangler pages dev functions --show-interactive-dev-session=false",
+  `npx wrangler pages dev functions --local-protocol=${protocol} --show-interactive-dev-session=false`,
 );
 
 // Handle termination signals to stop the development server gracefully

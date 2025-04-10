@@ -1,7 +1,6 @@
 import honeyCombPlugin, {
   PluginData,
 } from "@cloudflare/pages-plugin-honeycomb";
-import { errorResponse } from "@response-entity";
 import { HttpMethodEnum } from "@http-entity";
 import { withLogger } from "@logger-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
@@ -14,7 +13,17 @@ export const startLogger = middlewareRequestHandler(async (context) => {
     request.method === HttpMethodEnum.HEAD ||
     request.method === HttpMethodEnum.OPTIONS
   ) {
-    return errorResponse.METHOD_NOT_ALLOWED();
+    if (env.ENV !== "local") {
+      return new Response("Method not allowed", {
+        status: 405,
+      });
+    } else {
+      const response = new Response("All ok", {
+        status: 200,
+      });
+      addLocalCorsHeaders(response);
+      return response;
+    }
   }
   return honeyCombPlugin({
     apiKey: env.HONEYCOMB_API_KEY,
@@ -50,8 +59,30 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
 
     ENV.initialize(env);
 
-    return contextStore.run(() => withLogger(logger, next));
+    const response = await contextStore.run(() => withLogger(logger, next));
+
+    if (env.ENV === "local") {
+      addLocalCorsHeaders(response);
+    }
+    return response;
   },
 );
+
+const addLocalCorsHeaders = (response: Response): Response => {
+  response.headers.append(
+    "Access-Control-Allow-Origin",
+    "https://127.0.0.1:8081",
+  );
+  response.headers.append("Access-Control-Allow-Credentials", "true");
+  response.headers.append(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, CF-Access-Client-Id, CF-Access-Client-Secret",
+  );
+  response.headers.append(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  );
+  return response;
+};
 
 export const onRequest = [startLogger, setGlobalEnvs];

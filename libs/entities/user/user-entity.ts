@@ -24,11 +24,14 @@ export const baseUserSchema = createInsertSchema(usersTable, {
   email: emailSchema("user mail"),
   firstName: requiredStringSchema("user first name"),
   lastName: requiredStringSchema("user last name"),
-  googleUserId: requiredStringSchema("google user id").optional(),
+  googleUserId: requiredStringSchema("user google id").optional(),
   isOauth: booleanSchema("user is oauth").default(false),
+  isValidated: booleanSchema("user is validated").default(false),
 });
 
 export const insertUserSchema = baseUserSchema.omit({
+  createdAt: true,
+  lastModifiedAt: true,
   id: true,
   version: true,
   role: true,
@@ -55,7 +58,7 @@ export const userDTOSchema = userSchema.omit({
   version: true,
 });
 
-export const userToUserDTO = (user: User): UserDTO => {
+export const toUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
@@ -65,7 +68,17 @@ export const userDetailsSchema = requiredObjectSchema("Personal details", {
   lastName: insertUserSchema.shape.lastName,
 });
 
+export const UserValidationStatusEnum = {
+  VALIDATED: true,
+  NOT_VALIDATED: false,
+  ALL: null,
+} as const;
+
+export type UserValidationStatus =
+  (typeof UserValidationStatusEnum)[keyof typeof UserValidationStatusEnum];
+
 export type User = z.infer<typeof userSchema>;
 export type UserDTO = z.infer<typeof userDTOSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UserDetails = z.infer<typeof userDetailsSchema>;
+export type BaseUser = z.infer<typeof baseUserSchema>;

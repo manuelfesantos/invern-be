@@ -43,7 +43,7 @@ const GET: PagesFunction = async () => {
       });
     }
     return response;
-  } catch (error) {
+  } catch {
     return protectedSuccessResponse.OK("Checkout stages", {
       isCheckoutPossible: false,
     });

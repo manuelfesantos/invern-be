@@ -1,7 +1,11 @@
 import { usersTable } from "@schema";
 import { db } from "@db";
-import { eq } from "drizzle-orm";
-import { User } from "@user-entity";
+import { and, eq } from "drizzle-orm";
+import {
+  User,
+  UserValidationStatus,
+  UserValidationStatusEnum,
+} from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
@@ -13,9 +17,18 @@ const NO_USER_VERSION = 0;
 const selectUser = async (
   where: "id" | "email" | "cartId" | "googleUserId",
   selection: string,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
 ): Promise<User | undefined> => {
+  const filterUserBySelectionQuery = () => eq(usersTable[where], selection);
+
   const userTemplate = await db().query.usersTable.findFirst({
-    where: eq(usersTable[where], selection),
+    where:
+      validationStatus !== null
+        ? and(
+            filterUserBySelectionQuery(),
+            eq(usersTable.isValidated, validationStatus),
+          )
+        : filterUserBySelectionQuery(),
     with: {
       cart: {
         with: {
@@ -61,12 +74,16 @@ const selectUser = async (
 
 export const selectUserByEmail = async (
   email: string,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
 ): Promise<User | undefined> => {
-  return await selectUser("email", email);
+  return await selectUser("email", email, validationStatus);
 };
 
-export const selectUserById = async (userId: string): Promise<User> => {
-  const user = await selectUser("id", userId);
+export const selectUserById = async (
+  userId: string,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
+): Promise<User> => {
+  const user = await selectUser("id", userId, validationStatus);
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
@@ -75,8 +92,9 @@ export const selectUserById = async (userId: string): Promise<User> => {
 
 export const selectUserByGoogleUserId = async (
   googleUserId: string,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
 ): Promise<User | undefined> => {
-  return await selectUser("googleUserId", googleUserId);
+  return await selectUser("googleUserId", googleUserId, validationStatus);
 };
 
 export const selectUserVersionById = async (

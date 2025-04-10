@@ -12,14 +12,9 @@ import { CookieNameEnum } from "@http-entity";
 const POST: PagesFunction = async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
-  const { user, responseContext, cart } = await signup(body);
+  await signup(body);
 
-  const response = protectedSuccessResponse.OK(
-    "successfully signed up",
-    { user, cart },
-    undefined,
-    responseContext,
-  );
+  const response = protectedSuccessResponse.OK("successfully signed up");
 
   deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
   deleteCheckoutCookiesFromResponse(response);

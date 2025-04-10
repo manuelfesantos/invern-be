@@ -1,15 +1,9 @@
-import { InsertUser } from "@user-entity";
+import { BaseUser, InsertUser } from "@user-entity";
 import { getRandomUUID, hashPassword } from "@crypto-utils";
 import { db } from "@db";
 import { usersTable } from "@schema";
 
-export const insertUser = async (
-  user: InsertUser,
-): Promise<
-  {
-    userId: string;
-  }[]
-> => {
+export const insertUser = async (user: InsertUser): Promise<BaseUser[]> => {
   const insertUser = {
     ...user,
     id: getRandomUUID(),
@@ -22,7 +16,5 @@ export const insertUser = async (
     );
   }
 
-  return db().insert(usersTable).values(insertUser).returning({
-    userId: usersTable.id,
-  });
+  return db().insert(usersTable).values(insertUser).returning();
 };

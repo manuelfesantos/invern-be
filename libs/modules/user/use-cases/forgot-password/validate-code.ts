@@ -1,8 +1,8 @@
-import { validateSecret } from "./utils/validate-secret";
+import { validateBaseSecret } from "@user-module";
 
-export const validateForgotPasswordCode = async (
+export const validateCode = async (
   code: string,
   email: string,
 ): Promise<void> => {
-  await validateSecret(email, code);
+  await validateBaseSecret(email, code);
 };

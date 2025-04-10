@@ -21,7 +21,9 @@ const tryCatchWrapper = <T extends Data>(
 ): PagesFunction<Env, string, T> => {
   return async (context): Promise<Response> => {
     try {
-      preProcess && preProcess();
+      if (preProcess) {
+        preProcess();
+      }
       return await fn(context);
     } catch (error) {
       return errorHandler(error);

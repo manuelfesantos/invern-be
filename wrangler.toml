@@ -8,8 +8,8 @@ bucket_name = "stock-local"
 
 [[kv_namespaces]]
 binding = "AUTH_KV"
-id = "e5193edd-54a6-4b15-8e67-d0bd12b9afd2"
+id = "auth_kv"
 
 [[kv_namespaces]]
-binding = "FORGOT_KV"
-id = "e5193edd-54a6-4b15-8e67-d0bd12b9afd3"
+binding = "VALIDATION_KV"
+id = "validation_kv"

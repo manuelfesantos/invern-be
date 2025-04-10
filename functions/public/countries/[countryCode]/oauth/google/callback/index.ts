@@ -112,7 +112,7 @@ const getUser = async (
     },
   });
 
-  const [{ userId }] = await insertUser(newUser);
+  const [{ id: userId }] = await insertUser(newUser);
 
   const user = await selectUserById(userId);
 

@@ -56,6 +56,11 @@ export const usersTable = sqliteTable("users", {
     .notNull()
     .default(false),
   googleUserId: text("googleUserId").unique(),
+  isValidated: int("validated", {
+    mode: "boolean",
+  })
+    .notNull()
+    .default(false),
 });
 
 export const collectionsTable = sqliteTable("collections", {
