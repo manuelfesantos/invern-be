@@ -7,4 +7,5 @@ export * from "./login";
 export * from "./logout";
 export * from "./signup";
 export * from "./signup/validate-user";
+export * from "./signup/resend-email";
 export * from "./oauth";
