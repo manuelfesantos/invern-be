@@ -69,7 +69,10 @@ export const getGoogleOauthUser = withTransaction(
       };
     }
 
-    const dbGoogleUser = await selectUserByGoogleUserId(hashedGoogleUserId);
+    const dbGoogleUser = await selectUserByGoogleUserId(
+      hashedGoogleUserId,
+      UserValidationStatusEnum.ALL,
+    );
 
     if (dbGoogleUser) {
       let refreshToken = await getAuthSecret(dbGoogleUser.id);
@@ -107,7 +110,7 @@ export const getGoogleOauthUser = withTransaction(
 
     const [{ id: userId }] = await insertUser(newUser);
 
-    const user = await selectUserById(userId);
+    const user = await selectUserById(userId, UserValidationStatusEnum.ALL);
 
     const refreshToken = await getLoggedInRefreshToken(userId);
 
