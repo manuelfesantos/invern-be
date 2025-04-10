@@ -56,7 +56,7 @@ export const usersTable = sqliteTable("users", {
     .notNull()
     .default(false),
   googleUserId: text("googleUserId").unique(),
-  isValidated: int("validated", {
+  isValidated: int("isValidated", {
     mode: "boolean",
   })
     .notNull()

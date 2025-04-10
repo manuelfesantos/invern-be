@@ -68,7 +68,7 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
   await sendEmail({
     to: user.email,
     subject: `Welcome to ${ENV.SENDGRID_NAME}`,
-    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes.`,
+    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes. You can also use the following link to sign up: ${ENV.FRONTEND_HOST}/${contextStore.context.country.code.toLowerCase()}/sign-up/verify-email?email=${user.email}&code=${validationCode}.`,
   });
 });
 
