@@ -17,7 +17,7 @@ const NO_USER_VERSION = 0;
 const selectUser = async (
   where: "id" | "email" | "cartId" | "googleUserId",
   selection: string,
-  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.ALL,
 ): Promise<User | undefined> => {
   const filterUserBySelectionQuery = () => eq(usersTable[where], selection);
 
@@ -74,14 +74,14 @@ const selectUser = async (
 
 export const selectUserByEmail = async (
   email: string,
-  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.ALL,
 ): Promise<User | undefined> => {
   return await selectUser("email", email, validationStatus);
 };
 
 export const selectUserById = async (
   userId: string,
-  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.ALL,
 ): Promise<User> => {
   const user = await selectUser("id", userId, validationStatus);
   if (!user) {
@@ -92,7 +92,7 @@ export const selectUserById = async (
 
 export const selectUserByGoogleUserId = async (
   googleUserId: string,
-  validationStatus: UserValidationStatus = UserValidationStatusEnum.VALIDATED,
+  validationStatus: UserValidationStatus = UserValidationStatusEnum.ALL,
 ): Promise<User | undefined> => {
   return await selectUser("googleUserId", googleUserId, validationStatus);
 };

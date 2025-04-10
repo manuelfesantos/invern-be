@@ -1,11 +1,12 @@
-import { insertUser, selectUserByEmail, selectUserById } from "@user-db";
+import {
+  insertUser,
+  selectUserByEmail,
+  selectUserById,
+  updateUser,
+} from "@user-db";
 import { insertCart, updateCart } from "@cart-db";
 import { errors } from "@error-handling-utils";
-import {
-  insertUserSchema,
-  UserValidationStatusEnum,
-  ValidateEmailSecretBody,
-} from "@user-entity";
+import { insertUserSchema, User, ValidateEmailSecretBody } from "@user-entity";
 import { setAuthSecret, setValidationSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { contextStore } from "@context-utils";
@@ -22,7 +23,7 @@ export const signupBodySchema = insertUserSchema.omit({ cartId: true }).extend({
 });
 
 export const signup = withTransaction(async (body: unknown): Promise<void> => {
-  const { isLoggedIn, cartId } = contextStore.context;
+  const { isLoggedIn, cartId, country } = contextStore.context;
 
   if (isLoggedIn) {
     throw errors.UNAUTHORIZED("already logged in");
@@ -30,24 +31,36 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
 
   const parsedBody = signupBodySchema.parse(body);
 
-  await validateThatEmailIsUnique(parsedBody.email);
+  const userFromDb = await getUser(parsedBody.email);
 
-  if (!cartId) {
-    const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
-    contextStore.context.cartId = newCartId;
+  let userId: string;
+
+  if (userFromDb) {
+    await updateUser(userFromDb.id, {
+      isOauth: false,
+      firstName: parsedBody.firstName,
+      lastName: parsedBody.lastName,
+    });
+    userId = userFromDb.id;
   } else {
-    await updateCart(cartId, { isLoggedIn: true });
+    if (!cartId) {
+      const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
+      contextStore.context.cartId = newCartId;
+    } else {
+      await updateCart(cartId, { isLoggedIn: true });
+    }
+
+    const [{ id }] = await insertUser({
+      ...parsedBody,
+      cartId: contextStore.context.cartId,
+    });
+    userId = id;
+
+    const refreshToken = await getLoggedInRefreshToken(userId);
+    await setAuthSecret(userId, refreshToken);
   }
 
-  const [{ id: userId }] = await insertUser({
-    ...parsedBody,
-    cartId: contextStore.context.cartId,
-  });
-
-  const user = await selectUserById(userId, UserValidationStatusEnum.ALL);
-
-  const refreshToken = await getLoggedInRefreshToken(userId);
-  await setAuthSecret(userId, refreshToken);
+  const user = await selectUserById(userId);
 
   const { cart } = user;
 
@@ -56,9 +69,11 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
   }
 
   const validationCode = generateRandomEightDigitCode();
+
   const expiresAt = getDateTime(
     getFutureDate(SIGNUP_EMAIL_EXPIRY, "milliseconds"),
   );
+
   const validationSecretBody: ValidateEmailSecretBody = {
     code: validationCode,
     expiresAt,
@@ -78,15 +93,16 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
   await sendEmail({
     to: user.email,
     subject: `Welcome to ${ENV.SENDGRID_NAME}`,
-    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes. You can also use the following link to sign up: ${ENV.FRONTEND_HOST}/${contextStore.context.country.code.toLowerCase()}/sign-up/verify-email?${queryParams}`,
+    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes. You can also use the following link to sign up: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/sign-up/verify-email?${queryParams}`,
   });
 });
 
-const validateThatEmailIsUnique = async (email: string): Promise<void> => {
-  const userExists = Boolean(
-    await selectUserByEmail(email, UserValidationStatusEnum.ALL),
-  );
-  if (userExists) {
+const getUser = async (email: string): Promise<User | undefined> => {
+  const user = await selectUserByEmail(email);
+  const userIsValid = !user || user.isOauth;
+  if (!userIsValid) {
     throw errors.EMAIL_ALREADY_TAKEN();
   }
+
+  return user;
 };

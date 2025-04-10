@@ -1,9 +1,4 @@
-import {
-  InsertUser,
-  User,
-  userSchema,
-  UserValidationStatusEnum,
-} from "@user-entity";
+import { InsertUser, User, userSchema } from "@user-entity";
 import { hashString } from "@crypto-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
@@ -46,10 +41,7 @@ export const getGoogleOauthUser = withTransaction(
       },
     });
 
-    const dbUser = await selectUserByEmail(
-      googleUser.email,
-      UserValidationStatusEnum.ALL,
-    );
+    const dbUser = await selectUserByEmail(googleUser.email);
     if (dbUser) {
       if (!dbUser.googleUserId) {
         await updateUser(dbUser.id, {
@@ -69,10 +61,7 @@ export const getGoogleOauthUser = withTransaction(
       };
     }
 
-    const dbGoogleUser = await selectUserByGoogleUserId(
-      hashedGoogleUserId,
-      UserValidationStatusEnum.ALL,
-    );
+    const dbGoogleUser = await selectUserByGoogleUserId(hashedGoogleUserId);
 
     if (dbGoogleUser) {
       let refreshToken = await getAuthSecret(dbGoogleUser.id);
@@ -110,7 +99,7 @@ export const getGoogleOauthUser = withTransaction(
 
     const [{ id: userId }] = await insertUser(newUser);
 
-    const user = await selectUserById(userId, UserValidationStatusEnum.ALL);
+    const user = await selectUserById(userId);
 
     const refreshToken = await getLoggedInRefreshToken(userId);
 

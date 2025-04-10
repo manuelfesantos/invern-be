@@ -1,10 +1,5 @@
 import { selectUserByEmail, updateUser } from "@user-db";
-import {
-  toUserDTO,
-  UserDTO,
-  UserValidationStatusEnum,
-  ValidateEmailSecretBody,
-} from "@user-entity";
+import { toUserDTO, UserDTO, ValidateEmailSecretBody } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
@@ -25,7 +20,7 @@ export const validateUser = async (
   email: string,
   secret: ValidateEmailSecretBody,
 ): Promise<ReturnType> => {
-  const user = await selectUserByEmail(email, UserValidationStatusEnum.ALL);
+  const user = await selectUserByEmail(email);
   if (!user) throw errors.USER_NOT_FOUND();
 
   if (!user.isValidated) {

@@ -1,5 +1,10 @@
 import { selectUserByEmail, updateUser } from "@user-db";
-import { User, UserDTO, toUserDTO } from "@user-entity";
+import {
+  User,
+  UserDTO,
+  toUserDTO,
+  UserValidationStatusEnum,
+} from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { hashPassword } from "@crypto-utils";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
@@ -79,7 +84,10 @@ export const login = withTransaction(
 );
 
 const getUser = async (email: string): Promise<User> => {
-  const user = await selectUserByEmail(email);
+  const user = await selectUserByEmail(
+    email,
+    UserValidationStatusEnum.VALIDATED,
+  );
   if (!user) {
     throw errors.INVALID_CREDENTIALS();
   }
