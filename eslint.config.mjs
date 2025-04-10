@@ -2,8 +2,9 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginImport from "eslint-plugin-import";
-
-export default [
+import { globalIgnores, defineConfig } from "eslint/config";
+export default defineConfig([
+  globalIgnores(["docs/*", "scripts/*"]),
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
@@ -104,4 +105,4 @@ export default [
       "@typescript-eslint/explicit-function-return-type": "off",
     },
   },
-];
+]);

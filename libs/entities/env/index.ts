@@ -8,7 +8,7 @@ export interface Env {
   SENDGRID_DOMAIN: string;
   SENDGRID_NAME: string;
   AUTH_KV: KVNamespace;
-  FORGOT_KV: KVNamespace;
+  VALIDATION_KV: KVNamespace;
   TOKEN_SECRET: string;
   REFRESH_TOKEN_SECRET: string;
   FRONTEND_HOST: string;

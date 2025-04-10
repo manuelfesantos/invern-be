@@ -1,8 +1,7 @@
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { imagesTable } from "@schema";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+import { InsertImage } from "@image-entity";
 
 const FIRST_COLLECTION_IMAGE_INDEX = 0;
 const SECOND_COLLECTION_IMAGE_INDEX = 16;
@@ -12,8 +11,6 @@ export const insertImages = async (
   products: { productId: string; name: string }[],
   collections: { collectionId: string; name: string }[],
 ): Promise<void> => {
-  const insertImageSchema = createInsertSchema(imagesTable);
-  type InsertImage = z.infer<typeof insertImageSchema>;
   const imagesList: InsertImage[] = products
     .map((product, index) => [
       {

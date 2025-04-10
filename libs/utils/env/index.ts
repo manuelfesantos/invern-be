@@ -150,8 +150,8 @@ class EnvironmentService {
     return this.var("SENDGRID_NAME");
   }
 
-  get FORGOT_KV(): KVNamespace {
-    return this.var("FORGOT_KV");
+  get VALIDATION_KV(): KVNamespace {
+    return this.var("VALIDATION_KV");
   }
 }
 

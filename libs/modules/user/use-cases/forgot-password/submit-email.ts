@@ -8,8 +8,8 @@ import {
   getFutureDate,
   isDateInFuture,
 } from "@timer-utils";
-import { ForgotSecretBody, User } from "@user-entity";
-import { getForgotPasswordSecret, setForgotPasswordSecret } from "@kv-adapter";
+import { BaseValidationSecretBody, User } from "@user-entity";
+import { getValidationSecret, setValidationSecret } from "@kv-adapter";
 import queryString from "query-string";
 import { ENV } from "@env-utils";
 import { contextStore } from "@context-utils";
@@ -49,7 +49,7 @@ export const submitEmail = async (email: string): Promise<void> => {
 };
 
 const getPasswordResetCode = async (user: User): Promise<string> => {
-  const forgotSecret = await getForgotPasswordSecret(user.email);
+  const forgotSecret = await getValidationSecret(user.email);
 
   if (!forgotSecret || secretIsExpired(forgotSecret)) {
     return await generateNewSecretCode(user.email);
@@ -59,7 +59,7 @@ const getPasswordResetCode = async (user: User): Promise<string> => {
     throw errors.FORGOT_SECRET_EXHAUSTED(SECRET_EXPIRY_MINUTES);
   }
 
-  await setForgotPasswordSecret(user.email, {
+  await setValidationSecret(user.email, {
     ...forgotSecret,
     emailsSent: forgotSecret.emailsSent + ONE_ATTEMPT,
   });
@@ -77,21 +77,21 @@ const generateNewSecretCode = async (email: string): Promise<string> => {
     data: { expiresAt },
   });
 
-  const forgotSecretBody: ForgotSecretBody = {
+  const forgotSecretBody: BaseValidationSecretBody = {
     code,
     expiresAt: getDateTime(getFutureDate(FORGOT_SECRET_EXPIRY, "milliseconds")),
     attemptsLeft: 5,
     emailsSent: 1,
   };
 
-  await setForgotPasswordSecret(email, forgotSecretBody);
+  await setValidationSecret(email, forgotSecretBody);
 
   return code;
 };
 
-const secretIsExpired = (secret: ForgotSecretBody): boolean =>
+const secretIsExpired = (secret: BaseValidationSecretBody): boolean =>
   !isDateInFuture(secret.expiresAt);
 
-const secretIsExhausted = (secret: ForgotSecretBody): boolean =>
+const secretIsExhausted = (secret: BaseValidationSecretBody): boolean =>
   secret.attemptsLeft <= NO_ATTEMPTS_LEFT ||
   secret.emailsSent >= MAX_EMAILS_SENT;

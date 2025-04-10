@@ -82,7 +82,9 @@ const getCheckoutCookiesToRemove = (
 const initializeCheckoutStage = (
   checkoutStage: CheckoutStageName | null,
 ): void => {
-  checkoutStage && (contextStore.context.currentCheckoutStage = checkoutStage);
+  if (checkoutStage) {
+    contextStore.context.currentCheckoutStage = checkoutStage;
+  }
 };
 
 const getAllCheckoutCookies = (): CookieName[] => {

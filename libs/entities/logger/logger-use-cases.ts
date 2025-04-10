@@ -49,10 +49,22 @@ const r2BucketUseCasesSchema = [
   "PURGE_CACHE",
 ] as const;
 
-const forgotPasswordSecretKvSchema = [
-  "PUT_FORGOT_PASSWORD_SECRET",
-  "GET_FORGOT_PASSWORD_SECRET",
-  "DELETE_FORGOT_PASSWORD_SECRET",
+const authSecretKvSchema = [
+  "PUT_AUTH_SECRET",
+  "GET_AUTH_SECRET",
+  "DELETE_AUTH_SECRET",
+] as const;
+
+const validationSecretKvSchema = [
+  "PUT_VALIDATION_SECRET",
+  "GET_VALIDATION_SECRET",
+  "DELETE_VALIDATION_SECRET",
+] as const;
+
+const validateEmailSecretKvSchema = [
+  "PUT_VALIDATE_EMAIL_SECRET",
+  "GET_VALIDATE_EMAIL_SECRET",
+  "DELETE_VALIDATE_EMAIL_SECRET",
 ] as const;
 
 const responseUseCasesSchema = ["HTTP_RESPONSE"] as const;
@@ -79,8 +91,10 @@ const loggerUseCasesSchema = z.enum([
   ...responseUseCasesSchema,
   ...checkoutUseCasesSchema,
   ...oauthUseCasesSchema,
-  ...forgotPasswordSecretKvSchema,
+  ...validationSecretKvSchema,
   ...emailUseCasesSchema,
+  ...validateEmailSecretKvSchema,
+  ...authSecretKvSchema,
 ]);
 
 export const LoggerUseCaseEnum = loggerUseCasesSchema.enum;

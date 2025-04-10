@@ -6,7 +6,6 @@ import { logger } from "@logger-utils";
 import { isStripeEvent, isStripePaymentIntent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { requestHandler } from "@decorator-utils";
-// eslint-disable-next-line import/no-restricted-paths
 
 const POST: PagesFunction = async (context) => {
   const { request } = context;
