@@ -2,11 +2,15 @@ import { db } from "@db";
 import { usersTable } from "@schema";
 import { eq, sql } from "drizzle-orm";
 import { InsertUser } from "@user-entity";
+import { hashPassword } from "@crypto-utils";
 
 export const updateUser = async (
   userId: string,
   changes: Partial<InsertUser>,
 ): Promise<void> => {
+  if (changes.password) {
+    changes.password = await hashPassword(changes.password, userId);
+  }
   await db().update(usersTable).set(changes).where(eq(usersTable.id, userId));
 };
 

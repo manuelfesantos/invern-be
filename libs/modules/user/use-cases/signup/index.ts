@@ -40,6 +40,7 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
       isOauth: false,
       firstName: parsedBody.firstName,
       lastName: parsedBody.lastName,
+      password: parsedBody.password,
     });
     userId = userFromDb.id;
   } else {
