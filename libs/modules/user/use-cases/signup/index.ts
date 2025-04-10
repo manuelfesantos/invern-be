@@ -1,7 +1,11 @@
 import { insertUser, selectUserByEmail, selectUserById } from "@user-db";
 import { insertCart, updateCart } from "@cart-db";
 import { errors } from "@error-handling-utils";
-import { insertUserSchema, ValidateEmailSecretBody } from "@user-entity";
+import {
+  insertUserSchema,
+  UserValidationStatusEnum,
+  ValidateEmailSecretBody,
+} from "@user-entity";
 import { setAuthSecret, setValidationSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { contextStore } from "@context-utils";
@@ -39,7 +43,7 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
     cartId: contextStore.context.cartId,
   });
 
-  const user = await selectUserById(userId);
+  const user = await selectUserById(userId, UserValidationStatusEnum.ALL);
 
   const refreshToken = await getLoggedInRefreshToken(userId);
   await setAuthSecret(userId, refreshToken);
@@ -73,7 +77,9 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
 });
 
 const validateThatEmailIsUnique = async (email: string): Promise<void> => {
-  const userExists = Boolean(await selectUserByEmail(email, null));
+  const userExists = Boolean(
+    await selectUserByEmail(email, UserValidationStatusEnum.ALL),
+  );
   if (userExists) {
     throw errors.EMAIL_ALREADY_TAKEN();
   }
