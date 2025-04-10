@@ -13,17 +13,15 @@ import { contextStore } from "@context-utils";
 import { withTransaction } from "@db";
 import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
-import { sendEmail } from "@sendgrid-adapter";
-import { ENV } from "@env-utils";
 import { booleanSchema } from "@global-entity";
-import queryString from "query-string";
+import { sendSignupEmail } from "./utils/send-email";
 
 export const signupBodySchema = insertUserSchema.omit({ cartId: true }).extend({
   remember: booleanSchema("remember me").default(false),
 });
 
 export const signup = withTransaction(async (body: unknown): Promise<void> => {
-  const { isLoggedIn, cartId, country } = contextStore.context;
+  const { isLoggedIn, cartId } = contextStore.context;
 
   if (isLoggedIn) {
     throw errors.UNAUTHORIZED("already logged in");
@@ -38,8 +36,6 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
   if (userFromDb) {
     await updateUser(userFromDb.id, {
       isOauth: false,
-      firstName: parsedBody.firstName,
-      lastName: parsedBody.lastName,
       password: parsedBody.password,
     });
     userId = userFromDb.id;
@@ -86,16 +82,7 @@ export const signup = withTransaction(async (body: unknown): Promise<void> => {
 
   await setValidationSecret(user.email, validationSecretBody);
 
-  const queryParams = queryString.stringify({
-    email: user.email,
-    code: validationCode,
-  });
-
-  await sendEmail({
-    to: user.email,
-    subject: `Welcome to ${ENV.SENDGRID_NAME}`,
-    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes. You can also use the following link to sign up: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/sign-up/verify-email?${queryParams}`,
-  });
+  await sendSignupEmail(user, validationCode);
 });
 
 const getUser = async (email: string): Promise<User | undefined> => {

@@ -106,4 +106,13 @@ export const errors = {
       `Verification code exhausted. Please try again in ${waitingMinutes} minutes`,
       HttpStatusEnum.UNAUTHORIZED,
     ),
+  INVALID_VALIDATION_CODE: (message?: string): CustomError =>
+    new CustomError(
+      message || "Invalid validation code",
+      HttpStatusEnum.UNAUTHORIZED,
+    ),
+  VALIDATION_CODE_EXPIRED: (): CustomError =>
+    new CustomError("Validation code expired", HttpStatusEnum.UNAUTHORIZED),
+  VALIDATION_CODE_NOT_FOUND: (): CustomError =>
+    new CustomError("Validation code not found", HttpStatusEnum.NOT_FOUND),
 };
