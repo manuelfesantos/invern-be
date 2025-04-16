@@ -13,6 +13,11 @@ export const errors = {
     new CustomError(errorMessage ?? "User not found", HttpStatusEnum.NOT_FOUND),
   USER_DETAILS_NOT_PROVIDED: (): CustomError =>
     new CustomError("User details not provided", HttpStatusEnum.BAD_REQUEST),
+  PASSWORD_UPDATE_FAILED: (): CustomError =>
+    new CustomError(
+      "Password update failed",
+      HttpStatusEnum.INTERNAL_SERVER_ERROR,
+    ),
   PRODUCT_NOT_IN_CART: (): CustomError =>
     new CustomError("Product not in cart", HttpStatusEnum.BAD_REQUEST),
   PRODUCT_NOT_FOUND: (productId?: string): CustomError =>

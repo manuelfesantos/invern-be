@@ -1,0 +1,14 @@
+import { PagesFunction } from "@cloudflare/workers-types";
+import { getBodyFromRequest } from "@http-utils";
+import { protectedSuccessResponse } from "@response-entity";
+import { requestHandler } from "@decorator-utils";
+import { updateUserPersonalInformation } from "@user-module";
+
+const POST: PagesFunction = async ({ request }) => {
+  const body = await getBodyFromRequest(request);
+  const user = await updateUserPersonalInformation(body);
+
+  return protectedSuccessResponse.OK("successfully updated user", user);
+};
+
+export const onRequest = requestHandler({ POST });
