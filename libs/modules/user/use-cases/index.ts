@@ -1,5 +1,5 @@
 export * from "./get-user";
-export { updateUser } from "./update-user";
+export * from "./update-user";
 export { deleteUser } from "./delete-user";
 export * from "./details";
 export * from "./forgot-password";
