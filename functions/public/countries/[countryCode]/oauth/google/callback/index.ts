@@ -55,7 +55,9 @@ const GET: PagesFunction = async ({ request }) => {
   const response = successResponse.OK(
     "Successfully signed in with google oauth",
     {
-      accessToken: getLoggedInToken(user.id, user.cart?.id),
+      cart: user.cart,
+      user,
+      accessToken: await getLoggedInToken(user.id, user.cart?.id),
     },
   );
 
