@@ -13,7 +13,7 @@ const GET: PagesFunction = async () => {
   const state = { country: country.code.toLowerCase(), oauthToken };
   const params = queryString.stringify({
     client_id: ENV.GOOGLE_CLIENT_ID,
-    redirect_uri: `${ENV.FRONTEND_HOST}/api/oauth/google`,
+    redirect_uri: `${ENV.FRONTEND_HOST}/oauth-redirect.html`,
     response_type: "code",
     scope: "openid email profile",
     include_granted_scopes: "true",
