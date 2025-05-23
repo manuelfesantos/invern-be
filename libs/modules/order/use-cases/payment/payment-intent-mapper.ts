@@ -34,7 +34,7 @@ const paymentIntentTypeSchema = z.enum(
   },
 );
 
-export const mapPaymentIntentEvent = async (
+export const mapPaymentIntentEvent = (
   paymentIntent: Stripe.PaymentIntent,
   eventType: Stripe.Event.Type,
 ): Promise<Payment> => {
@@ -46,8 +46,5 @@ export const mapPaymentIntentEvent = async (
 
   logger().addRedactedData({ paymentId: paymentIntent.id });
 
-  return await withRetry(
-    paymentIntent,
-    paymentIntentEventMap[paymentIntentType],
-  );
+  return withRetry(paymentIntent, paymentIntentEventMap[paymentIntentType]);
 };
