@@ -1,4 +1,4 @@
-import { selectUserById } from "@user-db";
+import { getSelectUserByIdAction } from "@user-db";
 import { protectedSuccessResponse } from "@response-entity";
 import { getLoggedInToken } from "@jwt-utils";
 import { loggedOutResponse } from "./logged-out-response";
@@ -18,7 +18,7 @@ export const loggedInResponse = async (
 ): Promise<Response> => {
   logCredentials(cartId, userId);
 
-  const user = await selectUserById(userId);
+  const user = await getSelectUserByIdAction(userId).run();
 
   if (!user) {
     return loggedOutResponse(headers);

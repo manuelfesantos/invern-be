@@ -3,7 +3,7 @@ import { getBodyFromRequest } from "@http-utils";
 import { z } from "zod";
 /* eslint-disable import/no-restricted-paths */
 import { stockClient } from "@r2-adapter";
-import { selectProducts } from "@product-db";
+import { getSelectProductsAction } from "@product-db";
 /* eslint-enable import/no-restricted-paths */
 import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
@@ -22,10 +22,12 @@ const POST: PagesFunction = async ({ request }) => {
     return errorResponse.UNAUTHORIZED();
   }
 
-  const products = (await selectProducts()).map(({ id, stock }) => ({
-    id,
-    stock: stock || NO_STOCK,
-  }));
+  const products = (await getSelectProductsAction().run()).map(
+    ({ id, stock }) => ({
+      id,
+      stock: stock || NO_STOCK,
+    }),
+  );
 
   await stockClient.updateMany(products);
 

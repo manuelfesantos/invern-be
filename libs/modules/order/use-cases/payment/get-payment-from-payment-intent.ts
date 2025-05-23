@@ -6,20 +6,23 @@ import {
   PaymentIntentState,
 } from "@payment-entity";
 import {
-  selectPaymentById,
-  insertPaymentReturningAll,
-  updatePayment,
+  getSelectPaymentByIdAction,
+  getInsertPaymentReturningAllAction,
+  getUpdatePaymentAction,
 } from "@payment-db";
 import { errors } from "@error-handling-utils";
-import { selectOrderProductsByPaymentId, updateOrder } from "@order-db";
-import { increaseProductsStock } from "@product-db";
+import {
+  getSelectOrderProductsByPaymentIdAction,
+  getUpdateOrderAction,
+} from "@order-db";
+import { getIncreaseProductsStockAction } from "@product-db";
 import { stockClient } from "@r2-adapter";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { getPaymentFromPaymentIntent } from "./utils/get-payment";
 import {
-  insertPaymentMethod,
-  selectPaymentMethodById,
+  getInsertPaymentMethodAction,
+  getSelectPaymentMethodByIdAction,
 } from "@payment-method-db";
 
 export const getPaymentFromPaymentIntentSucceededEvent = async (
@@ -29,7 +32,7 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
     paymentIntent,
     PaymentIntentState.succeeded,
   );
-  const { id } = (await selectPaymentById(payment.id)) ?? {};
+  const { id } = (await getSelectPaymentByIdAction(payment.id).run()) ?? {};
 
   logger().info("Processing PaymentIntentSucceeded Event", {
     useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
@@ -42,10 +45,11 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
   await savePaymentMethod(paymentMethod);
 
   if (id) {
-    const [updatedPayment] = await updatePayment(id, payment);
+    const [updatedPayment] = await getUpdatePaymentAction(id, payment).run();
     return updatedPayment;
   }
-  const [insertedPayment] = await insertPaymentReturningAll(payment);
+  const [insertedPayment] =
+    await getInsertPaymentReturningAllAction(payment).run();
 
   return insertedPayment;
 };
@@ -57,7 +61,7 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
     paymentIntent,
     PaymentIntentState.created,
   );
-  const savedPayment = await selectPaymentById(payment.id);
+  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
 
   logger().info("Processing PaymentIntentCreated Event", {
     useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
@@ -73,10 +77,14 @@ export const getPaymentFromPaymentIntentCreatedEvent = async (
     if (savedPayment?.state !== PaymentIntentState.draft) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.id, payment);
+    const [updatedPayment] = await getUpdatePaymentAction(
+      payment.id,
+      payment,
+    ).run();
     return updatedPayment;
   }
-  const [insertedPayment] = await insertPaymentReturningAll(payment);
+  const [insertedPayment] =
+    await getInsertPaymentReturningAllAction(payment).run();
 
   return insertedPayment;
 };
@@ -89,7 +97,7 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
     PaymentIntentState.processing,
   );
 
-  const savedPayment = await selectPaymentById(payment.id);
+  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
 
   logger().info("Processing PaymentIntentProcessing Event", {
     useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
@@ -108,10 +116,14 @@ export const getPaymentFromPaymentIntentProcessingEvent = async (
     ) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.id, payment);
+    const [updatedPayment] = await getUpdatePaymentAction(
+      payment.id,
+      payment,
+    ).run();
     return updatedPayment;
   }
-  const [insertedPayment] = await insertPaymentReturningAll(payment);
+  const [insertedPayment] =
+    await getInsertPaymentReturningAllAction(payment).run();
   return insertedPayment;
 };
 
@@ -144,16 +156,19 @@ export const getPaymentFromPaymentIntentFailedEvent = async (
 const handleFailedPayment = async (
   payment: InsertPayment,
 ): Promise<Payment> => {
-  const { products, id } =
-    (await selectOrderProductsByPaymentId(payment.id)) ?? {};
+  const [{ products, id }] = await getSelectOrderProductsByPaymentIdAction(
+    payment.id,
+  ).run();
 
   if (products && products.length && id) {
-    const updatedProducts = await increaseProductsStock(products);
+    const updatedProducts =
+      await getIncreaseProductsStockAction(products).run();
+
     await stockClient.updateMany(updatedProducts);
 
-    await updateOrder(id, { isCanceled: true });
+    await getUpdateOrderAction(id, { isCanceled: true }).run();
   }
-  const savedPayment = await selectPaymentById(payment.id);
+  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
 
   logger().info("Processing Failed Payment Event", {
     useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
@@ -171,10 +186,14 @@ const handleFailedPayment = async (
     ) {
       throw errors.PAYMENT_ALREADY_EXISTS();
     }
-    const [updatedPayment] = await updatePayment(payment.id, payment);
+    const [updatedPayment] = await getUpdatePaymentAction(
+      payment.id,
+      payment,
+    ).run();
     return updatedPayment;
   }
-  const [insertedPayment] = await insertPaymentReturningAll(payment);
+  const [insertedPayment] =
+    await getInsertPaymentReturningAllAction(payment).run();
   return insertedPayment;
 };
 
@@ -184,8 +203,10 @@ const savePaymentMethod = async (
   if (!paymentMethod) {
     return;
   }
-  const paymentMethodFromDb = await selectPaymentMethodById(paymentMethod.id);
+  const paymentMethodFromDb = await getSelectPaymentMethodByIdAction(
+    paymentMethod.id,
+  ).run();
   if (!paymentMethodFromDb) {
-    await insertPaymentMethod(paymentMethod);
+    await getInsertPaymentMethodAction(paymentMethod).run();
   }
 };

@@ -1,9 +1,13 @@
 import { StripeSessionResult } from "@stripe-entity";
-import { checkIfOrderExists, selectOrderById, insertOrder } from "@order-db";
 import {
-  selectPaymentById,
-  insertPaymentReturningId,
-  updatePayment,
+  getCheckIfOrderExistsAction,
+  getSelectOrdersByIdAction,
+  getInsertOrderAction,
+} from "@order-db";
+import {
+  getSelectPaymentByIdAction,
+  getInsertPaymentReturningIdAction,
+  getUpdatePaymentAction,
 } from "@payment-db";
 import { InsertPayment } from "@payment-entity";
 import {
@@ -13,111 +17,148 @@ import {
   insertOrderSchema,
 } from "@order-entity";
 import { errors } from "@error-handling-utils";
-import { deleteCart, insertCartReturningAll } from "@cart-db";
-import { incrementUserVersion, updateUser } from "@user-db";
-import { popCheckoutSessionById } from "@checkout-session-db";
+import { getDeleteCartAction, getInsertCartAction } from "@cart-db";
+import { getIncrementUserVersionAction, getUpdateUserAction } from "@user-db";
+import {
+  getDeleteCheckoutSessionByIdAction,
+  getSelectCheckoutSessionByIdAction,
+} from "@checkout-session-db";
 import { logCredentials, logger } from "@logger-utils";
-import { insertShippingTransaction } from "@shipping-transaction-db";
+import { getInsertShippingTransactionAction } from "@shipping-transaction-db";
 import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
 import { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
-import { withTransaction } from "@db";
 import { sendEmail } from "@sendgrid-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
+import { getRandomUUID } from "@crypto-utils";
+import { createOperationBatch } from "@generics-db";
 
-export const getOrderFromSessionResult = withTransaction(
-  async (sessionResult: StripeSessionResult): Promise<ClientOrder> => {
-    logger().addRedactedData({ orderId: sessionResult.id });
+export const getOrderFromSessionResult = async (
+  sessionResult: StripeSessionResult,
+): Promise<ClientOrder> => {
+  logger().addRedactedData({ orderId: sessionResult.id });
 
-    await validateIfOrderAlreadyExists(sessionResult.id);
+  await validateIfOrderAlreadyExists(sessionResult.id);
 
-    const payment = await getPayment(sessionResult);
+  const payment = await getPayment(sessionResult);
 
-    const {
-      products,
-      userId,
-      cartId,
-      address,
-      personalDetails,
-      shippingMethod,
-      country,
-      orderId: clientId,
-    } = await getCheckoutSession(sessionResult.id);
+  const {
+    products,
+    userId,
+    cartId,
+    address,
+    personalDetails,
+    shippingMethod,
+    country,
+    orderId,
+  } = await getCheckoutSession(sessionResult.id);
 
-    logCredentials(cartId, userId);
+  logCredentials(cartId, userId);
 
-    const { id: shippingTransactionId } = await insertShippingTransaction({
-      status: ShippingTransactionStatusEnum.processing,
-    });
+  const shippingTransactionId = getRandomUUID();
 
-    const newOrder: BaseOrder = {
-      personalDetails,
-      shippingMethod,
-      country,
-      shippingTransactionId,
-      createdAt: getDateTime(),
-      lastModifiedAt: getDateTime(),
-      id: clientId,
-      address,
-      products,
-      userId: userId ?? null,
-      stripeId: sessionResult.id,
-      paymentId: payment.id,
-      isCanceled: false,
-    };
+  const insertShippingTransactionAction = getInsertShippingTransactionAction({
+    status: ShippingTransactionStatusEnum.processing,
+    id: shippingTransactionId,
+  });
 
-    const [{ orderId }] = await insertOrder(insertOrderSchema.parse(newOrder));
+  const newOrder: BaseOrder = {
+    personalDetails,
+    shippingMethod,
+    country,
+    shippingTransactionId,
+    createdAt: getDateTime(),
+    lastModifiedAt: getDateTime(),
+    id: orderId,
+    address,
+    products,
+    userId: userId ?? null,
+    stripeId: sessionResult.id,
+    paymentId: payment.id,
+    isCanceled: false,
+  };
 
-    const order = await selectOrderById(orderId);
+  const insertOrderAction = getInsertOrderAction(
+    insertOrderSchema.parse(newOrder),
+  );
 
-    if (!order) {
-      throw new Error("Unable to create order");
-    }
+  const selectOrdersByIdAction = getSelectOrdersByIdAction(orderId);
 
-    if (cartId) {
-      await deleteCart(cartId);
-      if (userId) {
-        const { id: newCartId } = await insertCartReturningAll({
-          isLoggedIn: true,
-        });
-        await updateUser(userId, { cartId: newCartId });
-        logCredentials(newCartId);
-      }
-    }
-
+  let deleteCartAction: ReturnType<typeof getDeleteCartAction> | undefined =
+    undefined;
+  let insertCartAction: ReturnType<typeof getInsertCartAction> | undefined =
+    undefined;
+  let updateUserAction: ReturnType<typeof getUpdateUserAction> | undefined =
+    undefined;
+  if (cartId) {
+    deleteCartAction = getDeleteCartAction(cartId);
     if (userId) {
-      await incrementUserVersion(userId);
-    }
-
-    const clientOrder = clientOrderSchema.parse(order);
-
-    logger().info("Finished creating order after checkout session result", {
-      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-      data: { createdOrder: stringifyObject(clientOrder) },
-    });
-
-    if (!personalDetails.email) {
-      logger().warn("Email not found in personal details", {
-        useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-        data: { personalDetails: stringifyObject(personalDetails) },
+      const newCartId = getRandomUUID();
+      insertCartAction = getInsertCartAction({
+        isLoggedIn: true,
+        id: newCartId,
       });
-      return clientOrder;
+      updateUserAction = getUpdateUserAction(userId, { cartId: newCartId });
+      logCredentials(newCartId);
     }
+  }
 
-    await sendEmail({
-      to: personalDetails.email || "",
-      subject: "Checkout",
-      text: `Thank you for purchasing with Invern Spirit, your order's total is ${sessionResult.amount_total}`,
+  if (userId) {
+    await getIncrementUserVersionAction(userId).run();
+  }
+
+  const operationBatch = createOperationBatch(
+    insertShippingTransactionAction,
+    insertOrderAction,
+    selectOrdersByIdAction,
+  );
+
+  if (deleteCartAction) {
+    operationBatch.addAction(deleteCartAction);
+  }
+  if (insertCartAction) {
+    operationBatch.addAction(insertCartAction);
+  }
+  if (updateUserAction) {
+    operationBatch.addAction(updateUserAction);
+  }
+
+  const [, , [order]] = await operationBatch.run();
+
+  if (!order) {
+    throw new Error("Unable to create order");
+  }
+
+  const clientOrder = clientOrderSchema.parse(order);
+
+  logger().info("Finished creating order after checkout session result", {
+    useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+    data: { createdOrder: stringifyObject(clientOrder) },
+  });
+
+  if (!personalDetails.email) {
+    logger().warn("Email not found in personal details", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: { personalDetails: stringifyObject(personalDetails) },
     });
-
     return clientOrder;
-  },
-);
+  }
+
+  await sendEmail({
+    to: personalDetails.email || "",
+    subject: "Checkout",
+    text: `Thank you for purchasing with Invern Spirit, your order's total is ${sessionResult.amount_total}`,
+  });
+
+  await getDeleteCheckoutSessionByIdAction(sessionResult.id).run();
+
+  return clientOrder;
+};
 
 const validateIfOrderAlreadyExists = async (orderId: string): Promise<void> => {
-  const orderAlreadyExists = await checkIfOrderExists(orderId);
+  const orderAlreadyExists = await getCheckIfOrderExistsAction(orderId).run();
 
   if (orderAlreadyExists) {
     throw errors.ORDER_ALREADY_EXISTS();
@@ -129,12 +170,16 @@ const getPayment = async (
 ): Promise<InsertPayment> => {
   const { payment } = getPaymentFromSessionResult(sessionResult);
 
-  const paymentExists = Boolean(await selectPaymentById(payment.id));
+  const paymentExists = Boolean(
+    await getSelectPaymentByIdAction(payment.id).run(),
+  );
 
   if (!paymentExists) {
-    await insertPaymentReturningId(payment);
+    await getInsertPaymentReturningIdAction(payment).run();
   } else {
-    await updatePayment(payment.id, { netAmount: payment.netAmount });
+    await getUpdatePaymentAction(payment.id, {
+      netAmount: payment.netAmount,
+    }).run();
   }
 
   return payment;
@@ -143,7 +188,8 @@ const getPayment = async (
 const getCheckoutSession = async (
   sessionId: string,
 ): Promise<CheckoutSession> => {
-  const [checkoutSession] = await popCheckoutSessionById(sessionId);
+  const checkoutSession =
+    await getSelectCheckoutSessionByIdAction(sessionId).run();
 
   if (!checkoutSession) {
     throw new Error("Checkout session not found");

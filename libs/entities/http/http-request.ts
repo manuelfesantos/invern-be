@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { Env } from "@env-entity";
 
 export const httpMethodsSchema = z.enum(

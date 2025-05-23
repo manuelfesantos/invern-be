@@ -9,7 +9,7 @@ const GET: PagesFunction = async (context) => {
   const { params, request } = context;
   const { id } = params;
   const email = request.headers.get("x-user-email");
-  const order = await getOrder(id, email ?? undefined);
+  const order = await getOrder(id, true, email ?? undefined);
 
   const response = successResponse.OK("Successfully got order", { order });
 

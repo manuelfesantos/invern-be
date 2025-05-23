@@ -18,10 +18,11 @@ import {
 import { getCartIdFromHeaders } from "@http-utils";
 /* eslint-disable import/no-restricted-paths */
 import { getAuthSecret } from "@kv-adapter";
-import { selectUserById, updateUser } from "@user-db";
-import { insertCartReturningAll } from "@cart-db";
+import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
+import { getInsertCartAction } from "@cart-db";
 /* eslint-enable import/no-restricted-paths */
 import { Credentials } from "@request-entity";
+import { getRandomUUID } from "@crypto-utils";
 
 export const getCredentials = async (
   headers: Headers,
@@ -114,19 +115,26 @@ const handleLoggedInRefreshToken = async (
     throw errors.UNAUTHORIZED();
   }
 
-  let { cart } = await selectUserById(userId);
+  const user = await getSelectUserByIdAction(userId).run();
+
+  if (!user) {
+    throw errors.UNAUTHORIZED();
+  }
+
+  let { id: cartId } = user.cart || {};
   const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
 
-  if (!cart) {
-    cart = await insertCartReturningAll({ isLoggedIn: true });
-    await updateUser(userId, { cartId: cart.id });
+  if (!cartId) {
+    cartId = getRandomUUID();
+    await getInsertCartAction({ isLoggedIn: true, id: cartId }).run();
+    await getUpdateUserAction(userId, { cartId: cartId }).run();
   }
 
-  const accessToken = await getLoggedInToken(userId, cart.id);
+  const accessToken = await getLoggedInToken(userId, cartId);
   return {
     userId,
-    cartId: cart.id,
+    cartId: cartId,
     accessToken,
     customerEmail,
     refreshToken,

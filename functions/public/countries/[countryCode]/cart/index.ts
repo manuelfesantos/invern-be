@@ -4,7 +4,7 @@ import { requestHandler } from "@decorator-utils";
 import { PagesFunction } from "@cloudflare/workers-types";
 
 const GET: PagesFunction = async () => {
-  const cart = await getCart();
+  const cart = await getCart(true);
 
   return protectedSuccessResponse.OK("success getting cart", cart);
 };

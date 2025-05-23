@@ -1,115 +1,124 @@
 import { createStripeCheckoutSession } from "@stripe-adapter";
-import { increaseProductsStock } from "@product-db";
+import { getIncreaseProductsStockAction } from "@product-db";
 import { errors } from "@error-handling-utils";
 import { LineItem, lineItemSchema } from "@product-entity";
 import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
-import { decreaseProductsStock } from "@product-db";
+import { getDecreaseProductsStockAction } from "@product-db";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stockClient } from "@r2-adapter";
 import { stringifyObject } from "@string-utils";
 import { getDateTime, MILLISECONDS_IN_SECOND } from "@timer-utils";
-import { insertCheckoutSession } from "@checkout-session-db";
+import { getInsertCheckoutSessionAction } from "@checkout-session-db";
 import { contextStore } from "@context-utils";
 import { decrypt, decryptObjectString, getRandomUUID } from "@crypto-utils";
 import { Country } from "@country-entity";
 import { Address } from "@address-entity";
-import { selectShippingMethod } from "@shipping-db";
+import { getSelectShippingMethodAction } from "@shipping-db";
 import { Cart, FilledCart, getCartWeight, toCartDTO } from "@cart-entity";
 import { UserDetails, userDetailsSchema } from "@user-entity";
-import { selectUserById } from "@user-db";
+import { getSelectUserByIdAction } from "@user-db";
 import { SelectedShippingMethod } from "@shipping-entity";
 import {
   CheckoutSession,
   insertCheckoutSessionSchema,
 } from "@checkout-session-entity";
 import { extendCart } from "@extender-utils";
-import { withTransaction } from "@db";
 
 interface CheckoutReturnType {
   url: string;
   checkoutSessionId: string;
 }
 
-export const getCheckoutSession = withTransaction(
-  async (origin?: string): Promise<CheckoutReturnType> => {
-    const {
-      cartId,
-      userId,
-      address: addressString,
-      country,
-      shippingMethodId,
-      userDetails,
-    } = contextStore.context;
+export const getCheckoutSession = async (
+  origin?: string,
+): Promise<CheckoutReturnType> => {
+  const {
+    cartId,
+    userId,
+    address: addressString,
+    country,
+    shippingMethodId,
+    userDetails,
+  } = contextStore.context;
 
-    const address = await getValidatedAddressFromString(country, addressString);
+  const address = await getValidatedAddressFromString(country, addressString);
 
-    const cart = await getValidatedCart(cartId);
+  const cart = await getValidatedCart(cartId);
 
-    const personalDetails = await getPersonalDetails(userId, userDetails);
+  const personalDetails = await getPersonalDetails(userId, userDetails);
 
-    const selectedShippingMethod = await getSelectedShippingMethod(
-      cart,
-      country,
-      shippingMethodId,
-    );
+  const selectedShippingMethod = await getSelectedShippingMethod(
+    cart,
+    country,
+    shippingMethodId,
+  );
 
-    await reserveLineItems(cart.products);
+  await reserveLineItems(cart.products);
 
-    const orderId = getRandomUUID();
+  const orderId = getRandomUUID();
 
-    const stripeCheckoutSession = await createStripeCheckoutSession(
-      cart.products,
-      selectedShippingMethod,
-      orderId,
-      origin,
-    );
+  const stripeCheckoutSession = await createStripeCheckoutSession(
+    cart.products,
+    selectedShippingMethod,
+    orderId,
+    origin,
+  );
 
-    const { url, expires_at, id, created } = stripeCheckoutSession;
+  const { url, expires_at, id, created } = stripeCheckoutSession;
 
-    if (!url) {
-      throw new Error("Checkout session creation failed");
-    }
+  if (!url) {
+    throw new Error("Checkout session creation failed");
+  }
 
-    const newCheckoutSession: CheckoutSession = {
-      id,
-      orderId,
-      userId: userId ?? null,
-      cartId: cartId ?? null,
-      expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
-      createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
-      products: cart.products,
-      shippingMethod: selectedShippingMethod,
-      address: address,
-      personalDetails: personalDetails,
-      country: country,
-    };
+  const newCheckoutSession: CheckoutSession = {
+    id,
+    orderId,
+    userId: userId ?? null,
+    cartId: cartId ?? null,
+    expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
+    createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
+    products: cart.products,
+    shippingMethod: selectedShippingMethod,
+    address: address,
+    personalDetails: personalDetails,
+    country: country,
+  };
 
-    const [checkoutSession] = await insertCheckoutSession(
-      insertCheckoutSessionSchema.parse(newCheckoutSession),
-    );
+  const [checkoutSession] = await getInsertCheckoutSessionAction(
+    insertCheckoutSessionSchema.parse(newCheckoutSession),
+  ).run();
 
-    logger().info("Finished creating checkout session", {
-      useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
-      data: {
-        sessionDetails: stringifyObject(stripeCheckoutSession),
-        checkoutSession,
-      },
-    });
+  logger().info("Finished creating checkout session", {
+    useCase: LoggerUseCaseEnum.CREATE_CHECKOUT_SESSION,
+    data: {
+      sessionDetails: stringifyObject(stripeCheckoutSession),
+      checkoutSession,
+    },
+  });
 
-    return {
-      url,
-      checkoutSessionId: id,
-    };
-  },
-);
+  return {
+    url,
+    checkoutSessionId: id,
+  };
+};
 
 const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
-  const updatedLineItems = await decreaseProductsStock(lineItems);
+  const updatedLineItems =
+    await getDecreaseProductsStockAction(lineItems).run();
+
+  logger().info("products reserved", {
+    useCase: LoggerUseCaseEnum.RESERVE_PRODUCTS,
+    data: {
+      products: updatedLineItems,
+    },
+  });
   try {
     await stockClient.updateMany(updatedLineItems);
   } catch {
-    const updatedProducts = await increaseProductsStock(lineItems);
+    const updatedProducts =
+      await getIncreaseProductsStockAction(lineItems).run();
+
     await stockClient.updateMany(updatedProducts);
   }
 };
@@ -192,7 +201,7 @@ const getPersonalDetails = async (
     if (!userId) {
       throw errors.USER_DETAILS_NOT_PROVIDED();
     }
-    const user = await selectUserById(userId);
+    const user = await getSelectUserByIdAction(userId).run();
     if (!user) {
       throw errors.USER_NOT_FOUND();
     }
@@ -213,10 +222,10 @@ const getSelectedShippingMethod = async (
     throw errors.SHIPPING_METHOD_NOT_FOUND();
   }
 
-  const shippingMethod = await selectShippingMethod(
+  const shippingMethod = await getSelectShippingMethodAction(
     await decrypt(shippingMethodId),
     getCartWeight(cart),
-  );
+  ).run();
 
   if (!shippingMethod) {
     logger().error("No shipping method provided", {

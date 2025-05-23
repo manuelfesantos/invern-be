@@ -18,7 +18,6 @@ export const shippingTransactionSchema = createInsertSchema(
 );
 
 export const insertShippingTransactionSchema = shippingTransactionSchema.omit({
-  id: true,
   createdAt: true,
   lastModifiedAt: true,
 });

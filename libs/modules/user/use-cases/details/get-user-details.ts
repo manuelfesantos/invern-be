@@ -1,7 +1,7 @@
 import { UserDetails } from "@user-entity";
 import { contextStore } from "@context-utils";
 import { decryptObjectString } from "@crypto-utils";
-import { getUserDetailsById } from "@user-db";
+import { getSelectUserDetailsByIdAction } from "@user-db";
 
 export const getUserDetails = async (): Promise<UserDetails | undefined> => {
   const { userDetails, userId } = contextStore.context;
@@ -10,6 +10,6 @@ export const getUserDetails = async (): Promise<UserDetails | undefined> => {
   }
 
   if (userId) {
-    return await getUserDetailsById(userId);
+    return getSelectUserDetailsByIdAction(userId).run();
   }
 };

@@ -3,7 +3,6 @@ import { insertData } from "./_test-data";
 import { getBodyFromRequest } from "@http-utils";
 import { z } from "zod";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { ENV } from "@env-utils";
 
 const testDataRequestBodySchema = z.object({

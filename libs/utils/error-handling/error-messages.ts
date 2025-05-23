@@ -2,6 +2,10 @@ import { CustomError } from "./custom-error";
 import { HttpStatusEnum } from "@http-entity";
 
 export const errors = {
+  COUNTRY_NOT_FOUND: (): CustomError =>
+    new CustomError("Country not found", HttpStatusEnum.NOT_FOUND),
+  CURRENCY_NOT_FOUND: (): CustomError =>
+    new CustomError("Currency not found", HttpStatusEnum.NOT_FOUND),
   EMAIL_ALREADY_TAKEN: (): CustomError =>
     new CustomError("Email already taken", HttpStatusEnum.CONFLICT),
   INVALID_CREDENTIALS: (): CustomError =>
@@ -18,6 +22,8 @@ export const errors = {
       "Password update failed",
       HttpStatusEnum.INTERNAL_SERVER_ERROR,
     ),
+  PASSWORD_REQUIRED: (): CustomError =>
+    new CustomError("Password is required", HttpStatusEnum.BAD_REQUEST),
   PRODUCT_NOT_IN_CART: (): CustomError =>
     new CustomError("Product not in cart", HttpStatusEnum.BAD_REQUEST),
   PRODUCT_NOT_FOUND: (productId?: string): CustomError =>

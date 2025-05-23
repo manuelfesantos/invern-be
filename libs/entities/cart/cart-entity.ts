@@ -19,9 +19,7 @@ const baseCartSchema = createSelectSchema(cartsTable, {
   isLoggedIn: booleanSchema("cart logged in status"),
 });
 
-export const insertCartSchema = createInsertSchema(cartsTable).omit({
-  id: true,
-});
+export const insertCartSchema = createInsertSchema(cartsTable);
 
 export const cartSchema = baseCartSchema.merge(
   z.object({

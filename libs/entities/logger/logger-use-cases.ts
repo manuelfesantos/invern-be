@@ -75,6 +75,7 @@ const checkoutUseCasesSchema = [
   "INVALIDATE_CHECKOUT_SESSION",
   "HANDLE_CHECKOUT_SESSION",
   "CHECK_EXPIRED_SESSIONS",
+  "CHECKOUT_ERROR",
 ] as const;
 
 const oauthUseCasesSchema = ["OAUTH_GOOGLE_CALLBACK"];

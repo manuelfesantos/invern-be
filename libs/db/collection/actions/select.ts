@@ -1,0 +1,67 @@
+import { Collection } from "@collection-entity";
+import { db } from "@db";
+import { actionBuilder, Result } from "@generics-db";
+import { eq } from "drizzle-orm";
+import { collectionsTable } from "@schema";
+
+const selectAllCollectionsQuery = () =>
+  db().query.collectionsTable.findMany({
+    with: {
+      images: {
+        columns: {
+          collectionId: false,
+          productId: false,
+        },
+      },
+    },
+  });
+
+const mapCollectionsFromSelectAllQueryResult = (
+  queryResult: Result<typeof selectAllCollectionsQuery>,
+): Collection[] =>
+  queryResult.map((collection) => ({
+    ...collection,
+    images: undefined,
+    image: collection.images,
+  }));
+
+const selectCollectionQuery = (selection: "id" | "name", value: string) =>
+  db().query.collectionsTable.findFirst({
+    where: eq(collectionsTable[selection], value),
+    with: {
+      products: {
+        columns: {
+          collectionId: false,
+          description: false,
+        },
+        with: {
+          images: {
+            limit: 1,
+            columns: {
+              collectionId: false,
+              productId: false,
+            },
+          },
+        },
+      },
+    },
+  });
+
+const selectCollectionByNameQuery = (collectionName: string) =>
+  selectCollectionQuery("name", collectionName);
+
+const selectCollectionByIdQuery = (collectionId: string) =>
+  selectCollectionQuery("id", collectionId);
+
+export const getSelectCollectionsAction = actionBuilder(
+  selectAllCollectionsQuery,
+  mapCollectionsFromSelectAllQueryResult,
+);
+
+export const getSelectCollectionByNameAction = actionBuilder(
+  selectCollectionByNameQuery,
+);
+
+export const getSelectCollectionByIdAction = actionBuilder(
+  selectCollectionByIdQuery,
+);

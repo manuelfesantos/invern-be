@@ -5,7 +5,7 @@ import {
 import { contextStore } from "@context-utils";
 import { errors } from "@error-handling-utils";
 import { validateCartId } from "@cart-db";
-import { selectShippingMethods } from "@shipping-db";
+import { getSelectShippingMethodsAction } from "@shipping-db";
 import { decrypt } from "@crypto-utils";
 import { getCartWeight } from "@cart-entity";
 
@@ -22,7 +22,8 @@ export const getShippingMethods = async (): Promise<{
   }
 
   const weight = getCartWeight(cart);
-  const shippingMethodsFromDb = await selectShippingMethods(weight);
+  const shippingMethodsFromDb =
+    await getSelectShippingMethodsAction(weight).run();
   if (!shippingMethodsFromDb || !shippingMethodsFromDb.length) {
     throw errors.SHIPPING_METHOD_NOT_FOUND();
   }

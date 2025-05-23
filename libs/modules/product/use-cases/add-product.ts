@@ -1,11 +1,12 @@
-import { insertProduct } from "@product-db";
+import { getInsertProductAction } from "@product-db";
 import { insertProductSchema } from "@product-entity";
-import { successResponse } from "@response-entity";
 
-export const addProduct = async (body: unknown): Promise<Response> => {
-  const [{ productId }] = await insertProduct(insertProductSchema.parse(body));
+export const addProduct = async (
+  body: unknown,
+): Promise<{ productId: string }> => {
+  const [{ productId }] = await getInsertProductAction(
+    insertProductSchema.parse(body),
+  ).run();
 
-  return successResponse.CREATED("success adding product", {
-    productId,
-  });
+  return { productId };
 };
