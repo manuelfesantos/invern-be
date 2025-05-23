@@ -13,7 +13,7 @@ export const getCookieHeader = (
   domain?: string,
   path: string = "/",
 ): string =>
-  `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? (ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;") : "SameSite=Lax;"} ${path ? `Path=${path};` : ""}`;
+  `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${domain ? `Domain=${domain};` : ENV.DOMAIN ? `Domain=${ENV.DOMAIN};` : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? (ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;") : "SameSite=Lax;"} ${path ? `Path=${path};` : ""}`;
 
 export const getCartIdFromHeaders = (headers: Headers): string | undefined => {
   const cookies = getCookies(headers);

@@ -48,7 +48,7 @@ export const decodeJwt = async (
 };
 
 export const getTokenCookie = (token: string, remember?: boolean): string =>
-  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; ${ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;"} ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${ENV.DOMAIN}; ${ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;"} ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
 
 export const getLoggedInToken = async (
   userId: string,
