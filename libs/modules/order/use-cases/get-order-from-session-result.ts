@@ -34,6 +34,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import { getRandomUUID } from "@crypto-utils";
 import { createOperationBatch } from "@generics-db";
+import { withRetry } from "./payment/utils/retry-payment";
 
 export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
@@ -170,19 +171,21 @@ const getPayment = async (
 ): Promise<InsertPayment> => {
   const { payment } = getPaymentFromSessionResult(sessionResult);
 
-  const paymentExists = Boolean(
-    await getSelectPaymentByIdAction(payment.id).run(),
-  );
+  return withRetry(sessionResult, async () => {
+    const paymentExists = Boolean(
+      await getSelectPaymentByIdAction(payment.id).run(),
+    );
 
-  if (!paymentExists) {
-    await getInsertPaymentReturningIdAction(payment).run();
-  } else {
-    await getUpdatePaymentAction(payment.id, {
-      netAmount: payment.netAmount,
-    }).run();
-  }
+    if (!paymentExists) {
+      await getInsertPaymentReturningIdAction(payment).run();
+    } else {
+      await getUpdatePaymentAction(payment.id, {
+        netAmount: payment.netAmount,
+      }).run();
+    }
 
-  return payment;
+    return payment;
+  });
 };
 
 const getCheckoutSession = async (
