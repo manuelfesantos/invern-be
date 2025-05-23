@@ -1,11 +1,17 @@
 import { successResponse } from "@response-entity";
-import { getAllCollections } from "@collection-module";
+import { getAllCollections, addCollection } from "@collection-module";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+import { getBodyFromRequest } from "@http-utils";
 
 const GET: PagesFunction = async (): Promise<Response> => {
   const collections = await getAllCollections();
   return successResponse.OK("success getting collections", collections);
 };
 
-export const onRequest = requestHandler({ GET });
+const POST: PagesFunction = async ({ request }): Promise<Response> => {
+  const body = await getBodyFromRequest(request);
+  const collection = await addCollection(body);
+  return successResponse.CREATED("success adding collection", collection);
+};
+
+export const onRequest = requestHandler({ GET, POST });

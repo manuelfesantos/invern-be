@@ -1,5 +1,5 @@
 import { InsertAddress } from "@address-entity";
-import { updateUser } from "@user-db";
+import { getUpdateUserAction } from "@user-db";
 import { encryptObject } from "@crypto-utils";
 import { contextStore } from "@context-utils";
 
@@ -12,5 +12,7 @@ export const updateAddress = async (
     ...insertAddress,
     country: country.code,
   };
-  await updateUser(id, { address: await encryptObject(address) });
+  await getUpdateUserAction(id, {
+    address: await encryptObject(address),
+  }).run();
 };

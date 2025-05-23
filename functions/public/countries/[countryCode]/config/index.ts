@@ -11,7 +11,6 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { CookieNameEnum } from "@http-entity";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { UserDetails } from "@user-entity";
 
 const GET: PagesFunction = async ({ request }): Promise<Response> => {

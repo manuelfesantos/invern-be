@@ -21,7 +21,7 @@ export const getBaseValidationSecret = async <
 
     return null;
   }
-  logger().info(`found validation secret secret for key ${key}`, {
+  logger().info(`found validation secret for key ${key}`, {
     useCase: LoggerUseCaseEnum.GET_VALIDATION_SECRET,
   });
 

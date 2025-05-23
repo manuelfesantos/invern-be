@@ -32,7 +32,6 @@ export const baseUserSchema = createInsertSchema(usersTable, {
 export const insertUserSchema = baseUserSchema.omit({
   createdAt: true,
   lastModifiedAt: true,
-  id: true,
   version: true,
   role: true,
 });

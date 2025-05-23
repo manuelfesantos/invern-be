@@ -1,7 +1,7 @@
-import { removeProductOperation } from "@cart-db";
 import { ExtendedCart, toCartDTO } from "@cart-entity";
 import { getCartId } from "./utils/get-cart-id";
 import { extendCart } from "@extender-utils";
+import { removeProductOperation } from "./operations/remove-product";
 
 export const removeCartItem = async (
   productId: string,

@@ -2,7 +2,6 @@ import { errorResponse, successResponse } from "@response-entity";
 // eslint-disable-next-line import/no-restricted-paths
 import { stockClient } from "@r2-adapter";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { ENV } from "@env-utils";
 
 const GET: PagesFunction = async ({ params }) => {

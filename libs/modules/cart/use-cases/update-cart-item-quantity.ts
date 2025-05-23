@@ -1,12 +1,5 @@
 import { errors } from "@error-handling-utils";
 import {
-  addProductOperation,
-  removeProductOperation,
-  selectProductStockAndQuantityOperation,
-  updateProductQuantityOperation,
-} from "@cart-db";
-import {
-  Cart,
   CartOperation,
   CartOperationEnum,
   ExtendedCart,
@@ -15,6 +8,8 @@ import {
 import { isZero } from "@number-utils";
 import { getCartId } from "./utils/get-cart-id";
 import { extendCart } from "@extender-utils";
+import { cartOperationMap } from "./operations";
+import { selectProductStockAndQuantityOperation } from "./operations/select-product-stock-and-quantity";
 
 export const updateCartItemQuantity = async (
   productId: string,
@@ -53,13 +48,4 @@ const getCartOperation = (
   }
 
   return CartOperationEnum.UPDATE;
-};
-
-const cartOperationMap: Record<
-  CartOperation,
-  (productId: string, cartId: string, quantity: number) => Promise<Cart>
-> = {
-  [CartOperationEnum.ADD]: addProductOperation,
-  [CartOperationEnum.REMOVE]: removeProductOperation,
-  [CartOperationEnum.UPDATE]: updateProductQuantityOperation,
 };

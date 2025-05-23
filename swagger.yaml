@@ -7,7 +7,7 @@ info:
     Handles product catalog, user management, shopping cart, checkout, and order processing.
 
 servers:
-  - url: https://localhost:8788 # Default wrangler dev port
+  - url: http://localhost:8788 # Default wrangler dev port (using http for local)
     description: Local Development Environment
   - url: https://api.invernspirit.com
     description: Production Environment
@@ -15,6 +15,7 @@ servers:
     description: Preview Environment (Cloudflare Pages Function URL)
 
 tags:
+  # Public
   - name: Public - Countries
     description: Operations related to country listing and selection.
   - name: Public - Config
@@ -24,29 +25,44 @@ tags:
   - name: Public - Collections
     description: Operations related to viewing product collections.
   - name: Public - Cart
-    description: Shopping cart management for authenticated users.
+    description: Shopping cart management (anonymous and authenticated users).
   - name: Public - Checkout
-    description: Multi-stage checkout process for authenticated users.
+    description: Multi-stage checkout process (requires authentication).
   - name: Public - User Auth
     description: User authentication operations (signup, login, logout, forgot password).
   - name: Public - User Profile
-    description: User profile management operations.
+    description: User profile management operations (requires authentication).
   - name: Public - Orders
-    description: Viewing user orders.
+    description: Viewing user orders (requires authentication or guest email).
   - name: Public - OAuth
     description: OAuth related operations (Google).
+  # Private (Admin/Internal)
+  - name: Private - Currencies
+    description: Admin operations for managing currencies. Requires Admin Authentication.
+  - name: Private - Countries
+    description: Admin operations for managing countries. Requires Admin Authentication.
+  - name: Private - Products Admin
+    description: Admin operations for managing products. Requires Admin Authentication.
+  - name: Private - Collections Admin
+    description: Admin operations for managing collections. Requires Admin Authentication.
+  - name: Private - Carts Admin # Added
+    description: Admin operations for viewing carts. Requires Admin Authentication.
+  - name: Private - Users Admin # Added
+    description: Admin operations for managing users. Requires Admin Authentication.
+  - name: Private - Orders Admin
+    description: Admin operations for viewing and managing all orders. Requires Admin Authentication. # Updated Description
   - name: Private - Stock
-    description: Internal operations for managing product stock (Requires special auth).
+    description: Internal operations for managing product stock. Requires special auth/intended for specific triggers.
   - name: Private - Test Data
-    description: Internal operations for seeding test data (Requires special auth).
+    description: Internal operations for seeding test data. Requires special auth.
   - name: Private - Scheduled Tasks
-    description: Endpoints triggered by Cloudflare Cron Triggers.
+    description: Endpoints triggered by Cloudflare Cron Triggers or similar mechanisms.
+  # Webhooks
   - name: Stripe Webhooks
     description: Webhooks for receiving events from Stripe.
 
 security:
-  - cloudflareClientId: [ ]
-  - cloudflareClientSecret: [ ]
+  - AdminSecretKey: [] # Define a scheme for private endpoints needing a secret key
 
 paths:
   # -------------------- Public - Countries --------------------
@@ -79,15 +95,9 @@ paths:
       tags:
         - Public - Countries
       summary: Get Country Details by Code
-      description: Retrieves detailed information for a specific country using its ISO 2-letter code (uppercase).
+      description: Retrieves detailed information for a specific country using its ISO 2-letter code (uppercase). Caches results.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
           description: Detailed information about the country.
@@ -100,7 +110,7 @@ paths:
                     type: string
                     example: Success getting country by code
                   data:
-                    $ref: '#/components/schemas/Country'
+                    $ref: '#/components/schemas/Country' # Full country details
         '400':
           $ref: '#/components/responses/BadRequest' # e.g., Invalid country code format
         '404':
@@ -116,22 +126,16 @@ paths:
       summary: Get Initial API Configuration
       description: |
         Fetches initial data needed for the frontend, including anonymous/logged-in tokens,
-        the current shopping cart state, and user details if logged in.
-        Handles refresh token validation and potentially issues new access tokens.
-        Cookies (`s_r`, `c_i`, `r_m`, checkout stage cookies) play a role in determining the response.
-        The `after-checkout` header influences cookie handling after a successful payment.
+        the current shopping cart state (from cookie `c_i` if present), and user details if logged in (validated via `s_r` refresh token cookie).
+        Handles refresh token validation and issues new access tokens.
+        Cookies (`s_r`, `c_i`, `r_m`, checkout stage cookies) determine the response state.
+        The `after-checkout` header influences cookie handling after a successful payment redirect. Sets auth cookies if needed.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+        - $ref: '#/components/parameters/CountryCode'
         - name: after-checkout
           in: header
           required: false
-          description: Set to 'true' after a successful checkout redirect to clean up session cookies.
+          description: Set to 'true' after a successful checkout redirect to clean up session cookies (`c_s`, `a_d`, `u_d`, `s_m`) and potentially set `c_m`.
           schema:
             type: string
             enum: ['true']
@@ -146,11 +150,11 @@ paths:
                   - $ref: '#/components/schemas/ConfigResponseLoggedOut'
           headers:
             Set-Cookie:
-              description: May set `s_r` (refresh token), `c_i` (cart ID), `r_m` (remember me), and delete checkout stage cookies.
+              description: May set `s_r` (refresh token), `c_i` (cart ID), `r_m` (remember me), `c_m` (customer email), and delete checkout stage cookies (`a_d`, `u_d`, `s_m`, `c_s`).
               schema:
                 type: string
-        '400':
-          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized' # If refresh token validation fails severely
         '404':
           $ref: '#/components/responses/NotFound' # Country not found
         '500':
@@ -164,19 +168,8 @@ paths:
       summary: Get All Products
       description: Retrieves a list of all available products for the specified country, optionally filtered by a search term. Prices include calculated taxes based on the country.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: search
-          in: query
-          required: false
-          description: Optional search term to filter products by name or description.
-          schema:
-            type: string
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/SearchQuery'
       responses:
         '200':
           description: A list of products available in the specified country.
@@ -204,21 +197,8 @@ paths:
       summary: Get Product Details
       description: Retrieves detailed information for a specific product by its ID, including calculated taxes and collection details.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the product.
-          schema:
-            type: string
-            format: uuid # Assuming UUIDs are used
-            example: nPn6WYEMz1NK2B61hmrWsb
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/ProductId'
       responses:
         '200':
           description: Detailed information about the product.
@@ -247,13 +227,7 @@ paths:
       summary: Get All Collections
       description: Retrieves a list of all product collections for the specified country.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
           description: A list of product collections.
@@ -281,21 +255,8 @@ paths:
       summary: Get Collection Details
       description: Retrieves detailed information for a specific collection by its ID, including its products with calculated taxes.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the collection.
-          schema:
-            type: string
-            format: uuid # Assuming UUIDs are used
-            example: 9bekuxMKGrRTKvZqNYZdDV
+        - $ref: '#/components/parameters/CountryCode'
+        - $ref: '#/components/parameters/CollectionId'
       responses:
         '200':
           description: Detailed information about the collection and its products.
@@ -322,74 +283,51 @@ paths:
       tags:
         - Public - Cart
       summary: Get Current Cart
-      description: Retrieves the current user's shopping cart, including product details, quantities, calculated prices, taxes, and totals. Requires authentication.
+      description: Retrieves the current user's shopping cart (anonymous or logged-in), identified by `c_i` cookie or user session. Includes product details, quantities, calculated prices, taxes, and totals. Issues new anonymous tokens/cart ID if none exist.
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
-          description: The user's current shopping cart.
+          description: The user's current shopping cart. May set `s_r` and `c_i` cookies if a new anonymous session is created.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartResponse'
+                $ref: '#/components/schemas/CartResponse' # Includes ExtendedCart and accessToken
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+              $ref: '#/components/headers/SetCookieOptional' # May set s_r, c_i
         '404':
           $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/cart/items/{id}:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+      - $ref: '#/components/parameters/ProductId'
     patch:
       tags:
         - Public - Cart
       summary: Add Quantity to Cart Item (Patch)
-      description: Increases the quantity of an existing item in the cart or adds it if not present. Requires authentication. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
-      parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the product to add/update.
-          schema:
-            type: string
-            format: uuid
-            example: 12v5c1uztaqpus8XNYNJtG
+      description: Increases the quantity of an existing item in the cart or adds it if not present. Requires `quantity` > 0. Creates an anonymous cart (`c_i` cookie) if one doesn't exist. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartItemQuantityInput'
+              $ref: '#/components/schemas/CartItemQuantityInputPatch' # Minimum 1
       responses:
         '200':
-          description: The updated shopping cart.
+          description: The updated shopping cart. May set `s_r` and `c_i` cookies.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional'
+              $ref: '#/components/headers/SetCookieOptional' # Sets checkout stage cookies to empty, may set s_r, c_i
         '400':
-          $ref: '#/components/responses/BadRequest' # Invalid quantity, product out of stock, invalid product ID
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/BadRequest' # Invalid quantity (<=0), product out of stock, invalid product ID
         '404':
           $ref: '#/components/responses/NotFound' # Product or Country not found
         '500':
@@ -398,44 +336,25 @@ paths:
       tags:
         - Public - Cart
       summary: Set Cart Item Quantity (Put)
-      description: Sets the exact quantity for a product in the cart. Adds the item if not present. Removes the item if quantity is 0. Requires authentication. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
-
-      parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the product to update.
-          schema:
-            type: string
-            format: uuid
-            example: 12v5c1uztaqpus8XNYNJtG
+      description: Sets the exact quantity for a product in the cart. Adds the item if not present (requires quantity > 0). Removes the item if quantity is 0. Creates an anonymous cart (`c_i` cookie) if one doesn't exist. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CartItemQuantityInput' # Quantity can be 0 here
+              $ref: '#/components/schemas/CartItemQuantityInputPut' # Minimum 0
       responses:
         '200':
-          description: The updated shopping cart.
+          description: The updated shopping cart. May set `s_r` and `c_i` cookies.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional'
+              $ref: '#/components/headers/SetCookieOptional' # Sets checkout stage cookies to empty, may set s_r, c_i
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid quantity (negative), product out of stock, invalid product ID
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound' # Product or Country not found
         '500':
@@ -444,38 +363,19 @@ paths:
       tags:
         - Public - Cart
       summary: Remove Item From Cart
-      description: Removes a specific product entirely from the shopping cart. Requires authentication. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
-
-      parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the product to remove.
-          schema:
-            type: string
-            format: uuid
-            example: 12v5c1uztaqpus8XNYNJtG
+      description: Removes a specific product entirely from the shopping cart. Requires cart to exist (identified by `c_i` or user session). Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
       responses:
         '200':
-          description: The updated shopping cart after removal.
+          description: The updated shopping cart after removal. May set `s_r` cookie.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional'
+              $ref: '#/components/headers/SetCookieOptional' # Sets checkout stage cookies to empty, may set s_r
         '400':
-          $ref: '#/components/responses/BadRequest' # Invalid product ID
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+          $ref: '#/components/responses/BadRequest' # Invalid product ID, Cart does not exist
         '404':
           $ref: '#/components/responses/NotFound' # Product or Country not found
         '500':
@@ -487,44 +387,21 @@ paths:
       tags:
         - Public - Checkout
       summary: Get Available Checkout Stages
-      description: Retrieves the list of checkout stages and their current enabled status based on the cart and previously completed steps (stored in cookies). Requires authentication.
-
+      description: Retrieves the list of checkout stages and their current enabled status based on the cart and previously completed steps (stored in cookies `u_d`, `a_d`, `s_m`). Requires authentication (access token).
       parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
           description: List of available checkout stages and their status.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
-                        description: Potentially refreshed access token.
-                      isCheckoutPossible:
-                        type: boolean
-                        description: Indicates if checkout is generally possible (e.g., cart not empty). Present if stages cannot be determined.
+                $ref: '#/components/schemas/CheckoutStagesResponse'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '400':
-          $ref: '#/components/responses/BadRequest' # Cart is empty or has issues
+          $ref: '#/components/responses/BadRequest' # Cart is empty or has issues preventing checkout
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -533,471 +410,242 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/checkout/stages/personal-details:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Checkout
       summary: Get Personal Details for Checkout
-      description: Retrieves the personal details (email, first/last name) either from cookies (guest) or the logged-in user profile. Requires authentication.
-
-      parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+      description: Retrieves the personal details (email, first/last name) either from cookie `u_d` (guest) or the logged-in user profile. Requires authentication. Fails if this stage is not enabled.
       responses:
         '200':
           description: Personal details for checkout and current stage status.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      personalDetails:
-                        $ref: '#/components/schemas/UserDetails'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponsePersonalDetailsGet'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '400':
-          description: Bad Request - Stage not enabled (returned via handler)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckoutStageErrorResponse'
+          $ref: '#/components/responses/CheckoutStageNotEnabled'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Public - Checkout
-      summary: Save Personal Details for Checkout
-      description: Saves personal details (email, first/last name) for a guest checkout. Sets a cookie and enables the next stage. Requires authentication (anonymous token is sufficient).
-
-      parameters:
-        - name: countryCode
-          in: path
-          required: true
-          description: ISO 2-letter country code (e.g., PT, ES).
-          schema:
-            type: string
-            example: PT
+      summary: Save Personal Details for Checkout (Guest Only)
+      description: Saves personal details (email, first/last name) for a guest checkout. Only applicable if user is *not* logged in. Sets the `u_d` cookie (encrypted) and enables the next stage. Requires authentication (anonymous token is sufficient). Fails if this stage is not enabled or user is logged in.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                personalDetails:
-                  $ref: '#/components/schemas/UserDetailsInput'
-              required:
-                - personalDetails
+              $ref: '#/components/schemas/CheckoutStageInputPersonalDetails'
       responses:
         '200':
           description: Personal details saved, returns updated stage status. Sets `u_d` cookie.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      personalDetails:
-                        $ref: '#/components/schemas/UserDetails'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponsePersonalDetailsPost'
           headers:
             Set-Cookie:
-              description: Sets `u_d` cookie (encrypted user details). Potentially refreshes `s_r`.
-              schema:
-                type: string
+              $ref: '#/components/headers/SetCookiePersonalDetails'
         '400':
-          description: Bad Request - Stage not enabled or invalid input.
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden - Cannot set guest details when logged in.
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CheckoutStageErrorResponse'
-                  - $ref: '#/components/schemas/ErrorResponse' # For invalid input
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  # ... (Similar structure for other checkout stages: address, shipping, review, payment) ...
-
   /public/countries/{countryCode}/checkout/stages/address:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Checkout
       summary: Get Address for Checkout
-      description: Retrieves the shipping address from cookies (guest) or the logged-in user's saved address. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Retrieves the shipping address from cookie `a_d` (guest) or the logged-in user's saved profile address. Requires authentication. Fails if this stage is not enabled.
       responses:
         '200':
           description: Address details and stage status.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      address:
-                        $ref: '#/components/schemas/Address'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponseAddressGet'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '400':
-          description: Bad Request - Stage not enabled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckoutStageErrorResponse'
+          $ref: '#/components/responses/CheckoutStageNotEnabled'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Public - Checkout
       summary: Save Address for Checkout
-      description: Saves the shipping address. Sets the `a_d` cookie (encrypted). Optionally saves to the user profile if logged in and `saveAddress` is true. Enables the next stage. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Saves the shipping address. Sets the `a_d` cookie (encrypted). Optionally saves to the user profile if logged in and `saveAddress` is true. Enables the next stage. Requires authentication. Fails if this stage is not enabled or address country doesn't match path country.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                address:
-                  $ref: '#/components/schemas/AddressInput'
-                saveAddress:
-                  type: boolean
-                  description: If true and user is logged in, save address to profile.
-                  default: false
-              required:
-                - address
+              $ref: '#/components/schemas/CheckoutStageInputAddress'
       responses:
         '200':
           description: Address saved, returns updated stage status. Sets `a_d` cookie.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      address:
-                        $ref: '#/components/schemas/Address'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponseAddressPost'
           headers:
             Set-Cookie:
-              description: Sets `a_d` cookie (encrypted address). Potentially refreshes `s_r`.
-              schema:
-                type: string
+              $ref: '#/components/headers/SetCookieAddress'
         '400':
-          description: Bad Request - Stage not enabled or invalid input/address mismatch.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CheckoutStageErrorResponse'
-                  - $ref: '#/components/schemas/ErrorResponse' # For invalid input
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest' # Also for country mismatch
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/checkout/stages/shipping:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Checkout
       summary: Get Available Shipping Methods
-      description: Retrieves available shipping methods based on cart weight and country. Returns the currently selected method if one is set via cookie. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Retrieves available shipping methods based on cart weight and destination country. Returns the currently selected method if `s_m` cookie is set. Requires authentication. Fails if this stage is not enabled.
       responses:
         '200':
           description: List of shipping methods and stage status.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      shippingMethods:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/SelectedShippingMethod'
-                      selectedShippingMethod:
-                        $ref: '#/components/schemas/SelectedShippingMethod'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponseShippingGet'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '400':
-          description: Bad Request - Stage not enabled or cart invalid.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CheckoutStageErrorResponse'
-                  - $ref: '#/components/schemas/ErrorResponse' # For cart issues
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest' # Also for cart invalid
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound' # No suitable shipping methods/rates found
+          $ref: '#/components/responses/NotFound' # No suitable shipping methods/rates found or country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
         - Public - Checkout
       summary: Select Shipping Method
-      description: Selects a shipping method/rate by its ID. Sets the `s_m` cookie (encrypted). Enables the next stage. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Selects a shipping method/rate by its ID (must be a valid rate for the current cart/country). Sets the `s_m` cookie (encrypted shipping *method* ID). Enables the next stage. Requires authentication. Fails if this stage is not enabled or rate is invalid/not applicable.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  format: uuid
-                  description: The ID of the *shipping rate* to select.
-              required:
-                - id
+              $ref: '#/components/schemas/CheckoutStageInputShipping' # ID of the shipping *method*
       responses:
         '200':
           description: Shipping method selected, returns updated stage status. Sets `s_m` cookie.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      shippingMethod:
-                        $ref: '#/components/schemas/SelectedShippingMethod'
-                      availableCheckoutStages:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ClientCheckoutStage'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponseShippingPost'
           headers:
             Set-Cookie:
-              description: Sets `s_m` cookie (encrypted shipping method ID). Potentially refreshes `s_r`.
-              schema:
-                type: string
+              $ref: '#/components/headers/SetCookieShipping'
         '400':
-          description: Bad Request - Stage not enabled or invalid input/rate not applicable.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CheckoutStageErrorResponse'
-                  - $ref: '#/components/schemas/ErrorResponse' # For invalid input/rate
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest' # Also for invalid input/rate not applicable
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound' # Shipping method/rate not found
+          $ref: '#/components/responses/NotFound' # Shipping method/rate not found or country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/checkout/stages/review:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Checkout
       summary: Get Checkout Review
-      description: Retrieves a summary of the order (cart items, personal details, address, selected shipping) before proceeding to payment. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Retrieves a summary of the order (cart items, personal details, address, selected shipping) before proceeding to payment. Requires authentication. Fails if this stage is not enabled or preceding stages are incomplete.
       responses:
         '200':
           description: Order review details.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      personalDetails:
-                        allOf:
-                          - $ref: '#/components/schemas/UserDetails'
-                          - type: object
-                            properties:
-                              isEditable:
-                                type: boolean
-                      address:
-                        allOf:
-                          - $ref: '#/components/schemas/Address'
-                          - type: object
-                            properties:
-                              isEditable:
-                                type: boolean
-                      shippingMethod:
-                        allOf:
-                          - $ref: '#/components/schemas/SelectedShippingMethod'
-                          - type: object
-                            properties:
-                              isEditable:
-                                type: boolean
-                      cart:
-                        $ref: '#/components/schemas/ExtendedCart'
-                      totalPrice:
-                        type: integer
-                        format: int32
-                        description: Total price including items, taxes, and shipping (in cents).
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponseReviewGet'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '400':
-          description: Bad Request - Stage not enabled or required preceding stages incomplete.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CheckoutStageErrorResponse'
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest' # Also for preceding stages incomplete
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/checkout/stages/payment:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Checkout
       summary: Get Payment Session URL
-      description: Creates a Stripe Checkout session and returns the URL to redirect the user for payment. Reserves stock. Sets the `c_s` cookie (encrypted checkout session ID). Requires authentication and all previous checkout stages to be complete.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Creates a Stripe Checkout session and returns the URL to redirect the user for payment. Reserves stock. Sets the `c_s` cookie (encrypted checkout session ID). Requires authentication and all previous checkout stages to be complete. Fails if the review stage is not enabled or cart has issues (e.g., stock).
       responses:
         '200':
           description: Stripe Checkout session URL. Sets `c_s` cookie.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  data:
-                    type: object
-                    properties:
-                      url:
-                        type: string
-                        format: url
-                        description: The URL to redirect the user to Stripe Checkout.
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/CheckoutStageResponsePaymentGet'
           headers:
             Set-Cookie:
-              description: Sets `c_s` cookie (encrypted checkout session ID). Potentially refreshes `s_r`.
-              schema:
-                type: string
+              $ref: '#/components/headers/SetCookieCheckoutSession'
         '400':
-          description: Bad Request - Stage not enabled or required preceding stages incomplete/invalid cart state.
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CheckoutStageErrorResponse'
-                  - $ref: '#/components/schemas/ErrorResponse' # For cart/stock issues
+          $ref: '#/components/responses/CheckoutStageNotEnabledOrBadRequest' # Also for preceding stages incomplete/invalid cart state/stock issues
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/NotFound' # Country not found
         '500':
           $ref: '#/components/responses/InternalServerError' # Stripe API error, stock reservation issues
 
-
   # -------------------- Public - User Auth --------------------
   /public/countries/{countryCode}/user/signup:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: User Signup
-      description: Creates a new user account. If the user had an anonymous cart (`c_i` cookie), it's associated with the new user. Returns user data, cart, and new auth tokens.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Creates a new, initially unvalidated user account. Sends a validation email. Fails if user is already logged in or email is taken by a validated user. If email exists but is unvalidated/OAuth, updates the record. Associates anonymous cart (`c_i` cookie) if present. Returns success message, requires email validation to complete login.
       requestBody:
         required: true
         content:
@@ -1005,32 +653,106 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupInput'
       responses:
-        '200': # Signup returns 200 OK in this implementation
-          description: User successfully created. Returns user data, cart, and tokens. Sets auth cookies.
+        '200':
+          description: Signup initiated, validation email sent. Returns anonymous tokens.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse' # Contains message and anonymous accessToken
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAnonymous' # Sets anonymous s_r, deletes c_i and checkout cookies
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized' # User already logged in
+        '409':
+          $ref: '#/components/responses/Conflict' # Email already taken by a validated, non-OAuth user
+        '500':
+          $ref: '#/components/responses/InternalServerError' # Email sending or DB error
+
+  /public/countries/{countryCode}/user/signup/verify-email:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Auth
+      summary: Verify Signup Email
+      description: Validates the code sent during signup. If valid, marks the user as validated, logs them in, and returns user data, cart, and auth tokens/cookies. Deletes validation secret from KV.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailInput'
+      responses:
+        '200':
+          description: Email verified, user logged in. Returns user data, cart, and tokens. Sets auth cookies.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthSuccessResponse'
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieAuth'
+              $ref: '#/components/headers/SetCookieAuth' # Sets s_r, r_m, deletes c_i, checkout cookies
         '400':
-          $ref: '#/components/responses/BadRequest' # Invalid input data
+          $ref: '#/components/responses/BadRequest' # Invalid input
         '401':
-          $ref: '#/components/responses/Unauthorized' # User already logged in
-        '409':
-          $ref: '#/components/responses/Conflict' # Email already taken
+          description: Invalid or expired code, or too many attempts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound' # User or code not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /public/countries/{countryCode}/user/signup/resend-email:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Auth
+      summary: Resend Signup Verification Email
+      description: Resends the verification email if the user exists, is unvalidated, and hasn't exceeded the resend limit. Uses the existing code stored in KV.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendEmailInput'
+      responses:
+        '200':
+          description: Verification email resent successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse' # Contains message and anonymous accessToken
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAnonymous' # May refresh anonymous s_r
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input
+        '401':
+          description: Too many resend attempts or code expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound' # User or original code not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/user/login:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: User Login
-      description: Logs in an existing user with email and password. Returns user data, cart, and new auth tokens.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Logs in an existing, validated user with email and password. Returns user data, cart, and new auth tokens/cookies. Merges anonymous cart (`c_i` cookie) if present.
       requestBody:
         required: true
         content:
@@ -1046,11 +768,11 @@ paths:
                 $ref: '#/components/schemas/AuthSuccessResponse'
           headers:
             Set-Cookie:
-              $ref: '#/components/headers/SetCookieAuth'
+              $ref: '#/components/headers/SetCookieAuth' # Sets s_r, r_m, deletes c_i, checkout cookies
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid input data
         '401':
-          description: Invalid credentials or user already logged in.
+          description: Invalid credentials or user not validated/already logged in.
           content:
             application/json:
               schema:
@@ -1059,14 +781,13 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/user/logout:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: User Logout
-      description: Logs out the current user. Invalidates the refresh token server-side (by deleting from KV if implemented, otherwise relies on client deleting cookie). Returns anonymous tokens and an empty cart representation. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Logs out the current user. Invalidates the refresh token server-side (by deleting from KV). Returns anonymous tokens and an empty cart representation. Requires authentication. Deletes auth cookies.
       responses:
         '200':
           description: User successfully logged out. Returns anonymous tokens and empty cart. Deletes auth cookies.
@@ -1083,28 +804,22 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/user/forgot-password/submit-email:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: Submit Forgot Password Email
-      description: Initiates the password reset process. Sends an email with a verification code to the user if the email exists.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Initiates the password reset process. Sends an email with a verification code to the user if the email exists and is validated. Creates/updates KV entry with code, expiry, attempts.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-              required:
-                - email
+              $ref: '#/components/schemas/SubmitForgotPasswordEmailInput'
       responses:
         '200':
-          description: Email sent successfully (even if user doesn't exist to prevent enumeration).
+          description: Email sent successfully (or process initiated; avoids user enumeration). Returns anonymous tokens.
           content:
             application/json:
               schema:
@@ -1118,44 +833,52 @@ paths:
                     properties:
                       accessToken:
                         type: string
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAnonymous'
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid email format
         '401':
-          description: Too many requests (code exhausted).
+          description: Too many requests (code exhausted) for this email recently.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found or not validated (Response is 200 to prevent enumeration, but internally no email sent).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email sent successfully
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/user/forgot-password/validate-code:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: Validate Forgot Password Code
-      description: Validates the verification code sent via email.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Validates the verification code sent via email against the entry in KV. Decrements attempts on failure.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                code:
-                  type: string
-                  description: The 8-digit verification code.
-              required:
-                - email
-                - code
+              $ref: '#/components/schemas/ValidateCodeInput'
       responses:
         '200':
-          description: Code validated successfully.
+          description: Code validated successfully. Returns anonymous tokens.
           content:
             application/json:
               schema:
@@ -1169,6 +892,9 @@ paths:
                     properties:
                       accessToken:
                         type: string
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAnonymous'
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid input
         '401':
@@ -1178,42 +904,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          $ref: '#/components/responses/NotFound' # Code not found (likely expired and deleted)
+          $ref: '#/components/responses/NotFound' # Code not found (likely expired and deleted or never existed)
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/user/forgot-password/reset:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     post:
       tags:
         - Public - User Auth
       summary: Reset Password
-      description: Resets the user's password using a validated code.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Resets the user's password using a validated code. Requires email, code, and new password. Validates code against KV again, then updates user password hash and deletes KV entry. Invalidates existing refresh token by creating a new one.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  format: email
-                code:
-                  type: string
-                  description: The 8-digit verification code.
-                password:
-                  type: string
-                  format: password
-                  description: The new password for the user.
-              required:
-                - email
-                - code
-                - password
+              $ref: '#/components/schemas/ResetPasswordInput'
       responses:
         '200':
-          description: Password reset successfully.
+          description: Password reset successfully. Returns anonymous tokens.
           content:
             application/json:
               schema:
@@ -1227,6 +938,9 @@ paths:
                     properties:
                       accessToken:
                         type: string
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAnonymous'
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid input
         '401':
@@ -1242,27 +956,20 @@ paths:
 
   # -------------------- Public - User Profile --------------------
   /public/countries/{countryCode}/user:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - User Profile
       summary: Get User Profile
       description: Retrieves the profile information (email, name, address) for the currently authenticated user. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
           description: User profile data.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Successfully got user
-                  data:
-                    $ref: '#/components/schemas/UserDTO'
+                $ref: '#/components/schemas/GetUserResponse'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
@@ -1272,68 +979,18 @@ paths:
           $ref: '#/components/responses/NotFound' # User record somehow missing
         '500':
           $ref: '#/components/responses/InternalServerError'
-    put:
-      tags:
-        - Public - User Profile
-      summary: Update User Profile
-      description: Updates the authenticated user's profile information (email, password, name, address). Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateUserInput'
-      responses:
-        '200':
-          description: User profile successfully updated. Returns updated user data.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: successfully updated user
-                  data:
-                    $ref: '#/components/schemas/UserDTO'
-          headers:
-            Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional'
-        '400':
-          $ref: '#/components/responses/BadRequest' # Invalid input data
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '409':
-          $ref: '#/components/responses/Conflict' # Email already taken if changed
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Public - User Profile
       summary: Delete User Account
-      description: Permanently deletes the authenticated user's account. Requires authentication. Returns anonymous tokens.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Permanently deletes the authenticated user's account and associated data (cart, orders might be kept or anonymized based on policy). Invalidates tokens. Requires authentication. Returns anonymous tokens.
       responses:
         '200':
           description: User account successfully deleted. Returns anonymous tokens. Deletes auth cookies.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: success deleting user
-                  data:
-                    type: object
-                    properties:
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/DeleteUserResponse'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieLogout'
@@ -1342,99 +999,200 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /public/countries/{countryCode}/user/update/personal-information:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Profile
+      summary: Update User Personal Information
+      description: Updates the authenticated user's first name, last name, and/or address. Requires authentication. Address country must match path country.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePersonalInformationInput'
+      responses:
+        '200':
+          description: Personal information successfully updated. Returns updated user profile data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserResponse'
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieOptional'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data or address country mismatch
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /public/countries/{countryCode}/user/update/password:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Profile
+      summary: Update User Password
+      description: Updates the authenticated user's password. Requires current password for verification. Requires authentication. Invalidates existing refresh token by creating a new one.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordInput'
+      responses:
+        '200':
+          description: Password successfully updated. Returns updated user profile data and new tokens.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserResponse' # Contains user DTO and new accessToken
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAuth' # Sets new s_r
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Incorrect current password or not logged in
+        '404':
+          $ref: '#/components/responses/NotFound' # User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /public/countries/{countryCode}/user/update/email/submit:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Profile
+      summary: Submit Email Change Request
+      description: Initiates the process to change the authenticated user's email. Sends a verification code to the *new* email address. Requires authentication. Stores the new email and code temporarily (e.g., in KV).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitEmailChangeInput'
+      responses:
+        '200':
+          description: Verification email sent to the new address. Returns current user profile data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserResponse' # Contains current user DTO and accessToken
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieOptional'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input email format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict' # New email address is already taken
+        '500':
+          $ref: '#/components/responses/InternalServerError' # KV or email sending error
+
+  /public/countries/{countryCode}/user/update/email/validate-code:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+    post:
+      tags:
+        - Public - User Profile
+      summary: Validate Email Change Code
+      description: Validates the code sent to the new email address. If valid, updates the user's email in the database and deletes the temporary validation secret. Requires authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateEmailChangeCodeInput'
+      responses:
+        '200':
+          description: Email successfully updated. Returns updated user profile data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserResponse'
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieOptional'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input
+        '401':
+          description: Invalid or expired code, or too many attempts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound' # User or code not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # -------------------- Public - Orders --------------------
   /public/countries/{countryCode}/orders:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - Orders
       summary: Get User Orders
       description: Retrieves a list of past orders for the authenticated user. Requires authentication.
-
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
       responses:
         '200':
           description: A list of the user's orders.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Successfully got user orders
-                  data:
-                    type: object
-                    properties:
-                      orders:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ExtendedClientOrder'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/GetUserOrdersResponse'
           headers:
             Set-Cookie:
               $ref: '#/components/headers/SetCookieOptional'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
-          $ref: '#/components/responses/NotFound' # User has no orders
+          $ref: '#/components/responses/NotFound' # User has no orders, or user not found
         '500':
           $ref: '#/components/responses/InternalServerError'
 
   /public/countries/{countryCode}/orders/{id}:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
+      - $ref: '#/components/parameters/OrderId'
+      - name: x-user-email # Optional header for guest access
+        in: header
+        required: false
+        description: Email address for guest order lookup (alternative to cookie `c_m`). Used only if user is not authenticated via JWT.
+        schema:
+          type: string
+          format: email
     get:
       tags:
         - Public - Orders
       summary: Get Order Details
-      description: Retrieves detailed information for a specific order by its ID. Requires authentication (either logged-in user matching order OR guest providing matching email via header/cookie).
- # Technically optional if guest uses email header/cookie
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
-        - name: id
-          in: path
-          required: true
-          description: The unique identifier of the order.
-          schema:
-            type: string
-            format: uuid
-            example: w3ChBD7SjeReRrNSwSSsa3
-        - name: x-user-email
-          in: header
-          required: false
-          description: Email address for guest order lookup (alternative to cookie `c_m`).
-          schema:
-            type: string
-            format: email
+      description: Retrieves detailed information for a specific order by its ID. Requires authentication (either logged-in user matching order OR guest providing matching email via `x-user-email` header or `c_m` cookie). Sets `c_m` cookie if email header was used successfully.
       responses:
         '200':
-          description: Detailed information about the order. Sets `c_m` cookie if email header was used.
+          description: Detailed information about the order.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Successfully got order
-                  data:
-                    type: object
-                    properties:
-                      order:
-                        $ref: '#/components/schemas/ExtendedClientOrder'
-                      accessToken:
-                        type: string
+                $ref: '#/components/schemas/GetOrderResponse'
           headers:
             Set-Cookie:
-              description: Sets `c_m` cookie (encrypted email) if looked up via header. Potentially refreshes `s_r`.
-              schema:
-                type: string
+              $ref: '#/components/headers/SetCookieOptionalOrCustomerEmail'
         '401':
-          $ref: '#/components/responses/Unauthorized' # User doesn't own order / Email doesn't match
+          $ref: '#/components/responses/Unauthorized' # User doesn't own order / Email doesn't match or not provided for guest
         '404':
           $ref: '#/components/responses/NotFound' # Order not found
         '422':
-          description: Unprocessable Entity - Email required for guest lookup but not provided.
+          description: Unprocessable Entity - Email required for guest lookup but not provided via header or cookie.
           content:
             application/json:
               schema:
@@ -1444,61 +1202,401 @@ paths:
 
   # -------------------- Public - OAuth --------------------
   /public/countries/{countryCode}/oauth/google/redirect:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode'
     get:
       tags:
         - Public - OAuth
       summary: Get Google OAuth Redirect URL
-      description: Generates the URL to redirect the user to Google for authentication. Sets an `o_t` cookie for state validation.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
+      description: Generates the URL to redirect the user to Google for authentication. Sets an `o_t` cookie (HttpOnly, Secure, SameSite=Lax) for state validation.
       responses:
         '200':
           description: Returns the Google OAuth URL. Sets `o_t` cookie.
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/OAuthRedirectResponse'
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieOAuthToken'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /public/countries/{countryCode}/oauth/google/callback:
+    parameters:
+      - $ref: '#/components/parameters/CountryCode' # Note: Country code in path might be ignored if state parameter overrides it
+      - name: code
+        in: query
+        required: true
+        description: Authorization code from Google.
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        description: State parameter containing original country and OAuth token, JSON stringified.
+        schema:
+          type: string
+          example: '{"country":"pt","oauthToken":"..."}'
+    get:
+      tags:
+        - Public - OAuth
+      summary: Handle Google OAuth Callback
+      description: Handles the callback from Google after successful authentication. Validates state against `o_t` cookie, exchanges code for tokens, retrieves user info, logs in or signs up the user, and returns auth tokens/cookies.
+      responses:
+        '200':
+          description: User successfully authenticated via Google. Returns tokens. Sets auth cookies. Deletes `o_t` cookie.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthCallbackResponse' # Contains accessToken
+          headers:
+            Set-Cookie:
+              $ref: '#/components/headers/SetCookieAuthAndOAuthDelete' # Sets s_r and r_m, deletes o_t
+        '400':
+          $ref: '#/components/responses/BadRequest' # Missing code or state, or invalid state JSON
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid state/token mismatch from cookie
+        '404':
+          $ref: '#/components/responses/NotFound' # Google user info not found after successful code exchange
+        '500':
+          $ref: '#/components/responses/InternalServerError' # Error communicating with Google or DB issues
+
+  # -------------------- Private - Currencies --------------------
+  /private/currencies:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Currencies
+      summary: Get All Currencies (Admin)
+      description: Retrieves a list of all currencies configured in the system. Requires Admin Authentication.
+      responses:
+        '200':
+          description: A list of currencies.
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   message:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      url:
-                        type: string
-                        format: url
-                        description: URL to redirect the user to Google.
-          headers:
-            Set-Cookie:
-              description: Sets the `o_t` cookie used for state verification.
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Currency' # Full currency details including rateToEuro
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Private - Currencies
+      summary: Add New Currency (Admin)
+      description: Adds a new currency to the system. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCurrency'
+      responses:
+        '200': # Using 200 as per existing patterns, could be 201
+          description: Currency successfully created. Returns the created currency.
+          content:
+            application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Currency'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
+        '409':
+          $ref: '#/components/responses/Conflict' # Currency code already exists
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /public/countries/{countryCode}/oauth/google/callback:
+  /private/currencies/{code}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - name: code
+        in: path
+        required: true
+        description: ISO 3-letter currency code (e.g., EUR, USD).
+        schema:
+          type: string
+          example: EUR
     get:
       tags:
-        - Public - OAuth
-      summary: Handle Google OAuth Callback
-      description: Handles the callback from Google after successful authentication. Validates state, retrieves user info, logs in or signs up the user, and returns auth tokens.
-      parameters:
-        - $ref: '#/components/parameters/CountryCode'
-        - name: code
-          in: query
-          required: true
-          description: Authorization code from Google.
-          schema:
-            type: string
-        - name: state
-          in: query
-          required: true
-          description: State parameter containing original country and OAuth token.
-          schema:
-            type: string
+        - Private - Currencies
+      summary: Get Currency by Code (Admin)
+      description: Retrieves details for a specific currency. Requires Admin Authentication.
       responses:
         '200':
-          description: User successfully authenticated via Google. Returns tokens. Sets auth cookies.
+          description: Currency details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Currency'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid code format
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
+        '404':
+          $ref: '#/components/responses/NotFound' # Currency not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Currencies
+      summary: Update Currency (Admin)
+      description: Updates details for an existing currency. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCurrency' # Use Insert schema for update payload
+      responses:
+        '200':
+          description: Currency successfully updated. Returns the updated currency.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Currency'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
+        '404':
+          $ref: '#/components/responses/NotFound' # Currency not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Private - Currencies
+      summary: Delete Currency (Admin)
+      description: Deletes a currency from the system. Requires Admin Authentication. Be cautious as this might break associations.
+      responses:
+        '200':
+          description: Currency successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid code format
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
+        '404':
+          $ref: '#/components/responses/NotFound' # Currency not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Countries --------------------
+  /private/countries:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Countries
+      summary: Get All Countries (Admin)
+      description: Retrieves a list of all countries configured in the system. Requires Admin Authentication.
+      responses:
+        '200':
+          description: A list of countries.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ClientCountry' # Use ClientCountry for listing
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Private - Countries
+      summary: Add New Country (Admin)
+      description: Adds a new country to the system. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCountry'
+      responses:
+        '200': # Using 200 as per existing patterns
+          description: Country successfully created. Returns the created country details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Country' # Return full details on create
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict' # Country code already exists
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/countries/{code}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - name: code
+        in: path
+        required: true
+        description: ISO 2-letter country code (e.g., PT, ES).
+        schema:
+          type: string
+          example: PT
+    get:
+      tags:
+        - Private - Countries
+      summary: Get Country by Code (Admin)
+      description: Retrieves details for a specific country. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Country details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Country'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Countries
+      summary: Update Country (Admin)
+      description: Updates details for an existing country. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCountry' # Use Insert schema for update payload
+      responses:
+        '200':
+          description: Country successfully updated. Returns the updated country details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Country'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Private - Countries
+      summary: Delete Country (Admin)
+      description: Deletes a country from the system. Requires Admin Authentication. Be cautious as this might break associations (taxes, shipping rates).
+      responses:
+        '200':
+          description: Country successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Products Admin --------------------
+  /private/products:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Products Admin
+      summary: Get All Products (Admin)
+      description: Retrieves a list of all products in the system without extended pricing. Requires Admin Authentication.
+      responses:
+        '200':
+          description: A list of products.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product' # Basic product info
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Private - Products Admin
+      summary: Add New Product (Admin)
+      description: Adds a new product to the system. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertProduct'
+      responses:
+        '200': # Using 200 as per existing patterns
+          description: Product successfully created. Returns the ID of the created product.
           content:
             application/json:
               schema:
@@ -1509,27 +1607,577 @@ paths:
                   data:
                     type: object
                     properties:
-                      accessToken:
+                      productId:
                         type: string
-          headers:
-            Set-Cookie:
-              $ref: '#/components/headers/SetCookieAuth' # Sets s_r and r_m
+                        format: uuid
         '400':
-          $ref: '#/components/responses/BadRequest' # Missing code or state
+          $ref: '#/components/responses/BadRequest' # Invalid input data
         '401':
-          $ref: '#/components/responses/Unauthorized' # Invalid state/token mismatch
+          $ref: '#/components/responses/Unauthorized' # Invalid admin auth
         '404':
-          $ref: '#/components/responses/NotFound' # Google user info not found
+          $ref: '#/components/responses/NotFound' # e.g., Referenced collection not found
         '500':
-          $ref: '#/components/responses/InternalServerError' # Error communicating with Google or DB issues
+          $ref: '#/components/responses/InternalServerError'
 
-  # -------------------- Private Endpoints --------------------
+  /private/products/{id}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    get:
+      tags:
+        - Private - Products Admin
+      summary: Get Product Details (Admin)
+      description: Retrieves detailed information for a specific product by its ID. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Detailed information about the product.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Product fetched successfully
+                  data:
+                    $ref: '#/components/schemas/ProductDetails' # Admin likely needs full details
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Product not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Products Admin
+      summary: Update Product (Admin)
+      description: Updates details for an existing product. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertProduct' # Use Insert schema for update payload
+      responses:
+        '200':
+          description: Product successfully updated. Returns the updated product details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ProductDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Product or related collection not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Private - Products Admin
+      summary: Delete Product (Admin)
+      description: Deletes a product from the system. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Product successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Product not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Collections Admin --------------------
+  /private/collections:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Collections Admin
+      summary: Get All Collections (Admin)
+      description: Retrieves a list of all collections in the system. Requires Admin Authentication.
+      responses:
+        '200':
+          description: A list of collections.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Collection' # Basic collection info
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Private - Collections Admin
+      summary: Add New Collection (Admin)
+      description: Adds a new collection to the system. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCollection'
+      responses:
+        '200': # Using 200 as per existing patterns
+          description: Collection successfully created. Returns the created collection details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/CollectionDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/collections/{id}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/CollectionId'
+    get:
+      tags:
+        - Private - Collections Admin
+      summary: Get Collection Details (Admin)
+      description: Retrieves detailed information for a specific collection by its ID, including its products. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Detailed information about the collection and its products.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/CollectionDetails' # Admin needs full details
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Collection not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Collections Admin
+      summary: Update Collection (Admin)
+      description: Updates details for an existing collection. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertCollection' # Use Insert schema for update payload
+      responses:
+        '200':
+          description: Collection successfully updated. Returns the updated collection details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/CollectionDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Collection not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Private - Collections Admin
+      summary: Delete Collection (Admin)
+      description: Deletes a collection from the system. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Collection successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Collection not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Carts Admin (NEW) --------------------
+  /private/carts:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Carts Admin
+      summary: Get All Carts (Admin)
+      description: Retrieves a list of all carts in the system. Requires Admin Authentication. Supports pagination.
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/PageSizeQuery'
+      responses:
+        '200':
+          description: A list of carts.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Carts fetched successfully
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cart' # Full Cart schema
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid pagination parameters
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/carts/{id}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/CartId'
+    get:
+      tags:
+        - Private - Carts Admin
+      summary: Get Cart by ID (Admin)
+      description: Retrieves detailed information for a specific cart by its ID. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Detailed information about the cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Cart fetched successfully
+                  data:
+                    $ref: '#/components/schemas/Cart' # Full Cart schema
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Cart not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+        tags:
+            - Private - Carts Admin
+        summary: Delete Cart by ID (Admin)
+        description: Deletes a cart by its ID. Requires Admin Authentication.
+        responses:
+            '200':
+            description: Cart successfully deleted.
+            content:
+                application/json:
+                schema:
+                    $ref: '#/components/schemas/SuccessResponse'
+            '400':
+              $ref: '#/components/responses/BadRequest' # Invalid ID format
+            '401':
+              $ref: '#/components/responses/Unauthorized'
+            '404':
+              $ref: '#/components/responses/NotFound' # Cart not found
+            '500':
+              $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Users Admin (NEW) --------------------
+  /private/users:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Users Admin
+      summary: Get All Users (Admin)
+      description: Retrieves a list of all users in the system. Requires Admin Authentication. Supports pagination.
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/PageSizeQuery'
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Users fetched successfully
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BaseUser' # Includes role, id, etc.
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid pagination parameters
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/users/{id}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags:
+        - Private - Users Admin
+      summary: Get User by ID (Admin)
+      description: Retrieves detailed information for a specific user by their ID. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Detailed user information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User fetched successfully
+                  data:
+                    $ref: '#/components/schemas/BaseUser'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Private - Users Admin
+      summary: Delete User by ID (Admin)
+      description: Deletes a user account by its ID. Requires Admin Authentication.
+      responses:
+        '200':
+          description: User successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # User not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Private - Orders Admin --------------------
+  /private/orders:
+    security:
+      - AdminSecretKey: []
+    get:
+      tags:
+        - Private - Orders Admin
+      summary: Get All Orders (Admin)
+      description: Retrieves a list of all orders in the system. Requires Admin Authentication. Supports querying by userId, paymentId, etc.
+      parameters:
+        - $ref: '#/components/parameters/PageQuery'
+        - $ref: '#/components/parameters/PageSizeQuery'
+        - name: userId
+          in: query
+          required: false
+          description: Filter orders by User ID.
+          schema:
+            type: string
+            format: uuid
+        - name: paymentId
+          in: query
+          required: false
+          description: Filter orders by Payment ID.
+          schema:
+            type: string
+        - name: stripeId
+          in: query
+          required: false
+          description: Filter orders by Stripe Checkout Session ID.
+          schema:
+            type: string
+        - name: shippingTransactionId
+          in: query
+          required: false
+          description: Filter orders by Shipping Transaction ID.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A list of all orders matching the filters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order' # Use full Order schema for admin
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid query parameters
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/orders/{id}:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    get:
+      tags:
+        - Private - Orders Admin
+      summary: Get Order Details (Admin)
+      description: Retrieves detailed information for a specific order by its ID. Requires Admin Authentication. Returns the full Order model including internal IDs.
+      responses:
+        '200':
+          description: Detailed information about the order.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order fetched successfully
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Order not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Orders Admin
+      summary: Update Order (Admin)
+      description: Updates details for an existing order. Requires Admin Authentication. Use with caution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAdminOrderInput' # Define this schema
+      responses:
+        '200':
+          description: Order successfully updated. Returns the updated order details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order updated successfully
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid input data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Order not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/orders/{id}/cancel:
+    security:
+      - AdminSecretKey: []
+    parameters:
+      - $ref: '#/components/parameters/OrderId'
+    put:
+      tags:
+        - Private - Orders Admin
+      summary: Cancel Order (Admin)
+      description: Marks an order as cancelled. Requires Admin Authentication. This might trigger stock release depending on implementation.
+      responses:
+        '200':
+          description: Order successfully cancelled. Returns the updated order details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order cancelled successfully
+                  data:
+                    $ref: '#/components/schemas/Order' # Shows order with isCanceled=true
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Order not found
+        '500':
+          $ref: '#/components/responses/InternalServerError' # E.g., failed to release stock
+
+  # -------------------- Private - Scheduled Tasks --------------------
   /private/check-expired-sessions:
     post:
       tags:
         - Private - Scheduled Tasks
       summary: Check and Expire Checkout Sessions
-      description: Endpoint typically triggered by a cron schedule to find and invalidate expired Stripe Checkout sessions and release associated product stock. No specific auth defined here, assumed to be protected by Cloudflare infrastructure (e.g., Cron Trigger auth).
+      description: Endpoint typically triggered by a cron schedule to find and invalidate expired Stripe Checkout sessions and release associated product stock. Auth handled by Cloudflare infrastructure (e.g., Cron Trigger auth header) or requires AdminSecretKey.
+      security:
+        - AdminSecretKey: [] # Or implied Cron Trigger auth
       responses:
         '200':
           description: Operation completed. Message indicates if sessions were expired.
@@ -1541,9 +2189,12 @@ paths:
                   message:
                     type: string
                     example: No sessions were expired
+        '401':
+          $ref: '#/components/responses/Unauthorized' # If using AdminSecretKey and it's invalid
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Test Data --------------------
   /private/insert-test-data:
     post:
       tags:
@@ -1555,13 +2206,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                secretKey:
-                  type: string
-                  description: Secret key to authorize test data insertion.
-              required:
-                - secretKey
+              $ref: '#/components/schemas/SecretKeyInput'
       responses:
         '200':
           description: Test data successfully inserted.
@@ -1573,15 +2218,12 @@ paths:
                   message:
                     type: string
                     example: success inserting test data
-        '403':
-          description: Forbidden - Missing or incorrect secret key.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Missing or incorrect secret key
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Stock --------------------
   /private/stock/setup:
     post:
       tags:
@@ -1593,13 +2235,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                secretKey:
-                  type: string
-                  description: Secret key to authorize stock setup.
-              required:
-                - secretKey
+              $ref: '#/components/schemas/SecretKeyInput'
       responses:
         '200':
           description: Stock bucket successfully initialized.
@@ -1617,19 +2253,13 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/stock/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
     get:
       tags:
         - Private - Stock
       summary: Get Stock (Local Dev Only)
-      description: Retrieves stock information for a specific product directly from the R2 bucket. Intended for local development/debugging only. No standard auth.
-      parameters:
-        - name: productId
-          in: path
-          required: true
-          description: The unique identifier of the product.
-          schema:
-            type: string
-            format: uuid
+      description: Retrieves stock information for a specific product directly from the R2 bucket. Intended for local development/debugging only. Returns 405 if accessed in non-local environment.
       responses:
         '200':
           description: Stock data for the product.
@@ -1646,7 +2276,7 @@ paths:
                     format: int32
                     description: Current stock quantity.
         '400':
-          $ref: '#/components/responses/BadRequest' # Missing productId
+          $ref: '#/components/responses/BadRequest' # Invalid productId
         '404':
           $ref: '#/components/responses/NotFound' # Product stock not found in bucket
         '405':
@@ -1664,7 +2294,7 @@ paths:
       tags:
         - Stripe Webhooks
       summary: Handle Stripe Checkout Session Events
-      description: Webhook endpoint to receive `checkout.session.completed` and `checkout.session.expired` events from Stripe. Creates orders or handles expiration logic. Signature verification should be handled by middleware (not detailed here).
+      description: Webhook endpoint to receive `checkout.session.completed` and `checkout.session.expired` events from Stripe. Creates orders or handles expiration logic (releasing stock). Verifies Stripe signature (assumed handled by middleware or infrastructure). Ignores events not matching the configured `STRIPE_ENV`.
       requestBody:
         required: true
         description: Stripe Event object (`checkout.session.completed` or `checkout.session.expired`).
@@ -1674,7 +2304,7 @@ paths:
               $ref: '#/components/schemas/StripeEvent' # Generic Stripe event, specific type checked internally
       responses:
         '200':
-          description: Event received and processed successfully. Returns created order data for completed sessions.
+          description: Event received and processed successfully. Returns created order data for completed sessions, or success message for expired/ignored sessions.
           content:
             application/json:
               schema:
@@ -1682,12 +2312,13 @@ paths:
                 properties:
                   message:
                     type: string
-                  data: # Only present for completed session
+                    example: success getting checkout-session # Or 'checkout session already expired', 'Unsupported event...'
+                  data: # Only present for newly created order on completed session
                     $ref: '#/components/schemas/ClientOrder'
         '400':
-          $ref: '#/components/responses/BadRequest' # Invalid payload or event type
+          $ref: '#/components/responses/BadRequest' # Invalid payload or event type, or Stripe signature validation failure
         '409':
-          description: Conflict - Order already exists for this session ID.
+          description: Conflict - Order already exists for this session ID (race condition).
           content:
             application/json:
               schema:
@@ -1700,7 +2331,7 @@ paths:
       tags:
         - Stripe Webhooks
       summary: Handle Stripe Payment Intent Events
-      description: Webhook endpoint to receive Payment Intent events from Stripe (created, succeeded, processing, canceled, failed). Updates payment status in the database. Signature verification should be handled by middleware.
+      description: Webhook endpoint to receive Payment Intent events from Stripe (`created`, `succeeded`, `processing`, `canceled`, `failed`). Updates payment status in the database. Verifies Stripe signature (assumed handled by middleware or infrastructure). Ignores events not matching the configured `STRIPE_ENV`.
       requestBody:
         required: true
         description: Stripe Event object (Payment Intent related types).
@@ -1718,9 +2349,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: success getting checkout-session # Message seems generic here
+                    example: success getting checkout-session # Message might vary
         '400':
-          $ref: '#/components/responses/BadRequest' # Invalid payload or event type
+          $ref: '#/components/responses/BadRequest' # Invalid payload, event type, or Stripe signature validation failure
         '409':
           description: Conflict - Payment already exists in a final state.
           content:
@@ -1741,23 +2372,124 @@ components:
           items:
             type: string
           example: ["Invalid username or password"]
-    SuccessData:
+    SuccessData: # Often includes accessToken
       type: object
-      description: Placeholder for successful response data, often includes accessToken.
+      description: Placeholder for successful response data structure.
       properties:
         accessToken:
           type: string
           description: JWT access token (present in most authenticated responses).
-    SuccessResponse:
+    SuccessResponse: # Basic success structure
       type: object
       properties:
         message:
           type: string
           description: A human-readable message indicating the result of the operation.
-        data:
-          $ref: '#/components/schemas/SuccessData'
+        data: # Optional data payload
+          nullable: true
+          oneOf:
+            - type: object
+            - type: array
+            - type: string
+            - type: number
+            - type: boolean
+    SecretKeyInput:
+      type: object
+      properties:
+        secretKey:
+          type: string
+          description: Secret key required for authorization.
+      required:
+        - secretKey
 
-    Country:
+    # --- Country/Currency/Tax ---
+    ClientCurrency:
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+          example: EUR
+          pattern: '^[A-Z]{3}$'
+        symbol:
+          type: string
+          example: €
+        stripeName:
+          type: string
+          example: eur
+    Currency: # Full currency details including rate
+      allOf:
+        - $ref: '#/components/schemas/ClientCurrency'
+        - type: object
+          properties:
+            rateToEuro:
+              type: number
+              format: float
+              description: Exchange rate relative to EUR (1 EUR = X rateToEuro).
+            createdAt:
+              type: string
+              format: date-time
+            lastModifiedAt:
+              type: string
+              format: date-time
+    InsertCurrency: # Schema for POST/PUT /private/currencies
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+          example: USD
+          pattern: '^[A-Z]{3}$'
+        symbol:
+          type: string
+          example: $
+        rateToEuro:
+          type: number
+          format: float
+        stripeName:
+          type: string
+          example: usd
+      required:
+        - name
+        - code
+        - symbol
+        - rateToEuro
+        - stripeName
+    ClientTax:
+      type: object
+      properties:
+        name:
+          type: string
+        rate:
+          type: number
+          format: float # e.g., 0.23 for 23%
+    Tax: # Full tax details including Stripe ID
+      allOf:
+        - $ref: '#/components/schemas/ClientTax'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Stripe Tax Rate ID.
+              example: txr_...
+            createdAt:
+              type: string
+              format: date-time
+            lastModifiedAt:
+              type: string
+              format: date-time
+    ExtendedClientTax: # Tax with calculated amount
+      allOf:
+        - $ref: '#/components/schemas/ClientTax'
+        - type: object
+          properties:
+            amount:
+              type: integer
+              format: int32
+              description: Calculated tax amount in cents for a given price.
+    ClientCountry: # Used for public listing
       type: object
       properties:
         name:
@@ -1765,23 +2497,7 @@ components:
         code:
           type: string
           example: PT
-        locale:
-          type: string
-          example: pt-PT
-        currency:
-          $ref: '#/components/schemas/ClientCurrency'
-        taxes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Tax'
-    ClientCountry:
-      type: object
-      properties:
-        name:
-          type: string
-        code:
-          type: string
-          example: PT
+          pattern: '^[A-Z]{2}$'
         locale:
           type: string
           example: pt-PT
@@ -1791,70 +2507,42 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClientTax'
-
-    Currency:
-      type: object
-      properties:
-        name:
-          type: string
-        code:
-          type: string
-          example: EUR
-        symbol:
-          type: string
-          example: €
-        rateToEuro:
-          type: number
-          format: float
-        stripeName:
-          type: string
-          example: eur
-    ClientCurrency:
-      type: object
-      properties:
-        name:
-          type: string
-        code:
-          type: string
-          example: EUR
-        symbol:
-          type: string
-          example: €
-        stripeName:
-          type: string
-          example: eur
-
-    Tax:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid # Stripe tax IDs might not be UUIDs
-        name:
-          type: string
-        rate:
-          type: number
-          format: float # Represents rate, e.g., 0.23 for 23%
-    ClientTax:
-      type: object
-      properties:
-        name:
-          type: string
-        rate:
-          type: number
-          format: float
-
-    ExtendedClientTax:
+    Country: # Full country details including full Tax info and dates
       allOf:
-        - $ref: '#/components/schemas/ClientTax'
+        - $ref: '#/components/schemas/ClientCountry'
         - type: object
           properties:
-            amount:
-              type: integer
-              format: int32
-              description: Calculated tax amount in cents for a given price.
+            taxes: # Override with full Tax schema
+              type: array
+              items:
+                $ref: '#/components/schemas/Tax'
+            createdAt:
+              type: string
+              format: date-time
+            lastModifiedAt:
+              type: string
+              format: date-time
+    InsertCountry: # Schema for POST/PUT /private/countries
+      type: object
+      properties:
+        name:
+          type: string
+        code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        locale:
+          type: string
+        currencyCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+      required:
+        - name
+        - code
+        - locale
+        - currencyCode
 
-    Image:
+    # --- Image ---
+    ImageDTO: # Basic image info for lists/previews
       type: object
       properties:
         url:
@@ -1862,16 +2550,20 @@ components:
           format: url
         alt:
           type: string
-    ImageDTO:
-      type: object
-      properties:
-        url:
-          type: string
-          format: url
-        alt:
-          type: string
+    Image: # Full image details including dates
+      allOf:
+        - $ref: '#/components/schemas/ImageDTO'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+            lastModifiedAt:
+              type: string
+              format: date-time
 
-    Product:
+    # --- Product/Collection ---
+    Product: # Core product data
       type: object
       properties:
         id:
@@ -1882,6 +2574,7 @@ components:
         priceInCents:
           type: integer
           format: int32
+          description: Net price before tax.
         stock:
           type: integer
           format: int32
@@ -1889,11 +2582,43 @@ components:
           type: integer
           format: int32
           description: Weight in grams.
-        images:
+        images: # Array for list views, often limited to 1
           type: array
           items:
             $ref: '#/components/schemas/ImageDTO'
-    ExtendedProduct:
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    InsertProduct: # Schema for POST/PUT /private/products
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        priceInCents:
+          type: integer
+          format: int32
+        stock:
+          type: integer
+          format: int32
+        weight:
+          type: integer
+          format: int32
+        collectionId:
+          type: string
+          format: uuid
+      required:
+        - name
+        - description
+        - priceInCents
+        - stock
+        - weight
+        - collectionId
+    ExtendedProduct: # Product with calculated prices and taxes
       allOf:
         - $ref: '#/components/schemas/Product'
         - type: object
@@ -1914,19 +2639,14 @@ components:
             - netPrice
             - grossPrice
             - taxes
-      required:
-        - netPrice
-        - grossPrice
-        - taxes
-
-    ProductDetails:
+    ProductDetails: # Product with full details (description, all images)
       allOf:
         - $ref: '#/components/schemas/Product'
         - type: object
           properties:
             description:
               type: string
-            images: # Override Product images to use full Image schema
+            images: # Override Product images to use full Image schema array
               type: array
               items:
                 $ref: '#/components/schemas/Image'
@@ -1936,34 +2656,7 @@ components:
       required:
         - description
         - collectionId
-
-    ExtendedProductDetails:
-      allOf:
-        - $ref: '#/components/schemas/ProductDetails'
-        - type: object
-          properties:
-            netPrice:
-              type: integer
-              format: int32
-              description: Price before tax (same as priceInCents).
-            grossPrice:
-              type: integer
-              format: int32
-              description: Price including tax.
-            taxes:
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedClientTax'
-          required:
-            - netPrice
-            - grossPrice
-            - taxes
-      required:
-        - netPrice
-        - grossPrice
-        - taxes
-
-    ProductWithCollectionDetails:
+    ProductWithCollectionDetails: # Product details including linked collection name/ID
       allOf:
         - $ref: '#/components/schemas/ProductDetails'
         - type: object
@@ -1981,37 +2674,15 @@ components:
                 - name
           required:
             - collection
-      required:
-        - collection
-
-
-    ExtendedProductWithCollectionDetails:
+    ExtendedProductWithCollectionDetails: # Full details + calculated prices/taxes
       allOf:
         - $ref: '#/components/schemas/ProductWithCollectionDetails'
-        - type: object
-          properties:
-            netPrice:
-              type: integer
-              format: int32
-              description: Price before tax (same as priceInCents).
-            grossPrice:
-              type: integer
-              format: int32
-              description: Price including tax.
-            taxes:
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedClientTax'
-          required:
-            - netPrice
-            - grossPrice
-            - taxes
-      required:
+        - $ref: '#/components/schemas/ExtendedProduct' # Inherit pricing fields
+      required: # Ensure inherited required fields are listed if needed
         - netPrice
         - grossPrice
         - taxes
-
-    Collection:
+    Collection: # Collection info for lists
       type: object
       properties:
         id:
@@ -2021,8 +2692,23 @@ components:
           type: string
         image:
           $ref: '#/components/schemas/Image' # Only one image shown in list view
-
-    CollectionDetails:
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    InsertCollection: # Schema for POST/PUT /private/collections
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+        - name
+        - description
+    CollectionDetails: # Full collection details with basic products
       allOf:
         - $ref: '#/components/schemas/Collection'
         - type: object
@@ -2032,12 +2718,11 @@ components:
             products:
               type: array
               items:
-                $ref: '#/components/schemas/Product' # Base product for details view
+                $ref: '#/components/schemas/Product'
       required:
         - description
         - products
-
-    ExtendedCollectionDetails:
+    ExtendedCollectionDetails: # Full collection details with extended products (prices/taxes)
       allOf:
         - $ref: '#/components/schemas/CollectionDetails'
         - type: object
@@ -2049,291 +2734,51 @@ components:
       required:
         - products
 
-    LineItem:
+    # --- Cart ---
+    LineItem: # Product within a cart context
       allOf:
-        - $ref: '#/components/schemas/Product' # Base product info
+        - $ref: '#/components/schemas/Product'
         - type: object
           properties:
             quantity:
               type: integer
               format: int32
-              minimum: 1
+              minimum: 1 # Usually, items in cart have quantity >= 1
           required:
             - quantity
+    LineItemError:
+      type: object
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+          enum: [NOT_ENOUGH_STOCK]
       required:
-        - quantity
-
-    ExtendedLineItem:
+        - message
+        - type
+    ExtendedLineItem: # Line item with calculated prices/taxes and potential issues
       allOf:
         - $ref: '#/components/schemas/LineItem'
+        - $ref: '#/components/schemas/ExtendedProduct' # Inherit pricing fields
         - type: object
           properties:
-            netPrice:
-              type: integer
-              format: int32
-              description: Price before tax (same as priceInCents).
-            grossPrice:
-              type: integer
-              format: int32
-              description: Price including tax.
-            taxes:
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedClientTax'
             issues:
               type: array
               items:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  type:
-                    type: string
-                    enum: [NOT_ENOUGH_STOCK]
-      required:
+                $ref: '#/components/schemas/LineItemError'
+      required: # Ensure inherited required fields are listed
         - netPrice
         - grossPrice
         - taxes
-
-    Cart:
+    CartDTO: # Basic structure of items in a cart
       type: object
       properties:
         products:
           type: array
           items:
             $ref: '#/components/schemas/LineItem'
-    ExtendedCart:
-      allOf:
-        - $ref: '#/components/schemas/Cart'
-        - type: object
-          properties:
-            netPrice:
-              type: integer
-              format: int32
-            grossPrice:
-              type: integer
-              format: int32
-            taxes:
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedClientTax'
-            isCheckoutPossible:
-              type: boolean
-            issues:
-              type: array
-              items:
-                type: string
-              description: List of issues preventing checkout (e.g., stock problems).
-      required:
-        - netPrice
-        - grossPrice
-        - taxes
-        - isCheckoutPossible
-
-    CartItemQuantityInput:
-      type: object
-      properties:
-        quantity:
-          type: integer
-          format: int32
-          minimum: 0 # 0 allowed for PUT to remove, minimum 1 for PATCH conceptually
-      required:
-        - quantity
-
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-        houseNumber:
-          type: string
-        apartment:
-          type: string
-          nullable: true
-        postalCode:
-          type: string
-        city:
-          type: string
-        province:
-          type: string
-          nullable: true
-        country:
-          type: string
-          description: ISO 2-letter country code.
-          example: PT
-      required:
-        - street
-        - houseNumber
-        - postalCode
-        - city
-        - country
-    AddressInput:
-      type: object
-      description: Address structure for input, country is added server-side based on path.
-      properties:
-        street:
-          type: string
-        houseNumber:
-          type: string
-        apartment:
-          type: string
-          nullable: true
-        postalCode:
-          type: string
-        city:
-          type: string
-        province:
-          type: string
-          nullable: true
-      required:
-        - street
-        - houseNumber
-        - postalCode
-        - city
-
-    UserDetails:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        firstName:
-          type: string
-        lastName:
-          type: string
-          nullable: true
-      required:
-        - email
-        - firstName
-    UserDetailsInput:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-        firstName:
-          type: string
-        lastName:
-          type: string
-          nullable: true
-      required:
-        - email
-        - firstName
-
-    UserDTO: # Data returned about the user (excluding sensitive info)
-      allOf:
-        - $ref: '#/components/schemas/UserDetails'
-        - type: object
-          properties:
-            address:
-              $ref: '#/components/schemas/Address'
-              nullable: true
-
-    UpdateUserInput:
-      type: object
-      description: Fields to update for a user. At least one must be provided.
-      properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
-        firstName:
-          type: string
-        lastName:
-          type: string
-        address:
-          $ref: '#/components/schemas/AddressInput'
-      minProperties: 1
-
-    ShippingRate:
-      type: object
-      properties:
-        priceInCents:
-          type: integer
-          format: int32
-        minWeight:
-          type: integer
-          format: int32
-        maxWeight:
-          type: integer
-          format: int32
-        deliveryTime:
-          type: integer
-          format: int32
-          description: Estimated delivery time in business days.
-        countryCodes:
-          type: array
-          items:
-            type: string
-            example: PT
-
-    BaseShippingMethod:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-    SelectedShippingMethod:
-      allOf:
-        - $ref: '#/components/schemas/BaseShippingMethod'
-        - type: object
-          properties:
-            rate:
-              $ref: '#/components/schemas/ShippingRate'
-      required:
-        - rate
-
-    PaymentMethod:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [card, paypal]
-        brand:
-          type: string
-          nullable: true
-          example: visa
-        last4:
-          type: string
-          nullable: true
-          example: '4242'
-
-    ClientPayment:
-      type: object
-      properties:
-        state:
-          type: string
-          enum: [draft, succeeded, canceled, created, processing, failed]
-        netAmount:
-          type: integer
-          format: int32
-          nullable: true
-        grossAmount:
-          type: integer
-          format: int32
-        paymentMethod:
-          $ref: '#/components/schemas/PaymentMethod'
-          nullable: true
-
-    ShippingTransaction:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          type: string
-          enum: [processing, shipped, delivered, canceled]
-        trackingUrl:
-          type: string
-          format: url
-          nullable: true
-
-    ClientOrder: # Order structure returned to the client
+    Cart: # Full Cart object including metadata
       type: object
       properties:
         id:
@@ -2345,59 +2790,336 @@ components:
         lastModifiedAt:
           type: string
           format: date-time
+        isLoggedIn:
+          type: boolean
         products:
           type: array
           items:
             $ref: '#/components/schemas/LineItem'
-        address:
-          $ref: '#/components/schemas/Address'
-        personalDetails:
-          $ref: '#/components/schemas/UserDetails'
-        shippingMethod:
-          $ref: '#/components/schemas/SelectedShippingMethod'
-        payment:
-          $ref: '#/components/schemas/ClientPayment'
+    ExtendedCart: # Cart with calculated totals, taxes, and checkout status
+      allOf:
+        - $ref: '#/components/schemas/CartDTO'
+        - type: object
+          properties:
+            products: # Override with extended line items
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtendedLineItem'
+            netPrice:
+              type: integer
+              format: int32
+              description: Total net price of all items in the cart.
+            grossPrice:
+              type: integer
+              format: int32
+              description: Total gross price of all items in the cart (including taxes).
+            taxes: # Aggregated taxes for the whole cart
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtendedClientTax'
+            isCheckoutPossible:
+              type: boolean
+              description: Indicates if checkout can proceed (e.g., cart not empty, no stock issues).
+            issues:
+              type: array
+              items:
+                type: string
+              description: List of issues preventing checkout (e.g., 'Some products have issues').
+      required:
+        - products
+        - netPrice
+        - grossPrice
+        - taxes
+        - isCheckoutPossible
+    CartItemQuantityInputPatch: # For PATCH /cart/items/{id}
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+          minimum: 1 # PATCH implies adding quantity > 0
+          description: Quantity to add to the existing item quantity.
+      required:
+        - quantity
+    CartItemQuantityInputPut: # For PUT /cart/items/{id}
+      type: object
+      properties:
+        quantity:
+          type: integer
+          format: int32
+          minimum: 0 # PUT sets the exact quantity, 0 means remove.
+          description: The exact quantity to set for the item. 0 removes the item.
+      required:
+        - quantity
+    CartResponse: # Standard response format for cart operations
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            cart:
+              $ref: '#/components/schemas/ExtendedCart'
+            accessToken: # May include refreshed anonymous or logged-in token
+              type: string
+      required:
+        - message
+        - data
+
+    # --- User / Address ---
+    AddressInput: # Structure for providing address data
+      type: object
+      description: Address structure for input. Country is determined by the path parameter.
+      properties:
+        street:
+          type: string
+        houseNumber:
+          type: string
+        apartment:
+          type: string
           nullable: true
-        shippingTransaction:
-          $ref: '#/components/schemas/ShippingTransaction'
-        isCanceled:
-          type: boolean
+        postalCode:
+          type: string
+        city:
+          type: string
+        province:
+          type: string
+          nullable: true
+      required:
+        - street
+        - houseNumber
+        - postalCode
+        - city
+    Address: # Full address structure including country code
+      allOf:
+        - $ref: '#/components/schemas/AddressInput'
+        - type: object
+          properties:
+            country:
+              type: string
+              description: ISO 2-letter country code.
+              example: PT
+              pattern: '^[A-Z]{2}$'
+          required:
+            - country
+    UserDetailsInput: # Structure for providing user details (guest checkout)
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+          nullable: true
+      required:
+        - email
+        - firstName
+    UserDetails: # User details without address
+      allOf:
+        - $ref: '#/components/schemas/UserDetailsInput'
+    UserDTO: # Data returned about the user (excluding sensitive info like password, role, internal IDs)
+      allOf:
+        - $ref: '#/components/schemas/UserDetails'
+        - type: object
+          properties:
+            address:
+              $ref: '#/components/schemas/Address'
+              nullable: true
+    BaseUser: # Full user schema as stored in DB (excluding password hash)
+      allOf:
+        - $ref: '#/components/schemas/UserDTO'
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            createdAt:
+              type: string
+              format: date-time
+            lastModifiedAt:
+              type: string
+              format: date-time
+            version:
+              type: integer
+            role:
+              type: string
+              enum: [ADMIN, USER]
+            isOauth:
+              type: boolean
+            googleUserId:
+              type: string
+              nullable: true
+            isValidated:
+              type: boolean
       required:
         - id
         - createdAt
         - lastModifiedAt
-        - products
-        - address
-        - personalDetails
-        - shippingMethod
-        - shippingTransaction
-        - isCanceled
-
-    ExtendedClientOrder: # Order structure with calculated fields
-      allOf:
-        - $ref: '#/components/schemas/ClientOrder'
-        - type: object
+        - version
+        - role
+        - isOauth
+        - isValidated
+    GetUserResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
           properties:
-            products: # Override with extended items
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedLineItem'
-            taxes:
-              type: array
-              items:
-                $ref: '#/components/schemas/ExtendedClientTax'
-            currency:
-              $ref: '#/components/schemas/ClientCurrency'
-            status:
+            user:
+              $ref: '#/components/schemas/UserDTO'
+            accessToken:
               type: string
-              enum: [processing_payment, packaging, shipping, completed, canceled, error]
-              description: Calculated order status based on payment and shipping.
       required:
-        - products
-        - taxes
-        - currency
-        - status
+        - message
+        - data
+    UpdateUserResponse: # Response after successful user update
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserDTO'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    DeleteUserResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data: # Contains anonymous token
+          $ref: '#/components/schemas/SuccessData'
+      required:
+        - message
+        - data
+    UpdatePersonalInformationInput:
+      type: object
+      description: Fields to update personal information. At least one property (firstName, lastName, or address) must be provided.
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressInput'
+      minProperties: 1
+    UpdatePasswordInput:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          format: password
+        newPassword:
+          type: string
+          format: password
+      required:
+        - currentPassword
+        - newPassword
+    SubmitEmailChangeInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The new email address to change to.
+      required:
+        - email
+    ValidateEmailChangeCodeInput:
+      type: object
+      properties:
+        code:
+          type: string
+          description: The validation code received in the new email.
+      required:
+        - code
 
+    # --- Auth / Config Responses ---
+    AuthSuccessResponse: # Response for successful login/signup validation
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserDTO'
+            cart:
+              $ref: '#/components/schemas/ExtendedCart'
+            accessToken:
+              type: string
+          required:
+            - user
+            - cart
+            - accessToken
+    LogoutResponse: # Response for successful logout
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            cart: # Represents an empty cart state after logout
+              $ref: '#/components/schemas/ExtendedCart'
+            accessToken: # New anonymous token
+              type: string
+          required:
+            - cart
+            - accessToken
+    SignupResponse: # Response for initiating signup (before email validation)
+      type: object
+      properties:
+        message:
+          type: string
+        data: # Contains anonymous token
+          $ref: '#/components/schemas/SuccessData'
+      required:
+        - message
+        - data
+    ConfigResponseLoggedIn: # Response for /config when user is logged in
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserDTO'
+            cart:
+              $ref: '#/components/schemas/ExtendedCart'
+            accessToken:
+              type: string
+          required:
+            - user
+            - cart
+            - accessToken
+    ConfigResponseLoggedOut: # Response for /config when user is logged out/anonymous
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            cart:
+              $ref: '#/components/schemas/ExtendedCart' # Could be empty or existing anonymous cart
+            accessToken: # Anonymous token
+              type: string
+          required:
+            - cart
+            - accessToken
     SignupInput:
       type: object
       properties:
@@ -2419,7 +3141,26 @@ components:
         - firstName
         - email
         - password
-
+    VerifyEmailInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          description: The 8-digit verification code from the signup email.
+      required:
+        - email
+        - code
+    ResendEmailInput:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
     LoginInput:
       type: object
       properties:
@@ -2435,85 +3176,46 @@ components:
       required:
         - email
         - password
-
-    # ---------- Auth/Config Responses ----------
-    AuthSuccessResponse:
+    SubmitForgotPasswordEmailInput:
       type: object
       properties:
-        message:
+        email:
           type: string
-        data:
-          type: object
-          properties:
-            user:
-              $ref: '#/components/schemas/UserDTO'
-            cart:
-              $ref: '#/components/schemas/ExtendedCart'
-            accessToken:
-              type: string
-          required:
-            - user
-            - cart
-            - accessToken
-    LogoutResponse:
+          format: email
+      required:
+        - email
+    ValidateCodeInput:
       type: object
       properties:
-        message:
+        email:
           type: string
-        data:
-          type: object
-          properties:
-            cart:
-              $ref: '#/components/schemas/ExtendedCart' # Will be an empty cart
-            accessToken:
-              type: string # Anonymous token
-          required:
-            - cart
-            - accessToken
-
-    ConfigResponseLoggedIn:
+          format: email
+        code:
+          type: string
+          description: The 8-digit verification code.
+      required:
+        - email
+        - code
+    ResetPasswordInput:
       type: object
       properties:
-        message:
+        email:
           type: string
-        data:
-          type: object
-          properties:
-            user:
-              $ref: '#/components/schemas/UserDTO'
-            cart:
-              $ref: '#/components/schemas/ExtendedCart'
-            accessToken:
-              type: string
-          required:
-            - user
-            - cart
-            - accessToken
-    ConfigResponseLoggedOut:
-      type: object
-      properties:
-        message:
+          format: email
+        code:
           type: string
-        data:
-          type: object
-          properties:
-            cart:
-              $ref: '#/components/schemas/ExtendedCart' # Could be empty or existing anonymous cart
-            accessToken:
-              type: string # Anonymous token
-          required:
-            - cart
-            - accessToken
-    CartResponse:
-      type: object
-      properties:
-        message:
+          description: The 8-digit verification code.
+        password:
           type: string
-        data:
-          $ref: '#/components/schemas/ExtendedCart'
+          format: password
+          description: The new password for the user.
+      required:
+        - email
+        - code
+        - password
 
     # ---------- Checkout Schemas ----------
-    ClientCheckoutStage:
+    ClientCheckoutStage: # Structure for stages returned by /checkout/stages GET
       type: object
       properties:
         name:
@@ -2527,8 +3229,27 @@ components:
         - name
         - isEnabled
         - title
-
-    CheckoutStageErrorResponse: # Specific error when a stage is invalid
+    CheckoutStagesResponse: # Response for GET /checkout/stages
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+            isCheckoutPossible: # Optional, present if stages cannot be determined due to cart issues
+              type: boolean
+              description: Indicates if checkout is generally possible (e.g., cart not empty).
+      required:
+        - message
+        - data
+    CheckoutStageErrorResponse: # Specific error when a stage is invalid/not enabled
       type: object
       properties:
         message:
@@ -2541,6 +3262,468 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageInputPersonalDetails:
+      type: object
+      properties:
+        personalDetails:
+          $ref: '#/components/schemas/UserDetailsInput'
+      required:
+        - personalDetails
+    CheckoutStageResponsePersonalDetailsGet:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            personalDetails:
+              $ref: '#/components/schemas/UserDetails'
+              nullable: true # Can be null if not set yet
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageResponsePersonalDetailsPost:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            personalDetails:
+              $ref: '#/components/schemas/UserDetails'
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageInputAddress:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/AddressInput'
+        saveAddress:
+          type: boolean
+          description: If true and user is logged in, save address to profile.
+          default: false
+      required:
+        - address
+    CheckoutStageResponseAddressGet:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            address:
+              $ref: '#/components/schemas/Address'
+              nullable: true
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageResponseAddressPost:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            address:
+              $ref: '#/components/schemas/Address'
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageInputShipping:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the *shipping method* to select.
+      required:
+        - id
+    CheckoutStageResponseShippingGet:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            shippingMethods:
+              type: array
+              items:
+                $ref: '#/components/schemas/SelectedShippingMethod'
+            selectedShippingMethod:
+              $ref: '#/components/schemas/SelectedShippingMethod'
+              nullable: true
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageResponseShippingPost:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            shippingMethod:
+              $ref: '#/components/schemas/SelectedShippingMethod'
+            availableCheckoutStages:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClientCheckoutStage'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageReviewItem: # Structure for review items (with edit status)
+      properties:
+        isEditable:
+          type: boolean
+      required:
+        - isEditable
+    CheckoutStageResponseReviewGet:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            personalDetails:
+              allOf:
+                - $ref: '#/components/schemas/UserDetails'
+                - $ref: '#/components/schemas/CheckoutStageReviewItem'
+            address:
+              allOf:
+                - $ref: '#/components/schemas/Address'
+                - $ref: '#/components/schemas/CheckoutStageReviewItem'
+            shippingMethod:
+              allOf:
+                - $ref: '#/components/schemas/SelectedShippingMethod'
+                - $ref: '#/components/schemas/CheckoutStageReviewItem'
+            cart:
+              $ref: '#/components/schemas/ExtendedCart'
+            totalPrice:
+              type: integer
+              format: int32
+              description: Total price including items, taxes, and shipping (in cents).
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    CheckoutStageResponsePaymentGet:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              format: url
+              description: The URL to redirect the user to Stripe Checkout.
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+
+    # --- Shipping ---
+    ShippingRate:
+      type: object
+      properties:
+        priceInCents:
+          type: integer
+          format: int32
+        minWeight:
+          type: integer
+          format: int32
+        maxWeight:
+          type: integer
+          format: int32
+        deliveryTime:
+          type: integer
+          format: int32
+          description: Estimated delivery time in business days.
+        countryCodes:
+          type: array
+          items:
+            type: string
+            example: PT
+            pattern: '^[A-Z]{2}$'
+    BaseShippingMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    SelectedShippingMethod: # Shipping method with the applicable rate selected
+      allOf:
+        - $ref: '#/components/schemas/BaseShippingMethod'
+        - type: object
+          properties:
+            rate:
+              $ref: '#/components/schemas/ShippingRate'
+      required:
+        - rate
+
+    # --- Payment / Order ---
+    PaymentMethod: # Info about the payment method used
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [card, paypal]
+        brand:
+          type: string
+          nullable: true
+          example: visa
+        last4:
+          type: string
+          nullable: true
+          example: '4242'
+    ClientPayment: # Payment details shown to the client
+      type: object
+      properties:
+        state:
+          type: string
+          enum: [draft, succeeded, canceled, created, processing, failed]
+        netAmount:
+          type: integer
+          format: int32
+          description: Amount before taxes (might be null if not applicable/available).
+          nullable: true
+        grossAmount:
+          type: integer
+          format: int32
+          description: Total amount paid.
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+    ShippingTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [processing, shipped, delivered, canceled]
+        trackingUrl:
+          type: string
+          format: url
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    ClientOrder: # Order structure returned to the client
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem' # Basic line item info
+        address:
+          $ref: '#/components/schemas/Address'
+        personalDetails:
+          $ref: '#/components/schemas/UserDetails'
+        shippingMethod:
+          $ref: '#/components/schemas/SelectedShippingMethod'
+        payment:
+          $ref: '#/components/schemas/ClientPayment'
+          nullable: true
+        shippingTransaction:
+          $ref: '#/components/schemas/ShippingTransaction'
+        isCanceled:
+          type: boolean
+          nullable: true # Might be null before explicitly set
+      required:
+        - id
+        - createdAt
+        - lastModifiedAt
+        - products
+        - address
+        - personalDetails
+        - shippingMethod
+        - shippingTransaction
+    ExtendedClientOrder: # Order structure with calculated fields (taxes, totals, status)
+      allOf:
+        - $ref: '#/components/schemas/ClientOrder'
+        - type: object
+          properties:
+            products: # Override with extended items including calculated prices/taxes
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtendedLineItem'
+            taxes: # Aggregated taxes for the order
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtendedClientTax'
+            currency:
+              $ref: '#/components/schemas/ClientCurrency'
+            status: # Calculated overall order status
+              type: string
+              enum: [processing_payment, packaging, shipping, completed, canceled, error]
+              description: Calculated order status based on payment and shipping states.
+      required:
+        - products
+        - taxes
+        - currency
+        - status
+    Order: # Full internal order representation (includes internal IDs like userId, paymentId, etc.)
+      allOf:
+        - $ref: '#/components/schemas/ClientOrder' # Base client view
+        - type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+              nullable: true
+            paymentId:
+              type: string
+              format: uuid # Assuming internal payment ID is UUID
+              nullable: true
+            stripeId: # The Stripe Checkout Session ID
+              type: string
+              example: cs_...
+            isCanceled:
+              type: boolean
+              nullable: true # Explicitly defining as nullable
+      required:
+        - stripeId
+    UpdateAdminOrderInput:
+      type: object
+      description: Fields that can be updated on an order by an admin.
+      properties:
+        # Add fields that make sense for admin update, e.g., shipping status, notes
+        # Example:
+        # shippingTransactionId:
+        #   type: string
+        #   format: uuid
+        #   description: Update the associated shipping transaction.
+        isCanceled:
+          type: boolean
+          description: Explicitly mark the order as canceled (use /cancel endpoint for state change logic).
+      # Add other updatable fields as needed
+    GetUserOrdersResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/ExtendedClientOrder'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+    GetOrderResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            order:
+              $ref: '#/components/schemas/ExtendedClientOrder'
+            accessToken:
+              type: string
+      required:
+        - message
+        - data
+
+    # ---------- OAuth Schemas ----------
+    OAuthRedirectResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            url:
+              type: string
+              format: url
+              description: URL to redirect the user to Google.
+      required:
+        - message
+        - data
+    OAuthCallbackResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
             accessToken:
               type: string
       required:
@@ -2563,13 +3746,13 @@ components:
         created:
           type: integer
           format: int64
-          description: Timestamp of event creation.
+          description: Timestamp of event creation (Unix epoch seconds).
         data:
           type: object
           properties:
             object:
               type: object
-              description: The actual Stripe object related to the event (e.g., PaymentIntent, CheckoutSession).
+              description: The actual Stripe object related to the event (e.g., PaymentIntent, CheckoutSession). Varies by event type.
         livemode:
           type: boolean
         pending_webhooks:
@@ -2596,32 +3779,27 @@ components:
         - type
 
   securitySchemes:
-    cloudflareClientId:
+    AdminSecretKey: # Define scheme for admin endpoints
       type: apiKey
       in: header
-      name: CF-Access-Client-Id
-      description: "Enter your Cloudflare Access Client ID here. The Client Secret must be configured separately in the initializer script (for this demo)."
-    cloudflareClientSecret:
-      type: apiKey
-      in: header
-      name: CF-Access-Client-Secret
-      description: "Enter your Cloudflare Access Client ID here. The Client Secret must be configured separately in the initializer script (for this demo)."
+      name: X-Admin-Secret-Key # Or choose another header name
+      description: Secret key required for accessing private administrative endpoints.
 
   responses:
     BadRequest:
-      description: Bad Request - Invalid input data, parameters, or request format.
+      description: Bad Request - Invalid input data, parameters, or request format. Check `issues` for details.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
-      description: Unauthorized - Authentication required or invalid credentials/token.
+      description: Unauthorized - Authentication required or invalid credentials/token/secret key.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Forbidden:
-      description: Forbidden - Access denied, insufficient permissions.
+      description: Forbidden - Access denied, insufficient permissions, or operation not allowed in current state.
       content:
         application/json:
           schema:
@@ -2633,7 +3811,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Conflict:
-      description: Conflict - The request could not be completed due to a conflict with the current state of the resource (e.g., email already exists).
+      description: Conflict - The request could not be completed due to a conflict with the current state of the resource (e.g., email already exists, order already processed).
       content:
         application/json:
           schema:
@@ -2644,27 +3822,145 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    CheckoutStageNotEnabled:
+      description: Bad Request - The requested checkout stage is not currently enabled or accessible.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CheckoutStageErrorResponse'
+    CheckoutStageNotEnabledOrBadRequest: # Combines stage errors with other potential 400s
+      description: Bad Request - Either the stage is not enabled, or the input data is invalid (e.g., address mismatch, invalid rate). See `issues` for details.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/CheckoutStageErrorResponse'
+              - $ref: '#/components/schemas/ErrorResponse'
 
   parameters:
     CountryCode:
       name: countryCode
       in: path
       required: true
-      description: ISO 2-letter country code (e.g., PT, ES).
+      description: ISO 2-letter country code (uppercase, e.g., PT, ES).
       schema:
         type: string
+        pattern: '^[A-Z]{2}$'
         example: PT
+    ProductId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the product.
+      schema:
+        type: string
+        format: uuid
+        example: nPn6WYEMz1NK2B61hmrWsb
+    CollectionId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the collection.
+      schema:
+        type: string
+        format: uuid
+        example: 9bekuxMKGrRTKvZqNYZdDV
+    CartId: # Added
+      name: id
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the cart.
+      schema:
+        type: string
+        format: uuid
+    UserId: # Added
+      name: id
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the user.
+      schema:
+        type: string
+        format: uuid
+    OrderId:
+      name: id
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the order.
+      schema:
+        type: string
+        format: uuid
+        example: w3ChBD7SjeReRrNSwSSsa3
+    SearchQuery: # Added
+      name: search
+      in: query
+      required: false
+      description: Optional search term to filter results by name or description.
+      schema:
+        type: string
+    PageQuery: # Added
+      name: page
+      in: query
+      required: false
+      description: Page number for pagination (default 1).
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    PageSizeQuery: # Added
+      name: pageSize
+      in: query
+      required: false
+      description: Number of items per page (default 10).
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100 # Example max, adjust as needed
+        default: 10
 
   headers:
-    SetCookieAuth:
-      description: Sets `s_r` (refresh token, HttpOnly, Secure, SameSite=Strict) and `r_m` (remember me, Secure, SameSite=Strict) if remember=true. Deletes `c_i` and checkout stage cookies.
+    SetCookieAuth: # For Login, Signup Validation, OAuth Callback
+      description: Sets `s_r` (refresh token, HttpOnly, Secure, SameSite=Strict) and optionally `r_m` (remember me, Secure, SameSite=Strict) if remember=true. Deletes `c_i`, `a_d`, `u_d`, `s_m`, `c_s`, `c_m`.
       schema:
         type: string
-    SetCookieLogout:
-      description: Deletes `s_r` and `r_m` cookies. Sets a new anonymous `s_r` token.
+    SetCookieAuthAndOAuthDelete: # For OAuth Callback specifically
+      description: Sets `s_r` and `r_m`. Deletes `o_t`, `c_i`, `a_d`, `u_d`, `s_m`, `c_s`, `c_m`.
       schema:
         type: string
-    SetCookieOptional:
-      description: May set or refresh the `s_r` cookie (refresh token) and/or `c_i` cookie (cart ID).
+    SetCookieLogout: # For Logout, Delete User
+      description: Deletes `s_r` and `r_m`. Sets a new anonymous `s_r` token. Deletes checkout cookies (`a_d`, `u_d`, `s_m`, `c_s`, `c_m`).
+      schema:
+        type: string
+    SetCookieAnonymous: # For Signup Init, Forgot Password Submit/Reset/Validate
+      description: Sets a new anonymous `s_r` token. May delete other cookies like `c_i`, checkout cookies.
+      schema:
+        type: string
+    SetCookieOptional: # For general authenticated endpoints GET /config, GET /cart, etc.
+      description: May refresh the `s_r` cookie (refresh token) and/or `c_i` cookie (cart ID).
+      schema:
+        type: string
+    SetCookieOptionalOrCustomerEmail: # For GET /orders/{id}
+      description: May refresh `s_r` cookie. May set `c_m` (encrypted customer email) if guest lookup via header was successful.
+      schema:
+        type: string
+    SetCookiePersonalDetails: # For POST /checkout/stages/personal-details
+      description: Sets `u_d` (encrypted user details) cookie. May refresh `s_r`.
+      schema:
+        type: string
+    SetCookieAddress: # For POST /checkout/stages/address
+      description: Sets `a_d` (encrypted address) cookie. May refresh `s_r`.
+      schema:
+        type: string
+    SetCookieShipping: # For POST /checkout/stages/shipping
+      description: Sets `s_m` (encrypted shipping method ID) cookie. May refresh `s_r`.
+      schema:
+        type: string
+    SetCookieCheckoutSession: # For GET /checkout/stages/payment
+      description: Sets `c_s` (encrypted Stripe checkout session ID) cookie. May refresh `s_r`.
+      schema:
+        type: string
+    SetCookieOAuthToken: # For GET /oauth/google/redirect
+      description: Sets `o_t` (OAuth state token) cookie (HttpOnly, Secure, SameSite=Lax).
       schema:
         type: string

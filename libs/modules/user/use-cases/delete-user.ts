@@ -1,23 +1,24 @@
-import { deleteUser as deleteUserAdapter } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
 import { ResponseContext } from "@http-entity";
 import { getAnonymousTokens } from "@jwt-utils";
-import { withTransaction } from "@db";
+import { getDeleteUserAction } from "@user-db";
 
 interface ReturnType {
   responseContext: ResponseContext;
 }
 
-export const deleteUser = withTransaction(async (): Promise<ReturnType> => {
-  const { userId } = contextStore.context;
+export const deleteUser = async (userId?: string): Promise<ReturnType> => {
+  if (!userId) {
+    userId = contextStore.context.userId;
+  }
 
   if (!userId) {
-    throw errors.UNAUTHORIZED();
+    throw errors.USER_NOT_FOUND();
   }
-  await deleteUserAdapter(userId);
+  await getDeleteUserAction(userId).run();
 
   return {
     responseContext: await getAnonymousTokens(),
   };
-});
+};

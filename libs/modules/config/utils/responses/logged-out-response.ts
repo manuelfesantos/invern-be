@@ -5,7 +5,7 @@ import {
   getCartIdFromHeaders,
   setCartIdCookieInResponse,
 } from "@http-utils";
-import { selectCartById } from "@cart-db";
+import { getSelectCartByIdAction } from "@cart-db";
 import { Cart, EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
 import { extendCart } from "@extender-utils";
@@ -19,7 +19,7 @@ export const loggedOutResponse = async (
 
   const cartId = getCartIdFromHeaders(headers);
   if (cartId) {
-    cart = (await selectCartById(cartId)) || cart;
+    cart = (await getSelectCartByIdAction(cartId).run()) || cart;
   }
 
   logCredentials(cartId);

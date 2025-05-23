@@ -3,6 +3,8 @@ import { z, ZodEffects, ZodNumber, ZodString } from "zod";
 import { isValidUUID } from "@crypto-utils";
 import { imageSchema } from "@image-entity";
 
+export type NonEmptyArray<T> = [T, ...T[]];
+
 const ZERO_ELEMENTS = 0;
 
 const stringSchema = (name: string): ZodString =>

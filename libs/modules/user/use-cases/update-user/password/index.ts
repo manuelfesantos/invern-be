@@ -1,38 +1,41 @@
-import { selectUserById, updateUser } from "@user-db";
+import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { hashPassword } from "@crypto-utils";
 import { contextStore } from "@context-utils";
 import { updatePasswordBodySchema } from "../types/update-user";
 import { errors } from "@error-handling-utils";
 import { toUserDTO, UserDTO } from "@user-entity";
-import { withTransaction } from "@db";
 
-export const updateUserPassword = withTransaction(
-  async (body: unknown): Promise<UserDTO> => {
-    const { userId } = contextStore.context;
+export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {
+  const { userId } = contextStore.context;
 
-    if (!userId) {
-      throw new Error("not logged in");
-    }
+  if (!userId) {
+    throw new Error("not logged in");
+  }
 
-    const { currentPassword, newPassword } =
-      updatePasswordBodySchema.parse(body);
+  const { currentPassword, newPassword } = updatePasswordBodySchema.parse(body);
 
-    const { password } = await selectUserById(userId);
+  const user = await getSelectUserByIdAction(userId).run();
 
-    const hashedCurrentPassword = await hashPassword(currentPassword, userId);
+  if (!user) {
+    throw errors.USER_NOT_FOUND();
+  }
+  const { password } = user;
 
-    if (hashedCurrentPassword !== password) {
-      throw errors.UNAUTHORIZED("current password is incorrect");
-    }
+  const hashedCurrentPassword = await hashPassword(currentPassword, userId);
 
-    await updateUser(userId, { password: newPassword });
+  if (hashedCurrentPassword !== password) {
+    throw errors.UNAUTHORIZED("current password is incorrect");
+  }
 
-    const updatedUser = await selectUserById(userId);
+  await getUpdateUserAction(userId, {
+    password: await hashPassword(newPassword, userId),
+  }).run();
 
-    if (!updatedUser) {
-      throw errors.USER_NOT_FOUND();
-    }
+  const updatedUser = await getSelectUserByIdAction(userId).run();
 
-    return toUserDTO(updatedUser);
-  },
-);
+  if (!updatedUser) {
+    throw errors.USER_NOT_FOUND();
+  }
+
+  return toUserDTO(updatedUser);
+};

@@ -1,6 +1,6 @@
 import { contextStore } from "@context-utils";
 import { errors } from "@error-handling-utils";
-import { selectUserById, updateUser } from "@user-db";
+import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { validateSubmitEmailCodeBodySchema } from "../types/update-user";
 import { validateEmailSecret } from "@user-module";
 
@@ -11,14 +11,14 @@ export const validateUpdateEmailCode = async (body: unknown): Promise<void> => {
     throw errors.UNAUTHORIZED();
   }
 
-  const user = await selectUserById(userId);
+  const user = await getSelectUserByIdAction(userId).run();
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
 
   const secret = await validateEmailSecret(user.email, code);
 
-  await updateUser(userId, {
+  await getUpdateUserAction(userId, {
     email: secret.newEmail,
-  });
+  }).run();
 };

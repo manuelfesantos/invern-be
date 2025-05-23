@@ -1,4 +1,3 @@
-import { PagesFunction } from "@cloudflare/workers-types";
 import { middlewareRequestHandler, requestHandler } from "@decorator-utils";
 import { CookieName, Data, HandlerMethodMapper } from "@http-entity";
 import { Env } from "@env-entity";
@@ -17,6 +16,8 @@ import {
   successResponse,
 } from "@response-entity";
 import { deleteCookieFromResponse } from "@http-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const checkoutRequestHandler = <T extends Data>(
   methodMapper: HandlerMethodMapper<T>,
@@ -38,6 +39,16 @@ const errorHandler = (error: unknown): Response => {
   const { currentCheckoutStage } = contextStore.context;
   if (error instanceof Error && currentCheckoutStage) {
     const cookiesToRemove = getCheckoutCookiesToRemove(currentCheckoutStage);
+    logger().error(
+      `Error in checkout stage ${currentCheckoutStage}: ${error.message}`,
+      {
+        useCase: LoggerUseCaseEnum.CHECKOUT_ERROR,
+        data: {
+          error,
+          checkoutStage: currentCheckoutStage,
+        },
+      },
+    );
     const response = protectedSuccessResponse.OK(
       error.message,
       {

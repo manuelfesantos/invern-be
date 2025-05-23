@@ -1,6 +1,5 @@
 import { getCountryByCountryCode } from "@country-module";
 import { countryCodeSchema } from "@global-entity";
-import { errorResponse } from "@response-entity";
 import { getCredentials } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
@@ -46,11 +45,7 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
     if (cachedCountry) {
       country = cachedCountry;
     } else {
-      const maybeCountry = await getCountryByCountryCode(countryCode);
-      if (!maybeCountry) {
-        return errorResponse.BAD_REQUEST("Country is not supported");
-      }
-      country = maybeCountry;
+      country = await getCountryByCountryCode(countryCode);
       countryCache.add(country);
     }
 

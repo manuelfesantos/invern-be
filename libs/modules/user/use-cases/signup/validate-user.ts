@@ -1,4 +1,4 @@
-import { selectUserByEmail, updateUser } from "@user-db";
+import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
 import { toUserDTO, UserDTO, ValidateEmailSecretBody } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
@@ -20,11 +20,11 @@ export const validateUser = async (
   email: string,
   secret: ValidateEmailSecretBody,
 ): Promise<ReturnType> => {
-  const user = await selectUserByEmail(email);
+  const user = await getSelectUserByEmailAction(email).run();
   if (!user) throw errors.USER_NOT_FOUND();
 
   if (!user.isValidated) {
-    await updateUser(user.id, { isValidated: true });
+    await getUpdateUserAction(user.id, { isValidated: true }).run();
   }
 
   const accessToken = await getLoggedInToken(user.id, user.cart?.id);

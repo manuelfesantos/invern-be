@@ -1,11 +1,11 @@
-import { selectUserByEmail } from "@user-db";
+import { getSelectUserByEmailAction } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { sendSignupEmail } from "./utils/send-email";
 import { getValidationSecret, setValidationSecret } from "@kv-adapter";
 import { MAX_EMAILS_SENT, ONE_ATTEMPT } from "./utils/values";
 
 export const resendEmail = async (email: string): Promise<void> => {
-  const user = await selectUserByEmail(email);
+  const user = await getSelectUserByEmailAction(email).run();
 
   if (!user) {
     throw errors.USER_NOT_FOUND();

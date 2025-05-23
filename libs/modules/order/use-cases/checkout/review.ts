@@ -7,11 +7,11 @@ import {
 import { ExtendedCart, getCartWeight, toCartDTO } from "@cart-entity";
 import { contextStore } from "@context-utils";
 import { validateCartId } from "@cart-db";
-import { selectShippingMethod } from "@shipping-db";
+import { getSelectShippingMethodAction } from "@shipping-db";
 import { errors } from "@error-handling-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
 import { extendCart } from "@extender-utils";
-import { selectUserById } from "@user-db";
+import { getSelectUserByIdAction } from "@user-db";
 
 interface IsEditable {
   isEditable: boolean;
@@ -45,7 +45,7 @@ export const getCheckoutReview =
       if (!userId) {
         throw errors.NOT_ALLOWED("Missing personal details");
       }
-      const user = await selectUserById(userId);
+      const user = await getSelectUserByIdAction(userId).run();
       personalDetails = userDetailsSchema.parse(user);
     }
 
@@ -78,7 +78,10 @@ const getShippingMethod = async (
   shippingMethodId: string,
   weight: number,
 ): Promise<SelectedShippingMethod> => {
-  const shippingMethod = await selectShippingMethod(shippingMethodId, weight);
+  const shippingMethod = await getSelectShippingMethodAction(
+    shippingMethodId,
+    weight,
+  ).run();
   if (!shippingMethod) {
     throw errors.SHIPPING_METHOD_NOT_FOUND();
   }

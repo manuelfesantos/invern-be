@@ -71,7 +71,7 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
 const addLocalCorsHeaders = (response: Response): Response => {
   response.headers.append(
     "Access-Control-Allow-Origin",
-    "https://127.0.0.1:8081",
+    "https://localhost:8081",
   );
   response.headers.append("Access-Control-Allow-Credentials", "true");
   response.headers.append(

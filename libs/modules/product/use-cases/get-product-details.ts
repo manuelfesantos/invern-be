@@ -1,24 +1,38 @@
-import { selectProductById } from "@product-db";
+import { getSelectProductByIdAction } from "@product-db";
 import { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { extendProductDetails } from "@extender-utils";
-import { selectCollectionById } from "@collection-db";
+import { getSelectCollectionByIdAction } from "@collection-db";
 import {
   ExtendedProductWithCollectionDetails,
+  ProductWithCollectionDetails,
   productWithCollectionDetailsSchema,
 } from "@product-entity";
 
-export const getProductDetails = async (
+export async function getProductDetails(
   id: HttpParams,
-): Promise<ExtendedProductWithCollectionDetails> => {
+  shouldExtend: true,
+): Promise<ExtendedProductWithCollectionDetails>;
+export async function getProductDetails(
+  id: HttpParams,
+  shouldExtend: false,
+): Promise<ProductWithCollectionDetails>;
+export async function getProductDetails(
+  id: HttpParams,
+  shouldExtend: boolean,
+): Promise<
+  ExtendedProductWithCollectionDetails | ProductWithCollectionDetails
+> {
   const productId = uuidSchema("product id").parse(id);
-  const product = await selectProductById(productId);
+  const product = await getSelectProductByIdAction(productId).run();
+
   if (!product) {
     throw errors.PRODUCT_NOT_FOUND();
   }
 
-  const { name } = (await selectCollectionById(product.collectionId)) || {};
+  const { name } =
+    (await getSelectCollectionByIdAction(product.collectionId).run()) || {};
 
   if (!name) {
     throw errors.COLLECTION_NOT_FOUND();
@@ -34,5 +48,9 @@ export const getProductDetails = async (
     },
   );
 
+  if (!shouldExtend) {
+    return productWithCollectionDetails;
+  }
+
   return extendProductDetails(productWithCollectionDetails);
-};
+}

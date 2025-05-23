@@ -1,4 +1,4 @@
-import { selectUserByEmail, updateUser } from "@user-db";
+import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
 import {
   User,
   UserDTO,
@@ -6,7 +6,7 @@ import {
   UserValidationStatusEnum,
 } from "@user-entity";
 import { errors } from "@error-handling-utils";
-import { hashPassword } from "@crypto-utils";
+import { getRandomUUID, hashPassword } from "@crypto-utils";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
@@ -14,8 +14,7 @@ import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
-import { insertCart } from "@cart-db";
-import { withTransaction } from "@db";
+import { getInsertCartAction } from "@cart-db";
 import { z } from "zod";
 import { emailSchema, requiredStringSchema } from "@global-entity";
 
@@ -31,63 +30,67 @@ export const loginBodySchema = z.object({
   remember: z.boolean().default(false),
 });
 
-export const login = withTransaction(
-  async (body: unknown): Promise<ReturnType> => {
-    const { isLoggedIn } = contextStore.context;
+export const login = async (body: unknown): Promise<ReturnType> => {
+  const { isLoggedIn } = contextStore.context;
 
-    if (isLoggedIn) {
-      throw errors.UNAUTHORIZED("already logged in");
-    }
+  if (isLoggedIn) {
+    throw errors.UNAUTHORIZED("already logged in");
+  }
 
-    const parsedBody = loginBodySchema.parse(body);
+  const parsedBody = loginBodySchema.parse(body);
 
-    const { email, password, remember } = parsedBody;
+  const { email, password, remember } = parsedBody;
 
-    const user = await getUser(email);
+  const user = await getUser(email);
 
-    await validatePassword(password, user);
+  await validatePassword(password, user);
 
-    const { id: userId } = user;
-    const { id: cartId } = user.cart ?? {};
+  const { id: userId } = user;
+  const { id: cartId } = user.cart ?? {};
 
-    logCredentials(cartId, userId);
+  logCredentials(cartId, userId);
 
-    if (!user.cart) {
-      const [{ cartId: newCartId }] = await insertCart({ isLoggedIn: true });
-      await updateUser(userId, { cartId: newCartId });
-      user.cart = {
-        ...EMPTY_CART,
-        id: newCartId,
-      };
-    }
+  if (!user.cart) {
+    const newCartId = getRandomUUID();
+    await getInsertCartAction({
+      isLoggedIn: true,
+      id: newCartId,
+    }).run();
 
-    const cart = toCartDTO(user.cart);
+    await getUpdateUserAction(userId, { cartId: newCartId }).run();
 
-    const accessToken = await getLoggedInToken(userId, cartId);
-    let refreshToken = await getAuthSecret(userId);
-
-    if (!refreshToken) {
-      refreshToken = await getLoggedInRefreshToken(userId);
-      await setAuthSecret(userId, refreshToken);
-    }
-
-    return {
-      user: toUserDTO(user),
-      cart: extendCart(cart),
-      responseContext: {
-        accessToken,
-        refreshToken,
-        remember,
-      },
+    user.cart = {
+      ...EMPTY_CART,
+      id: newCartId,
     };
-  },
-);
+  }
+
+  const cart = toCartDTO(user.cart);
+
+  const accessToken = await getLoggedInToken(userId, cartId);
+  let refreshToken = await getAuthSecret(userId);
+
+  if (!refreshToken) {
+    refreshToken = await getLoggedInRefreshToken(userId);
+    await setAuthSecret(userId, refreshToken);
+  }
+
+  return {
+    user: toUserDTO(user),
+    cart: extendCart(cart),
+    responseContext: {
+      accessToken,
+      refreshToken,
+      remember,
+    },
+  };
+};
 
 const getUser = async (email: string): Promise<User> => {
-  const user = await selectUserByEmail(
+  const user = await getSelectUserByEmailAction(
     email,
     UserValidationStatusEnum.VALIDATED,
-  );
+  ).run();
   if (!user) {
     throw errors.INVALID_CREDENTIALS();
   }

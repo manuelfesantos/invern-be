@@ -1,5 +1,4 @@
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { login } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
 import {

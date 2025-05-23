@@ -1,17 +1,47 @@
-import { selectCartById } from "@cart-db";
+import { getSelectCartByIdAction } from "@cart-db";
 import { extendCart } from "@extender-utils";
 import { contextStore } from "@context-utils";
-import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
-import { withTransaction } from "@db";
+import {
+  Cart,
+  CartDTO,
+  EMPTY_CART,
+  ExtendedCart,
+  toCartDTO,
+} from "@cart-entity";
 
-export const getCart = withTransaction(async (): Promise<ExtendedCart> => {
-  const { cartId } = contextStore.context;
+export async function getCart(
+  shouldExtend: true,
+  cartId?: string,
+): Promise<ExtendedCart>;
+export async function getCart(
+  shouldExtend: false,
+  cartId?: string,
+): Promise<CartDTO | Cart>;
+export async function getCart(
+  shouldExtend: boolean,
+  cartId?: string,
+): Promise<ExtendedCart | CartDTO | Cart> {
   if (!cartId) {
-    return extendCart(toCartDTO(EMPTY_CART));
+    cartId = contextStore.context.cartId;
   }
-  const cart = await selectCartById(cartId);
+
+  if (!cartId) {
+    return extendCartIfNecessary(EMPTY_CART, shouldExtend);
+  }
+
+  const cart = await getSelectCartByIdAction(cartId).run();
   if (!cart) {
-    return extendCart(toCartDTO(EMPTY_CART));
+    return extendCartIfNecessary(EMPTY_CART, shouldExtend);
+  }
+  return extendCartIfNecessary(cart, shouldExtend);
+}
+
+function extendCartIfNecessary(
+  cart: Cart,
+  shouldExtend: boolean,
+): ExtendedCart | Cart {
+  if (!shouldExtend) {
+    return cart;
   }
   return extendCart(toCartDTO(cart));
-});
+}

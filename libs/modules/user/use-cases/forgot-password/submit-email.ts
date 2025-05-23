@@ -1,4 +1,4 @@
-import { selectUserByEmail } from "@user-db";
+import { getSelectUserByEmailAction } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { sendEmail } from "@sendgrid-adapter";
 import { generateRandomEightDigitCode } from "@number-utils";
@@ -24,7 +24,7 @@ import {
 
 export const submitEmail = async (email: string): Promise<void> => {
   const { country } = contextStore.context;
-  const user = await selectUserByEmail(email);
+  const user = await getSelectUserByEmailAction(email).run();
 
   if (!user) throw errors.USER_NOT_FOUND();
 

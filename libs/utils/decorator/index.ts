@@ -1,6 +1,5 @@
 import { errorResponse, generateErrorResponse } from "@response-entity";
 import { Data, HandlerMethodMapper, httpMethodsSchema } from "@http-entity";
-import { PagesFunction } from "@cloudflare/workers-types";
 import { Env } from "@env-entity";
 
 interface RequestHandlerProps {
