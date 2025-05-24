@@ -46,7 +46,7 @@ export const runBatchOperation = async <Actions extends ActionsType>(
   );
 
   const queries = actions
-    .map((action, index) => action?.query(params[index]))
+    .map((action, index) => action?.query(...(params[index] ?? [])))
     .filter((action) => action !== undefined) as NonEmptyArray<
     BatchItem<"sqlite">
   >;
@@ -54,6 +54,7 @@ export const runBatchOperation = async <Actions extends ActionsType>(
   if (!queries.length) {
     throw Error("No queries provided in batch operation");
   }
+
   const results = await db().batch(queries);
 
   const mappedResults = [];
