@@ -1,9 +1,5 @@
 import { StripeSessionResult } from "@stripe-entity";
-import {
-  getCheckIfOrderExistsAction,
-  getSelectOrdersByIdAction,
-  getInsertOrderAction,
-} from "@order-db";
+import { getSelectOrdersByIdAction, getInsertOrderAction } from "@order-db";
 import {
   getSelectPaymentByIdAction,
   getInsertPaymentReturningIdAction,
@@ -41,9 +37,13 @@ export const getOrderFromSessionResult = async (
 ): Promise<ClientOrder> => {
   logger().addRedactedData({ orderId: sessionResult.id });
 
-  await validateIfOrderAlreadyExists(sessionResult.id);
+  const {
+    payment: checkoutSessionPayment,
+    paymentExists,
+    checkoutSession,
+  } = await getCheckoutData(sessionResult.id, sessionResult);
 
-  const payment = await getPayment(sessionResult);
+  const payment = await getPayment(paymentExists, checkoutSessionPayment);
 
   const {
     products,
@@ -54,7 +54,7 @@ export const getOrderFromSessionResult = async (
     shippingMethod,
     country,
     orderId,
-  } = await getCheckoutSession(sessionResult.id);
+  } = checkoutSession;
 
   logCredentials(cartId, userId);
 
@@ -113,6 +113,10 @@ export const getOrderFromSessionResult = async (
     incrementUserVersionAction = getIncrementUserVersionAction(userId);
   }
 
+  const deleteCheckoutSessionByIdAction = getDeleteCheckoutSessionByIdAction(
+    sessionResult.id,
+  );
+
   const [, , [order]] = await runBatchOperation(
     insertShippingTransactionAction,
     insertOrderAction,
@@ -121,6 +125,7 @@ export const getOrderFromSessionResult = async (
     insertCartAction,
     updateUserAction,
     incrementUserVersionAction,
+    deleteCheckoutSessionByIdAction,
   );
 
   if (!order) {
@@ -148,50 +153,66 @@ export const getOrderFromSessionResult = async (
     text: `Thank you for purchasing with Invern Spirit, your order's total is ${sessionResult.amount_total}`,
   });
 
-  await getDeleteCheckoutSessionByIdAction(sessionResult.id).run();
-
   return clientOrder;
 };
 
-const validateIfOrderAlreadyExists = async (orderId: string): Promise<void> => {
-  const orderAlreadyExists = await getCheckIfOrderExistsAction(orderId).run();
+const getCheckoutData = async (
+  sessionId: string,
+  sessionResult: StripeSessionResult,
+): Promise<{
+  paymentExists: boolean;
+  payment: InsertPayment;
+  checkoutSession: CheckoutSession;
+}> => {
+  const { payment: paymentFromSessionResult } =
+    getPaymentFromSessionResult(sessionResult);
 
-  if (orderAlreadyExists) {
+  const selectCheckoutSessionByIdAction =
+    getSelectCheckoutSessionByIdAction(sessionId);
+
+  const selectPaymentByIdAction = getSelectPaymentByIdAction(
+    paymentFromSessionResult.id,
+  );
+
+  const selectOrdersByIdAction = getSelectOrdersByIdAction(sessionId);
+
+  const [checkoutSession, payment, [order]] = await runBatchOperation(
+    selectCheckoutSessionByIdAction,
+    selectPaymentByIdAction,
+    selectOrdersByIdAction,
+  );
+
+  if (order) {
     throw errors.ORDER_ALREADY_EXISTS();
   }
-};
-
-const getPayment = async (
-  sessionResult: StripeSessionResult,
-): Promise<InsertPayment> => {
-  const { payment } = getPaymentFromSessionResult(sessionResult);
-
-  return withRetry(sessionResult, async () => {
-    const paymentExists = Boolean(
-      await getSelectPaymentByIdAction(payment.id).run(),
-    );
-
-    if (!paymentExists) {
-      await getInsertPaymentReturningIdAction(payment).run();
-    } else {
-      await getUpdatePaymentAction(payment.id, {
-        netAmount: payment.netAmount,
-      }).run();
-    }
-
-    return payment;
-  });
-};
-
-const getCheckoutSession = async (
-  sessionId: string,
-): Promise<CheckoutSession> => {
-  const checkoutSession =
-    await getSelectCheckoutSessionByIdAction(sessionId).run();
 
   if (!checkoutSession) {
     throw new Error("Checkout session not found");
   }
 
-  return checkoutSession;
+  return {
+    paymentExists: Boolean(payment),
+    checkoutSession,
+    payment: paymentFromSessionResult,
+  };
+};
+
+const getPayment = async (
+  paymentExists: boolean,
+  payment: InsertPayment,
+): Promise<InsertPayment> => {
+  return withRetry(
+    [paymentExists, payment],
+    async ([paymentExists, payment]: [boolean, InsertPayment]) => {
+      if (!paymentExists) {
+        await getInsertPaymentReturningIdAction(payment).run();
+      } else {
+        await getUpdatePaymentAction(payment.id, {
+          netAmount: payment.netAmount,
+        }).run();
+      }
+
+      return payment;
+    },
+  );
 };
