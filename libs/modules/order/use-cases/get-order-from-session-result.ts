@@ -37,13 +37,10 @@ export const getOrderFromSessionResult = async (
 ): Promise<ClientOrder> => {
   logger().addRedactedData({ orderId: sessionResult.id });
 
-  const {
-    payment: checkoutSessionPayment,
-    paymentExists,
-    checkoutSession,
-  } = await getCheckoutData(sessionResult.id, sessionResult);
+  const { payment: checkoutSessionPayment, checkoutSession } =
+    await getCheckoutData(sessionResult.id, sessionResult);
 
-  const payment = await getPayment(paymentExists, checkoutSessionPayment);
+  const payment = await getPayment(checkoutSessionPayment);
 
   const {
     products,
@@ -160,7 +157,6 @@ const getCheckoutData = async (
   sessionId: string,
   sessionResult: StripeSessionResult,
 ): Promise<{
-  paymentExists: boolean;
   payment: InsertPayment;
   checkoutSession: CheckoutSession;
 }> => {
@@ -170,15 +166,10 @@ const getCheckoutData = async (
   const selectCheckoutSessionByIdAction =
     getSelectCheckoutSessionByIdAction(sessionId);
 
-  const selectPaymentByIdAction = getSelectPaymentByIdAction(
-    paymentFromSessionResult.id,
-  );
-
   const selectOrdersByIdAction = getSelectOrdersByIdAction(sessionId);
 
-  const [checkoutSession, payment, [order]] = await runBatchOperation(
+  const [checkoutSession, [order]] = await runBatchOperation(
     selectCheckoutSessionByIdAction,
-    selectPaymentByIdAction,
     selectOrdersByIdAction,
   );
 
@@ -191,28 +182,24 @@ const getCheckoutData = async (
   }
 
   return {
-    paymentExists: Boolean(payment),
     checkoutSession,
     payment: paymentFromSessionResult,
   };
 };
 
-const getPayment = async (
-  paymentExists: boolean,
-  payment: InsertPayment,
-): Promise<InsertPayment> => {
-  return withRetry(
-    [paymentExists, payment],
-    async ([paymentExists, payment]: [boolean, InsertPayment]) => {
-      if (!paymentExists) {
-        await getInsertPaymentReturningIdAction(payment).run();
-      } else {
-        await getUpdatePaymentAction(payment.id, {
-          netAmount: payment.netAmount,
-        }).run();
-      }
+const getPayment = async (payment: InsertPayment): Promise<InsertPayment> => {
+  return withRetry(payment, async (payment: InsertPayment) => {
+    const paymentExists = Boolean(
+      await getSelectPaymentByIdAction(payment.id).run(),
+    );
+    if (!paymentExists) {
+      await getInsertPaymentReturningIdAction(payment).run();
+    } else {
+      await getUpdatePaymentAction(payment.id, {
+        netAmount: payment.netAmount,
+      }).run();
+    }
 
-      return payment;
-    },
-  );
+    return payment;
+  });
 };
