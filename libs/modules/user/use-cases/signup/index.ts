@@ -14,8 +14,9 @@ import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
 import { booleanSchema } from "@global-entity";
 import { sendSignupEmail } from "./utils/send-email";
-import { getRandomUUID, hashPassword } from "@crypto-utils";
+import { getRandomUUID } from "@crypto-utils";
 import { runBatchOperation } from "@generics-db";
+import { logCredentials } from "@logger-utils";
 
 export const signupBodySchema = insertUserSchema
   .omit({ cartId: true, id: true })
@@ -43,7 +44,7 @@ export const signup = async (body: unknown): Promise<void> => {
   if (userFromDb) {
     await getUpdateUserAction(userFromDb.id, {
       isOauth: false,
-      password: await hashPassword(parsedBody.password, userFromDb.id),
+      password: parsedBody.password,
     }).run();
     userId = userFromDb.id;
   } else {
@@ -69,7 +70,7 @@ export const signup = async (body: unknown): Promise<void> => {
 
     const insertUserAction = getInsertUserAction({
       ...parsedBody,
-      password: await hashPassword(parsedBody.password, userId),
+      password: parsedBody.password,
       cartId: contextStore.context.cartId,
       id: userId,
     });
@@ -86,6 +87,8 @@ export const signup = async (body: unknown): Promise<void> => {
   }
 
   const user = await getSelectUserByIdAction(userId).run();
+
+  logCredentials(user?.cart?.id, userId);
 
   const { cart } = user ?? {};
 

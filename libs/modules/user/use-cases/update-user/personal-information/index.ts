@@ -5,15 +5,18 @@ import { updateName } from "./utils/update-name";
 import { updateAddress } from "./utils/update-address";
 import { getSelectUserByIdAction } from "@user-db";
 import { UserDTO, userDTOSchema } from "@user-entity";
+import { logCredentials } from "@logger-utils";
 
 export const updateUserPersonalInformation = async (
   body: unknown,
 ): Promise<UserDTO> => {
-  const { userId } = contextStore.context;
+  const { userId, cartId } = contextStore.context;
 
   if (!userId) {
     throw errors.UNAUTHORIZED("not logged in");
   }
+
+  logCredentials(cartId, userId);
 
   const updateUserBody = updatePersonalInformationBodySchema.parse(body);
 

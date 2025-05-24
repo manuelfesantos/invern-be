@@ -3,7 +3,7 @@ import { validateBaseSecret } from "@user-module";
 import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { getLoggedInRefreshToken } from "@jwt-utils";
-import { hashPassword } from "@crypto-utils";
+import { logCredentials } from "@logger-utils";
 
 export const resetForgottenPassword = async (
   password: string,
@@ -12,9 +12,12 @@ export const resetForgottenPassword = async (
 ): Promise<void> => {
   const user = await getSelectUserByEmailAction(email).run();
   if (!user) throw errors.USER_NOT_FOUND();
+
+  logCredentials(user.cart?.id, user.id);
+
   await validateBaseSecret(email, code);
   await getUpdateUserAction(user.id, {
-    password: await hashPassword(password, user.id),
+    password,
   }).run();
   const userRefreshToken = await getLoggedInRefreshToken(user.id);
   await setAuthSecret(user.id, userRefreshToken);

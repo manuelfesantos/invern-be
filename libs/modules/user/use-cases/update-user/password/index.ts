@@ -4,13 +4,16 @@ import { contextStore } from "@context-utils";
 import { updatePasswordBodySchema } from "../types/update-user";
 import { errors } from "@error-handling-utils";
 import { toUserDTO, UserDTO } from "@user-entity";
+import { logCredentials } from "@logger-utils";
 
 export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {
-  const { userId } = contextStore.context;
+  const { userId, cartId } = contextStore.context;
 
   if (!userId) {
     throw new Error("not logged in");
   }
+
+  logCredentials(cartId, userId);
 
   const { currentPassword, newPassword } = updatePasswordBodySchema.parse(body);
 
@@ -28,7 +31,7 @@ export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {
   }
 
   await getUpdateUserAction(userId, {
-    password: await hashPassword(newPassword, userId),
+    password: newPassword,
   }).run();
 
   const updatedUser = await getSelectUserByIdAction(userId).run();

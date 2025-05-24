@@ -37,36 +37,45 @@ export type BaseMapperFunction<QueryFunction extends BaseQueryFunction> = (
   result: Awaited<ReturnType<QueryFunction>>,
 ) => unknown;
 
-export type QueryAction<Handler extends BaseQueryFunction> = (
-  ...params: Parameters<Handler>
-) => {
-  query: () => ReturnType<Handler>;
-  run: () => ReturnType<Handler>;
-};
-
-export type MappedAction<
-  Handler extends BaseQueryFunction,
-  Mapper extends BaseMapperFunction<Handler>,
-> = (...params: Parameters<Handler>) => {
-  run: () => Promise<ReturnType<Mapper>>;
-  query: () => ReturnType<Handler>;
-  map: Mapper;
-};
+export type BasePreProcessorFunction<QueryFunction extends BaseQueryFunction> =
+  (
+    ...args: any[]
+  ) => Parameters<QueryFunction> | Promise<Parameters<QueryFunction>>;
 
 export const actionBuilder = <
   Handler extends BaseQueryFunction,
+  PreProcessor extends
+    | BasePreProcessorFunction<Handler>
+    | undefined = undefined,
   Mapper extends BaseMapperFunction<Handler> | undefined = undefined,
 >(
   handler: Handler,
   mapper?: Mapper,
-): ((...params: Parameters<Handler>) => Action<Handler, Mapper>) => {
-  return (...params: Parameters<Handler>) => {
+  preProcessor?: PreProcessor,
+): ((
+  ...params: PreProcessor extends BasePreProcessorFunction<Handler>
+    ? Parameters<PreProcessor>
+    : Parameters<Handler>
+) => Action<Handler, Mapper, PreProcessor>) => {
+  return (...params) => {
     return {
-      query: (() => handler(...params)) as Handler,
-      run: (mapper
-        ? async () => mapper(await handler(...params))
-        : () => handler(...params)) as Action<Handler, Mapper>["run"],
+      params,
+      query: handler,
+      run: (async () => {
+        let handlerParams = params as
+          | (PreProcessor extends BasePreProcessorFunction<Handler>
+              ? Awaited<ReturnType<PreProcessor>>
+              : Parameters<Handler>)
+          | Parameters<Handler>;
+
+        if (preProcessor) {
+          handlerParams = await preProcessor(...params);
+        }
+        const queryResult = await handler(...handlerParams);
+        return mapper?.(queryResult) ?? queryResult;
+      }) as Action<Handler, Mapper, PreProcessor>["run"],
       map: mapper,
+      preProcess: preProcessor,
     };
   };
 };
@@ -74,12 +83,19 @@ export const actionBuilder = <
 export type Action<
   Handler extends BaseQueryFunction,
   Mapper extends BaseMapperFunction<Handler> | undefined = undefined,
+  PreProcessor extends
+    | BasePreProcessorFunction<Handler>
+    | undefined = undefined,
 > = {
   query: Handler;
   run: Mapper extends BaseMapperFunction<Handler>
     ? () => Promise<ReturnType<Mapper>>
-    : () => ReturnType<Handler>;
+    : () => Promise<ReturnType<Handler>>;
   map?: Mapper;
+  preprocess?: PreProcessor;
+  params: PreProcessor extends BasePreProcessorFunction<Handler>
+    ? Parameters<PreProcessor>
+    : Parameters<Handler>;
 };
 
 export type Result<T extends (...args: any) => any> = Awaited<ReturnType<T>>;

@@ -33,7 +33,7 @@ import { sendEmail } from "@sendgrid-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import { getRandomUUID } from "@crypto-utils";
-import { createOperationBatch } from "@generics-db";
+import { runBatchOperation } from "@generics-db";
 import { withRetry } from "./payment/utils/retry-payment";
 
 export const getOrderFromSessionResult = async (
@@ -110,23 +110,14 @@ export const getOrderFromSessionResult = async (
     await getIncrementUserVersionAction(userId).run();
   }
 
-  const operationBatch = createOperationBatch(
+  const [, , [order]] = await runBatchOperation(
     insertShippingTransactionAction,
     insertOrderAction,
     selectOrdersByIdAction,
+    deleteCartAction,
+    insertCartAction,
+    updateUserAction,
   );
-
-  if (deleteCartAction) {
-    operationBatch.addAction(deleteCartAction);
-  }
-  if (insertCartAction) {
-    operationBatch.addAction(insertCartAction);
-  }
-  if (updateUserAction) {
-    operationBatch.addAction(updateUserAction);
-  }
-
-  const [, , [order]] = await operationBatch.run();
 
   if (!order) {
     throw new Error("Unable to create order");

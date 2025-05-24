@@ -3,6 +3,7 @@ import { db } from "@db";
 import { usersTable } from "@schema";
 import { eq, sql } from "drizzle-orm";
 import { actionBuilder, Result } from "@generics-db";
+import { hashPassword } from "@crypto-utils";
 
 const ONE_VERSION = 1;
 
@@ -21,6 +22,16 @@ const mapUserFromUpdateQueryResult = (
     ...user,
     version: user.version + ONE_VERSION,
   };
+};
+
+const preProcessUserUpdate = async (
+  userId: string,
+  changes: Partial<InsertUser>,
+): Promise<[userId: string, changes: Partial<InsertUser>]> => {
+  if (changes.password) {
+    changes.password = await hashPassword(changes.password, userId);
+  }
+  return [userId, changes];
 };
 
 const incrementUserVersionQuery = (userId: string) =>
@@ -42,6 +53,7 @@ const mapUserFromncrementVersionQueryResult = async (
 export const getUpdateUserAction = actionBuilder(
   updateUserQuery,
   mapUserFromUpdateQueryResult,
+  preProcessUserUpdate,
 );
 
 export const getIncrementUserVersionAction = actionBuilder(

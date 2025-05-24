@@ -7,62 +7,70 @@ import {
   BaseMapperFunction,
   BaseQueryFunction,
   actionBuilder,
+  BasePreProcessorFunction,
 } from "../actions";
+import { BatchItem } from "drizzle-orm/batch";
 
 const NO_COUNT = 0;
 const FIRST_INDEX = 0;
 
 type BaseAction = Action<
   BaseQueryFunction,
-  BaseMapperFunction<BaseQueryFunction> | undefined
+  BaseMapperFunction<BaseQueryFunction> | undefined,
+  BasePreProcessorFunction<BaseQueryFunction> | undefined
 >;
 
-type ActionsType = NonEmptyArray<BaseAction>;
+type ActionsType = NonEmptyArray<BaseAction | undefined>;
 
-type BatchOperationResult<T extends ActionsType> = {
-  [K in keyof T]: T[K] extends { map?: infer M }
+type ActionFinalReturnType<Action extends BaseAction | undefined> =
+  Action extends {
+    map?: infer M;
+  }
     ? M extends BaseMapperFunction<BaseQueryFunction>
       ? Awaited<ReturnType<M>>
-      : Awaited<ReturnType<T[K]["query"]>>
-    : never;
+      : Awaited<ReturnType<Action["query"]>>
+    : undefined;
+
+type BatchOperationResult<Actions extends ActionsType> = {
+  [K in keyof Actions]: ActionFinalReturnType<Actions[K]>;
 };
 
-export const runBatchOperation = async <const Actions extends ActionsType>(
+export const runBatchOperation = async <Actions extends ActionsType>(
   ...actions: Actions
 ): Promise<BatchOperationResult<Actions>> => {
-  const queries = actions.map((action) => action.query()) as {
-    [K in keyof Actions]: ReturnType<Actions[K]["query"]>;
-  };
+  const params = await Promise.all(
+    actions.map(
+      async (action) =>
+        (await action?.preprocess?.(action.params)) ?? action?.params,
+    ),
+  );
+
+  const queries = actions
+    .map((action, index) => action?.query(params[index]))
+    .filter((action) => action !== undefined) as NonEmptyArray<
+    BatchItem<"sqlite">
+  >;
+
   if (!queries.length) {
     throw Error("No queries provided in batch operation");
   }
   const results = await db().batch(queries);
 
   const mappedResults = [];
+  let resultsIndex = 0;
 
   for (let i = 0; i < actions.length; i++) {
-    mappedResults[i] = (await actions[i].map?.(results[i])) ?? results[i];
+    if (actions[i] !== undefined) {
+      mappedResults[i] =
+        (await actions[i]?.map?.(results[resultsIndex])) ??
+        results[resultsIndex];
+      resultsIndex++;
+    } else {
+      mappedResults[i] = undefined;
+    }
   }
 
   return mappedResults as BatchOperationResult<Actions>;
-};
-
-export const createOperationBatch = <Actions extends ActionsType>(
-  ...args: Actions
-) => {
-  const operationBatch: Actions = [...args];
-  const addAction = <Action extends BaseAction>(action: Action) => {
-    operationBatch.push(action);
-  };
-  const run = async () => {
-    const results = await runBatchOperation(...operationBatch);
-    operationBatch.length = 0;
-    return results;
-  };
-  return {
-    addAction,
-    run,
-  };
 };
 
 const countQuery = <T extends TableConfig>(table: SQLiteTableWithColumns<T>) =>

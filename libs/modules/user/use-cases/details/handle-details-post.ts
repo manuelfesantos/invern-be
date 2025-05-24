@@ -1,6 +1,8 @@
 import { UserDetails, userDetailsSchema } from "@user-entity";
 import { encryptObject } from "@crypto-utils";
 import { requiredObjectSchema } from "@global-entity";
+import { contextStore } from "@context-utils";
+import { logCredentials } from "@logger-utils";
 
 const userDetailsPostPayloadSchema = requiredObjectSchema("Personal Details", {
   personalDetails: userDetailsSchema,
@@ -9,6 +11,10 @@ const userDetailsPostPayloadSchema = requiredObjectSchema("Personal Details", {
 export const handleDetailsPost = async (
   body: unknown,
 ): Promise<{ userDetails: UserDetails; encryptedUserDetails: string }> => {
+  const { userId, cartId } = contextStore.context;
+
+  logCredentials(cartId, userId);
+
   const { personalDetails } = userDetailsPostPayloadSchema.parse(body);
   const encryptedUserDetails = await encryptObject(personalDetails);
   return { userDetails: personalDetails, encryptedUserDetails };
