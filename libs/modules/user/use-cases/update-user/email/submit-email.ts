@@ -8,12 +8,16 @@ import { User, ValidateEmailSecretBody } from "@user-entity";
 import { setValidationSecret } from "@kv-adapter";
 import { sendEmail } from "@sendgrid-adapter";
 import { ENV } from "@env-utils";
+import { logCredentials } from "@logger-utils";
 
 export const updateUserEmail = async (body: unknown): Promise<void> => {
-  const { userId, remember } = contextStore.context;
+  const { userId, remember, cartId } = contextStore.context;
   if (!userId) {
     throw errors.UNAUTHORIZED("not logged in");
   }
+
+  logCredentials(cartId, userId);
+
   const { email } = updateEmailBodySchema.parse(body);
   await checkIfEmailIsTaken(email);
   const user = await getSelectUserByIdAction(userId).run();

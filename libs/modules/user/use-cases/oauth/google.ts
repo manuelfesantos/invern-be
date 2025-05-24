@@ -1,6 +1,6 @@
 import { InsertUser, User, userSchema } from "@user-entity";
 import { getRandomUUID, hashString } from "@crypto-utils";
-import { logger } from "@logger-utils";
+import { logCredentials, logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import {
   getInsertUserAction,
@@ -12,6 +12,7 @@ import {
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { getInsertCartAction } from "@cart-db";
+import { runBatchOperation } from "@generics-db";
 
 const FIRST_NAME = 0;
 const LAST_NAME = 1;
@@ -46,6 +47,9 @@ export const getGoogleOauthUser = async (
         googleUserId: hashedGoogleUserId,
       }).run();
     }
+
+    logCredentials(dbUser.cart?.id, dbUser.id);
+
     let refreshToken = await getAuthSecret(dbUser.id);
 
     if (!refreshToken) {
@@ -63,6 +67,8 @@ export const getGoogleOauthUser = async (
     await getSelectUserByGoogleUserIdAction(hashedGoogleUserId).run();
 
   if (dbGoogleUser) {
+    logCredentials(dbGoogleUser.cart?.id, dbGoogleUser.id);
+
     let refreshToken = await getAuthSecret(dbGoogleUser.id);
 
     if (!refreshToken) {
@@ -80,7 +86,10 @@ export const getGoogleOauthUser = async (
 
   const cartId = getRandomUUID();
 
-  await getInsertCartAction({ isLoggedIn: true, id: cartId }).run();
+  const insertCartAction = getInsertCartAction({
+    isLoggedIn: true,
+    id: cartId,
+  });
 
   const newUser: InsertUser = {
     id: getRandomUUID(),
@@ -99,9 +108,15 @@ export const getGoogleOauthUser = async (
     },
   });
 
-  await getInsertUserAction(newUser).run();
+  const insertUserAction = getInsertUserAction(newUser);
 
-  const user = await getSelectUserByIdAction(newUser.id).run();
+  const selectUserAction = getSelectUserByIdAction(newUser.id);
+
+  const [, , user] = await runBatchOperation(
+    insertCartAction,
+    insertUserAction,
+    selectUserAction,
+  );
 
   const refreshToken = await getLoggedInRefreshToken(newUser.id);
 

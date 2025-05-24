@@ -4,6 +4,7 @@ import { contextStore } from "@context-utils";
 import { ResponseContext } from "@http-entity";
 import { extendCart } from "@extender-utils";
 import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
+import { logCredentials } from "@logger-utils";
 
 interface ReturnType {
   responseContext: ResponseContext;
@@ -11,7 +12,9 @@ interface ReturnType {
 }
 
 export const logout = async (): Promise<ReturnType> => {
-  const { isLoggedOut } = contextStore.context;
+  const { isLoggedOut, userId, cartId } = contextStore.context;
+
+  logCredentials(cartId, userId);
 
   if (isLoggedOut) {
     throw errors.UNAUTHORIZED("not logged in");

@@ -43,12 +43,12 @@ export const login = async (body: unknown): Promise<ReturnType> => {
 
   const user = await getUser(email);
 
+  logCredentials(user.cart?.id, user.id);
+
   await validatePassword(password, user);
 
   const { id: userId } = user;
   const { id: cartId } = user.cart ?? {};
-
-  logCredentials(cartId, userId);
 
   if (!user.cart) {
     const newCartId = getRandomUUID();

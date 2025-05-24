@@ -2,6 +2,7 @@ import { getSelectUserByIdAction } from "@user-db";
 import { UserDTO, toUserDTO, User } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
+import { logCredentials } from "@logger-utils";
 
 export async function getUser(userId?: string): Promise<UserDTO>;
 export async function getUser(userId: string, shouldDTO: false): Promise<User>;
@@ -20,5 +21,7 @@ export async function getUser(
   if (!user) {
     throw errors.USER_NOT_FOUND();
   }
+
+  logCredentials(user.cart?.id, user.id);
   return shouldDTO ? toUserDTO(user) : user;
 }

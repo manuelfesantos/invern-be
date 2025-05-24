@@ -13,7 +13,7 @@ import { getValidationSecret, setValidationSecret } from "@kv-adapter";
 import queryString from "query-string";
 import { ENV } from "@env-utils";
 import { contextStore } from "@context-utils";
-import { logger } from "@logger-utils";
+import { logCredentials, logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import {
   MAX_EMAILS_SENT,
@@ -27,6 +27,8 @@ export const submitEmail = async (email: string): Promise<void> => {
   const user = await getSelectUserByEmailAction(email).run();
 
   if (!user) throw errors.USER_NOT_FOUND();
+
+  logCredentials(user.cart?.id, user.id);
 
   logger().info("requesting password reset for user", {
     useCase: LoggerUseCaseEnum.FORGOT_PASSWORD,
