@@ -28,14 +28,14 @@ export const patchCartItemQuantity = async (
 
   if (finalQuantity > stock) throw errors.PRODUCT_OUT_OF_STOCK(stock);
 
-  const cartOperation = getCartOperation(
+  const cartOperationType = getCartOperationType(
     quantity,
     cartQuantity,
     finalQuantity,
     stock,
   );
 
-  const cart = await cartOperationMap[cartOperation](
+  const cart = await cartOperationMap[cartOperationType](
     productId,
     cartId,
     finalQuantity,
@@ -44,7 +44,7 @@ export const patchCartItemQuantity = async (
   return extendCart(toCartDTO(cart));
 };
 
-const getCartOperation = (
+const getCartOperationType = (
   quantity: number,
   cartQuantity: number,
   finalQuantity: number,
