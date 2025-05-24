@@ -93,6 +93,9 @@ export const getOrderFromSessionResult = async (
     undefined;
   let updateUserAction: ReturnType<typeof getUpdateUserAction> | undefined =
     undefined;
+  let incrementUserVersionAction:
+    | ReturnType<typeof getIncrementUserVersionAction>
+    | undefined = undefined;
   if (cartId) {
     deleteCartAction = getDeleteCartAction(cartId);
     if (userId) {
@@ -107,7 +110,7 @@ export const getOrderFromSessionResult = async (
   }
 
   if (userId) {
-    await getIncrementUserVersionAction(userId).run();
+    incrementUserVersionAction = getIncrementUserVersionAction(userId);
   }
 
   const [, , [order]] = await runBatchOperation(
@@ -117,6 +120,7 @@ export const getOrderFromSessionResult = async (
     deleteCartAction,
     insertCartAction,
     updateUserAction,
+    incrementUserVersionAction,
   );
 
   if (!order) {
