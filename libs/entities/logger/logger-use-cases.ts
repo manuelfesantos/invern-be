@@ -22,6 +22,7 @@ const cartUseCasesSchema = [
   "MERGE_CART",
   "VALIDATE_CART_ID",
   "DELETE_EXPIRED_CARTS",
+  "DELETE_CART",
 ] as const;
 
 const userUseCasesSchema = [
@@ -41,6 +42,7 @@ const orderUseCasesSchema = [
   "CREATE_ORDER",
   "UPDATE_ORDER",
   "GET_PAYMENT_INTENT",
+  "DELETE_ORDER",
 ] as const;
 
 const r2BucketUseCasesSchema = [

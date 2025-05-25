@@ -10,7 +10,7 @@ const insertCartQuery = (insertCart: InsertCart) => {
     useCase: LoggerUseCaseEnum.CREATE_CART,
     data: insertCart,
   });
-  db().insert(cartsTable).values(insertCart).returning({
+  return db().insert(cartsTable).values(insertCart).returning({
     cartId: cartsTable.id,
   });
 };

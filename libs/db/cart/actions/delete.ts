@@ -3,9 +3,18 @@ import { and, eq, lt } from "drizzle-orm";
 import { db } from "@db";
 import { actionBuilder } from "@generics-db";
 import { CART_EXPIRY, getPastDate } from "@timer-utils";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
-const deleteCartQuery = (cartId: string) =>
-  db().delete(cartsTable).where(eq(cartsTable.id, cartId));
+const deleteCartQuery = (cartId: string) => {
+  logger().info("deleting cart", {
+    useCase: LoggerUseCaseEnum.DELETE_CART,
+    data: {
+      cartId,
+    },
+  });
+  return db().delete(cartsTable).where(eq(cartsTable.id, cartId));
+};
 
 const deleteProductFromCartQuery = (productId: string, cartId: string) =>
   db()
