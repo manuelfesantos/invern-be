@@ -6,6 +6,7 @@ import { logger } from "@logger-utils";
 import { isStripePaymentIntent, StripeEvent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { requestHandler } from "@decorator-utils";
+import { Buffer } from "node:buffer";
 
 // eslint-disable-next-line import/no-restricted-paths
 import { stripe } from "@stripe-adapter";
