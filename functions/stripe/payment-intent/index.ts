@@ -1,22 +1,43 @@
-import { successResponse } from "@response-entity";
-import { getBodyFromRequest, isStripeEnvValid } from "@http-utils";
+import { errorResponse, successResponse } from "@response-entity";
+import { isStripeEnvValid } from "@http-utils";
 import { mapPaymentIntentEvent } from "@order-module";
 import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
-import { isStripeEvent, isStripePaymentIntent } from "@stripe-entity";
+import { isStripePaymentIntent, StripeEvent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { requestHandler } from "@decorator-utils";
+
+// eslint-disable-next-line import/no-restricted-paths
+import { stripe } from "@stripe-adapter";
+import { ENV } from "@env-utils";
 
 const POST: PagesFunction = async (context) => {
   const { request } = context;
 
-  const body = await getBodyFromRequest(request);
+  const bodyBuffer = Buffer.from(await request.arrayBuffer());
 
-  if (!isStripeEvent(body)) {
-    throw errors.INVALID_PAYLOAD("Payload is not a Stripe Event");
+  let event: StripeEvent;
+
+  const sig = request.headers.get("stripe-signature");
+
+  if (!sig) {
+    return errorResponse.UNAUTHORIZED();
   }
 
-  const paymentIntent = body.data.object;
+  try {
+    event = await stripe().webhooks.constructEventAsync(
+      bodyBuffer,
+      sig,
+      ENV.STRIPE_PAYMENT_SECRET,
+    );
+  } catch (err) {
+    if (err instanceof Error) {
+      return errorResponse.BAD_REQUEST(`Webhook Error: ${err.message}`);
+    }
+    return errorResponse.BAD_REQUEST(`Webhook Error: Unknown error: ${err}`);
+  }
+
+  const paymentIntent = event.data.object;
 
   if (!isStripePaymentIntent(paymentIntent)) {
     throw errors.INVALID_PAYLOAD(
@@ -29,10 +50,10 @@ const POST: PagesFunction = async (context) => {
   }
 
   logger().addRedactedData({
-    checkoutPaymentIntent: stringifyObject(body),
+    checkoutPaymentIntent: stringifyObject(event),
   });
 
-  const payment = await mapPaymentIntentEvent(paymentIntent, body.type);
+  const payment = await mapPaymentIntentEvent(paymentIntent, event.type);
 
   logger().addRedactedData({ createdPayment: stringifyObject(payment) });
   return successResponse.OK("success getting checkout-session");

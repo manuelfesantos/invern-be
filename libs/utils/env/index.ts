@@ -157,6 +157,14 @@ class EnvironmentService {
   get IMAGES_HOST(): string {
     return this.var("IMAGES_HOST");
   }
+
+  get STRIPE_CHECKOUT_SECRET(): string {
+    return this.var("STRIPE_CHECKOUT_SECRET");
+  }
+
+  get STRIPE_PAYMENT_SECRET(): string {
+    return this.var("STRIPE_PAYMENT_SECRET");
+  }
 }
 
 export const ENV = EnvironmentService.getInstance();
