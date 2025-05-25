@@ -1,7 +1,8 @@
 import { cartsTable, productsToCartsTable } from "@schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, lt } from "drizzle-orm";
 import { db } from "@db";
 import { actionBuilder } from "@generics-db";
+import { CART_EXPIRY, getPastDate } from "@timer-utils";
 
 const deleteCartQuery = (cartId: string) =>
   db().delete(cartsTable).where(eq(cartsTable.id, cartId));
@@ -16,8 +17,26 @@ const deleteProductFromCartQuery = (productId: string, cartId: string) =>
       ),
     );
 
+const deleteExpiredCartsQuery = () =>
+  db()
+    .delete(cartsTable)
+    .where(
+      and(
+        lt(
+          cartsTable.lastModifiedAt,
+          new Date(getPastDate(CART_EXPIRY, "milliseconds")).toISOString(),
+        ),
+        eq(cartsTable.isLoggedIn, false),
+      ),
+    )
+    .returning({ id: cartsTable.id });
+
 export const getDeleteCartAction = actionBuilder(deleteCartQuery);
 
 export const getDeleteProductFromCartAction = actionBuilder(
   deleteProductFromCartQuery,
+);
+
+export const getDeleteExpiredCartsAction = actionBuilder(
+  deleteExpiredCartsQuery,
 );

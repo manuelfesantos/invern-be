@@ -2,11 +2,18 @@ import { db } from "@db";
 import { cartsTable, productsToCartsTable } from "@schema";
 import { actionBuilder } from "@generics-db";
 import { InsertCart } from "@cart-entity";
+import { logger } from "@logger-utils";
+import { LoggerUseCaseEnum } from "@logger-entity";
 
-const insertCartQuery = (insertCart: InsertCart) =>
+const insertCartQuery = (insertCart: InsertCart) => {
+  logger().info(`inserting cart with id ${insertCart.id}`, {
+    useCase: LoggerUseCaseEnum.CREATE_CART,
+    data: insertCart,
+  });
   db().insert(cartsTable).values(insertCart).returning({
     cartId: cartsTable.id,
   });
+};
 
 const insertProductInCartQuery = (
   productId: string,

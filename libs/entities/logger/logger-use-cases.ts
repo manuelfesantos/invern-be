@@ -14,12 +14,14 @@ const productUseCasesSchema = [
 
 const cartUseCasesSchema = [
   "GET_CART",
+  "CREATE_CART",
   "ADD_TO_CART",
   "REMOVE_FROM_CART",
   "UPDATE_CART",
   "EMPTY_CART",
   "MERGE_CART",
   "VALIDATE_CART_ID",
+  "DELETE_EXPIRED_CARTS",
 ] as const;
 
 const userUseCasesSchema = [

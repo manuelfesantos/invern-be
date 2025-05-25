@@ -26,14 +26,23 @@ export const TOKEN_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 export const SESSION_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;
 export const SIGNUP_EMAIL_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;
 export const FORGOT_SECRET_EXPIRY = SECONDS_IN_MINUTE * TEN_MINUTES;
+export const CART_EXPIRY = SECONDS_IN_DAY * DAYS_IN_WEEK * TWO_WEEKS;
 export const FORGOT_SECRET_LOCKED_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 
 export const getFutureDate = (
-  time: number,
+  timeInSeconds: number,
   format: "seconds" | "milliseconds" = "seconds",
 ): number =>
   (Number((Date.now() / MILLISECONDS_IN_SECOND).toFixed(NO_FRACTION_DIGITS)) +
-    time) *
+    timeInSeconds) *
+  (format === "milliseconds" ? MILLISECONDS_IN_SECOND : ONE);
+
+export const getPastDate = (
+  timeInSeconds: number,
+  format: "seconds" | "milliseconds" = "seconds",
+): number =>
+  (Number((Date.now() / MILLISECONDS_IN_SECOND).toFixed(NO_FRACTION_DIGITS)) -
+    timeInSeconds) *
   (format === "milliseconds" ? MILLISECONDS_IN_SECOND : ONE);
 
 export const getCurrentTime = (): number => {
