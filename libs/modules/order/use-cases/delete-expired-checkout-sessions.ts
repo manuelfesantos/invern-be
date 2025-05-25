@@ -6,7 +6,7 @@ import { CheckoutSession } from "@checkout-session-entity";
 import { getIncreaseProductsStockAction } from "@product-db";
 import { stockClient } from "@r2-adapter";
 
-export const checkExpiredCheckoutSessions = async (): Promise<string> => {
+export const deleteExpiredCheckoutSessions = async (): Promise<string> => {
   const expiredSessions = await getPopExpiredCheckoutSessionsAction().run();
   if (!expiredSessions.length) {
     return "No sessions were expired";

@@ -2,7 +2,7 @@ import { protectedSuccessResponse } from "@response-entity";
 import { getUserOrders } from "@order-module";
 import { requestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { errors } from "@error-handling-utils";
 
 const GET: PagesFunction = async () => {

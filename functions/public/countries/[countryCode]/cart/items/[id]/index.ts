@@ -13,7 +13,7 @@ import {
   removeCartItem,
 } from "@cart-module";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { contextStore } from "@context-utils";
 
 const cartItemUpdateBodySchema = z.object({

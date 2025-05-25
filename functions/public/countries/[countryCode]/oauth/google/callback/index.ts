@@ -1,5 +1,5 @@
 import { google } from "worker-auth-providers";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
 import {

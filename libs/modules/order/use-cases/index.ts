@@ -6,7 +6,7 @@ export * from "./get-order";
 export * from "./get-user-orders";
 export * from "./handle-session-expired-event";
 export * from "./invalidate-checkout-session";
-export * from "./check-expired-checkout-sessions";
+export * from "./delete-expired-checkout-sessions";
 export * from "./checkout/review";
 export * from "./get-all-orders";
 export * from "./cancel-order";

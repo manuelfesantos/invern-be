@@ -1,7 +1,7 @@
 import { deleteUser, getUser } from "@user-module";
 import { protectedSuccessResponse, successResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { deleteCheckoutCookiesFromResponse } from "@http-utils";
 
 const GET: PagesFunction = async () => {

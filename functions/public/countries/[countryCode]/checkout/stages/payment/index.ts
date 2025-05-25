@@ -4,7 +4,7 @@ import { getCheckoutSession } from "@order-module";
 import { encrypt } from "@crypto-utils";
 import { CookieNameEnum } from "@http-entity";
 import { SESSION_EXPIRY } from "@timer-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { isCheckoutStageEnabled, checkoutRequestHandler } from "@context-utils";
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";

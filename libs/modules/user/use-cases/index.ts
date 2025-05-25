@@ -10,3 +10,4 @@ export * from "./signup/validate-user";
 export * from "./signup/resend-email";
 export * from "./oauth";
 export * from "./get-all-users";
+export * from "./delete-expired-users";

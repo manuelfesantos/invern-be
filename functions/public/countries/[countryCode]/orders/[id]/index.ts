@@ -1,7 +1,7 @@
 import { successResponse } from "@response-entity";
 import { getOrder } from "@order-module";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { setCustomerEmailCookieInResponse } from "@http-utils";
 import { encrypt } from "@crypto-utils";
 

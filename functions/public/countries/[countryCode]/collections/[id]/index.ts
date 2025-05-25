@@ -5,7 +5,7 @@ import {
   updateCollection,
 } from "@collection-module";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { getBodyFromRequest } from "@http-utils";
 
 const GET: PagesFunction = async ({ params }): Promise<Response> => {
