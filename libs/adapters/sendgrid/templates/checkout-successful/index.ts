@@ -30,7 +30,7 @@ export const buildCheckoutSuccessfulTemplate = (
         order.payment?.grossAmount || getGrossAmountFromOrder(order),
       ),
       currency: order.country.currency.symbol,
-      order_url: `${ENV.FRONTEND_HOST}/${order.country.code.toLowerCase()}/orders/${order.id}`,
+      order_url: `${ENV.FRONTEND_HOST}/${order.country.code.toLowerCase()}/order?id=${order.id}`,
       support_email: from,
     },
     from,
@@ -57,7 +57,7 @@ const getProductsTemplateFromOrder = (
     quantity: product.quantity,
     price: getPrice(product.priceInCents * product.quantity),
     currency: order.country.currency.symbol,
-    url: `${ENV.FRONTEND_HOST}/${order.country.code.toLowerCase()}/products/${product.id}`,
+    url: `${ENV.FRONTEND_HOST}/${order.country.code.toLowerCase()}/shop/products/${product.id}`,
   }));
 
 const getOrderPriceFromProducts = (products: Order["products"]): number =>
