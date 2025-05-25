@@ -1,5 +1,5 @@
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import {
   deleteCheckoutCookiesFromResponse,
   deleteCookieFromResponse,

@@ -1,3 +1,5 @@
+import { SECONDS_IN_MINUTE, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
+
 export const MAX_EMAILS_SENT = 3;
 export const ONE_ATTEMPT = 1;
-export const SECRET_EXPIRY_MINUTES = 10;
+export const SECRET_EXPIRY_MINUTES = SIGNUP_EMAIL_EXPIRY / SECONDS_IN_MINUTE;

@@ -2,7 +2,8 @@ import { actionBuilder, Result } from "@generics-db";
 import { BaseUser, baseUserSchema } from "@user-entity";
 import { db } from "@db";
 import { usersTable } from "@schema";
-import { eq } from "drizzle-orm";
+import { and, eq, lt } from "drizzle-orm";
+import { getPastDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
 
 const FIRST_INDEX = 0;
 
@@ -16,7 +17,28 @@ const mapUserFromDeleteResult = (
   return baseUserSchema.parse(firstResult);
 };
 
+const deleteExpiredUsersQuery = () =>
+  db()
+    .delete(usersTable)
+    .where(
+      and(
+        eq(usersTable.isOauth, false),
+        eq(usersTable.isValidated, false),
+        lt(
+          usersTable.createdAt,
+          new Date(
+            getPastDate(SIGNUP_EMAIL_EXPIRY, "milliseconds"),
+          ).toISOString(),
+        ),
+      ),
+    )
+    .returning({ id: usersTable.id });
+
 export const getDeleteUserAction = actionBuilder(
   deleteUserQuery,
   mapUserFromDeleteResult,
+);
+
+export const getDeleteExpiredUsersAction = actionBuilder(
+  deleteExpiredUsersQuery,
 );

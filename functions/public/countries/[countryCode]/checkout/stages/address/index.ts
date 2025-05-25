@@ -5,7 +5,7 @@ import {
   setCookieInResponse,
 } from "@http-utils";
 import { getAddress, handleAddressPost } from "@address-module";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { CookieNameEnum } from "@http-entity";
 import {
   contextStore,

@@ -13,7 +13,7 @@ const NO_FRACTION_DIGITS = 0;
 
 export const NO_MAX_AGE = 0;
 
-const SECONDS_IN_MINUTE = 60;
+export const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * MINUTES_IN_HOUR;
 const HOURS_IN_DAY = 24;

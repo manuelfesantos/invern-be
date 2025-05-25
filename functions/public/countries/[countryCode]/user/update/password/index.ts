@@ -1,4 +1,3 @@
-import { PagesFunction } from "@cloudflare/workers-types";
 import { updateUserPassword } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";

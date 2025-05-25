@@ -11,7 +11,7 @@ import {
 import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const POST: PagesFunction = async (context) => {

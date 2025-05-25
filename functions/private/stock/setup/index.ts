@@ -6,7 +6,7 @@ import { stockClient } from "@r2-adapter";
 import { getSelectProductsAction } from "@product-db";
 /* eslint-enable import/no-restricted-paths */
 import { requestHandler } from "@decorator-utils";
-import { PagesFunction } from "@cloudflare/workers-types";
+
 import { ENV } from "@env-utils";
 
 const bodySchema = z.object({

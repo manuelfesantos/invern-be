@@ -1,4 +1,3 @@
-import { PagesFunction } from "@cloudflare/workers-types";
 import { getBodyFromRequest } from "@http-utils";
 import { protectedSuccessResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";
