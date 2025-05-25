@@ -153,6 +153,10 @@ class EnvironmentService {
   get VALIDATION_KV(): KVNamespace {
     return this.var("VALIDATION_KV");
   }
+
+  get IMAGES_HOST(): string {
+    return this.var("IMAGES_HOST");
+  }
 }
 
 export const ENV = EnvironmentService.getInstance();

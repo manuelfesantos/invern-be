@@ -3,30 +3,23 @@ import { HttpMethodEnum } from "@http-entity";
 import { ENV } from "@env-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
+import { Template } from "./templates";
 
-interface SendEmailContext {
+type SendEmailContext<T extends Record<string, unknown>> = {
   to: string;
-  subject: string;
-  text: string;
-  from?: string;
-  fromName?: string;
-}
+  template: Template<T>;
+};
 
-export const sendEmail = async ({
+export const sendEmail = async <T extends Record<string, unknown>>({
   to,
-  subject,
-  text,
-  from = "info",
-  fromName,
-}: SendEmailContext): Promise<Response> => {
+  template,
+}: SendEmailContext<T>): Promise<Response> => {
   logger().info("sending email", {
     useCase: LoggerUseCaseEnum.SEND_EMAIL,
     data: {
       to,
-      subject,
-      text,
-      from,
-      fromName,
+      from: template.from,
+      fromName: template.fromName,
     },
   });
 
@@ -35,8 +28,8 @@ export const sendEmail = async ({
       personalizations: [
         {
           from: {
-            email: `${from}@${ENV.SENDGRID_DOMAIN}`,
-            name: fromName || ENV.SENDGRID_NAME,
+            email: template.from,
+            name: template.fromName,
           },
           to: [
             {
@@ -44,19 +37,14 @@ export const sendEmail = async ({
               name: to,
             },
           ],
+          dynamic_template_data: template.templateData,
         },
       ],
       from: {
-        email: `${from}@${ENV.SENDGRID_DOMAIN}`,
-        name: fromName || ENV.SENDGRID_NAME,
+        email: template.from,
+        name: template.fromName,
       },
-      subject,
-      content: [
-        {
-          type: "text/plain",
-          value: text,
-        },
-      ],
+      template_id: template.id,
     }),
     headers: {
       Authorization: `Bearer ${ENV.SENDGRID_API_KEY}`,

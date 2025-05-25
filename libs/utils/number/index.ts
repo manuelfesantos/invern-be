@@ -14,5 +14,7 @@ export const generateRandomEightDigitCode = (): string => {
   return randomNumber.toString().padStart(EIGHT_DIGITS, "0");
 };
 
+export const getPrice = (price: number): number => price / NUMBER_100;
+
 export const DEFAULT_PAGE_SIZE = 10;
 export const DEFAULT_PAGE = 1;

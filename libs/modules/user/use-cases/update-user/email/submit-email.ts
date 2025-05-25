@@ -6,9 +6,9 @@ import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
 import { User, ValidateEmailSecretBody } from "@user-entity";
 import { setValidationSecret } from "@kv-adapter";
-import { sendEmail } from "@sendgrid-adapter";
-import { ENV } from "@env-utils";
+import { sendVerifyEmail } from "@sendgrid-adapter";
 import { logCredentials } from "@logger-utils";
+import { SECRET_EXPIRY_MINUTES } from "../utils/values";
 
 export const updateUserEmail = async (body: unknown): Promise<void> => {
   const { userId, remember, cartId } = contextStore.context;
@@ -58,9 +58,5 @@ const sendEmailToUser = async (
   user: User,
   newEmail: string,
 ): Promise<void> => {
-  await sendEmail({
-    to: newEmail,
-    subject: `Welcome to ${ENV.SENDGRID_NAME}`,
-    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${code}. This code will expire in 30 minutes.`,
-  });
+  await sendVerifyEmail(user, code, SECRET_EXPIRY_MINUTES, newEmail);
 };

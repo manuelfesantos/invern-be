@@ -54,7 +54,7 @@ export type Action<
     ? () => Promise<ReturnType<Mapper>>
     : () => Promise<ReturnType<Handler>>;
   map?: Mapper;
-  preprocess?: PreProcessor;
+  preProcess?: PreProcessor;
   params: PreProcessor extends BasePreProcessorFunction<Handler>
     ? Parameters<PreProcessor>
     : Parameters<Handler>;

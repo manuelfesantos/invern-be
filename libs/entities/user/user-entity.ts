@@ -23,7 +23,7 @@ export const baseUserSchema = createInsertSchema(usersTable, {
   role: z.enum(["ADMIN", "USER"]).default("USER"),
   email: emailSchema("user mail"),
   firstName: requiredStringSchema("user first name"),
-  lastName: requiredStringSchema("user last name"),
+  lastName: requiredStringSchema("user last name").optional(),
   googleUserId: requiredStringSchema("user google id").optional(),
   isOauth: booleanSchema("user is oauth").default(false),
   isValidated: booleanSchema("user is validated").default(false),
