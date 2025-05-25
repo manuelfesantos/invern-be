@@ -1,0 +1,1 @@
+export const SECRET_EXPIRY_MINUTES = 10;

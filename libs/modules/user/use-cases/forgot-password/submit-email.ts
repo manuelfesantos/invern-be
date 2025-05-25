@@ -1,6 +1,6 @@
 import { getSelectUserByEmailAction } from "@user-db";
 import { errors } from "@error-handling-utils";
-import { sendEmail } from "@sendgrid-adapter";
+import { sendResetPasswordEmail } from "@sendgrid-adapter";
 import { generateRandomEightDigitCode } from "@number-utils";
 import {
   FORGOT_SECRET_EXPIRY,
@@ -43,11 +43,12 @@ export const submitEmail = async (email: string): Promise<void> => {
     "validate-code": true,
   });
 
-  await sendEmail({
-    to: user.email,
-    subject: "Reset password",
-    text: `Hi ${user.firstName}, here's your password reset code: ${code}. This code will expire in 10 minutes. You can also click on this link to reset your password: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/forgot-password?${queryParams}`,
-  });
+  await sendResetPasswordEmail(
+    user,
+    code,
+    `${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/forgot-password?${queryParams}`,
+    SECRET_EXPIRY_MINUTES,
+  );
 };
 
 const getPasswordResetCode = async (user: User): Promise<string> => {

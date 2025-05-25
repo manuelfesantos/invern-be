@@ -1,8 +1,9 @@
 import { User } from "@user-entity";
 import queryString from "query-string";
-import { sendEmail } from "@sendgrid-adapter";
-import { ENV } from "@env-utils";
+import { sendSignupEmail as sendSignupEmailAdapter } from "@sendgrid-adapter";
 import { contextStore } from "@context-utils";
+import { SECRET_EXPIRY_MINUTES } from "./values";
+import { ENV } from "@env-utils";
 
 export const sendSignupEmail = async (
   user: User,
@@ -14,9 +15,10 @@ export const sendSignupEmail = async (
     code: validationCode,
   });
 
-  await sendEmail({
-    to: user.email,
-    subject: `Welcome to ${ENV.SENDGRID_NAME}`,
-    text: `Hi ${user.firstName}, welcome to ${ENV.SENDGRID_NAME}! Your validation code is: ${validationCode}. This code will expire in 30 minutes. You can also use the following link to sign up: ${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/sign-up/verify-email?${queryParams}`,
-  });
+  await sendSignupEmailAdapter(
+    user,
+    validationCode,
+    SECRET_EXPIRY_MINUTES,
+    `${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/sign-up/verify-email?${queryParams}`,
+  );
 };

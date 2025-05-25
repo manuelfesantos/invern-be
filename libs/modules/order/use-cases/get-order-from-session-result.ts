@@ -25,7 +25,7 @@ import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
 import { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
-import { sendEmail } from "@sendgrid-adapter";
+import { sendCheckoutSuccessfulEmail } from "@sendgrid-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import { getRandomUUID } from "@crypto-utils";
@@ -144,11 +144,7 @@ export const getOrderFromSessionResult = async (
     return clientOrder;
   }
 
-  await sendEmail({
-    to: personalDetails.email || "",
-    subject: "Checkout",
-    text: `Thank you for purchasing with Invern Spirit, your order's total is ${sessionResult.amount_total}`,
-  });
+  await sendCheckoutSuccessfulEmail(order);
 
   return clientOrder;
 };

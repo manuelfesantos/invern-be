@@ -16,6 +16,7 @@ export interface Env {
   COUNTRIES_BUCKET: R2Bucket;
   STOCK_HOST: string;
   COUNTRIES_HOST: string;
+  IMAGES_HOST: string;
   CACHE_API_KEY: string;
   CACHE_API_EMAIL: string;
   ZONE_ID: string;

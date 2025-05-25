@@ -41,7 +41,7 @@ export const runBatchOperation = async <Actions extends ActionsType>(
   const params = await Promise.all(
     actions.map(
       async (action) =>
-        (await action?.preprocess?.(action.params)) ?? action?.params,
+        (await action?.preProcess?.(...action.params)) ?? action?.params,
     ),
   );
 

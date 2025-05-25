@@ -95,7 +95,7 @@ export const getGoogleOauthUser = async (
     id: getRandomUUID(),
     email: googleUser.email,
     firstName: names[FIRST_NAME],
-    lastName: names.slice(LAST_NAME)?.join(" "),
+    lastName: names.slice(LAST_NAME)?.join(" ").trim() || undefined,
     googleUserId: hashedGoogleUserId,
     isOauth: true,
     cartId,
