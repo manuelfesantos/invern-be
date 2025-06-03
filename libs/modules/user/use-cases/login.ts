@@ -12,11 +12,17 @@ import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { ResponseContext } from "@http-entity";
 import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
-import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
+import { Cart, EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
-import { getInsertCartAction } from "@cart-db";
+import {
+  getDeleteCartAction,
+  getInsertCartAction,
+  getSelectCartByIdAction,
+  getUpdateCartAction,
+} from "@cart-db";
 import { z } from "zod";
 import { emailSchema, requiredStringSchema } from "@global-entity";
+import { runBatchOperation } from "@generics-db";
 
 interface ReturnType {
   user: UserDTO;
@@ -31,7 +37,7 @@ export const loginBodySchema = z.object({
 });
 
 export const login = async (body: unknown): Promise<ReturnType> => {
-  const { isLoggedIn } = contextStore.context;
+  const { isLoggedIn, cartId } = contextStore.context;
 
   if (isLoggedIn) {
     throw errors.UNAUTHORIZED("already logged in");
@@ -48,21 +54,25 @@ export const login = async (body: unknown): Promise<ReturnType> => {
   await validatePassword(password, user);
 
   const { id: userId } = user;
-  const { id: cartId } = user.cart ?? {};
 
   if (!user.cart) {
-    const newCartId = getRandomUUID();
-    await getInsertCartAction({
-      isLoggedIn: true,
-      id: newCartId,
-    }).run();
+    if (cartId) {
+      const [, , cart] = await runBatchOperation(
+        getUpdateUserAction(userId, { cartId }),
+        getUpdateCartAction(cartId, {
+          isLoggedIn: true,
+        }),
+        getSelectCartByIdAction(cartId),
+      );
 
-    await getUpdateUserAction(userId, { cartId: newCartId }).run();
-
-    user.cart = {
-      ...EMPTY_CART,
-      id: newCartId,
-    };
+      user.cart = cart ?? (await createCartForUser(userId));
+    } else {
+      user.cart = await createCartForUser(userId);
+    }
+  } else {
+    if (cartId) {
+      await getDeleteCartAction(cartId).run();
+    }
   }
 
   const cart = toCartDTO(user.cart);
@@ -83,6 +93,22 @@ export const login = async (body: unknown): Promise<ReturnType> => {
       refreshToken,
       remember,
     },
+  };
+};
+
+const createCartForUser = async (userId: string): Promise<Cart> => {
+  const cartId = getRandomUUID();
+  await runBatchOperation(
+    getInsertCartAction({
+      isLoggedIn: true,
+      id: cartId,
+    }),
+    getUpdateUserAction(userId, { cartId }),
+  );
+
+  return {
+    ...EMPTY_CART,
+    id: cartId,
   };
 };
 

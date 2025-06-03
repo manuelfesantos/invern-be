@@ -5,6 +5,8 @@ import { getPrice } from "@number-utils";
 
 const FIRST_INDEX = 0;
 const INITIAL_PRICE_VALUE = 0;
+const FIRST_CHARACTER = 0;
+const LAST_MINUTE_CHARACTER = 5;
 
 export const buildCheckoutSuccessfulTemplate = (
   order: Order,
@@ -40,7 +42,7 @@ export const buildCheckoutSuccessfulTemplate = (
 
 const formatDateFromOrderCreatedAt = (date: string): string => {
   const [datePart, timePart] = date.split("T");
-  return `${datePart} ${timePart.split(".")[FIRST_INDEX]}`;
+  return `${datePart} ${timePart.substring(FIRST_CHARACTER, LAST_MINUTE_CHARACTER)}`;
 };
 
 const getShippingAddressFromOrder = (order: Order): string => {

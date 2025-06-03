@@ -11,8 +11,13 @@ import {
 } from "@user-db";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
-import { getInsertCartAction } from "@cart-db";
+import {
+  getDeleteCartAction,
+  getInsertCartAction,
+  getUpdateCartAction,
+} from "@cart-db";
 import { runBatchOperation } from "@generics-db";
+import { contextStore } from "@context-utils";
 
 const FIRST_NAME = 0;
 const LAST_NAME = 1;
@@ -31,6 +36,7 @@ interface GoogleUserResponse {
 export const getGoogleOauthUser = async (
   googleUser: GoogleUserResponse,
 ): Promise<{ user: User; refreshToken: string }> => {
+  const { cartId } = contextStore.context;
   const hashedGoogleUserId = await hashString(googleUser.id);
 
   logger().info("user from google", {
@@ -48,14 +54,9 @@ export const getGoogleOauthUser = async (
       }).run();
     }
 
-    logCredentials(dbUser.cart?.id, dbUser.id);
+    await syncCartWithUser(dbUser);
 
-    let refreshToken = await getAuthSecret(dbUser.id);
-
-    if (!refreshToken) {
-      refreshToken = await getLoggedInRefreshToken(dbUser.id);
-      await setAuthSecret(dbUser.id, refreshToken);
-    }
+    const refreshToken = await getRefreshToken(dbUser);
 
     return {
       user: dbUser,
@@ -67,14 +68,9 @@ export const getGoogleOauthUser = async (
     await getSelectUserByGoogleUserIdAction(hashedGoogleUserId).run();
 
   if (dbGoogleUser) {
-    logCredentials(dbGoogleUser.cart?.id, dbGoogleUser.id);
+    await syncCartWithUser(dbGoogleUser);
 
-    let refreshToken = await getAuthSecret(dbGoogleUser.id);
-
-    if (!refreshToken) {
-      refreshToken = await getLoggedInRefreshToken(dbGoogleUser.id);
-      await setAuthSecret(dbGoogleUser.id, refreshToken);
-    }
+    const refreshToken = await getRefreshToken(dbGoogleUser);
 
     return {
       user: dbGoogleUser,
@@ -84,12 +80,7 @@ export const getGoogleOauthUser = async (
 
   const names = googleUser.name.split(" ");
 
-  const cartId = getRandomUUID();
-
-  const insertCartAction = getInsertCartAction({
-    isLoggedIn: true,
-    id: cartId,
-  });
+  const { cartAction, newCartId } = getCartAction(cartId);
 
   const newUser: InsertUser = {
     id: getRandomUUID(),
@@ -98,7 +89,7 @@ export const getGoogleOauthUser = async (
     lastName: names.slice(LAST_NAME)?.join(" ").trim() || undefined,
     googleUserId: hashedGoogleUserId,
     isOauth: true,
-    cartId,
+    cartId: newCartId,
   };
 
   logger().info("Creating new user", {
@@ -113,17 +104,98 @@ export const getGoogleOauthUser = async (
   const selectUserAction = getSelectUserByIdAction(newUser.id);
 
   const [, , user] = await runBatchOperation(
-    insertCartAction,
+    cartAction,
     insertUserAction,
     selectUserAction,
   );
 
-  const refreshToken = await getLoggedInRefreshToken(newUser.id);
+  if (!user) {
+    throw new Error("User not found after creation");
+  }
 
-  await setAuthSecret(newUser.id, refreshToken);
+  logCredentials(user.cart?.id, user.id);
+
+  const refreshToken = await getLoggedInToken(user.id);
 
   return {
     user: userSchema.parse(user),
     refreshToken,
   };
+};
+
+const getCartAction = (
+  cartId?: string,
+): {
+  cartAction:
+    | ReturnType<typeof getUpdateCartAction>
+    | ReturnType<typeof getInsertCartAction>;
+  newCartId: string;
+} => {
+  let newCartId = cartId;
+
+  let cartAction;
+
+  if (newCartId) {
+    cartAction = getUpdateCartAction(newCartId, { isLoggedIn: true });
+  } else {
+    newCartId = getRandomUUID();
+    cartAction = getInsertCartAction({
+      isLoggedIn: true,
+      id: newCartId,
+    });
+  }
+  return { cartAction, newCartId };
+};
+
+const syncCartWithUser = async (user: User): Promise<User> => {
+  const { cartId } = contextStore.context;
+  if (!user.cart) {
+    if (cartId) {
+      const [, , updatedUser] = await runBatchOperation(
+        getUpdateUserAction(user.id, { cartId }),
+        getUpdateCartAction(cartId, { isLoggedIn: true }),
+        getSelectUserByIdAction(user.id),
+      );
+      if (!updatedUser) {
+        throw new Error("User not found after updating cart");
+      }
+      user.cart = updatedUser.cart;
+    } else {
+      const newCartId = getRandomUUID();
+      const [, , updatedUser] = await runBatchOperation(
+        getInsertCartAction({
+          isLoggedIn: true,
+          id: newCartId,
+        }),
+        getUpdateUserAction(user.id, { cartId: newCartId }),
+        getSelectUserByIdAction(user.id),
+      );
+      if (!updatedUser) {
+        throw new Error("User not found after creating new cart");
+      }
+      user.cart = updatedUser.cart;
+    }
+  } else {
+    if (cartId) {
+      await getDeleteCartAction(cartId).run();
+    }
+  }
+  return user;
+};
+
+const getLoggedInToken = async (userId: string): Promise<string> => {
+  const refreshToken = await getLoggedInRefreshToken(userId);
+  await setAuthSecret(userId, refreshToken);
+  return refreshToken;
+};
+
+const getRefreshToken = async (user: User): Promise<string> => {
+  logCredentials(user.cart?.id, user.id);
+
+  let refreshToken = await getAuthSecret(user.id);
+
+  if (!refreshToken) {
+    refreshToken = await getLoggedInToken(user.id);
+  }
+  return refreshToken;
 };

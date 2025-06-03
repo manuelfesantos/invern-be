@@ -23,9 +23,7 @@ type BaseAction = Action<
 type ActionsType = NonEmptyArray<BaseAction | undefined>;
 
 type ActionFinalReturnType<Action extends BaseAction | undefined> =
-  Action extends {
-    map?: infer M;
-  }
+  Action extends { map?: infer M }
     ? M extends BaseMapperFunction<BaseQueryFunction>
       ? Awaited<ReturnType<M>>
       : Awaited<ReturnType<Action["query"]>>

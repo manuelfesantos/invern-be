@@ -3,6 +3,7 @@ import { google } from "worker-auth-providers";
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
 import {
+  deleteCookieFromResponse,
   getCookies,
   getRememberCookieHeader,
   setCookieInResponse,
@@ -63,6 +64,7 @@ const GET: PagesFunction = async ({ request }) => {
 
   setCookieInResponse(response, getTokenCookie(refreshToken, true));
   setCookieInResponse(response, getRememberCookieHeader());
+  deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
 
   return response;
 };
