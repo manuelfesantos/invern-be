@@ -3,6 +3,7 @@ import { contextStore } from "@context-utils";
 import { ResponseContext } from "@http-entity";
 import { getAnonymousTokens } from "@jwt-utils";
 import { getDeleteUserAction } from "@user-db";
+import { getDeleteCartAction } from "@cart-db";
 
 interface ReturnType {
   responseContext: ResponseContext;
@@ -16,7 +17,11 @@ export const deleteUser = async (userId?: string): Promise<ReturnType> => {
   if (!userId) {
     throw errors.USER_NOT_FOUND();
   }
-  await getDeleteUserAction(userId).run();
+  const { cartId } = await getDeleteUserAction(userId).run();
+
+  if (cartId) {
+    await getDeleteCartAction(cartId).run();
+  }
 
   return {
     responseContext: await getAnonymousTokens(),

@@ -14,6 +14,6 @@ export const getUserDetails = async (): Promise<UserDetails | undefined> => {
   }
 
   if (userId) {
-    return getSelectUserDetailsByIdAction(userId).run();
+    return await getSelectUserDetailsByIdAction(userId).run();
   }
 };
