@@ -9,7 +9,7 @@ import { Country } from "@country-entity";
 
 const SECOND_INDEX = 1;
 
-const protectedEndpoints = ["cart", "checkout", "orders", "user"];
+const protectedEndpoints = ["cart", "checkout", "orders", "user", "oauth"];
 
 type ProtectedContextData = {
   endpoint?: string;
