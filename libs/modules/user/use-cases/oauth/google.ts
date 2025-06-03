@@ -149,6 +149,13 @@ const getCartAction = (
 
 const syncCartWithUser = async (user: User): Promise<User> => {
   const { cartId } = contextStore.context;
+  logger().info("Syncing cart with user", {
+    useCase: LoggerUseCaseEnum.OAUTH_GOOGLE_CALLBACK,
+    data: {
+      userId: user.id,
+      cartId,
+    },
+  });
   if (!user.cart) {
     if (cartId) {
       const [, , updatedUser] = await runBatchOperation(
