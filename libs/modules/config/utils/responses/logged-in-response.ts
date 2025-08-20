@@ -32,6 +32,7 @@ export const loggedInResponse = async (
     "success getting logged in config",
     {
       user: userDTOSchema.parse(user),
+      userID: user.id,
       cart: extendCart(toCartDTO(user.cart || EMPTY_CART)),
     },
     undefined,
