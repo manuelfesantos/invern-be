@@ -51,11 +51,13 @@ const GET: PagesFunction = async ({ request }) => {
     throw errors.USER_NOT_FOUND("no user provided by google");
   }
 
-  const { user, refreshToken } = await getGoogleOauthUser(providerUser);
+  const { user, refreshToken, newUser } =
+      await getGoogleOauthUser(providerUser);
 
   const response = successResponse.OK(
     "Successfully signed in with google oauth",
     {
+      newUser,
       cart: user.cart,
       user,
       accessToken: await getLoggedInToken(user.id, user.cart?.id),

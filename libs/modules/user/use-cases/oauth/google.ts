@@ -35,7 +35,7 @@ interface GoogleUserResponse {
 
 export const getGoogleOauthUser = async (
   googleUser: GoogleUserResponse,
-): Promise<{ user: User; refreshToken: string }> => {
+): Promise<{ user: User; refreshToken: string, newUser: boolean }> => {
   const { cartId } = contextStore.context;
   const hashedGoogleUserId = await hashString(googleUser.id);
 
@@ -59,6 +59,7 @@ export const getGoogleOauthUser = async (
     const refreshToken = await getRefreshToken(dbUser);
 
     return {
+      newUser: false,
       user: dbUser,
       refreshToken,
     };
@@ -73,6 +74,7 @@ export const getGoogleOauthUser = async (
     const refreshToken = await getRefreshToken(dbGoogleUser);
 
     return {
+      newUser: false,
       user: dbGoogleUser,
       refreshToken,
     };
@@ -118,6 +120,7 @@ export const getGoogleOauthUser = async (
   const refreshToken = await getLoggedInToken(user.id);
 
   return {
+    newUser: true,
     user: userSchema.parse(user),
     refreshToken,
   };
