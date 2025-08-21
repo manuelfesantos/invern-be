@@ -77,7 +77,7 @@ export const login = async (body: unknown): Promise<ReturnType> => {
 
   const cart = toCartDTO(user.cart);
 
-  const accessToken = await getLoggedInToken(userId, cartId);
+  const accessToken = await getLoggedInToken(userId, user.cart.id);
   let refreshToken = await getAuthSecret(userId);
 
   if (!refreshToken) {
