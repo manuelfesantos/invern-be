@@ -10,7 +10,7 @@ import {
 } from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 
-const cartOperationSchema = z.enum(["ADD", "REMOVE", "UPDATE"]);
+const cartOperationSchema = z.enum(["ADD", "REMOVE", "UPDATE", "UPSERT"]);
 
 const baseCartSchema = createSelectSchema(cartsTable, {
   id: uuidSchema("cart id"),

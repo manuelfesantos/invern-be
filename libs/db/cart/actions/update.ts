@@ -22,8 +22,29 @@ const updateProductQuantityInCartQuery = (
       ),
     );
 
+const upsertProductQuantityInCartQuery = (
+  productId: string,
+  cartId: string,
+  quantity: number,
+) =>
+  db()
+    .insert(productsToCartsTable)
+    .values({
+      productId,
+      cartId,
+      quantity,
+    })
+    .onConflictDoUpdate({
+      target: [productsToCartsTable.productId, productsToCartsTable.cartId],
+      set: { quantity },
+    });
+
 export const getUpdateCartAction = actionBuilder(updateCartQuery);
 
 export const getUpdateProductQuantityInCartAction = actionBuilder(
   updateProductQuantityInCartQuery,
+);
+
+export const getUpsertProductQuantityInCartAction = actionBuilder(
+  upsertProductQuantityInCartQuery,
 );
