@@ -1,15 +1,15 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { Country } from "@country-entity";
-import { CheckoutStage } from "./checkout-context/types";
+import type { Country } from "@country-entity";
+import type { CheckoutStage } from "./checkout-context/types";
 import { firstStage } from "./checkout-context/stages";
-import { CheckoutStageName } from "@checkout-session-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
 
 class Context {
   private _cartId?: string;
   private _userId?: string;
   private _country?: Country;
   private _accessToken?: string;
-  private _refreshToken: string = "";
+  private _refreshToken = "";
   private _remember?: boolean;
   private _address?: string;
   private _userDetails?: string;

@@ -1,4 +1,4 @@
-import { InsertProduct } from "@product-entity";
+import type { InsertProduct } from "@product-entity";
 import { productsTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";

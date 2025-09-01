@@ -1,4 +1,4 @@
-import { VerifyEmailTemplate } from "./types";
+import type { VerifyEmailTemplate } from "./types";
 import { ENV } from "@env-utils";
 
 export const buildVerifyEmailTemplate = ({

@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
-import { SQLiteSelectBase } from "drizzle-orm/sqlite-core/query-builders/select";
-import { GetSelectTableName } from "drizzle-orm/query-builders/select.types";
-import {
+import type { SQLiteRelationalQuery } from "drizzle-orm/sqlite-core/query-builders/query";
+import type { SQLiteSelectBase } from "drizzle-orm/sqlite-core/query-builders/select";
+import type { GetSelectTableName } from "drizzle-orm/query-builders/select.types";
+import type {
   SQLiteDeleteWithout,
   SQLiteInsertWithout,
   SQLiteSelect,
   SQLiteTableWithColumns,
   SQLiteUpdateWithout,
 } from "drizzle-orm/sqlite-core";
-import { SQL } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 
 export type BaseQueryFunction = (
   ...args: any[]

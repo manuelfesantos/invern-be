@@ -2,7 +2,7 @@ import { getRandomUUID } from "@crypto-utils";
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { productsTable } from "@schema";
-import { InsertProduct } from "@product-entity";
+import type { InsertProduct } from "@product-entity";
 
 const getProductsList = (): InsertProduct[] => [
   {

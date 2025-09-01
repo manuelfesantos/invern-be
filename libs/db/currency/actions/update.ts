@@ -1,4 +1,4 @@
-import { InsertCurrency } from "@currency-entity";
+import type { InsertCurrency } from "@currency-entity";
 import { currenciesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";

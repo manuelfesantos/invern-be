@@ -10,12 +10,10 @@ const validateCodeBodySchema = z.object({
   email: emailSchema("customer email"),
 });
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { code, email } = validateCodeBodySchema.parse(body);
   await validateCode(code, email);
 
   return protectedSuccessResponse.OK("Code validated successfully");
-};
-
-export const onRequest = requestHandler({ POST });
+});

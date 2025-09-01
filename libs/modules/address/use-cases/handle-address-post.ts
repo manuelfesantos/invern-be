@@ -1,4 +1,5 @@
-import { Address, insertAddressSchema } from "@address-entity";
+import type { Address} from "@address-entity";
+import { insertAddressSchema } from "@address-entity";
 import { contextStore } from "@context-utils";
 import { getUpdateUserAction } from "@user-db";
 import { encryptObject } from "@crypto-utils";

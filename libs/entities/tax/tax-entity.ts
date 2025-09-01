@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { taxesTable } from "@schema";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   dateTimeSchema,
   positiveIntegerSchema,

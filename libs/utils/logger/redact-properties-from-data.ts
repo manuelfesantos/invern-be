@@ -1,7 +1,7 @@
 const redactedProperties = ["accessToken"];
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RedactedObject = { [key: string]: any };
+type RedactedObject = Record<string, any>;
 
 export const redactPropertiesFromData = (
   data: unknown,

@@ -1,4 +1,4 @@
-import { Template } from "../types";
+import type { Template } from "../types";
 
 type CheckoutSuccessfulProductTemplateData = {
   image_url: string;

@@ -6,7 +6,8 @@ import {
   setCartIdCookieInResponse,
 } from "@http-utils";
 import { getSelectCartByIdAction } from "@cart-db";
-import { Cart, EMPTY_CART, toCartDTO } from "@cart-entity";
+import type { Cart} from "@cart-entity";
+import { EMPTY_CART, toCartDTO } from "@cart-entity";
 import { CookieNameEnum } from "@http-entity";
 import { extendCart } from "@extender-utils";
 import { logCredentials } from "@logger-utils";

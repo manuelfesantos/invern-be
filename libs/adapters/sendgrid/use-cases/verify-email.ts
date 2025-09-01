@@ -1,4 +1,4 @@
-import { User } from "@user-entity";
+import type { User } from "@user-entity";
 import { sendEmail } from "../send-email";
 import { buildVerifyEmailTemplate } from "../templates";
 

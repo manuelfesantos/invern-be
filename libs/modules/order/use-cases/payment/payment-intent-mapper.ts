@@ -1,4 +1,4 @@
-import { Payment } from "@payment-entity";
+import type { Payment } from "@payment-entity";
 import {
   getPaymentFromPaymentIntentCanceledEvent,
   getPaymentFromPaymentIntentCreatedEvent,
@@ -10,7 +10,7 @@ import { z } from "zod";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { withRetry } from "./utils/retry-payment";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 
 const paymentIntentEventMap = {
   "payment_intent.created": getPaymentFromPaymentIntentCreatedEvent,

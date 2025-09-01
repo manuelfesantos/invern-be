@@ -1,11 +1,11 @@
 import { getAllOrders } from "@order-module";
 import { successResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";
-import { Order } from "@order-entity";
+import type { Order } from "@order-entity";
 
 const NO_ORDERS = 0;
 
-const GET: PagesFunction = async ({ request }) => {
+export const onRequestGet = requestHandler(async ({ request }) => {
   const { searchParams } = new URL(request.url);
   let orders: Order[] = [];
   let count: number = NO_ORDERS;
@@ -39,6 +39,4 @@ const GET: PagesFunction = async ({ request }) => {
   }
 
   return successResponse.OK("Orders fetched successfully", { count, orders });
-};
-
-export const onRequest = requestHandler({ GET });
+});

@@ -1,6 +1,6 @@
 import { productsTable } from "@schema";
 import { db } from "@db";
-import { InsertProduct } from "@product-entity";
+import type { InsertProduct } from "@product-entity";
 import { getRandomUUID } from "@crypto-utils";
 import { actionBuilder } from "@generics-db";
 

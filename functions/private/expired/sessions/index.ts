@@ -2,9 +2,7 @@ import { deleteExpiredCheckoutSessions } from "@order-module";
 import { requestHandler } from "@decorator-utils";
 import { successResponse } from "@response-entity";
 
-const DELETE: PagesFunction = async () => {
+export const onRequestDelete = requestHandler(async () => {
   const responseMessage = await deleteExpiredCheckoutSessions();
   return successResponse.OK(responseMessage);
-};
-
-export const onRequest = requestHandler({ DELETE });
+});

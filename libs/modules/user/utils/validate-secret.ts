@@ -1,4 +1,4 @@
-import {
+import type {
   BaseValidationSecretBody,
   ValidateEmailSecretBody,
 } from "@user-entity";

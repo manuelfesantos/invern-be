@@ -1,4 +1,4 @@
-import { InsertImage } from "@image-entity";
+import type { InsertImage } from "@image-entity";
 import { imagesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";

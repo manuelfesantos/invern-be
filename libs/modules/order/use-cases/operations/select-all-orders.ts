@@ -1,4 +1,4 @@
-import { Order } from "@order-entity";
+import type { Order } from "@order-entity";
 import { runBatchOperationWithCount } from "@generics-db";
 import { ordersTable } from "@schema";
 import { getSelectOrdersAction } from "@order-db";

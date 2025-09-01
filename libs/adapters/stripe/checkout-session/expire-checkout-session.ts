@@ -1,5 +1,5 @@
 import { stripe } from "../stripe-client";
-import { StripeCheckoutSessionResponse } from "@stripe-entity";
+import type { StripeCheckoutSessionResponse } from "@stripe-entity";
 
 export const expireCheckoutSession = async (
   checkoutSessionId: string,

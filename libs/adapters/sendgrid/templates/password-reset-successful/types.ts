@@ -1,4 +1,4 @@
-import { Template } from "../types";
+import type { Template } from "../types";
 
 type PasswordResetSuccessfulTemplateData = {
   brand_logo_url: string;

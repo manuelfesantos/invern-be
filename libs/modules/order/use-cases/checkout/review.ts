@@ -1,10 +1,13 @@
-import { UserDetails, userDetailsSchema } from "@user-entity";
-import { Address } from "@address-entity";
+import type { UserDetails} from "@user-entity";
+import { userDetailsSchema } from "@user-entity";
+import type { Address } from "@address-entity";
+import type {
+  SelectedShippingMethod} from "@shipping-entity";
 import {
-  SelectedShippingMethod,
   selectedShippingMethodSchema,
 } from "@shipping-entity";
-import { ExtendedCart, getCartWeight, toCartDTO } from "@cart-entity";
+import type { ExtendedCart} from "@cart-entity";
+import { getCartWeight, toCartDTO } from "@cart-entity";
 import { contextStore } from "@context-utils";
 import { validateCartId } from "@cart-db";
 import { getSelectShippingMethodAction } from "@shipping-db";

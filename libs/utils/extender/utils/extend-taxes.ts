@@ -1,4 +1,4 @@
-import { ExtendedClientTax, Tax } from "@tax-entity";
+import type { ExtendedClientTax, Tax } from "@tax-entity";
 import { calculateTaxAmount } from "./calculate-tax-amount";
 
 export const extendTaxes = (price: number, taxes: Tax[]): ExtendedClientTax[] =>

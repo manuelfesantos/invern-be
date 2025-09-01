@@ -8,6 +8,7 @@ import {
 import { z } from "zod";
 import { integerSchema } from "@global-entity";
 import { updateCartItemQuantity, removeCartItem } from "@cart-module";
+import type { RequestHandlerProps } from "@decorator-utils";
 import { requestHandler } from "@decorator-utils";
 
 import { contextStore } from "@context-utils";
@@ -16,7 +17,14 @@ const cartItemUpdateBodySchema = z.object({
   quantity: integerSchema("cart item quantity"),
 });
 
-const PUT: PagesFunction = async ({ request, params }) => {
+const handlerOptions: RequestHandlerProps = {
+  postProcess: (response) => {
+    deleteShippingMethodCookieFromResponse(response);
+    return response;
+  },
+};
+
+export const onRequestPut = requestHandler(async ({ request, params }) => {
   const { id: productId } = params;
 
   const body = await getBodyFromRequest(request);
@@ -37,10 +45,10 @@ const PUT: PagesFunction = async ({ request, params }) => {
   }
 
   return response;
-};
+}, handlerOptions);
 
 // Deprecated for now
-// const PATCH: PagesFunction = async ({ request, params }) => {
+// export const onRequestPatch = requestHandler(async ({ request, params }) => {
 //   const { id: productId } = params;
 //
 //   const body = await getBodyFromRequest(request);
@@ -62,7 +70,7 @@ const PUT: PagesFunction = async ({ request, params }) => {
 //   return response;
 // };
 
-const DELETE: PagesFunction = async ({ params }) => {
+export const onRequestDelete = requestHandler(async ({ params }) => {
   const { id: productId } = params;
 
   const cart = await removeCartItem(productId as string);
@@ -80,14 +88,4 @@ const DELETE: PagesFunction = async ({ params }) => {
   }
 
   return response;
-};
-
-export const onRequest = requestHandler(
-  { PUT, DELETE },
-  {
-    postProcess: (response) => {
-      deleteShippingMethodCookieFromResponse(response);
-      return response;
-    },
-  },
-);
+}, handlerOptions);

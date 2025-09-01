@@ -1,4 +1,4 @@
-import { Template } from "../types";
+import type { Template } from "../types";
 
 type VerifyEmailTemplateData = {
   brand_logo_url: string;

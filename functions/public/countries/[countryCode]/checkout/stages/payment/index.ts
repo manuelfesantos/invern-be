@@ -9,31 +9,32 @@ import { isCheckoutStageEnabled, checkoutRequestHandler } from "@context-utils";
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
-const GET: PagesFunction = async ({ request }): Promise<Response> => {
-  if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
-    throw errors.NOT_ALLOWED("Payment checkout stage is not enabled");
-  }
+export const onRequestGet = checkoutRequestHandler(
+  async ({ request }): Promise<Response> => {
+    if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
+      throw errors.NOT_ALLOWED("Payment checkout stage is not enabled");
+    }
 
-  const { headers } = request;
+    const { headers } = request;
 
-  const origin = headers.get("origin") || undefined;
-  const { url, checkoutSessionId } = await getCheckoutSession(origin);
+    const origin = headers.get("origin") || undefined;
+    const { url, checkoutSessionId } = await getCheckoutSession(origin);
 
-  const checkoutSessionToken = await encrypt(checkoutSessionId);
+    const checkoutSessionToken = await encrypt(checkoutSessionId);
 
-  const checkoutSessionCookie = getCookieHeader(
-    CookieNameEnum.CHECKOUT_SESSION,
-    checkoutSessionToken,
-    SESSION_EXPIRY,
-  );
+    const checkoutSessionCookie = getCookieHeader(
+      CookieNameEnum.CHECKOUT_SESSION,
+      checkoutSessionToken,
+      SESSION_EXPIRY,
+    );
 
-  const response = protectedSuccessResponse.OK("checkout session created", {
-    url,
-  });
+    const response = protectedSuccessResponse.OK("checkout session created", {
+      url,
+    });
 
-  setCookieInResponse(response, checkoutSessionCookie);
+    setCookieInResponse(response, checkoutSessionCookie);
 
-  return response;
-};
-
-export const onRequest = checkoutRequestHandler({ GET }, null);
+    return response;
+  },
+  null,
+);

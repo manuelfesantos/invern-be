@@ -1,4 +1,4 @@
-import { InsertAddress } from "@address-entity";
+import type { InsertAddress } from "@address-entity";
 import { getUpdateUserAction } from "@user-db";
 import { encryptObject } from "@crypto-utils";
 import { contextStore } from "@context-utils";

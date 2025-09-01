@@ -1,4 +1,4 @@
-import { InsertCountry } from "@country-entity";
+import type { InsertCountry } from "@country-entity";
 import { countriesTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";

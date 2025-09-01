@@ -5,7 +5,7 @@ import { requestHandler } from "@decorator-utils";
 import { setCustomerEmailCookieInResponse } from "@http-utils";
 import { encrypt } from "@crypto-utils";
 
-const GET: PagesFunction = async (context) => {
+export const onRequestGet = requestHandler(async (context) => {
   const { params, request } = context;
   const { id } = params;
   const email = request.headers.get("x-user-email");
@@ -18,6 +18,4 @@ const GET: PagesFunction = async (context) => {
   }
 
   return response;
-};
-
-export const onRequest = requestHandler({ GET });
+});

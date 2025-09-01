@@ -1,9 +1,12 @@
-import { eq, SQL } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { ordersTable } from "@schema";
 import { db } from "@db";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@number-utils";
-import { baseOrderSchema, Order } from "@order-entity";
-import { actionBuilder, Result } from "@generics-db";
+import type { Order } from "@order-entity";
+import { baseOrderSchema } from "@order-entity";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectOrdersQuery = (
   where?: "id" | "userId" | "paymentId" | "shippingTransactionId" | "stripeId",

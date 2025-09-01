@@ -4,7 +4,8 @@ import { updatePersonalInformationBodySchema } from "../types/update-user";
 import { updateName } from "./utils/update-name";
 import { updateAddress } from "./utils/update-address";
 import { getSelectUserByIdAction } from "@user-db";
-import { UserDTO, userDTOSchema } from "@user-entity";
+import type { UserDTO} from "@user-entity";
+import { userDTOSchema } from "@user-entity";
 import { logCredentials } from "@logger-utils";
 
 export const updateUserPersonalInformation = async (

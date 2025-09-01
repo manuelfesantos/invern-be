@@ -1,4 +1,4 @@
-import { CheckoutStage } from "./types";
+import type { CheckoutStage } from "./types";
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 
 const reviewStage: CheckoutStage = {

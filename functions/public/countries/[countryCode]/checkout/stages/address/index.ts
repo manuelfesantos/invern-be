@@ -17,7 +17,7 @@ import {
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
@@ -40,9 +40,9 @@ const POST: PagesFunction = async ({ request }) => {
   );
 
   return response;
-};
+}, CheckoutStageNameEnum.ADDRESS);
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = checkoutRequestHandler(async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
     throw errors.NOT_ALLOWED("Address checkout stage is not enabled");
   }
@@ -51,9 +51,4 @@ const GET: PagesFunction = async () => {
     ...(address && { address }),
     availableCheckoutStages: getClientCheckoutStages(),
   });
-};
-
-export const onRequest = checkoutRequestHandler(
-  { POST, GET },
-  CheckoutStageNameEnum.ADDRESS,
-);
+}, CheckoutStageNameEnum.ADDRESS);

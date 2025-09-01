@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { imagesTable } from "@schema";
-import { InsertImage } from "@image-entity";
+import type { InsertImage } from "@image-entity";
 
 const FIRST_COLLECTION_IMAGE_INDEX = 0;
 const SECOND_COLLECTION_IMAGE_INDEX = 16;

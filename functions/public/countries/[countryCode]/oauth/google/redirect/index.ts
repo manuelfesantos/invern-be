@@ -7,7 +7,7 @@ import { CookieNameEnum } from "@http-entity";
 import queryString from "query-string";
 import { ENV } from "@env-utils";
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = requestHandler(async () => {
   const { country } = contextStore.context;
   const oauthToken = await encrypt(Date.now().toString());
   const state = { country: country.code.toLowerCase(), oauthToken };
@@ -37,6 +37,4 @@ const GET: PagesFunction = async () => {
   );
 
   return response;
-};
-
-export const onRequest = requestHandler({ GET });
+});

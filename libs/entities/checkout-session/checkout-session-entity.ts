@@ -1,6 +1,7 @@
 import { checkoutSessionsTable } from "@schema";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { optional, z } from "zod";
+import type { z } from "zod";
+import { optional } from "zod";
 import { lineItemSchema } from "@product-entity";
 import {
   dateTimeSchema,

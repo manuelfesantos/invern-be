@@ -1,4 +1,4 @@
-import { StripeSessionResult } from "@stripe-entity";
+import type { StripeSessionResult } from "@stripe-entity";
 import { getIncreaseProductsStockAction } from "@product-db";
 import { stockClient } from "@r2-adapter";
 import { getPopCheckoutSessionByIdAction } from "@checkout-session-db";

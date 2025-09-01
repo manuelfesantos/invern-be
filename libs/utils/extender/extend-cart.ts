@@ -1,7 +1,8 @@
-import { CartDTO, ExtendedCart, extendedCartSchema } from "@cart-entity";
+import type { CartDTO, ExtendedCart} from "@cart-entity";
+import { extendedCartSchema } from "@cart-entity";
 import { extendTaxes } from "./utils/extend-taxes";
 import { getTaxedPrice } from "./utils/get-taxed-price";
-import { ExtendedLineItem } from "@product-entity";
+import type { ExtendedLineItem } from "@product-entity";
 import { extendLineItem } from "./utils/extend-line-item";
 import { contextStore } from "@context-utils";
 

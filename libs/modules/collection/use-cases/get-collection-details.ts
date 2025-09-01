@@ -1,9 +1,9 @@
 import { getSelectCollectionByIdAction } from "@collection-db";
-import { HttpParams } from "@http-entity";
+import type { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { extendProduct } from "@extender-utils";
-import {
+import type {
   CollectionDetails,
   ExtendedCollectionDetails,
 } from "@collection-entity";

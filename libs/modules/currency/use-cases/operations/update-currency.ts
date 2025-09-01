@@ -1,4 +1,4 @@
-import { Currency, InsertCurrency } from "@currency-entity";
+import type { Currency, InsertCurrency } from "@currency-entity";
 import { runBatchOperation } from "@generics-db";
 import {
   getSelectCurrencyByCodeAction,

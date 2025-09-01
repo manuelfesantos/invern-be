@@ -1,5 +1,6 @@
+import type {
+  ValidateEmailSecretBody} from "@user-entity";
 import {
-  ValidateEmailSecretBody,
   validateEmailSecretBodySchema,
 } from "@user-entity";
 import {

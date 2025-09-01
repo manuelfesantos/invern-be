@@ -1,5 +1,6 @@
+import type {
+  SelectedShippingMethod} from "@shipping-entity";
 import {
-  SelectedShippingMethod,
   selectedShippingMethodSchema,
 } from "@shipping-entity";
 import { z } from "zod";

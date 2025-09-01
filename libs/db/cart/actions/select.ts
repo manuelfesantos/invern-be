@@ -2,8 +2,10 @@ import { db } from "@db";
 import { DEFAULT_PAGE } from "@number-utils";
 import { and, eq } from "drizzle-orm";
 import { cartsTable, productsToCartsTable } from "@schema";
-import { Cart, cartSchema } from "@cart-entity";
-import { actionBuilder, Result } from "@generics-db";
+import type { Cart} from "@cart-entity";
+import { cartSchema } from "@cart-entity";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectAllCartsQuery = (page: number, pageSize: number) =>
   db().query.cartsTable.findMany({

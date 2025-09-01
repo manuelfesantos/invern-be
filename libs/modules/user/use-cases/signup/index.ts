@@ -6,7 +6,8 @@ import {
 } from "@user-db";
 import { getInsertCartAction, getUpdateCartAction } from "@cart-db";
 import { errors } from "@error-handling-utils";
-import { insertUserSchema, User, ValidateEmailSecretBody } from "@user-entity";
+import type { User, ValidateEmailSecretBody } from "@user-entity";
+import { insertUserSchema } from "@user-entity";
 import { setAuthSecret, setValidationSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { contextStore } from "@context-utils";

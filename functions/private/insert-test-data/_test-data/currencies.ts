@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { currenciesTable } from "@schema";
-import { InsertCurrency } from "@currency-entity";
+import type { InsertCurrency } from "@currency-entity";
 
 const currenciesList: InsertCurrency[] = [
   {

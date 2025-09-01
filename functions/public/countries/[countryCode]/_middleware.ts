@@ -5,7 +5,7 @@ import { contextStore } from "@context-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { logCredentials } from "@logger-utils";
 import { countryCache } from "@cache-utils";
-import { Country } from "@country-entity";
+import type { Country } from "@country-entity";
 
 const SECOND_INDEX = 1;
 

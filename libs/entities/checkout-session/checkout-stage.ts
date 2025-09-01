@@ -1,4 +1,5 @@
-import { CookieName, CookieNameEnum } from "@http-entity";
+import type { CookieName} from "@http-entity";
+import { CookieNameEnum } from "@http-entity";
 
 export const CheckoutStageNameEnum = {
   ADDRESS: "address",

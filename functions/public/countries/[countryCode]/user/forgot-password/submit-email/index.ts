@@ -9,13 +9,11 @@ const forgotPasswordBodySchema = z.object({
   email: emailSchema("customer email"),
 });
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { email } = forgotPasswordBodySchema.parse(body);
 
   await submitEmail(email);
 
   return protectedSuccessResponse.OK("Email sent successfully");
-};
-
-export const onRequest = requestHandler({ POST });
+});

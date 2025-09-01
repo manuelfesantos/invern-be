@@ -1,5 +1,5 @@
 import { db } from "@db";
-import { InsertPaymentMethod } from "@payment-entity";
+import type { InsertPaymentMethod } from "@payment-entity";
 import { paymentMethodsTable } from "@schema";
 import { actionBuilder } from "@generics-db";
 

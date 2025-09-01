@@ -1,7 +1,7 @@
 import { collectionsTable } from "@schema";
 import { getRandomUUID } from "@crypto-utils";
 import { db } from "@db";
-import { InsertCollection } from "@collection-entity";
+import type { InsertCollection } from "@collection-entity";
 import { actionBuilder } from "@generics-db";
 
 export const insertCollectionQuery = (collection: InsertCollection) => {

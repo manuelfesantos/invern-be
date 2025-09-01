@@ -1,5 +1,6 @@
+import type {
+  ProductIdAndQuantity} from "@product-entity";
 import {
-  ProductIdAndQuantity,
   productIdAndQuantityArraySchema,
 } from "@product-entity";
 

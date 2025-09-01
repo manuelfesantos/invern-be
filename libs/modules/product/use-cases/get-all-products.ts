@@ -4,7 +4,7 @@ import {
 } from "@product-db";
 import { logger } from "@logger-utils";
 import { extendProduct } from "@extender-utils";
-import { ExtendedProduct, Product } from "@product-entity";
+import type { ExtendedProduct, Product } from "@product-entity";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
 export async function getAllProducts(

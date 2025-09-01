@@ -2,7 +2,7 @@ import { getPopExpiredCheckoutSessionsAction } from "@checkout-session-db";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
-import { CheckoutSession } from "@checkout-session-entity";
+import type { CheckoutSession } from "@checkout-session-entity";
 import { getIncreaseProductsStockAction } from "@product-db";
 import { stockClient } from "@r2-adapter";
 

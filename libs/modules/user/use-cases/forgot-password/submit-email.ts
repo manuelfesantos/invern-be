@@ -8,7 +8,7 @@ import {
   getFutureDate,
   isDateInFuture,
 } from "@timer-utils";
-import { BaseValidationSecretBody, User } from "@user-entity";
+import type { BaseValidationSecretBody, User } from "@user-entity";
 import { getValidationSecret, setValidationSecret } from "@kv-adapter";
 import queryString from "query-string";
 import { ENV } from "@env-utils";

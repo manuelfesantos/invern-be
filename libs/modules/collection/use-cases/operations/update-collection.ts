@@ -1,4 +1,4 @@
-import { CollectionDetails, InsertCollection } from "@collection-entity";
+import type { CollectionDetails, InsertCollection } from "@collection-entity";
 import { runBatchOperation } from "@generics-db";
 import {
   getSelectCollectionByIdAction,

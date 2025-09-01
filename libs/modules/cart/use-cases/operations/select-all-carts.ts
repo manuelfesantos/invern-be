@@ -1,4 +1,4 @@
-import { Cart } from "@cart-entity";
+import type { Cart } from "@cart-entity";
 import { runBatchOperationWithCount } from "@generics-db";
 import { cartsTable } from "@schema";
 import { getSelectAllCartsAction } from "@cart-db";

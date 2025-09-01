@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { countriesTable } from "@schema";
-import { InsertCountry } from "@country-entity";
+import type { InsertCountry } from "@country-entity";
 
 const countriesList: InsertCountry[] = [
   {

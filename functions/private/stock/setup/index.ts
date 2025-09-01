@@ -15,7 +15,7 @@ const bodySchema = z.object({
 
 const NO_STOCK = 0;
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
   const { secretKey } = bodySchema.parse(body);
   if (!secretKey || secretKey !== ENV.SETUP_STOCK_SECRET) {
@@ -32,6 +32,4 @@ const POST: PagesFunction = async ({ request }) => {
   await stockClient.updateMany(products);
 
   return successResponse.OK("success setting up stock in bucket");
-};
-
-export const onRequest = requestHandler({ POST });
+});

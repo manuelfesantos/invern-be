@@ -1,4 +1,4 @@
-import { InsertTax } from "@tax-entity";
+import type { InsertTax } from "@tax-entity";
 import { getRandomUUID } from "@crypto-utils";
 import { taxesTable } from "@schema";
 import { db } from "@db";

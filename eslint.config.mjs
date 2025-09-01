@@ -7,7 +7,8 @@ export default defineConfig([
   globalIgnores(["docs/*", "scripts/*"]),
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.strict,
+  ...tseslint.configs.stylistic,
   {
     plugins: {
       import: pluginImport,
@@ -30,6 +31,8 @@ export default defineConfig([
         },
       ],
       "@typescript-eslint/no-magic-numbers": "error",
+      "@typescript-eslint/consistent-type-definitions": "off",
+      "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-restricted-imports": [
         "error",
         {

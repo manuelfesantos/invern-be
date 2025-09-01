@@ -1,4 +1,5 @@
-import { insertProductSchema, ProductDetails } from "@product-entity";
+import type { ProductDetails } from "@product-entity";
+import { insertProductSchema } from "@product-entity";
 import { updateProductOperation } from "./operations/update-product";
 export const updateProduct = async (
   id: string,

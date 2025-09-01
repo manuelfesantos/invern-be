@@ -6,7 +6,7 @@ import {
 } from "../jwt-utils";
 import { errors } from "@error-handling-utils";
 import { getAnonymousToken } from "../get-anonymous-tokens";
-import { UserJWT } from "@jwt-entity";
+import type { UserJWT } from "@jwt-entity";
 import {
   getAddressFromHeaders,
   getCustomerEmailFromHeaders,
@@ -21,7 +21,7 @@ import { getAuthSecret } from "@kv-adapter";
 import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { getInsertCartAction } from "@cart-db";
 /* eslint-enable import/no-restricted-paths */
-import { Credentials } from "@request-entity";
+import type { Credentials } from "@request-entity";
 import { getRandomUUID } from "@crypto-utils";
 
 export const getCredentials = async (

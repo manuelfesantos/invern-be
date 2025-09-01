@@ -1,4 +1,4 @@
-import { InsertShippingRate } from "@shipping-entity";
+import type { InsertShippingRate } from "@shipping-entity";
 import { db } from "@db";
 import { shippingRatesTable } from "@schema";
 import { eq } from "drizzle-orm";

@@ -1,8 +1,8 @@
-import { errorResponse, generateErrorResponse } from "@response-entity";
-import { Data, HandlerMethodMapper, httpMethodsSchema } from "@http-entity";
-import { Env } from "@env-entity";
+import { generateErrorResponse } from "@response-entity";
+import type { Data } from "@http-entity";
+import type { Env } from "@env-entity";
 
-interface RequestHandlerProps {
+export interface RequestHandlerProps {
   errorHandler?: (error: unknown) => Response;
   preProcess?: () => void;
   postProcess?: (response: Response) => Response;
@@ -38,16 +38,12 @@ export const middlewareRequestHandler = <T extends Data>(
 };
 
 export const requestHandler = <T extends Data>(
-  methodMapper: HandlerMethodMapper<T>,
+  handler: PagesFunction<Env, string, T>,
   { errorHandler, preProcess, postProcess }: RequestHandlerProps = {},
 ): PagesFunction<Env, string, T> => {
   return async (context) => {
-    const method = httpMethodsSchema.safeParse(context.request.method);
-    if (!method.success || !methodMapper[method.data]) {
-      return errorResponse.METHOD_NOT_ALLOWED();
-    }
     const response = await tryCatchWrapper(
-      methodMapper[method.data]!,
+      handler,
       errorHandler,
       preProcess,
     )(context);

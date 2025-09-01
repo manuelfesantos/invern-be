@@ -1,6 +1,5 @@
-import honeyCombPlugin, {
-  PluginData,
-} from "@cloudflare/pages-plugin-honeycomb";
+import type { PluginData } from "@cloudflare/pages-plugin-honeycomb";
+import honeyCombPlugin from "@cloudflare/pages-plugin-honeycomb";
 import { HttpMethodEnum } from "@http-entity";
 import { withLogger } from "@logger-utils";
 import { middlewareRequestHandler } from "@decorator-utils";

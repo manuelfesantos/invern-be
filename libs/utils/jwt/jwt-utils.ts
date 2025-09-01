@@ -1,4 +1,5 @@
-import { JWT, jwtSchema, UserJWT, userJwtSchema } from "@jwt-entity";
+import type { JWT, UserJWT} from "@jwt-entity";
+import { jwtSchema, userJwtSchema } from "@jwt-entity";
 import {
   getFutureDate,
   TOKEN_COOKIE_MAX_AGE,

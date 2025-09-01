@@ -1,10 +1,11 @@
-import { ShippingRate } from "@shipping-entity";
+import type { ShippingRate } from "@shipping-entity";
 
 import { db } from "@db";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingRatesTable } from "@schema";
 import { countryCodeSchema } from "@global-entity";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectShippingRateByIdQuery = (id: string) =>
   db().query.shippingRatesTable.findFirst({

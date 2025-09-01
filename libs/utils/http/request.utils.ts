@@ -1,5 +1,5 @@
 import { HttpMethodEnum } from "@http-entity";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { logger } from "@logger-utils";
 import { errors } from "@error-handling-utils";
 import { ENV } from "@env-utils";

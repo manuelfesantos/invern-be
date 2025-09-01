@@ -1,10 +1,12 @@
 import { contextStore } from "@context-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
-import { Address, addressSchema } from "@address-entity";
+import type { Address} from "@address-entity";
+import { addressSchema } from "@address-entity";
 import { userDetailsSchema } from "@user-entity";
+import type {
+  CheckoutStageName} from "@checkout-session-entity";
 import {
-  CheckoutStageNameEnum,
-  CheckoutStageName,
+  CheckoutStageNameEnum
 } from "@checkout-session-entity";
 import { uuidSchema } from "@global-entity";
 

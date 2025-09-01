@@ -1,4 +1,4 @@
-import { Country } from "@country-entity";
+import type { Country } from "@country-entity";
 
 const countriesMap = new Map<string, Country>();
 

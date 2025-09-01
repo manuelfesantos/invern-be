@@ -1,4 +1,4 @@
-import { EmailChangeSuccessfulTemplate } from "./types";
+import type { EmailChangeSuccessfulTemplate } from "./types";
 import { ENV } from "@env-utils";
 
 export const buildEmailChangeSuccessfulTemplate = ({

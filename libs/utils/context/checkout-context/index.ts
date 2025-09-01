@@ -1,16 +1,18 @@
 import { contextStore } from "../context-store";
 import { validations } from "./validations";
 import { firstStage } from "./stages";
+import type {
+  CheckoutStageName} from "@checkout-session-entity";
 import {
-  CheckoutStageName,
   checkoutStageToCookie,
 } from "@checkout-session-entity";
-import {
+import type {
   CheckoutStage,
-  ClientCheckoutStage,
+  ClientCheckoutStage} from "./types";
+import {
   clientCheckoutStageSchema,
 } from "./types";
-import { CookieName } from "@http-entity";
+import type { CookieName } from "@http-entity";
 
 export const setupCheckoutStages = async (): Promise<void> => {
   let stage: CheckoutStage = firstStage;

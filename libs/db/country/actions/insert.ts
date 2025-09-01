@@ -1,6 +1,6 @@
 import { db } from "@db";
 import { countriesTable } from "@schema";
-import { InsertCountry } from "@country-entity";
+import type { InsertCountry } from "@country-entity";
 import { actionBuilder } from "@generics-db";
 
 const insertCountryQuery = (country: InsertCountry) =>

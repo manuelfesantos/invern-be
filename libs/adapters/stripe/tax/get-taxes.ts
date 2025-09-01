@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { stripe } from "@stripe-adapter";
 
 export const getStripeTaxes = async (): Promise<Stripe.TaxRate[]> => {

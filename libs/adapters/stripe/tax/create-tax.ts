@@ -1,5 +1,5 @@
 import { stripe } from "@stripe-adapter";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 
 export const createStripeTax = async ({
   countryCode,

@@ -3,7 +3,7 @@ import { HttpMethodEnum } from "@http-entity";
 import { ENV } from "@env-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { Template } from "./templates";
+import type { Template } from "./templates";
 
 type SendEmailContext<T extends Record<string, unknown>> = {
   to: string;

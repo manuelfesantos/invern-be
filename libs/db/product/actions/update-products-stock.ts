@@ -1,4 +1,4 @@
-import { ProductIdAndQuantity } from "@product-entity";
+import type { ProductIdAndQuantity } from "@product-entity";
 import { inArray, sql } from "drizzle-orm";
 import { db } from "@db";
 import { productsTable } from "@schema";

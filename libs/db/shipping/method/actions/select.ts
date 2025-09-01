@@ -1,10 +1,11 @@
-import { ShippingMethod } from "@shipping-entity";
+import type { ShippingMethod } from "@shipping-entity";
 
 import { db } from "@db";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingMethodsTable, shippingRatesTable } from "@schema";
 import { countryCodeSchema } from "@global-entity";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectShippingMethodQuery = (id: string, weight?: number) =>
   db().query.shippingMethodsTable.findFirst({

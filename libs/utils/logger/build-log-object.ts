@@ -1,4 +1,4 @@
-import { LoggerUseCase } from "@logger-entity";
+import type { LoggerUseCase } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 
 export const buildLogObject = (

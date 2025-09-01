@@ -1,6 +1,7 @@
 import { createClient } from "@libsql/client";
 import { ENV } from "@env-utils";
-import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
+import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "@db-schema";
 
 let dbClient: LibSQLDatabase<typeof schema> | null = null;

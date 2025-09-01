@@ -1,6 +1,6 @@
 import { paymentMethodsTable } from "@schema";
 import { eq } from "drizzle-orm";
-import { PaymentMethod } from "@payment-entity";
+import type { PaymentMethod } from "@payment-entity";
 import { db } from "@db";
 import { actionBuilder } from "@generics-db";
 

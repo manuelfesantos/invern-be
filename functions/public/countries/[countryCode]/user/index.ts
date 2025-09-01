@@ -4,12 +4,12 @@ import { requestHandler } from "@decorator-utils";
 
 import { deleteCheckoutCookiesFromResponse } from "@http-utils";
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = requestHandler(async () => {
   const user = await getUser();
   return successResponse.OK("Successfully got user", user);
-};
+});
 
-const DELETE: PagesFunction = async () => {
+export const onRequestDelete = requestHandler(async () => {
   const { responseContext } = await deleteUser();
   const response = protectedSuccessResponse.OK(
     "success deleting user",
@@ -19,6 +19,4 @@ const DELETE: PagesFunction = async () => {
   );
   deleteCheckoutCookiesFromResponse(response);
   return response;
-};
-
-export const onRequest = requestHandler({ GET, DELETE });
+});

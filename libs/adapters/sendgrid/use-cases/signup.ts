@@ -1,4 +1,4 @@
-import { User } from "@user-entity";
+import type { User } from "@user-entity";
 import { sendEmail } from "../send-email";
 import { buildSignupTemplate } from "../templates";
 import { ENV } from "@env-utils";

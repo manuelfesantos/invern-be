@@ -1,8 +1,10 @@
-import { Country, countrySchema } from "@country-entity";
+import type { Country} from "@country-entity";
+import { countrySchema } from "@country-entity";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { countriesTable } from "@schema";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectCountryByCodeQuery = (countryCode: string) =>
   db().query.countriesTable.findFirst({

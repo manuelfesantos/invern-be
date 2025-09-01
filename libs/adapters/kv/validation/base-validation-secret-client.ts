@@ -1,9 +1,10 @@
 import { ENV } from "@env-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { ZodType } from "zod";
+import type { ZodType } from "zod";
+import type {
+  BaseValidationSecretBody} from "@user-entity";
 import {
-  BaseValidationSecretBody,
   baseValidationSecretBodySchema,
 } from "@user-entity";
 

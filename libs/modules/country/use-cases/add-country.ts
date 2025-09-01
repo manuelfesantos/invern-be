@@ -1,4 +1,5 @@
-import { Country, insertCountrySchema } from "@country-entity";
+import type { Country} from "@country-entity";
+import { insertCountrySchema } from "@country-entity";
 import {
   getSelectCountryByCodeAction,
   getInsertCountryAction,

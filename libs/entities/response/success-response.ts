@@ -1,4 +1,5 @@
-import { HttpStatusEnum, ResponseContext } from "@http-entity";
+import type { ResponseContext } from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 /* eslint-disable import/no-restricted-paths */
 import { getTokenCookie } from "@jwt-utils";

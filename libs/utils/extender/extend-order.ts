@@ -1,6 +1,7 @@
-import {
+import type {
   ClientOrder,
-  ExtendedClientOrder,
+  ExtendedClientOrder} from "@order-entity";
+import {
   extendedClientOrderSchema,
 } from "@order-entity";
 import { extendTaxes } from "./utils/extend-taxes";

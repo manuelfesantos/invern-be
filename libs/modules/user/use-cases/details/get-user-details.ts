@@ -1,4 +1,4 @@
-import { UserDetails } from "@user-entity";
+import type { UserDetails } from "@user-entity";
 import { contextStore } from "@context-utils";
 import { decryptObjectString } from "@crypto-utils";
 import { getSelectUserDetailsByIdAction } from "@user-db";

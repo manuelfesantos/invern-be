@@ -1,4 +1,4 @@
-import { ExtendedClientTax } from "@tax-entity";
+import type { ExtendedClientTax } from "@tax-entity";
 
 const VALUE_ZERO = 0;
 export const getTaxedPrice = (taxes: ExtendedClientTax[]): number =>

@@ -9,7 +9,7 @@ const resendEmailBodySchema = z.object({
   email: emailSchema("customer email"),
 });
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
   const { email } = resendEmailBodySchema.parse(body);
@@ -17,6 +17,4 @@ const POST: PagesFunction = async ({ request }) => {
   await resendEmail(email);
 
   return protectedSuccessResponse.OK("successfully signed up");
-};
-
-export const onRequest = requestHandler({ POST });
+});

@@ -8,7 +8,7 @@ import {
 } from "@http-utils";
 import { CookieNameEnum } from "@http-entity";
 
-const POST: PagesFunction = async () => {
+export const onRequestPost = requestHandler(async () => {
   const { responseContext, cart } = await logout();
 
   const response = protectedSuccessResponse.OK(
@@ -22,6 +22,4 @@ const POST: PagesFunction = async () => {
   deleteCheckoutCookiesFromResponse(response);
 
   return response;
-};
-
-export const onRequest = requestHandler({ POST });
+});

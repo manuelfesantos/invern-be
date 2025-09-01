@@ -1,5 +1,6 @@
 import { errors } from "@error-handling-utils";
-import { ExtendedCart, toCartDTO } from "@cart-entity";
+import type { ExtendedCart} from "@cart-entity";
+import { toCartDTO } from "@cart-entity";
 import { isZero } from "@number-utils";
 import { getCartId } from "./utils/get-cart-id";
 import { extendCart } from "@extender-utils";

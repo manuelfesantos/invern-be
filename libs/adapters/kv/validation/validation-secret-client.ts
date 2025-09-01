@@ -1,5 +1,6 @@
+import type {
+  BaseValidationSecretBody} from "@user-entity";
 import {
-  BaseValidationSecretBody,
   baseValidationSecretBodySchema,
 } from "@user-entity";
 import {

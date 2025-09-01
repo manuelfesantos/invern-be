@@ -1,11 +1,12 @@
-import {
+import type {
   ExtendedLineItem,
-  extendedLineItemSchema,
   LineItem,
-  LineItemError,
+  LineItemError} from "@product-entity";
+import {
+  extendedLineItemSchema,
   LineItemErrorEnum,
 } from "@product-entity";
-import { Country } from "@country-entity";
+import type { Country } from "@country-entity";
 import { getTaxedPrice } from "./get-taxed-price";
 import { extendTaxes } from "./extend-taxes";
 

@@ -1,5 +1,6 @@
 import { parse } from "cookie";
-import { CookieName, CookieNameEnum, HttpHeaderEnum } from "@http-entity";
+import type { CookieName} from "@http-entity";
+import { CookieNameEnum, HttpHeaderEnum } from "@http-entity";
 import { getFutureDate, NO_MAX_AGE, TOKEN_COOKIE_MAX_AGE } from "@timer-utils";
 import { ENV } from "@env-utils";
 
@@ -7,11 +8,11 @@ export const getCookieHeader = (
   name: CookieName,
   value: string,
   maxAge?: number,
-  isSecure: boolean = true,
-  isHttpOnly: boolean = true,
-  isSameSite: boolean = true,
+  isSecure = true,
+  isHttpOnly = true,
+  isSameSite = true,
   domain?: string,
-  path: string = "/",
+  path = "/",
 ): string =>
   `${name}=${value}; ${maxAge !== undefined ? `Max-Age=${maxAge}` : ""}; ${isSecure ? "Secure;" : ""} ${domain ? `Domain=${domain};` : ENV.DOMAIN ? `Domain=${ENV.DOMAIN};` : ""} ${isHttpOnly ? "HttpOnly;" : ""} ${isSameSite ? (ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;") : "SameSite=Lax;"} ${path ? `Path=${path};` : ""}`;
 

@@ -9,17 +9,17 @@ const testDataRequestBodySchema = z.object({
   secretKey: z.string(),
 });
 
-const POST: PagesFunction = async ({ request }): Promise<Response> => {
-  const body = await getBodyFromRequest(request);
+export const onRequestPost = requestHandler(
+  async ({ request }): Promise<Response> => {
+    const body = await getBodyFromRequest(request);
 
-  const { secretKey } = testDataRequestBodySchema.parse(body);
+    const { secretKey } = testDataRequestBodySchema.parse(body);
 
-  if (!secretKey || secretKey !== ENV.INSERT_TEST_DATA_SECRET) {
-    return errorResponse.FORBIDDEN("Missing or wrong secret key");
-  }
+    if (!secretKey || secretKey !== ENV.INSERT_TEST_DATA_SECRET) {
+      return errorResponse.FORBIDDEN("Missing or wrong secret key");
+    }
 
-  await insertData();
-  return successResponse.OK("success inserting test data");
-};
-
-export const onRequest = requestHandler({ POST });
+    await insertData();
+    return successResponse.OK("success inserting test data");
+  },
+);

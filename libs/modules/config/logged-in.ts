@@ -1,4 +1,4 @@
-import { UserJWT } from "@jwt-entity";
+import type { UserJWT } from "@jwt-entity";
 import { loggedInResponse } from "./utils/responses/logged-in-response";
 import { loggedOutResponse } from "./utils/responses/logged-out-response";
 import { getAuthSecret } from "@kv-adapter";

@@ -1,5 +1,7 @@
-import { actionBuilder, Result } from "@generics-db";
-import { BaseUser, baseUserSchema } from "@user-entity";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
+import type { BaseUser} from "@user-entity";
+import { baseUserSchema } from "@user-entity";
 import { db } from "@db";
 import { usersTable } from "@schema";
 import { and, eq, lt } from "drizzle-orm";

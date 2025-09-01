@@ -1,6 +1,6 @@
 import { createSelectSchema } from "drizzle-zod";
 import { currenciesTable } from "@schema";
-import { z } from "zod";
+import type { z } from "zod";
 import {
   dateTimeSchema,
   positiveNumberSchema,

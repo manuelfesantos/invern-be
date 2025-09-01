@@ -5,7 +5,7 @@ import { contextStore } from "@context-utils";
 
 import { errors } from "@error-handling-utils";
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = requestHandler(async () => {
   const { userId } = contextStore.context;
 
   if (!userId) {
@@ -17,6 +17,4 @@ const GET: PagesFunction = async () => {
   return protectedSuccessResponse.OK("Successfully got user orders", {
     orders,
   });
-};
-
-export const onRequest = requestHandler({ GET });
+});

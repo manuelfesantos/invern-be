@@ -1,11 +1,13 @@
-import {
+import type {
   CheckoutSession,
-  checkoutSessionSchema,
-  InsertCheckoutSession,
+  InsertCheckoutSession} from "@checkout-session-entity";
+import {
+  checkoutSessionSchema
 } from "@checkout-session-entity";
 import { db } from "@db";
 import { checkoutSessionsTable } from "@schema";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const insertCheckoutSessionQuery = (
   insertCheckoutSession: InsertCheckoutSession,

@@ -4,7 +4,7 @@ import { contextStore } from "@context-utils";
 import { updateEmailBodySchema } from "../types/update-user";
 import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
-import { User, ValidateEmailSecretBody } from "@user-entity";
+import type { User, ValidateEmailSecretBody } from "@user-entity";
 import { setValidationSecret } from "@kv-adapter";
 import { sendVerifyEmail } from "@sendgrid-adapter";
 import { logCredentials } from "@logger-utils";

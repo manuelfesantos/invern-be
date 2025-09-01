@@ -1,14 +1,15 @@
-import { StripeSessionResult } from "@stripe-entity";
+import type { StripeSessionResult } from "@stripe-entity";
 import { getSelectOrdersByIdAction, getInsertOrderAction } from "@order-db";
 import {
   getSelectPaymentByIdAction,
   getInsertPaymentReturningIdAction,
   getUpdatePaymentAction,
 } from "@payment-db";
-import { InsertPayment } from "@payment-entity";
-import {
+import type { InsertPayment } from "@payment-entity";
+import type {
   BaseOrder,
-  ClientOrder,
+  ClientOrder} from "@order-entity";
+import {
   clientOrderSchema,
   insertOrderSchema,
 } from "@order-entity";
@@ -23,7 +24,7 @@ import { logCredentials, logger } from "@logger-utils";
 import { getInsertShippingTransactionAction } from "@shipping-transaction-db";
 import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
-import { CheckoutSession } from "@checkout-session-entity";
+import type { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
 import { sendCheckoutSuccessfulEmail } from "@sendgrid-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";

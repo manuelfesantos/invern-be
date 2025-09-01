@@ -1,14 +1,15 @@
-import { PaymentIntent, StripeSessionResult } from "@stripe-entity";
-import {
+import type { PaymentIntent, StripeSessionResult } from "@stripe-entity";
+import type {
   InsertPayment,
   InsertPaymentMethod,
+  PaymentIntentStateType} from "@payment-entity";
+import {
   PaymentIntentState,
-  PaymentIntentStateType,
   PaymentMethodType,
   paymentMethodTypeSchema,
 } from "@payment-entity";
 import { errors } from "@error-handling-utils";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { getPaymentMethod } from "@stripe-adapter";
 
 const VALUE_ZERO = 0;

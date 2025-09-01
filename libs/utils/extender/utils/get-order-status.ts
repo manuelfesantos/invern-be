@@ -1,12 +1,11 @@
-import { ClientOrder, OrderStatus, OrderStatusType } from "@order-entity";
+import type { ClientOrder, OrderStatusType } from "@order-entity";
+import { OrderStatus } from "@order-entity";
 import { PaymentIntentState } from "@payment-entity";
 import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
-interface OrderStatusChecker {
-  (order: ClientOrder): OrderStatusType | undefined;
-}
+type OrderStatusChecker = (order: ClientOrder) => OrderStatusType | undefined;
 
 export const getOrderStatus = (order: ClientOrder): OrderStatusType => {
   for (const check of orderStatusChecks) {

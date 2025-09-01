@@ -1,5 +1,5 @@
 import { getSelectCurrencyByCodeAction } from "@currency-db";
-import { Currency } from "@currency-entity";
+import type { Currency } from "@currency-entity";
 import { errors } from "@error-handling-utils";
 
 export const getCurrencyByCode = async (code: string): Promise<Currency> => {

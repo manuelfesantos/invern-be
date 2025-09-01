@@ -1,4 +1,4 @@
-import { Cart } from "@cart-entity";
+import type { Cart } from "@cart-entity";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, NUMBER_ZERO } from "@number-utils";
 import { selectAllCartsOperation } from "./operations/select-all-carts";
 

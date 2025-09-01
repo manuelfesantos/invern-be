@@ -1,4 +1,4 @@
-import { User } from "@user-entity";
+import type { User } from "@user-entity";
 import queryString from "query-string";
 import { sendSignupEmail as sendSignupEmailAdapter } from "@sendgrid-adapter";
 import { contextStore } from "@context-utils";

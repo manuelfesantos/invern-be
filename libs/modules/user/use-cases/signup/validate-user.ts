@@ -1,10 +1,12 @@
 import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
-import { toUserDTO, UserDTO, ValidateEmailSecretBody } from "@user-entity";
+import type { UserDTO, ValidateEmailSecretBody } from "@user-entity";
+import { toUserDTO } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { extendCart } from "@extender-utils";
-import { EMPTY_CART, ExtendedCart, toCartDTO } from "@cart-entity";
+import type { ExtendedCart} from "@cart-entity";
+import { EMPTY_CART, toCartDTO } from "@cart-entity";
 
 interface ReturnType {
   user: UserDTO;

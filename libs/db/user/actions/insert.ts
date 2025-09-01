@@ -1,5 +1,7 @@
-import { actionBuilder, Result } from "@generics-db";
-import { BaseUser, baseUserSchema, InsertUser } from "@user-entity";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
+import type { BaseUser, InsertUser } from "@user-entity";
+import { baseUserSchema } from "@user-entity";
 import { db } from "@db";
 import { usersTable } from "@schema";
 import { hashPassword } from "@crypto-utils";

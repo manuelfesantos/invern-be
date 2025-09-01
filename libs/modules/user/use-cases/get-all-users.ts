@@ -1,4 +1,4 @@
-import { BaseUser } from "@user-entity";
+import type { BaseUser } from "@user-entity";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE, NUMBER_ZERO } from "@number-utils";
 import { selectAllUsersOperation } from "./operations/select-all-users";
 

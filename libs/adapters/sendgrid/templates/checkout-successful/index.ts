@@ -1,5 +1,5 @@
-import { CheckoutSuccessfulTemplate } from "./types";
-import { Order } from "@order-entity";
+import type { CheckoutSuccessfulTemplate } from "./types";
+import type { Order } from "@order-entity";
 import { ENV } from "@env-utils";
 import { getPrice } from "@number-utils";
 

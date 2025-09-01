@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-restricted-paths
 import { db } from "@db";
 import { collectionsTable } from "@schema";
-import { InsertCollection } from "@collection-entity";
+import type { InsertCollection } from "@collection-entity";
 import { getRandomUUID } from "@crypto-utils";
 
 const getCollectionsList = (): InsertCollection[] => [

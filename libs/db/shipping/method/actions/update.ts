@@ -1,4 +1,4 @@
-import { BaseShippingMethod, InsertShippingMethod } from "@shipping-entity";
+import type { BaseShippingMethod, InsertShippingMethod } from "@shipping-entity";
 import { db } from "@db";
 import { shippingMethodsTable } from "@schema";
 import { eq } from "drizzle-orm";

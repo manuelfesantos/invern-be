@@ -1,6 +1,6 @@
 import { buildResetPasswordTemplate } from "../templates";
 import { sendEmail } from "../send-email";
-import { User } from "@user-entity";
+import type { User } from "@user-entity";
 
 export const sendResetPasswordEmail = async (
   user: User,

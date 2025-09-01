@@ -1,4 +1,4 @@
-import { InsertOrder } from "@order-entity";
+import type { InsertOrder } from "@order-entity";
 import { db } from "@db";
 import { ordersTable } from "@schema";
 import { logger } from "@logger-utils";

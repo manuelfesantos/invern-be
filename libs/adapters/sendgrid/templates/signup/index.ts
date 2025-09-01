@@ -1,4 +1,4 @@
-import { SignupTemplate } from "./types";
+import type { SignupTemplate } from "./types";
 import { ENV } from "@env-utils";
 
 export const buildSignupTemplate = ({

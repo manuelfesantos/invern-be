@@ -1,4 +1,5 @@
-import { z, ZodEffects, ZodNumber, ZodString } from "zod";
+import type { ZodEffects, ZodNumber, ZodString } from "zod";
+import { z } from "zod";
 // eslint-disable-next-line import/no-restricted-paths
 import { isValidUUID } from "@crypto-utils";
 import { imageSchema } from "@image-entity";

@@ -16,7 +16,7 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { ENV } from "@env-utils";
 import { getGoogleOauthUser } from "@user-module";
 
-const GET: PagesFunction = async ({ request }) => {
+export const onRequestGet = requestHandler(async ({ request }) => {
   const cookies = getCookies(request.headers);
   const { [CookieNameEnum.OAUTH_TOKEN]: oauthTokenCookie } = cookies;
   const url = new URL(request.url);
@@ -52,7 +52,7 @@ const GET: PagesFunction = async ({ request }) => {
   }
 
   const { user, refreshToken, newUser } =
-      await getGoogleOauthUser(providerUser);
+    await getGoogleOauthUser(providerUser);
 
   const response = successResponse.OK(
     "Successfully signed in with google oauth",
@@ -69,6 +69,4 @@ const GET: PagesFunction = async ({ request }) => {
   deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
 
   return response;
-};
-
-export const onRequest = requestHandler({ GET });
+});

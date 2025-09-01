@@ -1,4 +1,4 @@
-import { InsertProduct, ProductDetails } from "@product-entity";
+import type { InsertProduct, ProductDetails } from "@product-entity";
 import { runBatchOperation } from "@generics-db";
 import {
   getSelectProductByIdAction,

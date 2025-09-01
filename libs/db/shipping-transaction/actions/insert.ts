@@ -1,5 +1,5 @@
 import { db } from "@db";
-import {
+import type {
   InsertShippingTransaction,
   ShippingTransaction,
 } from "@shipping-transaction-entity";

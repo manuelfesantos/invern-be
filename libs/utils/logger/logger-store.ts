@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { Logger } from "./honeycomb-logger";
-import { LoggerUseCase } from "@logger-entity";
+import type { Logger } from "./honeycomb-logger";
+import type { LoggerUseCase } from "@logger-entity";
 import { buildLogObject } from "./build-log-object";
 import { localLogger } from "./local-logger";
 import { redactPropertiesFromData } from "./redact-properties-from-data";

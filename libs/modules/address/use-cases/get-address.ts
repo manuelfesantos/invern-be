@@ -1,5 +1,5 @@
 import { contextStore } from "@context-utils";
-import { Address } from "@address-entity";
+import type { Address } from "@address-entity";
 import { getSelectUserByIdAction } from "@user-db";
 import { decryptObjectString } from "@crypto-utils";
 

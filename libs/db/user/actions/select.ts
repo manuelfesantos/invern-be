@@ -1,15 +1,17 @@
-import {
+import type {
   User,
-  UserValidationStatus,
+  UserValidationStatus} from "@user-entity";
+import {
   UserValidationStatusEnum,
 } from "@user-entity";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { decryptObjectString } from "@crypto-utils";
-import { Address } from "@address-entity";
+import type { Address } from "@address-entity";
 import { db } from "@db";
 import { DEFAULT_PAGE } from "@number-utils";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 import { and, eq } from "drizzle-orm";
 import { usersTable } from "@schema";
 

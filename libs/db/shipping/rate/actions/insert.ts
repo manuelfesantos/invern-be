@@ -1,4 +1,4 @@
-import { BaseShippingRate } from "@shipping-entity";
+import type { BaseShippingRate } from "@shipping-entity";
 import { db } from "@db";
 import { shippingRatesTable, shippingRatesToCountriesTable } from "@schema";
 import { actionBuilder } from "@generics-db";

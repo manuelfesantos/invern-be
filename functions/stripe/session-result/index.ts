@@ -1,9 +1,10 @@
 import { errorResponse, prepareError, successResponse } from "@response-entity";
 import { isStripeEnvValid } from "@http-utils";
+import type {
+  StripeEvent} from "@stripe-entity";
 import {
   isStripeSessionExpiredEvent,
-  isStripeSessionResultEvent,
-  StripeEvent,
+  isStripeSessionResultEvent
 } from "@stripe-entity";
 import {
   getOrderFromSessionResult,
@@ -19,7 +20,7 @@ import { stripe } from "@stripe-adapter";
 import { ENV } from "@env-utils";
 import { Buffer } from "node:buffer";
 
-export const POST: PagesFunction = async (context) => {
+export const onRequestPost = requestHandler(async (context) => {
   const { request } = context;
   const bodyBuffer = Buffer.from(await request.arrayBuffer());
 
@@ -77,6 +78,4 @@ export const POST: PagesFunction = async (context) => {
   const clientOrder = await getOrderFromSessionResult(sessionEvent);
 
   return successResponse.OK("success getting checkout-session", clientOrder);
-};
-
-export const onRequest = requestHandler({ POST });
+});

@@ -1,13 +1,14 @@
 import { middlewareRequestHandler, requestHandler } from "@decorator-utils";
-import { CookieName, Data, HandlerMethodMapper } from "@http-entity";
-import { Env } from "@env-entity";
+import type { CookieName, Data } from "@http-entity";
+import type { Env } from "@env-entity";
 import {
   contextStore,
   getClientCheckoutStages,
   getRemoveCookieNamesFromInvalidCheckoutStage,
 } from "@context-utils";
+import type {
+  CheckoutStageName} from "@checkout-session-entity";
 import {
-  CheckoutStageName,
   checkoutStageToCookie,
 } from "@checkout-session-entity";
 import {
@@ -20,10 +21,10 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
 export const checkoutRequestHandler = <T extends Data>(
-  methodMapper: HandlerMethodMapper<T>,
+  handler: PagesFunction<Env, string, T>,
   checkoutStage: CheckoutStageName | null,
 ): PagesFunction<Env, string, T> => {
-  return requestHandler(methodMapper, {
+  return requestHandler(handler, {
     errorHandler,
     preProcess: () => initializeCheckoutStage(checkoutStage),
   });

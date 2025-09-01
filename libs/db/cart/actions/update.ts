@@ -1,4 +1,4 @@
-import { InsertCart } from "@cart-entity";
+import type { InsertCart } from "@cart-entity";
 import { db } from "@db";
 import { cartsTable, productsToCartsTable } from "@schema";
 import { and, eq } from "drizzle-orm";

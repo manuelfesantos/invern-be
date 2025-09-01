@@ -15,7 +15,7 @@ import {
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
@@ -34,9 +34,9 @@ const POST: PagesFunction = async ({ request }) => {
     getCookieHeader(CookieNameEnum.USER_DETAILS, encryptedUserDetails),
   );
   return response;
-};
+}, CheckoutStageNameEnum.PERSONAL_DETAILS);
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = checkoutRequestHandler(async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
@@ -45,9 +45,4 @@ const GET: PagesFunction = async () => {
     ...(userDetails && { personalDetails: userDetails }),
     availableCheckoutStages: getClientCheckoutStages(),
   });
-};
-
-export const onRequest = checkoutRequestHandler(
-  { POST, GET },
-  CheckoutStageNameEnum.PERSONAL_DETAILS,
-);
+}, CheckoutStageNameEnum.PERSONAL_DETAILS);

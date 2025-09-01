@@ -1,4 +1,5 @@
-import { CollectionDetails, insertCollectionSchema } from "@collection-entity";
+import type { CollectionDetails} from "@collection-entity";
+import { insertCollectionSchema } from "@collection-entity";
 import {
   getInsertCollectionAction,
   getSelectCollectionByIdAction,

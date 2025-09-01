@@ -1,7 +1,8 @@
 import { db } from "@db";
 import { eq, inArray, like, or } from "drizzle-orm";
 import { productsTable } from "@schema";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 
 const selectProductsQuery = () => {
   return db().query.productsTable.findMany({

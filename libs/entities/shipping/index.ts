@@ -7,7 +7,7 @@ import {
   countryCodeSchema,
   dateTimeSchema,
 } from "@global-entity";
-import { z } from "zod";
+import type { z } from "zod";
 
 export const baseShippingMethodSchema = createSelectSchema(
   shippingMethodsTable,

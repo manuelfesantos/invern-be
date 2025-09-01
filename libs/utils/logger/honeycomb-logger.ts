@@ -1,3 +1,3 @@
-import { PluginData } from "@cloudflare/pages-plugin-honeycomb";
+import type { PluginData } from "@cloudflare/pages-plugin-honeycomb";
 
 export type Logger = PluginData["honeycomb"]["tracer"];

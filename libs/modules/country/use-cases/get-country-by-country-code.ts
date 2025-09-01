@@ -1,4 +1,4 @@
-import { Country } from "@country-entity";
+import type { Country } from "@country-entity";
 import { countryCodeSchema } from "@global-entity";
 import { getSelectCountryByCodeAction } from "@country-db";
 import { errors } from "@error-handling-utils";

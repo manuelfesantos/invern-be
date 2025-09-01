@@ -1,4 +1,5 @@
-import { InsertUser, User, userSchema } from "@user-entity";
+import type { InsertUser, User} from "@user-entity";
+import { userSchema } from "@user-entity";
 import { getRandomUUID, hashString } from "@crypto-utils";
 import { logCredentials, logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";

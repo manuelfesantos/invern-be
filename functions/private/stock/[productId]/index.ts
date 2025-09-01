@@ -4,7 +4,7 @@ import { stockClient } from "@r2-adapter";
 import { requestHandler } from "@decorator-utils";
 import { ENV } from "@env-utils";
 
-const GET: PagesFunction = async ({ params }) => {
+export const onRequestGet = requestHandler(async ({ params }) => {
   const isLocalRequest = ENV.ENV === "local";
 
   if (!isLocalRequest) {
@@ -23,6 +23,4 @@ const GET: PagesFunction = async ({ params }) => {
   return successResponse.OK("success getting stock", response.data, {
     "Access-Control-Allow-Origin": ENV.FRONTEND_HOST,
   });
-};
-
-export const onRequest = requestHandler({ GET });
+});

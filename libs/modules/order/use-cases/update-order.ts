@@ -1,5 +1,6 @@
 import { getSelectOrdersByIdAction, getUpdateOrderAction } from "@order-db";
-import { insertOrderSchema, Order } from "@order-entity";
+import type { Order } from "@order-entity";
+import { insertOrderSchema } from "@order-entity";
 
 export const updateOrder = async (
   orderId: string,

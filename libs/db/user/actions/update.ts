@@ -1,8 +1,9 @@
-import { BaseUser, InsertUser } from "@user-entity";
+import type { BaseUser, InsertUser } from "@user-entity";
 import { db } from "@db";
 import { usersTable } from "@schema";
 import { eq, sql } from "drizzle-orm";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
 import { hashPassword } from "@crypto-utils";
 
 const ONE_VERSION = 1;

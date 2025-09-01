@@ -1,6 +1,6 @@
 import { buildEmailChangeSuccessfulTemplate } from "../templates";
 import { sendEmail } from "../send-email";
-import { User } from "@user-entity";
+import type { User } from "@user-entity";
 
 export const sendEmailChangeSuccessfulEmail = async (
   user: User,

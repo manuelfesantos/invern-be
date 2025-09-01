@@ -1,4 +1,4 @@
-import { Cart } from "@cart-entity";
+import type { Cart } from "@cart-entity";
 
 const NO_WEIGHT = 0;
 

@@ -9,11 +9,11 @@ import {
 } from "@context-utils";
 import { errors } from "@error-handling-utils";
 import { deleteCookieFromResponse } from "@http-utils";
-import { CheckoutStageName } from "@checkout-session-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
 import { extendCart } from "@extender-utils";
 import { toCartDTO } from "@cart-entity";
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = checkoutRequestHandler(async () => {
   try {
     const cart = await validateCartId(contextStore.context.cartId);
 
@@ -48,6 +48,4 @@ const GET: PagesFunction = async () => {
       isCheckoutPossible: false,
     });
   }
-};
-
-export const onRequest = checkoutRequestHandler({ GET }, null);
+}, null);

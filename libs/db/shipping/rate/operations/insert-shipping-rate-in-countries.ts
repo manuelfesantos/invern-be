@@ -1,4 +1,4 @@
-import { BaseShippingRate, InsertShippingRate } from "@shipping-entity";
+import type { BaseShippingRate, InsertShippingRate } from "@shipping-entity";
 import { getRandomUUID } from "@crypto-utils";
 import { runBatchOperation } from "@generics-db";
 import {

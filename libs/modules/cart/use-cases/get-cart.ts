@@ -1,11 +1,12 @@
 import { getSelectCartByIdAction } from "@cart-db";
 import { extendCart } from "@extender-utils";
 import { contextStore } from "@context-utils";
-import {
+import type {
   Cart,
   CartDTO,
+  ExtendedCart} from "@cart-entity";
+import {
   EMPTY_CART,
-  ExtendedCart,
   toCartDTO,
 } from "@cart-entity";
 

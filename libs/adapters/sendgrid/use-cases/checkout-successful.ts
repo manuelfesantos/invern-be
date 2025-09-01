@@ -1,6 +1,6 @@
 import { sendEmail } from "../send-email";
 import { buildCheckoutSuccessfulTemplate } from "../templates";
-import { Order } from "@order-entity";
+import type { Order } from "@order-entity";
 
 export const sendCheckoutSuccessfulEmail = async (
   order: Order,

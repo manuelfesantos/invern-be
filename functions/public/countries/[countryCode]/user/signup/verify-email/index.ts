@@ -15,7 +15,7 @@ const validateEmailBodySchema = z.object({
   email: emailSchema("customer email"),
 });
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
   const { code, email } = validateEmailBodySchema.parse(body);
@@ -38,6 +38,4 @@ const POST: PagesFunction = async ({ request }) => {
   deleteCheckoutCookiesFromResponse(response);
 
   return response;
-};
-
-export const onRequest = requestHandler({ POST });
+});

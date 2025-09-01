@@ -9,7 +9,7 @@ import { signup } from "@user-module";
 import { protectedSuccessResponse } from "@response-entity";
 import { CookieNameEnum } from "@http-entity";
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
   await signup(body);
@@ -20,6 +20,4 @@ const POST: PagesFunction = async ({ request }) => {
   deleteCheckoutCookiesFromResponse(response);
 
   return response;
-};
-
-export const onRequest = requestHandler({ POST });
+});

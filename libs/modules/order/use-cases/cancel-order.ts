@@ -1,4 +1,4 @@
-import { Order } from "@order-entity";
+import type { Order } from "@order-entity";
 import { getSelectOrdersByIdAction, getUpdateOrderAction } from "@order-db";
 
 export const cancelOrder = async (orderId: string): Promise<Order> => {

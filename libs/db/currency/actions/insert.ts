@@ -1,4 +1,4 @@
-import { InsertCurrency } from "@currency-entity";
+import type { InsertCurrency } from "@currency-entity";
 import { currenciesTable } from "@schema";
 import { db } from "@db";
 import { actionBuilder } from "@generics-db";

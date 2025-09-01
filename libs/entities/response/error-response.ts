@@ -1,4 +1,5 @@
-import { z, ZodError } from "zod";
+import type { ZodError } from "zod";
+import { z } from "zod";
 import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 /* eslint-disable import/no-restricted-paths */

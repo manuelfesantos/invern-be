@@ -1,12 +1,13 @@
 import { getSelectProductByIdAction } from "@product-db";
-import { HttpParams } from "@http-entity";
+import type { HttpParams } from "@http-entity";
 import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { extendProductDetails } from "@extender-utils";
 import { getSelectCollectionByIdAction } from "@collection-db";
-import {
+import type {
   ExtendedProductWithCollectionDetails,
-  ProductWithCollectionDetails,
+  ProductWithCollectionDetails} from "@product-entity";
+import {
   productWithCollectionDetailsSchema,
 } from "@product-entity";
 

@@ -1,4 +1,4 @@
-import { CheckoutStageName } from "@checkout-session-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
 import { z } from "zod";
 
 export interface CheckoutStage {

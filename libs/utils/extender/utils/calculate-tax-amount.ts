@@ -1,4 +1,4 @@
-import { Tax } from "@tax-entity";
+import type { Tax } from "@tax-entity";
 
 const VALUE_ZERO = 0;
 

@@ -15,7 +15,7 @@ import {
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
 
-const POST: PagesFunction = async ({ request }) => {
+export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
@@ -34,9 +34,9 @@ const POST: PagesFunction = async ({ request }) => {
     getCookieHeader(CookieNameEnum.SHIPPING_METHOD, encryptedShippingMethodId),
   );
   return response;
-};
+}, CheckoutStageNameEnum.SHIPPING);
 
-const GET: PagesFunction = async () => {
+export const onRequestGet = checkoutRequestHandler(async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
@@ -47,9 +47,4 @@ const GET: PagesFunction = async () => {
     selectedShippingMethod,
     availableCheckoutStages: getClientCheckoutStages(),
   });
-};
-
-export const onRequest = checkoutRequestHandler(
-  { POST, GET },
-  CheckoutStageNameEnum.SHIPPING,
-);
+}, CheckoutStageNameEnum.SHIPPING);

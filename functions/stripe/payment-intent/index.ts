@@ -3,7 +3,8 @@ import { isStripeEnvValid } from "@http-utils";
 import { mapPaymentIntentEvent } from "@order-module";
 import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
-import { isStripePaymentIntent, StripeEvent } from "@stripe-entity";
+import type { StripeEvent } from "@stripe-entity";
+import { isStripePaymentIntent } from "@stripe-entity";
 import { errors } from "@error-handling-utils";
 import { requestHandler } from "@decorator-utils";
 import { Buffer } from "node:buffer";
@@ -12,7 +13,7 @@ import { Buffer } from "node:buffer";
 import { stripe } from "@stripe-adapter";
 import { ENV } from "@env-utils";
 
-const POST: PagesFunction = async (context) => {
+export const onRequestPost = requestHandler(async (context) => {
   const { request } = context;
 
   const bodyBuffer = Buffer.from(await request.arrayBuffer());
@@ -58,6 +59,4 @@ const POST: PagesFunction = async (context) => {
 
   logger().addRedactedData({ createdPayment: stringifyObject(payment) });
   return successResponse.OK("success getting checkout-session");
-};
-
-export const onRequest = requestHandler({ POST });
+});

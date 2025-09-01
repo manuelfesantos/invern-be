@@ -1,9 +1,10 @@
-import { Env } from "@env-entity";
+import type { Env } from "@env-entity";
 
 class EnvironmentService {
   private static instance: EnvironmentService;
   private _env?: Env;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   static getInstance(): EnvironmentService {

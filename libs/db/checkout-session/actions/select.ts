@@ -1,9 +1,11 @@
 import { db } from "@db";
 import { eq } from "drizzle-orm";
 import { checkoutSessionsTable } from "@schema";
-import { actionBuilder, Result } from "@generics-db";
+import type { Result } from "@generics-db";
+import { actionBuilder } from "@generics-db";
+import type {
+  CheckoutSession} from "@checkout-session-entity";
 import {
-  CheckoutSession,
   checkoutSessionSchema,
 } from "@checkout-session-entity";
 

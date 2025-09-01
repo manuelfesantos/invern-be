@@ -1,4 +1,4 @@
-import { Country, InsertCountry } from "@country-entity";
+import type { Country, InsertCountry } from "@country-entity";
 import { runBatchOperation } from "@generics-db";
 import {
   getSelectCountryByCodeAction,

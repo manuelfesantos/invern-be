@@ -1,4 +1,5 @@
-import { Currency, insertCurrencySchema } from "@currency-entity";
+import type { Currency} from "@currency-entity";
+import { insertCurrencySchema } from "@currency-entity";
 import { updateCurrencyOperation } from "./operations/update-currency";
 
 export const updateCurrency = async (

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Env } from "@env-entity";
 
 export const httpMethodsSchema = z.enum(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
@@ -34,7 +33,3 @@ export const CookieNameEnum = {
 export type CookieName = (typeof CookieNameEnum)[keyof typeof CookieNameEnum];
 
 export type Data = Record<string, unknown>;
-
-export type HandlerMethodMapper<T extends Data> = Partial<
-  Record<keyof typeof HttpMethodEnum, PagesFunction<Env, string, T>>
->;

@@ -1,12 +1,12 @@
 import { stripe } from "../stripe-client";
-import { LineItem } from "@product-entity";
+import type { LineItem } from "@product-entity";
 import { Stripe } from "stripe";
 import Response = Stripe.Response;
 import { getFutureDate, SESSION_EXPIRY } from "@timer-utils";
 import { contextStore } from "@context-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { SelectedShippingMethod } from "@shipping-entity";
+import type { SelectedShippingMethod } from "@shipping-entity";
 import { ENV } from "@env-utils";
 
 export const createStripeCheckoutSession = async (

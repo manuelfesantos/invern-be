@@ -1,4 +1,4 @@
-import { PasswordResetSuccessfulTemplate } from "./types";
+import type { PasswordResetSuccessfulTemplate } from "./types";
 import { ENV } from "@env-utils";
 
 export const buildPasswordResetSuccessfulTemplate = ({

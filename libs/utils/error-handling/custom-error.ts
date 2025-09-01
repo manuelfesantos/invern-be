@@ -1,5 +1,6 @@
-import { CookieName, HttpStatusEnum } from "@http-entity";
-import { CheckoutStageName } from "@checkout-session-entity";
+import type { CookieName} from "@http-entity";
+import { HttpStatusEnum } from "@http-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
 import { successResponse } from "@response-entity";
 import {
   getClientCheckoutStages,

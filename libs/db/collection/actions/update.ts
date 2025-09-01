@@ -1,4 +1,4 @@
-import { InsertCollection } from "@collection-entity";
+import type { InsertCollection } from "@collection-entity";
 import { collectionsTable } from "@schema";
 import { db } from "@db";
 import { eq } from "drizzle-orm";

@@ -1,4 +1,4 @@
-import { BaseUser } from "@user-entity";
+import type { BaseUser } from "@user-entity";
 import { runBatchOperationWithCount } from "@generics-db";
 import { usersTable } from "@schema";
 import { getSelectAllUsersAction } from "@user-db";

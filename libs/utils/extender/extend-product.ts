@@ -1,10 +1,11 @@
-import {
+import type {
   ExtendedProduct,
-  extendedProductSchema,
   ExtendedProductWithCollectionDetails,
-  extendedProductWithCollectionDetailsSchema,
   Product,
-  ProductWithCollectionDetails,
+  ProductWithCollectionDetails} from "@product-entity";
+import {
+  extendedProductSchema,
+  extendedProductWithCollectionDetailsSchema
 } from "@product-entity";
 import { getTaxedPrice } from "./utils/get-taxed-price";
 import { extendTaxes } from "./utils/extend-taxes";

@@ -1,7 +1,7 @@
 import { db } from "@db";
 import { cartsTable, productsToCartsTable } from "@schema";
 import { actionBuilder } from "@generics-db";
-import { InsertCart } from "@cart-entity";
+import type { InsertCart } from "@cart-entity";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 

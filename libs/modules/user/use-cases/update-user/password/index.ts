@@ -3,7 +3,8 @@ import { hashPassword } from "@crypto-utils";
 import { contextStore } from "@context-utils";
 import { updatePasswordBodySchema } from "../types/update-user";
 import { errors } from "@error-handling-utils";
-import { toUserDTO, UserDTO } from "@user-entity";
+import type { UserDTO } from "@user-entity";
+import { toUserDTO } from "@user-entity";
 import { logCredentials } from "@logger-utils";
 
 export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {

@@ -1,8 +1,9 @@
-import { PaymentIntent } from "@stripe-entity";
-import {
+import type { PaymentIntent } from "@stripe-entity";
+import type {
   InsertPayment,
   InsertPaymentMethod,
-  Payment,
+  Payment} from "@payment-entity";
+import {
   PaymentIntentState,
 } from "@payment-entity";
 import {

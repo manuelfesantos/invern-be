@@ -1,6 +1,6 @@
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
-import { ResponseContext } from "@http-entity";
+import type { ResponseContext } from "@http-entity";
 import { getAnonymousTokens } from "@jwt-utils";
 import { getDeleteUserAction } from "@user-db";
 import { getDeleteCartAction } from "@cart-db";

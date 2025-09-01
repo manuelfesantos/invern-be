@@ -1,7 +1,7 @@
 import { shippingTransactionsTable } from "@schema";
 import { eq } from "drizzle-orm";
 import { db } from "@db";
-import { ShippingTransaction } from "@shipping-transaction-entity";
+import type { ShippingTransaction } from "@shipping-transaction-entity";
 import { actionBuilder } from "@generics-db";
 
 const updateShippingTransactionQuery = (
