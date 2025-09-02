@@ -1,4 +1,4 @@
-import type { InsertUser, User} from "@user-entity";
+import type { InsertUser, User } from "@user-entity";
 import { userSchema } from "@user-entity";
 import { getRandomUUID, hashString } from "@crypto-utils";
 import { logCredentials, logger } from "@logger-utils";
@@ -36,7 +36,7 @@ interface GoogleUserResponse {
 
 export const getGoogleOauthUser = async (
   googleUser: GoogleUserResponse,
-): Promise<{ user: User; refreshToken: string, newUser: boolean }> => {
+): Promise<{ user: User; refreshToken: string; isNewUser: boolean }> => {
   const { cartId } = contextStore.context;
   const hashedGoogleUserId = await hashString(googleUser.id);
 
@@ -60,7 +60,7 @@ export const getGoogleOauthUser = async (
     const refreshToken = await getRefreshToken(dbUser);
 
     return {
-      newUser: false,
+      isNewUser: false,
       user: dbUser,
       refreshToken,
     };
@@ -75,7 +75,7 @@ export const getGoogleOauthUser = async (
     const refreshToken = await getRefreshToken(dbGoogleUser);
 
     return {
-      newUser: false,
+      isNewUser: false,
       user: dbGoogleUser,
       refreshToken,
     };
@@ -121,7 +121,7 @@ export const getGoogleOauthUser = async (
   const refreshToken = await getLoggedInToken(user.id);
 
   return {
-    newUser: true,
+    isNewUser: true,
     user: userSchema.parse(user),
     refreshToken,
   };

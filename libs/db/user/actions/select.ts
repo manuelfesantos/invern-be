@@ -1,9 +1,5 @@
-import type {
-  User,
-  UserValidationStatus} from "@user-entity";
-import {
-  UserValidationStatusEnum,
-} from "@user-entity";
+import type { User, UserValidationStatus } from "@user-entity";
+import { UserValidationStatusEnum } from "@user-entity";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { decryptObjectString } from "@crypto-utils";
@@ -77,23 +73,23 @@ const selectUserByGoogleUserIdQuery = async (
 const mapUserFromSelectResult = async (
   userQueryResult: Result<typeof selectUserQuery> | undefined,
 ): Promise<User | undefined> => {
-  if (userQueryResult) {
-    return {
-      ...userQueryResult,
-      cart: userQueryResult?.cart
-        ? {
-            ...userQueryResult.cart,
-            products: userQueryResult.cart.productsToCarts.map((product) => ({
-              ...product.product,
-              quantity: product.quantity,
-            })),
-          }
-        : null,
-      address: userQueryResult.address
-        ? await decryptObjectString<Address>(userQueryResult.address)
-        : null,
-    };
-  }
+  if (!userQueryResult) return;
+
+  return {
+    ...userQueryResult,
+    cart: userQueryResult?.cart
+      ? {
+          ...userQueryResult.cart,
+          products: userQueryResult.cart.productsToCarts.map((product) => ({
+            ...product.product,
+            quantity: product.quantity,
+          })),
+        }
+      : null,
+    address: userQueryResult.address
+      ? await decryptObjectString<Address>(userQueryResult.address)
+      : null,
+  };
 };
 
 const selectUserVersionByIdQuery = (userId: string) =>

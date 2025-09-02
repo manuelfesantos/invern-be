@@ -15,6 +15,9 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { ENV } from "@env-utils";
 import { getGoogleOauthUser } from "@user-module";
+import { userDTOSchema } from "@user-entity";
+import { EMPTY_CART, toCartDTO } from "@cart-entity";
+import { extendCart } from "@extender-utils";
 
 export const onRequestGet = requestHandler(async ({ request }) => {
   const cookies = getCookies(request.headers);
@@ -51,15 +54,15 @@ export const onRequestGet = requestHandler(async ({ request }) => {
     throw errors.USER_NOT_FOUND("no user provided by google");
   }
 
-  const { user, refreshToken, newUser } =
+  const { user, refreshToken, isNewUser } =
     await getGoogleOauthUser(providerUser);
 
   const response = successResponse.OK(
     "Successfully signed in with google oauth",
     {
-      newUser,
-      cart: user.cart,
-      user,
+      isNewUser,
+      cart: extendCart(toCartDTO(user.cart ?? EMPTY_CART)),
+      user: userDTOSchema.parse(user),
       accessToken: await getLoggedInToken(user.id, user.cart?.id),
     },
   );
