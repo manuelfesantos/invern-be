@@ -1,4 +1,4 @@
-import type { Address} from "@address-entity";
+import type { Address } from "@address-entity";
 import { insertAddressSchema } from "@address-entity";
 import { contextStore } from "@context-utils";
 import { getUpdateUserAction } from "@user-db";
@@ -21,15 +21,14 @@ export const handleAddressPost = async (
   const address = {
     ...insertAddress,
     country: country.code,
+    saveAddress,
   };
 
   const encryptedAddress = await encryptObject(address);
 
   const { userId } = contextStore.context;
-  if (userId) {
-    if (saveAddress) {
-      await getUpdateUserAction(userId, { address: encryptedAddress }).run();
-    }
+  if (userId && saveAddress) {
+    await getUpdateUserAction(userId, { address: encryptedAddress }).run();
   }
 
   return { address, encryptedAddress };
