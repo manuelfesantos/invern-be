@@ -2,11 +2,8 @@ import { ENV } from "@env-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import type { ZodType } from "zod";
-import type {
-  BaseValidationSecretBody} from "@user-entity";
-import {
-  baseValidationSecretBodySchema,
-} from "@user-entity";
+import type { BaseValidationSecretBody } from "@user-entity";
+import { baseValidationSecretBodySchema } from "@user-entity";
 
 export const getBaseValidationSecret = async <
   T extends BaseValidationSecretBody = BaseValidationSecretBody,
@@ -14,7 +11,7 @@ export const getBaseValidationSecret = async <
   key: string,
   schema: ZodType<T> = baseValidationSecretBodySchema as unknown as ZodType<T>,
 ): Promise<T | null> => {
-  const secret = await ENV.VALIDATION_KV.get(key);
+  const secret = await ENV.VALIDATION_KV.get(key, { type: "json" });
   if (!secret) {
     logger().info(`no validation secret secret found for key ${key}`, {
       useCase: LoggerUseCaseEnum.GET_VALIDATION_SECRET,
@@ -26,7 +23,7 @@ export const getBaseValidationSecret = async <
     useCase: LoggerUseCaseEnum.GET_VALIDATION_SECRET,
   });
 
-  return schema.parse(JSON.parse(secret));
+  return schema.parse(secret);
 };
 
 export const setBaseValidationSecret = async <
@@ -38,7 +35,9 @@ export const setBaseValidationSecret = async <
   logger().info(`setting validation secret secret for key ${key}`, {
     useCase: LoggerUseCaseEnum.PUT_VALIDATION_SECRET,
   });
-  await ENV.VALIDATION_KV.put(key, JSON.stringify(value));
+  await ENV.VALIDATION_KV.put(key, JSON.stringify(value), {
+    expirationTtl: 86400 /* expires in 1 day */,
+  });
 };
 
 export const deleteBaseValidationSecret = async (
