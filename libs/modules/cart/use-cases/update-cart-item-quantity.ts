@@ -1,11 +1,12 @@
 import { errors } from "@error-handling-utils";
-import type { ExtendedCart} from "@cart-entity";
+import type { ExtendedCart } from "@cart-entity";
 import { toCartDTO } from "@cart-entity";
 import { isZero } from "@number-utils";
 import { getCartId } from "./utils/get-cart-id";
 import { extendCart } from "@extender-utils";
 import { cartOperationMap } from "./operations";
 import { getSelectProductStockByIdAction } from "@product-db";
+import { stockClient } from "@r2-adapter";
 
 export const updateCartItemQuantity = async (
   productId: string,
@@ -19,13 +20,19 @@ export const updateCartItemQuantity = async (
     return extendCart(toCartDTO(cart));
   }
 
-  const stock = await getSelectProductStockByIdAction(productId).run();
-  if (stock === undefined) throw errors.PRODUCT_NOT_FOUND();
+  let stock: number | null | undefined = await stockClient.get(productId);
+  let updateKVPromise: Promise<void> | undefined;
+  if (stock === null) {
+    stock = await getSelectProductStockByIdAction(productId).run();
+    if (stock === undefined) throw errors.PRODUCT_NOT_FOUND();
+    updateKVPromise = stockClient.setKV(productId, stock);
+  }
 
   if (quantity > stock) {
     throw errors.PRODUCT_OUT_OF_STOCK(stock);
   }
 
   const cart = await cartOperationMap.UPSERT(productId, cartId, quantity);
+  await updateKVPromise;
   return extendCart(toCartDTO(cart));
 };

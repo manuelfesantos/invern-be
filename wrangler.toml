@@ -13,3 +13,7 @@ id = "auth_kv"
 [[kv_namespaces]]
 binding = "VALIDATION_KV"
 id = "validation_kv"
+
+[[kv_namespaces]]
+binding = "STOCK_KV"
+id = "stock_kv"

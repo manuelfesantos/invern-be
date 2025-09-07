@@ -53,6 +53,12 @@ const r2BucketUseCasesSchema = [
   "PURGE_CACHE",
 ] as const;
 
+const kvStockUseCasesSchema = [
+  "PUT_KV_STOCK",
+  "GET_KV_STOCK",
+  "DELETE_KV_STOCK",
+] as const;
+
 const authSecretKvSchema = [
   "PUT_AUTH_SECRET",
   "GET_AUTH_SECRET",
@@ -94,6 +100,7 @@ const loggerUseCasesSchema = z.enum([
   ...userUseCasesSchema,
   ...orderUseCasesSchema,
   ...r2BucketUseCasesSchema,
+  ...kvStockUseCasesSchema,
   ...responseUseCasesSchema,
   ...checkoutUseCasesSchema,
   ...oauthUseCasesSchema,

@@ -6,25 +6,16 @@ import { z } from "zod";
 import { ENV } from "@env-utils";
 
 const STOCK_LOCK_TTL = 3000;
-const MAX_RETRIES = 3;
-
-let _stockBucket: R2Bucket | null = null;
+const MAX_RETRIES = 5;
 
 const stockDataSchema = z.object({
   data: z.number(),
 });
 
-const getStockBucket = (): R2Bucket => {
-  if (!_stockBucket) {
-    _stockBucket = ENV.STOCK_BUCKET;
-  }
-  return _stockBucket;
-};
-
-const getStock = async (
+const getStockFromBucket = async (
   productId: string,
-): Promise<{ data: number } | undefined> => {
-  const bucketObject = await getStockBucket().get(productId);
+): Promise<number | undefined> => {
+  const bucketObject = await ENV.STOCK_BUCKET.get(productId);
   if (!bucketObject) {
     return undefined;
   }
@@ -38,7 +29,13 @@ const getStock = async (
     },
   });
 
-  return stockDataSchema.parse(productStock);
+  return stockDataSchema.parse(productStock).data;
+};
+
+const getStock = async (productId: string): Promise<number | null> => {
+  const value = await ENV.STOCK_KV.get(productId);
+  if (value === null) return null;
+  return Number(value);
 };
 
 const updateStock = async ({
@@ -48,24 +45,22 @@ const updateStock = async ({
   id: string;
   stock: number;
 }): Promise<void> => {
-  const stockBucket = getStockBucket();
+  await ENV.STOCK_KV.put(productId, stock.toString());
+
   const lockKey = `lock-${productId}`;
 
   let stockUpdated = false;
   let retries = 0;
 
   while (!stockUpdated && retries < MAX_RETRIES) {
-    retries++;
-    const lock = await acquireLock(stockBucket, lockKey, STOCK_LOCK_TTL);
+    const lock = await acquireLock(ENV.STOCK_BUCKET, lockKey, STOCK_LOCK_TTL);
 
     if (lock) {
-      await stockBucket.put(productId, stringifyObject({ data: stock }));
+      await ENV.STOCK_BUCKET.put(productId, stringifyObject({ data: stock }));
       const cacheKey = getCacheKey(ENV.STOCK_HOST, productId);
-      if (cacheKey) {
-        await purgeCache(cacheKey);
-      }
+      await purgeCache(cacheKey);
 
-      await releaseLock(stockBucket, lockKey);
+      await releaseLock(ENV.STOCK_BUCKET, lockKey);
 
       stockUpdated = true;
 
@@ -76,14 +71,18 @@ const updateStock = async ({
           stock,
         },
       });
+      return;
     } else {
       logger().warn("Failed to acquire lock, trying again", {
         useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
         data: {
           productId,
+          stock,
+          retries,
         },
       });
     }
+    retries++;
   }
 };
 
@@ -98,9 +97,10 @@ const updateMany = async (
 };
 
 const deleteStock = async (productId: string): Promise<void> => {
-  await getStockBucket().delete(productId);
+  await ENV.STOCK_KV.delete(productId);
+  await ENV.STOCK_BUCKET.delete(productId);
 
-  logger().info("Deleted stock from bucket", {
+  logger().info("Deleted stock from bucket and kv", {
     useCase: LoggerUseCaseEnum.DELETE_R2_STOCK,
     data: {
       productId,
@@ -108,8 +108,22 @@ const deleteStock = async (productId: string): Promise<void> => {
   });
 };
 
+const setKVStock = async (productId: string, stock: number): Promise<void> => {
+  await ENV.STOCK_KV.put(productId, stock.toString());
+
+  logger().info("Updated stock in kv", {
+    useCase: LoggerUseCaseEnum.PUT_KV_STOCK,
+    data: {
+      productId,
+      stock,
+    },
+  });
+};
+
 export const stockClient = {
+  getFromBucket: getStockFromBucket,
   get: getStock,
   delete: deleteStock,
   updateMany,
+  setKV: setKVStock,
 };

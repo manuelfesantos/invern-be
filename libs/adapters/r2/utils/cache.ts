@@ -55,8 +55,8 @@ export const purgeCache = async (
   });
 };
 
-export const getCacheKey = (host: string, key: string): string | undefined =>
-  host ? `${host}/${key}` : undefined;
+export const getCacheKey = (host: string, key: string): string =>
+  `${host}/${key}`;
 
 export const getFiles = (
   cacheKey: string | string[],

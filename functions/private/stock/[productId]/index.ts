@@ -15,12 +15,12 @@ export const onRequestGet = requestHandler(async ({ params }) => {
   if (!productId) {
     return errorResponse.BAD_REQUEST("productId is required");
   }
-  const response = await stockClient.get(productId as string);
+  const response = await stockClient.getFromBucket(productId as string);
   if (!response) {
     return errorResponse.NOT_FOUND("product not found");
   }
 
-  return successResponse.OK("success getting stock", response.data, {
+  return successResponse.OK("success getting stock", response, {
     "Access-Control-Allow-Origin": ENV.FRONTEND_HOST,
   });
 });

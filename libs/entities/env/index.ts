@@ -26,6 +26,7 @@ export interface Env {
   SETUP_COUNTRIES_SECRET: string;
   SETUP_STOCK_SECRET: string;
   STOCK_BUCKET: R2Bucket;
+  STOCK_KV: KVNamespace;
   STOCK_HOST: string;
   STRIPE_API_KEY: string;
   STRIPE_CHECKOUT_SECRET: string;
