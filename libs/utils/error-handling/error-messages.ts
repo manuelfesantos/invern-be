@@ -34,7 +34,7 @@ export const errors = {
   PRODUCT_OUT_OF_STOCK: (stock: number): CustomError =>
     new CustomError(
       stock
-        ? `Not enough stock available for this product. Only ${stock} in stock`
+        ? `Not enough stock available for this product. Only ${stock} in stock.`
         : "Product out of stock",
       HttpStatusEnum.BAD_REQUEST,
     ),
