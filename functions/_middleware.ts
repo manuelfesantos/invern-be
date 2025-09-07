@@ -4,7 +4,7 @@ import { HttpMethodEnum } from "@http-entity";
 import { withLogger } from "@logger-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
-import { ENV } from "@env-utils";
+import { setEnv } from "@env-utils";
 
 export const startLogger = middlewareRequestHandler(async (context) => {
   const { env, request } = context;
@@ -56,7 +56,7 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
       country: country || request.cf?.country,
     });
 
-    ENV.initialize(env);
+    setEnv(env);
 
     const response = await contextStore.run(() => withLogger(logger, next));
 

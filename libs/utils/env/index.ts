@@ -1,171 +1,29 @@
 import type { Env } from "@env-entity";
 
-class EnvironmentService {
-  private static instance: EnvironmentService;
-  private _env?: Env;
+type EnvironmentServiceProxy = Readonly<Env>;
+type EnvObject = {
+  env?: Env;
+};
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
+const createProxy = (): EnvironmentServiceProxy => {
+  const service: EnvObject = { env: undefined };
 
-  static getInstance(): EnvironmentService {
-    if (!EnvironmentService.instance) {
-      EnvironmentService.instance = new EnvironmentService();
-    }
-    return EnvironmentService.instance;
-  }
+  const handler: ProxyHandler<EnvObject> = {
+    get(target, prop) {
+      if (!target.env) throw new Error("Environment is not initialized.");
+      if (prop in target.env) {
+        return target.env[prop as keyof Env];
+      }
+      throw new Error(
+        `Property "${String(prop)}" is not defined in environment.`,
+      );
+    },
+  };
 
-  private var<T extends keyof Env>(name: T): Env[T] {
-    const value = this._env?.[name];
-    if (!value) {
-      throw new Error(`${name} is not set`);
-    }
-    return value;
-  }
+  return new Proxy(service, handler) as EnvironmentServiceProxy;
+};
 
-  initialize(env: Env): void {
-    this._env = env;
-  }
-
-  get STRIPE_API_KEY(): string {
-    return this.var("STRIPE_API_KEY");
-  }
-
-  get SENDGRID_API_KEY(): string {
-    return this.var("SENDGRID_API_KEY");
-  }
-
-  get TOKEN_SECRET(): string {
-    return this.var("TOKEN_SECRET");
-  }
-
-  get REFRESH_TOKEN_SECRET(): string {
-    return this.var("REFRESH_TOKEN_SECRET");
-  }
-
-  get STOCK_HOST(): string {
-    if (this.var("ENV") === "local") return "";
-    return this.var("STOCK_HOST");
-  }
-
-  get COUNTRIES_HOST(): string {
-    return this.var("COUNTRIES_HOST");
-  }
-
-  get CACHE_API_KEY(): string {
-    return this.var("CACHE_API_KEY");
-  }
-
-  get CACHE_API_EMAIL(): string {
-    return this.var("CACHE_API_EMAIL");
-  }
-
-  get FRONTEND_HOST(): string {
-    return this.var("FRONTEND_HOST");
-  }
-
-  get ZONE_ID(): string {
-    return this.var("ZONE_ID");
-  }
-
-  get ENV(): string {
-    return this.var("ENV");
-  }
-
-  get SETUP_STOCK_SECRET(): string {
-    return this.var("SETUP_STOCK_SECRET");
-  }
-
-  get SETUP_COUNTRIES_SECRET(): string {
-    return this.var("SETUP_COUNTRIES_SECRET");
-  }
-
-  get STRIPE_ENV(): string {
-    return this.var("STRIPE_ENV");
-  }
-
-  get INSERT_TEST_DATA_SECRET(): string {
-    return this.var("INSERT_TEST_DATA_SECRET");
-  }
-
-  get LOGGER_LEVEL(): string {
-    return this.var("LOGGER_LEVEL");
-  }
-
-  get DOMAIN(): string {
-    return this.var("DOMAIN");
-  }
-
-  get ENCRYPTION_KEY(): string {
-    return this.var("ENCRYPTION_KEY");
-  }
-
-  get DEFAULT_IV(): string {
-    return this.var("DEFAULT_IV");
-  }
-
-  get SALT(): string {
-    return this.var("SALT");
-  }
-
-  get GOOGLE_CLIENT_ID(): string {
-    return this.var("GOOGLE_CLIENT_ID");
-  }
-
-  get GOOGLE_CLIENT_SECRET(): string {
-    return this.var("GOOGLE_CLIENT_SECRET");
-  }
-
-  get GOOGLE_REDIRECT_URI(): string {
-    return this.var("GOOGLE_REDIRECT_URI");
-  }
-
-  get INVERN_DB(): D1Database {
-    return this.var("INVERN_DB");
-  }
-
-  get STOCK_BUCKET(): R2Bucket {
-    return this.var("STOCK_BUCKET");
-  }
-
-  get COUNTRIES_BUCKET(): R2Bucket {
-    return this.var("COUNTRIES_BUCKET");
-  }
-
-  get AUTH_KV(): KVNamespace {
-    return this.var("AUTH_KV");
-  }
-
-  get TURSO_CONNECTION_URL(): string {
-    return this.var("TURSO_CONNECTION_URL");
-  }
-
-  get TURSO_AUTH_TOKEN(): string {
-    return this.var("TURSO_AUTH_TOKEN");
-  }
-
-  get SENDGRID_DOMAIN(): string {
-    return this.var("SENDGRID_DOMAIN");
-  }
-
-  get SENDGRID_NAME(): string {
-    return this.var("SENDGRID_NAME");
-  }
-
-  get VALIDATION_KV(): KVNamespace {
-    return this.var("VALIDATION_KV");
-  }
-
-  get IMAGES_HOST(): string {
-    return this.var("IMAGES_HOST");
-  }
-
-  get STRIPE_CHECKOUT_SECRET(): string {
-    return this.var("STRIPE_CHECKOUT_SECRET");
-  }
-
-  get STRIPE_PAYMENT_SECRET(): string {
-    return this.var("STRIPE_PAYMENT_SECRET");
-  }
-}
-
-export const ENV = EnvironmentService.getInstance();
+export const ENV = createProxy();
+export const setEnv = (env: Env): void => {
+  (ENV as unknown as { env: Env }).env = env;
+};
