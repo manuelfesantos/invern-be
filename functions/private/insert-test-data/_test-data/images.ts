@@ -37,6 +37,13 @@ export const insertImages = async (
         alt: product.name,
         collectionId: undefined,
       },
+      {
+        productId: product.productId,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-thumb.webp`,
+        alt: product.name,
+        collectionId: undefined,
+        isThumbnail: true,
+      },
     ])
     .flat();
 

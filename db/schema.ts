@@ -93,6 +93,11 @@ export const imagesTable = sqliteTable(
     collectionId: text("collectionId")
       .unique()
       .references(() => collectionsTable.id, { onDelete: "set null" }),
+    isThumbnail: int("isThumbnail", {
+      mode: "boolean",
+    })
+      .notNull()
+      .default(false),
   },
   (t) => [index("productId_index").on(t.productId)],
 );

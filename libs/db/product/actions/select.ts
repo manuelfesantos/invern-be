@@ -1,11 +1,11 @@
 import { db } from "@db";
-import { eq, inArray, like, or } from "drizzle-orm";
-import { productsTable } from "@schema";
+import { desc, eq, inArray, like, or } from "drizzle-orm";
+import { imagesTable, productsTable } from "@schema";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
 
-const selectProductsQuery = () => {
-  return db().query.productsTable.findMany({
+const selectProductsQuery = () =>
+  db().query.productsTable.findMany({
     columns: {
       description: false,
       collectionId: false,
@@ -17,10 +17,10 @@ const selectProductsQuery = () => {
           productId: false,
           collectionId: false,
         },
+        orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
   });
-};
 
 const selectProductStockByIdQuery = (productId: string) =>
   db().query.productsTable.findFirst({
@@ -49,6 +49,7 @@ const selectProductsByCollectionIdQuery = (collectionId: string) =>
           productId: false,
           collectionId: false,
         },
+        orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
   });
@@ -66,6 +67,7 @@ const selectProductsBySearchQuery = (search: string) =>
           productId: false,
           collectionId: false,
         },
+        orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
   });
@@ -80,6 +82,7 @@ const selectProductsByProductIdsQuery = (productIds: string[]) =>
           productId: false,
           collectionId: false,
         },
+        orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
   });
