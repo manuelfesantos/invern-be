@@ -1,7 +1,7 @@
 import { db } from "@db";
 import { DEFAULT_PAGE } from "@number-utils";
-import { and, eq } from "drizzle-orm";
-import { cartsTable, productsToCartsTable } from "@schema";
+import { and, desc, eq } from "drizzle-orm";
+import { cartsTable, imagesTable, productsToCartsTable } from "@schema";
 import type { Cart} from "@cart-entity";
 import { cartSchema } from "@cart-entity";
 import type { Result } from "@generics-db";
@@ -64,6 +64,7 @@ const selectCartByIdQuery = (cartId: string) =>
                   collectionId: false,
                 },
                 limit: 1,
+                orderBy: [desc(imagesTable.isThumbnail)],
               },
             },
           },
