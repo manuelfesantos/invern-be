@@ -1,13 +1,20 @@
 import type {
-  ValidateEmailSecretBody} from "@user-entity";
-import {
-  validateEmailSecretBodySchema,
+  ValidateEmailSecretBody,
+  ValidateNewEmailSecretBody,
 } from "@user-entity";
+import { validateNewEmailSecretBodySchema } from "@user-entity";
+import { validateEmailSecretBodySchema } from "@user-entity";
 import {
   deleteBaseValidationSecret,
   setBaseValidationSecret,
   getBaseValidationSecret,
 } from "./base-validation-secret-client";
+
+export const getValidateNewEmailSecret = async (
+  key: string,
+): Promise<ValidateNewEmailSecretBody | null> => {
+  return await getBaseValidationSecret(key, validateNewEmailSecretBodySchema);
+};
 
 export const getValidateEmailSecret = async (
   key: string,

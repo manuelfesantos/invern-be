@@ -108,6 +108,11 @@ export const errors = {
     new CustomError("Unable to parse body", HttpStatusEnum.BAD_REQUEST),
   FORGOT_SECRET_NOT_FOUND: (): CustomError =>
     new CustomError("Verification code not found", HttpStatusEnum.NOT_FOUND),
+  NEW_EMAIL_SECRET_NOT_FOUND: (): CustomError =>
+    new CustomError(
+      "New email verification code not found",
+      HttpStatusEnum.NOT_FOUND,
+    ),
   INVALID_FORGOT_SECRET: (): CustomError =>
     new CustomError("Invalid verification code", HttpStatusEnum.UNAUTHORIZED),
   FORGOT_SECRET_EXPIRED: (): CustomError =>

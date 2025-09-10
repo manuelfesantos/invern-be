@@ -4,14 +4,14 @@ import { contextStore } from "@context-utils";
 import { updateEmailBodySchema } from "../types/update-user";
 import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
-import type { User, ValidateEmailSecretBody } from "@user-entity";
+import type { User, ValidateNewEmailSecretBody } from "@user-entity";
 import { setValidationSecret } from "@kv-adapter";
 import { sendVerifyEmail } from "@sendgrid-adapter";
 import { logCredentials } from "@logger-utils";
 import { SECRET_EXPIRY_MINUTES } from "../utils/values";
 
 export const updateUserEmail = async (body: unknown): Promise<void> => {
-  const { userId, remember, cartId } = contextStore.context;
+  const { userId, cartId } = contextStore.context;
   if (!userId) {
     throw errors.UNAUTHORIZED("not logged in");
   }
@@ -32,12 +32,11 @@ export const updateUserEmail = async (body: unknown): Promise<void> => {
     getFutureDate(SIGNUP_EMAIL_EXPIRY, "milliseconds"),
   );
 
-  const validationSecretBody: ValidateEmailSecretBody = {
+  const validationSecretBody: ValidateNewEmailSecretBody = {
     code: validationCode,
     expiresAt,
     emailsSent: 1,
     attemptsLeft: 3,
-    remember: remember ?? false,
     newEmail: email,
   };
 

@@ -2,7 +2,7 @@ import { contextStore } from "@context-utils";
 import { errors } from "@error-handling-utils";
 import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { validateSubmitEmailCodeBodySchema } from "../types/update-user";
-import { validateEmailSecret } from "@user-module";
+import { validateNewEmailSecret } from "@user-module";
 import { logCredentials } from "@logger-utils";
 import { sendEmailChangeSuccessfulEmail } from "@sendgrid-adapter";
 import { ENV } from "@env-utils";
@@ -21,7 +21,7 @@ export const validateUpdateEmailCode = async (body: unknown): Promise<void> => {
     throw errors.USER_NOT_FOUND();
   }
 
-  const secret = await validateEmailSecret(user.email, code);
+  const secret = await validateNewEmailSecret(user.email, code);
 
   await getUpdateUserAction(userId, {
     email: secret.newEmail,

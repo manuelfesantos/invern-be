@@ -113,7 +113,6 @@ export const signup = async (body: unknown): Promise<void> => {
     emailsSent: 1,
     attemptsLeft: 3,
     remember: parsedBody.remember,
-    newEmail: parsedBody.email,
   };
 
   await setValidationSecret(user.email, validationSecretBody);

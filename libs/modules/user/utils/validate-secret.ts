@@ -1,6 +1,7 @@
 import type {
   BaseValidationSecretBody,
   ValidateEmailSecretBody,
+  ValidateNewEmailSecretBody,
 } from "@user-entity";
 import { errors } from "@error-handling-utils";
 import {
@@ -10,6 +11,7 @@ import {
 } from "../use-cases/forgot-password/utils/values";
 import {
   getValidateEmailSecret,
+  getValidateNewEmailSecret,
   getValidationSecret,
   setValidationSecret,
 } from "@kv-adapter";
@@ -29,6 +31,15 @@ export const validateEmailSecret = async (
   code: string,
 ): Promise<ValidateEmailSecretBody> => {
   const secret = await getValidateEmailSecret(key);
+  if (!secret) throw errors.FORGOT_SECRET_NOT_FOUND();
+  return await validateSecret(key, code, secret);
+};
+
+export const validateNewEmailSecret = async (
+  key: string,
+  code: string,
+): Promise<ValidateNewEmailSecretBody> => {
+  const secret = await getValidateNewEmailSecret(key);
   if (!secret) throw errors.FORGOT_SECRET_NOT_FOUND();
   return await validateSecret(key, code, secret);
 };

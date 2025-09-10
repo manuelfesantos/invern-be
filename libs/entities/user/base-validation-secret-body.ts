@@ -20,10 +20,18 @@ export type BaseValidationSecretBody = z.infer<
 
 export const validateEmailSecretBodySchema =
   baseValidationSecretBodySchema.extend({
-    newEmail: emailSchema("forgot secret email"),
     remember: booleanSchema("forgot secret remember me"),
+  });
+
+export const validateNewEmailSecretBodySchema =
+  baseValidationSecretBodySchema.extend({
+    newEmail: emailSchema("forgot secret email"),
   });
 
 export type ValidateEmailSecretBody = z.infer<
   typeof validateEmailSecretBodySchema
+>;
+
+export type ValidateNewEmailSecretBody = z.infer<
+  typeof validateNewEmailSecretBodySchema
 >;
