@@ -92,6 +92,7 @@ const selectProductByIdQuery = (productId: string) =>
     where: eq(productsTable.id, productId),
     with: {
       images: {
+        where: eq(imagesTable.isThumbnail, false),
         columns: {
           productId: false,
           collectionId: false,
