@@ -45,7 +45,7 @@ const updateStock = async ({
   id: string;
   stock: number;
 }): Promise<void> => {
-  await ENV.STOCK_KV.put(productId, stock.toString());
+  await setKVStock(productId, stock);
 
   const lockKey = `lock-${productId}`;
 
@@ -109,7 +109,9 @@ const deleteStock = async (productId: string): Promise<void> => {
 };
 
 const setKVStock = async (productId: string, stock: number): Promise<void> => {
-  await ENV.STOCK_KV.put(productId, stock.toString());
+  await ENV.STOCK_KV.put(productId, stock.toString(), {
+    expirationTtl: 43200 /* expires in 12 hours */,
+  });
 
   logger().info("Updated stock in kv", {
     useCase: LoggerUseCaseEnum.PUT_KV_STOCK,
