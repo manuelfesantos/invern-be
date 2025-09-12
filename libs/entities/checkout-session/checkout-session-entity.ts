@@ -1,13 +1,7 @@
 import { checkoutSessionsTable } from "@schema";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
-import { optional } from "zod";
+import * as z from "zod";
 import { lineItemSchema } from "@product-entity";
-import {
-  dateTimeSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
 import { selectedShippingMethodSchema } from "@shipping-entity";
 import { countrySchema } from "@country-entity";
 import { addressSchema } from "@address-entity";
@@ -16,11 +10,11 @@ import { userDetailsSchema } from "@user-entity";
 export const insertCheckoutSessionSchema = createInsertSchema(
   checkoutSessionsTable,
   {
-    id: requiredStringSchema("checkout session id"),
-    cartId: optional(uuidSchema("cart id")),
-    createdAt: dateTimeSchema("checkout session created at"),
-    userId: optional(uuidSchema("user id")),
-    expiresAt: dateTimeSchema("checkout session expiration date"),
+    id: z.string().nonempty(),
+    cartId: z.uuidv4(),
+    createdAt: z.iso.datetime({ local: true }),
+    userId: z.uuidv4().nullable(),
+    expiresAt: z.iso.datetime({ local: true }),
     products: lineItemSchema
       .array()
       .transform((value) => JSON.stringify(value)),
@@ -29,7 +23,7 @@ export const insertCheckoutSessionSchema = createInsertSchema(
     ),
     country: countrySchema.transform((value) => JSON.stringify(value)),
     address: addressSchema.transform((value) => JSON.stringify(value)),
-    orderId: uuidSchema("order id"),
+    orderId: z.uuidv4(),
     personalDetails: userDetailsSchema.transform((value) =>
       JSON.stringify(value),
     ),
@@ -41,24 +35,28 @@ export const checkoutSessionSchema = createSelectSchema(checkoutSessionsTable, {
   cartId: insertCheckoutSessionSchema.shape.cartId,
   createdAt: insertCheckoutSessionSchema.shape.createdAt,
   lastModifiedAt: insertCheckoutSessionSchema.shape.lastModifiedAt,
-  userId: insertCheckoutSessionSchema.shape.userId,
+  userId: insertCheckoutSessionSchema.shape.userId.nullable(),
   expiresAt: insertCheckoutSessionSchema.shape.expiresAt,
-  products: requiredStringSchema("checkout products").transform((value) =>
-    lineItemSchema.array().parse(JSON.parse(value)),
-  ),
-  shippingMethod: requiredStringSchema("checkout shipping method").transform(
-    (value) => selectedShippingMethodSchema.parse(JSON.parse(value)),
-  ),
-  country: requiredStringSchema("checkout country").transform((value) =>
-    countrySchema.parse(JSON.parse(value)),
-  ),
-  address: requiredStringSchema("checkout address").transform((value) =>
-    addressSchema.parse(JSON.parse(value)),
-  ),
+  products: z
+    .string()
+    .transform((value: string) =>
+      lineItemSchema.array().parse(JSON.parse(value)),
+    ),
+  shippingMethod: z
+    .string()
+    .transform((value: string) =>
+      selectedShippingMethodSchema.parse(JSON.parse(value)),
+    ),
+  country: z
+    .string()
+    .transform((value: string) => countrySchema.parse(JSON.parse(value))),
+  address: z
+    .string()
+    .transform((value: string) => addressSchema.parse(JSON.parse(value))),
   orderId: insertCheckoutSessionSchema.shape.orderId,
-  personalDetails: requiredStringSchema("checkout personal details").transform(
-    (value) => userDetailsSchema.parse(JSON.parse(value)),
-  ),
+  personalDetails: z
+    .string()
+    .transform((value: string) => userDetailsSchema.parse(JSON.parse(value))),
 });
 
 export type InsertCheckoutSession = z.infer<typeof insertCheckoutSessionSchema>;

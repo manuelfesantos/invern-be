@@ -1,11 +1,11 @@
 import { getCountryByCountryCode } from "@country-module";
-import { countryCodeSchema } from "@global-entity";
 import { getCredentials } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { logCredentials } from "@logger-utils";
 import { countryCache } from "@cache-utils";
 import type { Country } from "@country-entity";
+import * as z from "zod";
 
 const SECOND_INDEX = 1;
 
@@ -34,9 +34,10 @@ const getProtectedContext = middlewareRequestHandler<ProtectedContextData>(
   async ({ data, next, request }) => {
     const { endpoint, countryCode: maybeCountryCode } = data;
 
-    const countryCode = countryCodeSchema.parse(
-      maybeCountryCode?.toUpperCase(),
-    );
+    const countryCode = z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .parse(maybeCountryCode?.toUpperCase());
 
     let country: Country;
 

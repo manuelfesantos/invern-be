@@ -1,7 +1,7 @@
 import { getLoggedInConfig } from "./logged-in";
 import { decodeJwt, verifyRefreshToken } from "@jwt-utils";
 import { loggedOutResponse } from "./utils/responses/logged-out-response";
-import { z } from "zod";
+import * as z from "zod";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { simplifyError } from "@response-entity";

@@ -6,7 +6,7 @@ import {
   getPaymentFromPaymentIntentProcessingEvent,
   getPaymentFromPaymentIntentSucceededEvent,
 } from "@order-module";
-import { z } from "zod";
+import * as z from "zod";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { withRetry } from "./utils/retry-payment";
@@ -20,7 +20,7 @@ const paymentIntentEventMap = {
   "payment_intent.payment_failed": getPaymentFromPaymentIntentFailedEvent,
 };
 
-const paymentIntentTypeSchema = z.enum(
+export const paymentIntentTypeSchema = z.enum(
   [
     "payment_intent.created",
     "payment_intent.succeeded",
@@ -29,8 +29,10 @@ const paymentIntentTypeSchema = z.enum(
     "payment_intent.payment_failed",
   ],
   {
-    message: "invalid payment intent type",
-    required_error: "payment intent type is required",
+    error: (issue) =>
+      issue.input === undefined
+        ? "payment intent type is required"
+        : "invalid payment intent type",
   },
 );
 

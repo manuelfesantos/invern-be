@@ -1,6 +1,6 @@
 import { errorResponse, successResponse } from "@response-entity";
 import { getBodyFromRequest } from "@http-utils";
-import { z } from "zod";
+import * as z from "zod";
 /* eslint-disable import/no-restricted-paths */
 import { stockClient } from "@r2-adapter";
 import { getSelectProductsAction } from "@product-db";

@@ -5,8 +5,7 @@ import {
   getCartIdCookieHeader,
   setCookieInResponse,
 } from "@http-utils";
-import { z } from "zod";
-import { integerSchema } from "@global-entity";
+import * as z from "zod";
 import { updateCartItemQuantity, removeCartItem } from "@cart-module";
 import type { RequestHandlerProps } from "@decorator-utils";
 import { requestHandler } from "@decorator-utils";
@@ -14,7 +13,7 @@ import { requestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
 
 const cartItemUpdateBodySchema = z.object({
-  quantity: integerSchema("cart item quantity"),
+  quantity: z.int().nonnegative(),
 });
 
 const handlerOptions: RequestHandlerProps = {

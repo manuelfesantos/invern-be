@@ -1,11 +1,11 @@
-import type { UserDetails} from "@user-entity";
+import type { UserDetails } from "@user-entity";
 import { userDetailsSchema } from "@user-entity";
 import { encryptObject } from "@crypto-utils";
-import { requiredObjectSchema } from "@global-entity";
 import { contextStore } from "@context-utils";
 import { logCredentials } from "@logger-utils";
+import * as z from "zod";
 
-const userDetailsPostPayloadSchema = requiredObjectSchema("Personal Details", {
+const userDetailsPostPayloadSchema = z.object({
   personalDetails: userDetailsSchema,
 });
 

@@ -30,7 +30,7 @@ export default defineConfig([
           allowHigherOrderFunctions: true,
         },
       ],
-      "@typescript-eslint/no-magic-numbers": "error",
+      // "@typescript-eslint/no-magic-numbers": "error",
       "@typescript-eslint/consistent-type-definitions": "off",
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-restricted-imports": [

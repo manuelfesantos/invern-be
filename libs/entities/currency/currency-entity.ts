@@ -1,28 +1,13 @@
 import { createSelectSchema } from "drizzle-zod";
 import { currenciesTable } from "@schema";
-import type { z } from "zod";
-import {
-  dateTimeSchema,
-  positiveNumberSchema,
-  requiredStringSchema,
-} from "@global-entity";
-
-const CURRENCY_CODE_LENGTH = 3;
-
-export const currencyCodeSchema = requiredStringSchema("Currency code")
-  .refine((value) => value.length === CURRENCY_CODE_LENGTH, {
-    message: "Currency code should be a 3 letter string",
-  })
-  .refine((value) => /^[A-Z]+$/.test(value), {
-    message: "Currency code should be uppercase",
-  });
+import * as z from "zod";
 
 const baseCurrencySchema = createSelectSchema(currenciesTable, {
-  name: requiredStringSchema("Currency name"),
-  code: currencyCodeSchema,
-  rateToEuro: positiveNumberSchema("Currency rate to euro"),
-  createdAt: dateTimeSchema("Currency creation date"),
-  lastModifiedAt: dateTimeSchema("Currency last modified date"),
+  name: z.string().nonempty(),
+  code: z.string().regex(/^[A-Z]{3}$/),
+  rateToEuro: z.number().nonnegative(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
 });
 
 export const insertCurrencySchema = baseCurrencySchema.omit({

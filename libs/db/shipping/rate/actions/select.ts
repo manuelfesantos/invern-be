@@ -3,9 +3,9 @@ import type { ShippingRate } from "@shipping-entity";
 import { db } from "@db";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingRatesTable } from "@schema";
-import { countryCodeSchema } from "@global-entity";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import * as z from "zod";
 
 const selectShippingRateByIdQuery = (id: string) =>
   db().query.shippingRatesTable.findFirst({
@@ -28,7 +28,10 @@ const mapShippingRateFromSelectQueryResult = (
   return {
     ...queryResult,
     countryCodes: queryResult.ratesToCountries.map((rateToCountry) =>
-      countryCodeSchema.parse(rateToCountry.countryCode),
+      z
+        .string()
+        .regex(/^[A-Z]{2}$/)
+        .parse(rateToCountry.countryCode),
     ),
   };
 };
@@ -61,7 +64,10 @@ const mapShippingRatesFromSelectQueryResult = (
   return queryResult.map((shippingRateTemplate) => ({
     ...shippingRateTemplate,
     countryCodes: shippingRateTemplate.ratesToCountries.map((rateToCountry) =>
-      countryCodeSchema.parse(rateToCountry.countryCode),
+      z
+        .string()
+        .regex(/^[A-Z]{2}$/)
+        .parse(rateToCountry.countryCode),
     ),
   }));
 };

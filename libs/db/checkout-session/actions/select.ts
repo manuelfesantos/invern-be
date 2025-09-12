@@ -3,11 +3,8 @@ import { eq } from "drizzle-orm";
 import { checkoutSessionsTable } from "@schema";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
-import type {
-  CheckoutSession} from "@checkout-session-entity";
-import {
-  checkoutSessionSchema,
-} from "@checkout-session-entity";
+import type { CheckoutSession } from "@checkout-session-entity";
+import { checkoutSessionSchema } from "@checkout-session-entity";
 
 const selectCheckoutSessionByIdQuery = (id: string) =>
   db().query.checkoutSessionsTable.findFirst({

@@ -6,13 +6,12 @@ import {
 import { CookieNameEnum } from "@http-entity";
 import { protectedSuccessResponse } from "@response-entity";
 import { requestHandler } from "@decorator-utils";
-import { emailSchema, requiredStringSchema } from "@global-entity";
-import { z } from "zod";
+import * as z from "zod";
 import { validateEmailSecret, validateUser } from "@user-module";
 
 const validateEmailBodySchema = z.object({
-  code: requiredStringSchema("signup secret code"),
-  email: emailSchema("customer email"),
+  code: z.string().nonempty(),
+  email: z.email(),
 });
 
 export const onRequestPost = requestHandler(async ({ request }) => {

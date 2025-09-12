@@ -120,7 +120,7 @@ export const productsToCartsTable = sqliteTable(
 
 export const ordersTable = sqliteTable("orders", {
   ...baseResourceWithId,
-  stripeId: text("stripeId").unique().notNull(),
+  stripeId: text("stripeId").notNull().unique(),
   userId: text("userId").references(() => usersTable.id, {
     onDelete: "cascade",
   }),

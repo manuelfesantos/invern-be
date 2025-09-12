@@ -2,7 +2,7 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { acquireLock, getCacheKey, purgeCache, releaseLock } from "../utils";
 import { stringifyObject } from "@string-utils";
-import { z } from "zod";
+import * as z from "zod";
 import { ENV } from "@env-utils";
 
 const STOCK_LOCK_TTL = 3000;

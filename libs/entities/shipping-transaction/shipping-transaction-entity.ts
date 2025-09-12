@@ -1,7 +1,6 @@
 import { createInsertSchema } from "drizzle-zod";
 import { shippingTransactionsTable } from "@schema";
-import { z } from "zod";
-import { dateTimeSchema, urlSchema } from "@global-entity";
+import * as z from "zod";
 
 const shippingTransactionStatusEnumSchema = z.enum(
   shippingTransactionsTable.status.enumValues,
@@ -11,9 +10,9 @@ export const shippingTransactionSchema = createInsertSchema(
   shippingTransactionsTable,
   {
     status: shippingTransactionStatusEnumSchema,
-    createdAt: dateTimeSchema("shippingTransaction created at"),
-    trackingUrl: urlSchema("tracking url"),
-    lastModifiedAt: dateTimeSchema("shippingTransaction updated at"),
+    trackingUrl: z.url().nullable(),
+    createdAt: z.iso.datetime({ local: true }),
+    lastModifiedAt: z.iso.datetime({ local: true }),
   },
 );
 

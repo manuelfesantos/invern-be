@@ -1,30 +1,24 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { imagesTable } from "@schema";
-import { z } from "zod";
-import {
-  dateTimeSchema,
-  requiredStringSchema,
-  urlSchema,
-  uuidSchema,
-} from "@global-entity";
+import * as z from "zod";
 
 export const imageSchema = createSelectSchema(imagesTable, {
-  productId: uuidSchema("product id"),
-  collectionId: z.optional(uuidSchema("collection id")),
-  url: urlSchema("image url"),
-  alt: requiredStringSchema("image alt"),
-  createdAt: dateTimeSchema("image creation date"),
-  lastModifiedAt: dateTimeSchema("image last modified date"),
+  productId: z.uuidv4(),
+  collectionId: z.uuidv4().optional(),
+  url: z.url(),
+  alt: z.string().nonempty(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
 }).omit({
   collectionId: true,
   productId: true,
 });
 
 export const insertImageSchema = createInsertSchema(imagesTable, {
-  alt: requiredStringSchema("image alt"),
-  url: urlSchema("image url"),
-  productId: uuidSchema("product id"),
-  collectionId: z.optional(uuidSchema("collection id")),
+  alt: z.string().nonempty(),
+  url: z.url(),
+  productId: z.uuidv4(),
+  collectionId: z.uuidv4().optional(),
 });
 
 export const imageDTOSchema = imageSchema.omit({

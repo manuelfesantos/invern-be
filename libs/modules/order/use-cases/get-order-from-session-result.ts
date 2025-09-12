@@ -6,13 +6,8 @@ import {
   getUpdatePaymentAction,
 } from "@payment-db";
 import type { InsertPayment } from "@payment-entity";
-import type {
-  BaseOrder,
-  ClientOrder} from "@order-entity";
-import {
-  clientOrderSchema,
-  insertOrderSchema,
-} from "@order-entity";
+import type { BaseOrder, ClientOrder } from "@order-entity";
+import { clientOrderSchema, insertOrderSchema } from "@order-entity";
 import { errors } from "@error-handling-utils";
 import { getDeleteCartAction, getInsertCartAction } from "@cart-db";
 import { getIncrementUserVersionAction, getUpdateUserAction } from "@user-db";
@@ -61,6 +56,7 @@ export const getOrderFromSessionResult = async (
   const insertShippingTransactionAction = getInsertShippingTransactionAction({
     status: ShippingTransactionStatusEnum.processing,
     id: shippingTransactionId,
+    trackingUrl: null,
   });
 
   const newOrder: BaseOrder = {

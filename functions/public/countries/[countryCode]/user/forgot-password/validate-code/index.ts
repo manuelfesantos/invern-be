@@ -1,13 +1,12 @@
 import { requestHandler } from "@decorator-utils";
-import { z } from "zod";
-import { emailSchema, requiredStringSchema } from "@global-entity";
+import * as z from "zod";
 import { getBodyFromRequest } from "@http-utils";
 import { protectedSuccessResponse } from "@response-entity";
 import { validateCode } from "@user-module";
 
 const validateCodeBodySchema = z.object({
-  code: requiredStringSchema("forgot password secret code"),
-  email: emailSchema("customer email"),
+  code: z.string().nonempty(),
+  email: z.email(),
 });
 
 export const onRequestPost = requestHandler(async ({ request }) => {

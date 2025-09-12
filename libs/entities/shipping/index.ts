@@ -1,21 +1,14 @@
 import { createSelectSchema } from "drizzle-zod";
 import { shippingMethodsTable, shippingRatesTable } from "@schema";
-import {
-  positiveIntegerSchema,
-  requiredStringSchema,
-  uuidSchema,
-  countryCodeSchema,
-  dateTimeSchema,
-} from "@global-entity";
-import type { z } from "zod";
+import * as z from "zod";
 
 export const baseShippingMethodSchema = createSelectSchema(
   shippingMethodsTable,
   {
-    name: requiredStringSchema("shipping method name"),
-    id: uuidSchema("shipping method id"),
-    createdAt: dateTimeSchema("shipping method created at date"),
-    lastModifiedAt: dateTimeSchema("shipping method last modified at date"),
+    name: z.string().nonempty(),
+    id: z.uuidv4(),
+    createdAt: z.iso.datetime({ local: true }),
+    lastModifiedAt: z.iso.datetime({ local: true }),
   },
 );
 
@@ -40,13 +33,13 @@ export type EssentialShippingMethod = z.infer<
 
 export const baseShippingRateSchema = createSelectSchema(shippingRatesTable, {
   shippingMethodId: baseShippingMethodSchema.shape.id,
-  id: uuidSchema("shipping rate id"),
-  createdAt: dateTimeSchema("shipping rate created at date"),
-  lastModifiedAt: dateTimeSchema("shipping rate last modified at date"),
-  priceInCents: positiveIntegerSchema("price in cents"),
-  minWeight: positiveIntegerSchema("min weight"),
-  maxWeight: positiveIntegerSchema("max weight"),
-  deliveryTime: positiveIntegerSchema("delivery time"),
+  id: z.uuidv4(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  priceInCents: z.int().nonnegative(),
+  minWeight: z.int().nonnegative(),
+  maxWeight: z.int().nonnegative(),
+  deliveryTime: z.int().nonnegative(),
 });
 
 export const insertShippingRateSchema = baseShippingRateSchema.omit({
@@ -58,7 +51,10 @@ export const insertShippingRateSchema = baseShippingRateSchema.omit({
 export const shippingRateSchema = baseShippingRateSchema
   .omit({ shippingMethodId: true, id: true })
   .extend({
-    countryCodes: countryCodeSchema.array(),
+    countryCodes: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .array(),
   });
 
 export const shippingMethodSchema = baseShippingMethodSchema.extend({

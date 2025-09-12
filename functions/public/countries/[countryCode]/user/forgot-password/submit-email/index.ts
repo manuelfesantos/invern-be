@@ -1,12 +1,11 @@
 import { getBodyFromRequest } from "@http-utils";
-import { z } from "zod";
-import { emailSchema } from "@global-entity";
+import * as z from "zod";
 import { submitEmail } from "@user-module";
 import { requestHandler } from "@decorator-utils";
 import { protectedSuccessResponse } from "@response-entity";
 
 const forgotPasswordBodySchema = z.object({
-  email: emailSchema("customer email"),
+  email: z.email(),
 });
 
 export const onRequestPost = requestHandler(async ({ request }) => {

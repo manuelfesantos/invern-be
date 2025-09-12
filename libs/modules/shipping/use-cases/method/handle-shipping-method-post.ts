@@ -1,20 +1,16 @@
-import type {
-  SelectedShippingMethod} from "@shipping-entity";
-import {
-  selectedShippingMethodSchema,
-} from "@shipping-entity";
-import { z } from "zod";
+import type { SelectedShippingMethod } from "@shipping-entity";
+import { selectedShippingMethodSchema } from "@shipping-entity";
+import * as z from "zod";
 import { contextStore } from "@context-utils";
 import { getSelectShippingMethodAction } from "@shipping-db";
 import { validateCartId } from "@cart-db";
 import { errors } from "@error-handling-utils";
 import { encrypt } from "@crypto-utils";
-import { requiredStringSchema } from "@global-entity";
 import { getCartWeight, toCartDTO } from "@cart-entity";
 import { extendCart } from "@extender-utils";
 
 const shippingMethodPostBodySchema = z.object({
-  id: requiredStringSchema("shipping method id"),
+  id: z.uuidv4(),
 });
 
 export const handleShippingMethodPost = async (

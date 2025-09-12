@@ -9,8 +9,11 @@ import { actionBuilder } from "@generics-db";
 const insertShippingTransactionQuery = (
   insertShippingTransaction: InsertShippingTransaction,
 ) => {
+  const dateTime = new Date().toISOString();
   const shippingTransaction: ShippingTransaction = {
     ...insertShippingTransaction,
+    createdAt: dateTime,
+    lastModifiedAt: dateTime,
   };
   return db()
     .insert(shippingTransactionsTable)

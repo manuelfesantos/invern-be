@@ -1,20 +1,15 @@
 import { createSelectSchema } from "drizzle-zod";
 import { collectionsTable } from "@schema";
-import { z } from "zod";
+import * as z from "zod";
 import { extendedProductSchema, productSchema } from "@product-entity";
 import { imageSchema } from "@image-entity";
-import {
-  dateTimeSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
 
 const baseCollectionSchema = createSelectSchema(collectionsTable, {
-  id: uuidSchema("collection id"),
-  name: requiredStringSchema("collection name"),
-  description: requiredStringSchema("collection description"),
-  lastModifiedAt: dateTimeSchema("collection last modified date"),
-  createdAt: dateTimeSchema("collection creation date"),
+  id: z.uuidv4(),
+  name: z.string().nonempty(),
+  description: z.string().nonempty(),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  createdAt: z.iso.datetime({ local: true }),
 });
 export const insertCollectionSchema = baseCollectionSchema.omit({
   id: true,
@@ -22,11 +17,9 @@ export const insertCollectionSchema = baseCollectionSchema.omit({
   createdAt: true,
 });
 
-export const collectionDetailsSchema = baseCollectionSchema.merge(
-  z.object({
-    products: z.array(productSchema),
-  }),
-);
+export const collectionDetailsSchema = baseCollectionSchema.extend({
+  products: z.array(productSchema),
+});
 
 export const extendedCollectionDetailsSchema = collectionDetailsSchema.extend({
   products: extendedProductSchema.array(),
@@ -34,11 +27,9 @@ export const extendedCollectionDetailsSchema = collectionDetailsSchema.extend({
 
 export const collectionSchema = baseCollectionSchema
   .omit({ description: true })
-  .merge(
-    z.object({
-      image: imageSchema.nullable(),
-    }),
-  );
+  .extend({
+    image: imageSchema.nullable(),
+  });
 
 export type CollectionDetails = z.infer<typeof collectionDetailsSchema>;
 export type Collection = z.infer<typeof collectionSchema>;

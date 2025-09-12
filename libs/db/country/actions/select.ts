@@ -1,4 +1,4 @@
-import type { Country} from "@country-entity";
+import type { Country } from "@country-entity";
 import { countrySchema } from "@country-entity";
 import { db } from "@db";
 import { eq } from "drizzle-orm";
@@ -40,9 +40,7 @@ const selectAllCountriesQuery = () =>
 const mapCountryFromQueryResult = (
   queryResult: Result<typeof selectCountryByCodeQuery>,
 ): Country | undefined => {
-  if (!queryResult) {
-    return;
-  }
+  if (!queryResult) return;
   return countrySchema.parse({
     ...queryResult,
     taxes: queryResult?.taxes ?? [],

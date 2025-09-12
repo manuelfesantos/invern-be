@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 export const httpMethodsSchema = z.enum(
   ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],

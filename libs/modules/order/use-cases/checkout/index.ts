@@ -1,7 +1,7 @@
 import { createStripeCheckoutSession } from "@stripe-adapter";
 import { getIncreaseProductsStockAction } from "@product-db";
 import { errors } from "@error-handling-utils";
-import type { LineItem} from "@product-entity";
+import type { LineItem } from "@product-entity";
 import { lineItemSchema } from "@product-entity";
 import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
@@ -16,17 +16,14 @@ import { decrypt, decryptObjectString, getRandomUUID } from "@crypto-utils";
 import type { Country } from "@country-entity";
 import type { Address } from "@address-entity";
 import { getSelectShippingMethodAction } from "@shipping-db";
-import type { Cart, FilledCart} from "@cart-entity";
+import type { Cart, FilledCart } from "@cart-entity";
 import { getCartWeight, toCartDTO } from "@cart-entity";
-import type { UserDetails} from "@user-entity";
+import type { UserDetails } from "@user-entity";
 import { userDetailsSchema } from "@user-entity";
 import { getSelectUserByIdAction } from "@user-db";
 import type { SelectedShippingMethod } from "@shipping-entity";
-import type {
-  CheckoutSession} from "@checkout-session-entity";
-import {
-  insertCheckoutSessionSchema,
-} from "@checkout-session-entity";
+import type { CheckoutSession } from "@checkout-session-entity";
+import { insertCheckoutSessionSchema } from "@checkout-session-entity";
 import { extendCart } from "@extender-utils";
 
 interface CheckoutReturnType {
@@ -45,6 +42,7 @@ export const getCheckoutSession = async (
     shippingMethodId,
     userDetails,
   } = contextStore.context;
+  if (!cartId) throw errors.NOT_ALLOWED("Missing cart id");
 
   const address = await getValidatedAddressFromString(country, addressString);
 
@@ -79,7 +77,7 @@ export const getCheckoutSession = async (
     id,
     orderId,
     userId: userId ?? null,
-    cartId: cartId ?? null,
+    cartId: cartId,
     expiresAt: getDateTime(expires_at * MILLISECONDS_IN_SECOND),
     createdAt: getDateTime(created * MILLISECONDS_IN_SECOND),
     products: cart.products,

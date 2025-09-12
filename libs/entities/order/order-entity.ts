@@ -5,16 +5,11 @@ import { addressSchema } from "@address-entity";
 import { clientPaymentSchema } from "@payment-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 import { clientCurrencySchema } from "@currency-entity";
-import {
-  dateTimeSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
 import { countrySchema } from "@country-entity";
 import { selectedShippingMethodSchema } from "@shipping-entity";
 import { userDetailsSchema } from "@user-entity";
 import { shippingTransactionSchema } from "@shipping-transaction-entity";
-import { z } from "zod";
+import * as z from "zod";
 
 const orderStatusSchema = z.enum([
   "processing_payment",
@@ -26,28 +21,30 @@ const orderStatusSchema = z.enum([
 ]);
 
 export const baseOrderSchema = createSelectSchema(ordersTable, {
-  id: uuidSchema("order id"),
-  userId: z.optional(uuidSchema("user id")),
-  paymentId: z.optional(requiredStringSchema("payment id")),
-  stripeId: requiredStringSchema("stripe id"),
-  createdAt: dateTimeSchema("order creation date"),
-  lastModifiedAt: dateTimeSchema("order last modified date"),
-  products: requiredStringSchema("products").transform((value) =>
-    lineItemSchema.array().parse(JSON.parse(value)),
-  ),
-  address: requiredStringSchema("address").transform((value) =>
-    addressSchema.parse(JSON.parse(value)),
-  ),
-  country: requiredStringSchema("country").transform((value) =>
-    countrySchema.parse(JSON.parse(value)),
-  ),
-  shippingMethod: requiredStringSchema("shipping method").transform((value) =>
-    selectedShippingMethodSchema.parse(JSON.parse(value)),
-  ),
-  shippingTransactionId: uuidSchema("shipping transaction id"),
-  personalDetails: requiredStringSchema("order personal details").transform(
-    (value) => userDetailsSchema.parse(JSON.parse(value)),
-  ),
+  id: z.uuidv4(),
+  userId: z.uuidv4().nullable(),
+  paymentId: z.string().nonempty().optional(),
+  stripeId: z.string().nonempty(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  products: z
+    .string()
+    .transform((value) => lineItemSchema.array().parse(JSON.parse(value))),
+  address: z
+    .string()
+    .transform((value) => addressSchema.parse(JSON.parse(value))),
+  country: z
+    .string()
+    .transform((value) => countrySchema.parse(JSON.parse(value))),
+  shippingMethod: z
+    .string()
+    .transform((value) =>
+      selectedShippingMethodSchema.parse(JSON.parse(value)),
+    ),
+  shippingTransactionId: z.uuidv4(),
+  personalDetails: z
+    .string()
+    .transform((value) => userDetailsSchema.parse(JSON.parse(value))),
 });
 
 export const insertOrderSchema = createInsertSchema(ordersTable, {
@@ -63,7 +60,8 @@ export const insertOrderSchema = createInsertSchema(ordersTable, {
   products: lineItemSchema.array().transform((value) => JSON.stringify(value)),
   country: countrySchema.transform((value) => JSON.stringify(value)),
   address: addressSchema.transform((value) => JSON.stringify(value)),
-  personalDetails: userDetailsSchema.transform((value) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  personalDetails: userDetailsSchema.transform((value: any) =>
     JSON.stringify(value),
   ),
 });
@@ -103,9 +101,9 @@ export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type BaseOrder = z.infer<typeof baseOrderSchema>;
 
 export const invalidateCheckoutCookiePayloadSchema = z.object({
-  checkoutSessionId: requiredStringSchema("checkout session id"),
-  expiresAt: requiredStringSchema("expires at"),
+  checkoutSessionId: z.string().nonempty(),
+  expiresAt: z.string().nonempty(),
 });
 
-export const OrderStatus = orderStatusSchema.Enum;
+export const OrderStatus = orderStatusSchema.enum;
 export type OrderStatusType = z.infer<typeof orderStatusSchema>;

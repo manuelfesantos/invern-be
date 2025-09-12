@@ -1,7 +1,7 @@
 import { errorResponse, successResponse } from "@response-entity";
 import { insertData } from "./_test-data";
 import { getBodyFromRequest } from "@http-utils";
-import { z } from "zod";
+import * as z from "zod";
 import { requestHandler } from "@decorator-utils";
 import { ENV } from "@env-utils";
 

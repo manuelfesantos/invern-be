@@ -3,9 +3,9 @@ import type { ShippingMethod } from "@shipping-entity";
 import { db } from "@db";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingMethodsTable, shippingRatesTable } from "@schema";
-import { countryCodeSchema } from "@global-entity";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import * as z from "zod";
 
 const selectShippingMethodQuery = (id: string, weight?: number) =>
   db().query.shippingMethodsTable.findFirst({
@@ -41,7 +41,10 @@ const mapShippingMethodFromSelectResult = (
     rates: queryResult.rates.map((rate) => ({
       ...rate,
       countryCodes: rate.ratesToCountries.map((rateToCountry) =>
-        countryCodeSchema.parse(rateToCountry.countryCode),
+        z
+          .string()
+          .regex(/^[A-Z]{2}$/)
+          .parse(rateToCountry.countryCode),
       ),
     })),
   };
@@ -76,7 +79,10 @@ const mapShippingMethodsFromSelectResult = (
     rates: result.rates.map((rate) => ({
       ...rate,
       countryCodes: rate.ratesToCountries.map((rateToCountry) =>
-        countryCodeSchema.parse(rateToCountry.countryCode),
+        z
+          .string()
+          .regex(/^[A-Z]{2}$/)
+          .parse(rateToCountry.countryCode),
       ),
     })),
   }));

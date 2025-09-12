@@ -1,45 +1,43 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { paymentMethodsTable, paymentsTable } from "@schema";
-import { z } from "zod";
-import {
-  dateTimeSchema,
-  positiveIntegerSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
+import * as z from "zod";
 
 export const paymentMethodTypeSchema = z.enum(
   paymentMethodsTable.type.enumValues,
   {
-    required_error: "payment method type is required",
-    invalid_type_error: "payment method type should be a text",
+    error: (issue) =>
+      issue.input === undefined
+        ? "payment method type is required"
+        : "invalid payment method type",
   },
 );
-export const PaymentMethodType = paymentMethodTypeSchema.Enum;
+export const PaymentMethodType = paymentMethodTypeSchema.enum;
 
 export const paymentIntentStateSchema = z.enum(paymentsTable.state.enumValues, {
-  required_error: "payment intent state is required",
-  invalid_type_error: "payment intent state should be a text",
+  error: (issue) =>
+    issue.input === undefined
+      ? "payment intent state is required"
+      : "invalid payment intent state",
 });
-export const PaymentIntentState = paymentIntentStateSchema.Enum;
+export const PaymentIntentState = paymentIntentStateSchema.enum;
 
 const basePaymentSchema = createSelectSchema(paymentsTable, {
-  id: uuidSchema("payment id"),
+  id: z.string().nonempty(),
   state: paymentIntentStateSchema,
-  createdAt: dateTimeSchema("payment created at date"),
-  lastModifiedAt: dateTimeSchema("payment last modified at date"),
-  netAmount: positiveIntegerSchema("payment net amount").optional(),
-  grossAmount: positiveIntegerSchema("payment gross amount"),
-  paymentMethodId: requiredStringSchema("payment method id").optional(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  netAmount: z.int().nonnegative(),
+  grossAmount: z.int().nonnegative(),
+  paymentMethodId: z.string().nonempty().nullable(),
 });
 
 export const basePaymentMethodSchema = createSelectSchema(paymentMethodsTable, {
-  id: requiredStringSchema("payment method id"),
+  id: z.string().nonempty(),
   type: paymentMethodTypeSchema,
-  brand: requiredStringSchema("payment method brand").optional(),
-  last4: requiredStringSchema("payment method last 4").optional(),
-  createdAt: dateTimeSchema("payment method created at date"),
-  lastModifiedAt: dateTimeSchema("payment method last modified at date"),
+  brand: z.string().nonempty().nullable(),
+  last4: z.string().nonempty().nullable(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
 });
 
 export const insertPaymentMethodSchema = createInsertSchema(

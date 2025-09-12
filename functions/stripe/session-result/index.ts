@@ -1,10 +1,9 @@
 import { errorResponse, prepareError, successResponse } from "@response-entity";
 import { isStripeEnvValid } from "@http-utils";
-import type {
-  StripeEvent} from "@stripe-entity";
+import type { StripeEvent } from "@stripe-entity";
 import {
   isStripeSessionExpiredEvent,
-  isStripeSessionResultEvent
+  isStripeSessionResultEvent,
 } from "@stripe-entity";
 import {
   getOrderFromSessionResult,
@@ -14,7 +13,6 @@ import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
 import { requestHandler } from "@decorator-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-
 // eslint-disable-next-line import/no-restricted-paths
 import { stripe } from "@stripe-adapter";
 import { ENV } from "@env-utils";

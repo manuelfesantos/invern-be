@@ -25,9 +25,6 @@ const selectOrdersQuery = (
     ...(whereClause && { where: whereClause }),
     with: {
       payment: {
-        columns: {
-          paymentMethodId: false,
-        },
         with: {
           paymentMethod: true,
         },

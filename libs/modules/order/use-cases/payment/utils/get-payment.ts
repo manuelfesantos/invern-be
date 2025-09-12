@@ -2,7 +2,8 @@ import type { PaymentIntent, StripeSessionResult } from "@stripe-entity";
 import type {
   InsertPayment,
   InsertPaymentMethod,
-  PaymentIntentStateType} from "@payment-entity";
+  PaymentIntentStateType,
+} from "@payment-entity";
 import {
   PaymentIntentState,
   PaymentMethodType,
@@ -22,6 +23,7 @@ export const getPaymentFromSessionResult = (
     grossAmount: validateAmount(sessionResult.amount_total),
     netAmount: validateAmount(sessionResult.amount_subtotal),
     state: PaymentIntentState.draft,
+    paymentMethodId: null,
   };
 
   return { payment };
@@ -36,14 +38,14 @@ export const getPaymentFromPaymentIntent = async (
   const paymentMethodId =
     typeof paymentIntent.payment_method === "string"
       ? paymentIntent.payment_method
-      : paymentIntent.payment_method?.id;
+      : (paymentIntent.payment_method?.id ?? null);
 
   const payment: InsertPayment = {
     id: validatePaymentIntent(paymentIntent),
     grossAmount: validateAmount(paymentIntent.amount),
     state: type,
     paymentMethodId,
-  };
+  } as InsertPayment;
 
   if (!paymentMethodId) {
     return { payment };
@@ -52,6 +54,8 @@ export const getPaymentFromPaymentIntent = async (
   const paymentMethod: InsertPaymentMethod = {
     id: paymentMethodId,
     type: paymentMethodTypeSchema.parse(paymentMethodType),
+    brand: null,
+    last4: null,
   };
 
   if (paymentMethod.type !== PaymentMethodType.card) {
@@ -60,8 +64,8 @@ export const getPaymentFromPaymentIntent = async (
 
   const stripePaymentMethod = await getPaymentMethod(paymentMethodId);
 
-  paymentMethod.brand = stripePaymentMethod.card?.brand;
-  paymentMethod.last4 = stripePaymentMethod.card?.last4;
+  paymentMethod.brand = stripePaymentMethod.card?.brand ?? null;
+  paymentMethod.last4 = stripePaymentMethod.card?.last4 ?? null;
 
   return { payment, paymentMethod };
 };

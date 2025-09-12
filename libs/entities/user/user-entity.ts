@@ -1,32 +1,24 @@
 import { createInsertSchema } from "drizzle-zod";
 import { usersTable } from "@schema";
-import { z } from "zod";
+import * as z from "zod";
 import { cartSchema } from "@cart-entity";
-import {
-  booleanSchema,
-  dateTimeSchema,
-  emailSchema,
-  requiredObjectSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
 import { addressSchema } from "@address-entity";
 
 export const DEFAULT_USER_VERSION = 1;
 
 export const baseUserSchema = createInsertSchema(usersTable, {
-  id: uuidSchema("user id"),
-  createdAt: dateTimeSchema("user creation date"),
-  lastModifiedAt: dateTimeSchema("user last modified date"),
-  password: requiredStringSchema("user password"),
+  id: z.uuidv4(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  password: z.string().nonempty().nullable(),
   version: z.number().default(DEFAULT_USER_VERSION),
   role: z.enum(["ADMIN", "USER"]).default("USER"),
-  email: emailSchema("user mail"),
-  firstName: requiredStringSchema("user first name"),
-  lastName: requiredStringSchema("user last name").optional(),
-  googleUserId: requiredStringSchema("user google id").optional(),
-  isOauth: booleanSchema("user is oauth").default(false),
-  isValidated: booleanSchema("user is validated").default(false),
+  email: z.email(),
+  firstName: z.string().nonempty(),
+  lastName: z.string().nonempty().nullable(),
+  googleUserId: z.string().nonempty().nullable(),
+  isOauth: z.boolean(),
+  isValidated: z.boolean(),
 });
 
 export const insertUserSchema = baseUserSchema.omit({
@@ -61,7 +53,7 @@ export const toUserDTO = (user: User): UserDTO => {
   return userDTOSchema.parse(user);
 };
 
-export const userDetailsSchema = requiredObjectSchema("Personal details", {
+export const userDetailsSchema = z.object({
   email: insertUserSchema.shape.email,
   firstName: insertUserSchema.shape.firstName,
   lastName: insertUserSchema.shape.lastName,

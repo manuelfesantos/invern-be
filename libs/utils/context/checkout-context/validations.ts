@@ -1,14 +1,11 @@
 import { contextStore } from "@context-utils";
 import { decrypt, decryptObjectString } from "@crypto-utils";
-import type { Address} from "@address-entity";
+import type { Address } from "@address-entity";
 import { addressSchema } from "@address-entity";
 import { userDetailsSchema } from "@user-entity";
-import type {
-  CheckoutStageName} from "@checkout-session-entity";
-import {
-  CheckoutStageNameEnum
-} from "@checkout-session-entity";
-import { uuidSchema } from "@global-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
+import * as z from "zod";
 
 const isAddressValid = async (): Promise<boolean> => {
   const { address: addressString, country } = contextStore.context;
@@ -30,7 +27,7 @@ const isShippingMethodValid = async (): Promise<boolean> => {
   const { shippingMethodId } = contextStore.context;
   if (!shippingMethodId) return false;
   const shippingMethod = await decrypt(shippingMethodId);
-  return uuidSchema("").safeParse(shippingMethod).success;
+  return z.uuidv4().safeParse(shippingMethod).success;
 };
 
 const isReviewValid = async (): Promise<boolean> => {

@@ -1,5 +1,4 @@
-import type { ZodError } from "zod";
-import { z } from "zod";
+import * as z from "zod";
 import { HttpStatusEnum } from "@http-entity";
 import { buildResponse } from "./response";
 /* eslint-disable import/no-restricted-paths */
@@ -61,7 +60,7 @@ export const prepareError = (message: string, cause?: string): SimpleError => {
 };
 
 interface SimplifiedZodError {
-  issues: z.ZodIssue[];
+  issues: z.core.$ZodIssue[];
   name: string;
   cause: unknown;
   stack?: string;
@@ -140,7 +139,7 @@ export const buildErrorResponse = (
   headers?: Record<string, string>,
 ): Response => buildResponse(error, { status }, headers);
 
-export const simplifyZodError = (error: ZodError): SimplifiedZodError => {
+export const simplifyZodError = (error: z.ZodError): SimplifiedZodError => {
   return {
     issues: error.issues,
     name: error.name,

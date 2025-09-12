@@ -1,31 +1,23 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { cartsTable } from "@schema";
-import { z } from "zod";
+import * as z from "zod";
 import { extendedLineItemSchema, lineItemSchema } from "@product-entity";
-import {
-  booleanSchema,
-  dateTimeSchema,
-  positiveIntegerSchema,
-  uuidSchema,
-} from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 
 const cartOperationSchema = z.enum(["ADD", "REMOVE", "UPDATE", "UPSERT"]);
 
 const baseCartSchema = createSelectSchema(cartsTable, {
-  id: uuidSchema("cart id"),
-  createdAt: dateTimeSchema("cart creation date"),
-  lastModifiedAt: dateTimeSchema("cart last modified date"),
-  isLoggedIn: booleanSchema("cart logged in status"),
+  id: z.uuidv4(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
+  isLoggedIn: z.boolean(),
 });
 
 export const insertCartSchema = createInsertSchema(cartsTable);
 
-export const cartSchema = baseCartSchema.merge(
-  z.object({
-    products: z.array(lineItemSchema).optional(),
-  }),
-);
+export const cartSchema = baseCartSchema.extend({
+  products: z.array(lineItemSchema).optional(),
+});
 
 export const filledCartSchema = cartSchema.extend({
   products: lineItemSchema.array(),
@@ -40,10 +32,10 @@ export const cartDTOSchema = cartSchema.omit({
 
 export const extendedCartSchema = cartDTOSchema.extend({
   products: extendedLineItemSchema.array(),
-  grossPrice: positiveIntegerSchema("cart gross price"),
-  netPrice: positiveIntegerSchema("cart net price"),
+  grossPrice: z.int().nonnegative(),
+  netPrice: z.int().nonnegative(),
   taxes: extendedClientTaxSchema.array(),
-  isCheckoutPossible: booleanSchema("cart checkout possibility"),
+  isCheckoutPossible: z.boolean(),
   issues: z.string().array().optional(),
 });
 
@@ -61,7 +53,7 @@ export type ExtendedCart = z.infer<typeof extendedCartSchema>;
 
 export type InsertCart = z.infer<typeof insertCartSchema>;
 
-export const CartOperationEnum = cartOperationSchema.Enum;
+export const CartOperationEnum = cartOperationSchema.enum;
 
 export type CartOperation = z.infer<typeof cartOperationSchema>;
 

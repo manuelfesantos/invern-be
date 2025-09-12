@@ -89,10 +89,12 @@ export const getGoogleOauthUser = async (
     id: getRandomUUID(),
     email: googleUser.email,
     firstName: names[FIRST_NAME],
-    lastName: names.slice(LAST_NAME)?.join(" ").trim() || undefined,
+    lastName: names.slice(LAST_NAME)?.join(" ").trim() || null,
     googleUserId: hashedGoogleUserId,
     isOauth: true,
     cartId: newCartId,
+    password: null,
+    isValidated: false,
   };
 
   logger().info("Creating new user", {

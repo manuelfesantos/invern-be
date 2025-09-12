@@ -2,15 +2,13 @@ import type { TableConfig } from "drizzle-orm";
 import { count } from "drizzle-orm";
 import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import { db } from "@db";
-import type { NonEmptyArray } from "@global-entity";
 import type {
   Action,
   BaseMapperFunction,
   BaseQueryFunction,
-  BasePreProcessorFunction} from "../actions";
-import {
-  actionBuilder
+  BasePreProcessorFunction,
 } from "../actions";
+import { actionBuilder } from "../actions";
 import type { BatchItem } from "drizzle-orm/batch";
 
 const NO_COUNT = 0;
@@ -21,6 +19,8 @@ type BaseAction = Action<
   BaseMapperFunction<BaseQueryFunction> | undefined,
   BasePreProcessorFunction<BaseQueryFunction> | undefined
 >;
+
+type NonEmptyArray<T> = [T, ...T[]];
 
 type ActionsType = NonEmptyArray<BaseAction | undefined>;
 

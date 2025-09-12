@@ -13,16 +13,21 @@ import { getLoggedInRefreshToken } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
-import { booleanSchema } from "@global-entity";
 import { sendSignupEmail } from "./utils/send-email";
 import { getRandomUUID } from "@crypto-utils";
 import { runBatchOperation } from "@generics-db";
 import { logCredentials } from "@logger-utils";
+import * as z from "zod";
 
 export const signupBodySchema = insertUserSchema
-  .omit({ cartId: true, id: true })
+  .pick({
+    email: true,
+    firstName: true,
+    lastName: true,
+    password: true,
+  })
   .extend({
-    remember: booleanSchema("remember me").default(false),
+    remember: z.boolean(),
   });
 
 export const signup = async (body: unknown): Promise<void> => {
@@ -72,8 +77,11 @@ export const signup = async (body: unknown): Promise<void> => {
     const insertUserAction = getInsertUserAction({
       ...parsedBody,
       password: parsedBody.password,
-      cartId: contextStore.context.cartId,
+      cartId: contextStore.context.cartId ?? null,
       id: userId,
+      isOauth: false,
+      googleUserId: null,
+      isValidated: false,
     });
 
     await runBatchOperation(

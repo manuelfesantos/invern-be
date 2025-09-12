@@ -1,15 +1,14 @@
 import { getSelectProductByIdAction } from "@product-db";
 import type { HttpParams } from "@http-entity";
-import { uuidSchema } from "@global-entity";
 import { errors } from "@error-handling-utils";
 import { extendProductDetails } from "@extender-utils";
 import { getSelectCollectionByIdAction } from "@collection-db";
 import type {
   ExtendedProductWithCollectionDetails,
-  ProductWithCollectionDetails} from "@product-entity";
-import {
-  productWithCollectionDetailsSchema,
+  ProductWithCollectionDetails,
 } from "@product-entity";
+import { productWithCollectionDetailsSchema } from "@product-entity";
+import * as z from "zod";
 
 export async function getProductDetails(
   id: HttpParams,
@@ -25,7 +24,7 @@ export async function getProductDetails(
 ): Promise<
   ExtendedProductWithCollectionDetails | ProductWithCollectionDetails
 > {
-  const productId = uuidSchema("product id").parse(id);
+  const productId = z.uuidv4().parse(id);
   const product = await getSelectProductByIdAction(productId).run();
 
   if (!product) {

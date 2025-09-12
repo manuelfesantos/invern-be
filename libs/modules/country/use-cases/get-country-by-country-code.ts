@@ -1,13 +1,16 @@
 import type { Country } from "@country-entity";
-import { countryCodeSchema } from "@global-entity";
 import { getSelectCountryByCodeAction } from "@country-db";
 import { errors } from "@error-handling-utils";
+import * as z from "zod";
 
 export const getCountryByCountryCode = async (
   countryCode: string,
 ): Promise<Country> => {
   const country = await getSelectCountryByCodeAction(
-    countryCodeSchema.parse(countryCode.toUpperCase()),
+    z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .parse(countryCode.toUpperCase()),
   ).run();
 
   if (!country) {

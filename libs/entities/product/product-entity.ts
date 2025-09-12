@@ -1,41 +1,33 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { productsTable } from "@schema";
-import { z } from "zod";
+import * as z from "zod";
 import { imageDTOSchema, imageSchema } from "@image-entity";
-import {
-  dateTimeSchema,
-  positiveIntegerSchema,
-  requiredObjectSchema,
-  requiredStringSchema,
-  uuidSchema,
-} from "@global-entity";
 import { extendedClientTaxSchema } from "@tax-entity";
 
 const priceDetailsSchema = z.object({
-  netPrice: positiveIntegerSchema("product net price"),
-  grossPrice: positiveIntegerSchema("product gross price"),
+  netPrice: z.int().nonnegative(),
+  grossPrice: z.int().nonnegative(),
   taxes: extendedClientTaxSchema.array(),
 });
 
 const baseProductSchema = createSelectSchema(productsTable, {
-  id: uuidSchema("product id"),
-  name: requiredStringSchema("product name"),
-  description: requiredStringSchema("product description"),
-  priceInCents: positiveIntegerSchema("product price in cents"),
-  collectionId: uuidSchema("collection id"),
-  stock: positiveIntegerSchema("product stock"),
-  weight: positiveIntegerSchema("product weight"),
-  createdAt: dateTimeSchema("product creation date"),
-  lastModifiedAt: dateTimeSchema("product last modified date"),
+  id: z.uuidv4(),
+  name: z.string().nonempty(),
+  description: z.string().nonempty(),
+  priceInCents: z.number().nonnegative(),
+  collectionId: z.uuidv4(),
+  stock: z.int().nonnegative(),
+  weight: z.int().nonnegative(),
+  createdAt: z.iso.datetime({ local: true }),
+  lastModifiedAt: z.iso.datetime({ local: true }),
 });
 export const insertProductSchema = createInsertSchema(productsTable, {
-  id: uuidSchema("product id"),
-  name: requiredStringSchema("product name"),
-  description: requiredStringSchema("product description"),
-  priceInCents: positiveIntegerSchema("product price in cents"),
-  collectionId: uuidSchema("collection id"),
-  stock: positiveIntegerSchema("product stock"),
-  weight: positiveIntegerSchema("product weight"),
+  name: z.string().nonempty(),
+  description: z.string().nonempty(),
+  priceInCents: z.number().nonnegative(),
+  collectionId: z.uuidv4(),
+  stock: z.int().nonnegative(),
+  weight: z.int().nonnegative(),
 }).omit({
   id: true,
 });
@@ -49,9 +41,9 @@ export const productWithCollectionDetailsSchema = productDetailsSchema
     collectionId: true,
   })
   .extend({
-    collection: requiredObjectSchema("product collection", {
-      name: requiredStringSchema("collection name"),
-      id: uuidSchema("collection name"),
+    collection: z.object({
+      name: z.string().nonempty(),
+      id: z.uuidv4(),
     }),
   });
 
@@ -60,7 +52,7 @@ export const extendedProductWithCollectionDetailsSchema =
     .omit({
       priceInCents: true,
     })
-    .merge(priceDetailsSchema);
+    .extend(priceDetailsSchema.shape);
 
 export const productSchema = baseProductSchema
   .omit({ collectionId: true, description: true })
@@ -70,11 +62,11 @@ export const productSchema = baseProductSchema
 
 export const extendedProductSchema = productSchema
   .omit({ priceInCents: true })
-  .merge(priceDetailsSchema);
+  .extend(priceDetailsSchema.shape);
 
 export const extendedProductDetailsSchema = productDetailsSchema
   .omit({ priceInCents: true })
-  .merge(priceDetailsSchema);
+  .extend(priceDetailsSchema.shape);
 
 export const lineItemSchema = productSchema
   .omit({
@@ -82,13 +74,13 @@ export const lineItemSchema = productSchema
     lastModifiedAt: true,
   })
   .extend({
-    quantity: positiveIntegerSchema("line item quantity"),
+    quantity: z.int().nonnegative(),
   });
 
 export const lineItemErrorEnumSchema = z.enum(["NOT_ENOUGH_STOCK"]);
 
 export const lineItemErrorSchema = z.object({
-  message: requiredStringSchema("cart item error"),
+  message: z.string().nonempty(),
   type: lineItemErrorEnumSchema,
 });
 
@@ -97,15 +89,15 @@ export const extendedLineItemSchema = lineItemSchema
     priceInCents: true,
   })
   .extend({
-    netPrice: positiveIntegerSchema("line item net price"),
-    grossPrice: positiveIntegerSchema("line item gross price"),
+    netPrice: z.int().nonnegative(),
+    grossPrice: z.int().nonnegative(),
     taxes: extendedClientTaxSchema.array(),
     issues: z.array(lineItemErrorSchema).optional(),
   });
 
 export const productIdAndQuantitySchema = z.object({
-  id: uuidSchema("product id"),
-  quantity: positiveIntegerSchema("line item quantity"),
+  id: z.uuidv4(),
+  quantity: z.int().nonnegative(),
 });
 
 export const productIdAndQuantityArraySchema = z.array(
@@ -139,5 +131,5 @@ export type ExtendedProductWithCollectionDetails = z.infer<
 >;
 
 export type LineItemError = z.infer<typeof lineItemErrorSchema>;
-export const LineItemErrorEnum = lineItemErrorEnumSchema.Enum;
+export const LineItemErrorEnum = lineItemErrorEnumSchema.enum;
 export type LineItemErrorEnumType = z.infer<typeof lineItemErrorEnumSchema>;

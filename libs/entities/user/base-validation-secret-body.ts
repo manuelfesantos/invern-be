@@ -1,17 +1,10 @@
-import { z } from "zod";
-import {
-  booleanSchema,
-  dateTimeSchema,
-  emailSchema,
-  positiveIntegerSchema,
-  requiredStringSchema,
-} from "@global-entity";
+import * as z from "zod";
 
 export const baseValidationSecretBodySchema = z.object({
-  code: requiredStringSchema("forgot secret code"),
-  expiresAt: dateTimeSchema("forgot secret issued at date"),
-  attemptsLeft: positiveIntegerSchema("forgot secret attempts left"),
-  emailsSent: positiveIntegerSchema("forgot secret emails sent"),
+  code: z.string().nonempty(),
+  expiresAt: z.iso.datetime({ local: true }),
+  attemptsLeft: z.int().nonnegative(),
+  emailsSent: z.int().nonnegative(),
 });
 
 export type BaseValidationSecretBody = z.infer<
@@ -20,12 +13,12 @@ export type BaseValidationSecretBody = z.infer<
 
 export const validateEmailSecretBodySchema =
   baseValidationSecretBodySchema.extend({
-    remember: booleanSchema("forgot secret remember me"),
+    remember: z.boolean(),
   });
 
 export const validateNewEmailSecretBodySchema =
   baseValidationSecretBodySchema.extend({
-    newEmail: emailSchema("forgot secret email"),
+    newEmail: z.email(),
   });
 
 export type ValidateEmailSecretBody = z.infer<
