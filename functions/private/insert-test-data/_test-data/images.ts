@@ -15,25 +15,25 @@ export const insertImages = async (
     .map((product, index) => [
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-1.webp`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-1.avif`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-2.webp`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-2.avif`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-3.webp`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-3.avif`,
         alt: product.name,
         collectionId: undefined,
       },
       {
         productId: product.productId,
-        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-4.webp`,
+        url: `${imagesBaseUrl}/ceramics-product-${indexToProductNumber(index)}-4.avif`,
         alt: product.name,
         collectionId: undefined,
       },
