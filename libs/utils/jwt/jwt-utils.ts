@@ -1,4 +1,4 @@
-import type { JWT, UserJWT} from "@jwt-entity";
+import type { JWT, UserJWT } from "@jwt-entity";
 import { jwtSchema, userJwtSchema } from "@jwt-entity";
 import {
   getFutureDate,
@@ -24,9 +24,11 @@ export const verifyJwt = async (
   encodedToken: string,
   secretKey: string,
 ): Promise<boolean> =>
-  await jwt.verify(await decrypt(encodedToken), secretKey, {
-    algorithm: "HS512",
-  });
+  Boolean(
+    await jwt.verify(await decrypt(encodedToken), secretKey, {
+      algorithm: "HS512",
+    }),
+  );
 
 export const verifyAccessToken = async (
   encodedToken: string,
