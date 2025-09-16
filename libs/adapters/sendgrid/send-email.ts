@@ -18,36 +18,23 @@ export const sendEmail = async <T extends Record<string, unknown>>({
     useCase: LoggerUseCaseEnum.SEND_EMAIL,
     data: {
       to,
-      from: template.from,
-      fromName: template.fromName,
     },
   });
 
-  return await fetch("https://api.sendgrid.com/v3/mail/send", {
+  return fetch("https://api.brevo.com/v3/smtp/email", {
     body: stringifyObject({
-      personalizations: [
+      to: [
         {
-          from: {
-            email: template.from,
-            name: template.fromName,
-          },
-          to: [
-            {
-              email: to,
-              name: to,
-            },
-          ],
-          dynamic_template_data: template.templateData,
+          email: to,
+          name: to,
         },
       ],
-      from: {
-        email: template.from,
-        name: template.fromName,
-      },
-      template_id: template.id,
+      templateId: template.id,
+      params: template.templateData,
     }),
     headers: {
-      Authorization: `Bearer ${ENV.SENDGRID_API_KEY}`,
+      accept: "application/json",
+      "api-key": ENV.BREVO_API_KEY,
       "Content-Type": "application/json",
     },
     method: HttpMethodEnum.POST,

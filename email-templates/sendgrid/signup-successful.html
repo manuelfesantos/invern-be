@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Welcome to {{brand_name}}</title>
+  </head>
+  <body style="margin:0!important;padding:0!important;width:100%!important;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse!important;">
+      <tr>
+        <td align="center">
+          <table width="100%" cellpadding="0" cellspacing="0"
+                 style="max-width:600px;margin:0 auto;border-collapse:collapse!important;">
+            <!-- Header -->
+            <tr>
+              <td align="center" style="background-color:#18222d;padding:20px;">
+                <img
+                  src="{{brand_logo_url}}"
+                  alt="{{brand_name}} Logo"
+                  style="border:0;height:auto;line-height:100%;outline:none;text-decoration:none;max-width:150px;"
+                />
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="background-color:#ffffff;padding:30px;font-family:Arial, sans-serif;color:#333333;">
+                <p style="font-size:18px;margin:0 0 20px 0;">
+                  Welcome, {{customer_first_name}}!
+                </p>
+                <p style="font-size:16px;margin:0 0 20px 0;">
+                  Thank you for creating an account with <strong>{{brand_name}}</strong>. We're thrilled to have you with us!
+                </p>
+                <p style="font-size:16px;margin:0 0 30px 0;">
+                  To complete your registration and verify your email address, please enter the verification code below. This code will expire in {{expiry_minutes}} minutes.
+                </p>
+
+                <!-- Verification Code -->
+                <div style="background-color:#f1f1f1;border:1px dashed #cccccc;padding:20px;text-align:center;font-size:24px;letter-spacing:4px;font-family:Courier, monospace;margin:0 0 30px 0;">
+                  {{verification_code}}
+                </div>
+
+                <p style="font-size:16px;margin:0 0 30px 0;text-align:center;">
+                  Or click the button below to verify instantly:
+                </p>
+                <p style="text-align:center;margin:0;">
+                  <a
+                    href="{{verify_url}}"
+                    style="display:inline-block;padding:12px 24px;background-color:#18222d;color:#ffffff;text-decoration:none;border-radius:4px;font-size:16px;font-family:Arial, sans-serif;"
+                  >Verify Email</a>
+                </p>
+              </td>
+            </tr>
+
+            <!-- Support Note -->
+            <tr>
+              <td style="background-color:#ffffff;padding:30px;font-family:Arial, sans-serif;color:#333333;">
+                <p style="font-size:16px;margin:0;">
+                  If you didn’t create an account, you can ignore this email or contact us at
+                  <a href="mailto:{{support_email}}" style="color:#1a73e8;text-decoration:underline;">{{support_email}}</a>.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center"
+                  style="background-color:#fafafa;padding:20px;font-size:12px;color:#888888;font-family:Arial, sans-serif;">
+                <p style="margin:0 0 5px 0;">{{brand_name}} • {{brand_address}}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

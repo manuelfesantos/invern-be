@@ -2,6 +2,7 @@ import type { CheckoutSuccessfulTemplate } from "./types";
 import type { Order } from "@order-entity";
 import { ENV } from "@env-utils";
 import { getPrice } from "@number-utils";
+import { EmailTemplateEnum } from "@email-entity";
 
 const FIRST_INDEX = 0;
 const INITIAL_PRICE_VALUE = 0;
@@ -11,13 +12,13 @@ const LAST_MINUTE_CHARACTER = 5;
 export const buildCheckoutSuccessfulTemplate = (
   order: Order,
 ): CheckoutSuccessfulTemplate => {
-  const from = `info@${ENV.SENDGRID_DOMAIN}`;
+  const from = `info@${ENV.BREVO_DOMAIN}`;
   return {
-    id: "d-6166707236e94f50a06144337056bf19",
+    id: EmailTemplateEnum.CHECKOUT_SUCCESSFUL,
     templateData: {
       brand_logo_url: `${ENV.IMAGES_HOST}/logo.png`,
       brand_address: `Portugal`,
-      brand_name: ENV.SENDGRID_NAME,
+      brand_name: ENV.BREVO_NAME,
       order_id: order.id,
       order_date: formatDateFromOrderCreatedAt(order.createdAt),
       shipping_address: getShippingAddressFromOrder(order),
@@ -35,8 +36,6 @@ export const buildCheckoutSuccessfulTemplate = (
       order_url: `${ENV.FRONTEND_HOST}/${order.country.code.toLowerCase()}/order?id=${order.id}`,
       support_email: from,
     },
-    from,
-    fromName: ENV.SENDGRID_NAME,
   };
 };
 

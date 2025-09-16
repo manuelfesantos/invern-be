@@ -20,9 +20,9 @@ export interface Env {
   LOGGER_LEVEL: string;
   REFRESH_TOKEN_SECRET: string;
   SALT: string;
-  SENDGRID_API_KEY: string;
-  SENDGRID_DOMAIN: string;
-  SENDGRID_NAME: string;
+  BREVO_API_KEY: string;
+  BREVO_DOMAIN: string;
+  BREVO_NAME: string;
   SETUP_COUNTRIES_SECRET: string;
   SETUP_STOCK_SECRET: string;
   STOCK_BUCKET: R2Bucket;

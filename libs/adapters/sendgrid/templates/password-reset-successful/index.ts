@@ -1,5 +1,6 @@
 import type { PasswordResetSuccessfulTemplate } from "./types";
 import { ENV } from "@env-utils";
+import { EmailTemplateEnum } from "@email-entity";
 
 export const buildPasswordResetSuccessfulTemplate = ({
   customerFirstName,
@@ -9,16 +10,14 @@ export const buildPasswordResetSuccessfulTemplate = ({
   loginUrl: string;
 }): PasswordResetSuccessfulTemplate => {
   return {
-    id: "d-8f647036eac84597b82e73ce20011592",
-    from: `info@${ENV.SENDGRID_DOMAIN}`,
-    fromName: ENV.SENDGRID_NAME,
+    id: EmailTemplateEnum.PASSWORD_RESET_SUCCESSFUL,
     templateData: {
       brand_address: "Portugal",
       brand_logo_url: `${ENV.IMAGES_HOST}/logo.png`,
-      brand_name: ENV.SENDGRID_NAME,
+      brand_name: ENV.BREVO_NAME,
       customer_first_name: customerFirstName,
       login_url: loginUrl,
-      support_email: `info@${ENV.SENDGRID_DOMAIN}`,
+      support_email: `info@${ENV.BREVO_DOMAIN}`,
     },
   };
 };

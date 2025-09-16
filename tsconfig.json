@@ -83,7 +83,8 @@
       "@timer-utils": ["libs/utils/timer"],
       "@user-db": ["libs/db/user"],
       "@user-entity": ["libs/entities/user"],
-      "@user-module": ["libs/modules/user"]
+      "@user-module": ["libs/modules/user"],
+      "@email-entity": ["libs/entities/email"]
     }
   }
 }

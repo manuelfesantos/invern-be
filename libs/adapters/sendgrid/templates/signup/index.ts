@@ -1,5 +1,5 @@
 import type { SignupTemplate } from "./types";
-import { ENV } from "@env-utils";
+import { EmailTemplateEnum } from "@email-entity";
 
 export const buildSignupTemplate = ({
   brandName,
@@ -21,7 +21,7 @@ export const buildSignupTemplate = ({
   brandAddress: string;
 }): SignupTemplate => {
   return {
-    id: "d-310c0a520dcd4bbbbe88f9342fe021a4",
+    id: EmailTemplateEnum.SIGNUP_SUCCESSFUL,
     templateData: {
       brand_name: brandName,
       brand_logo_url: brandLogoUrl,
@@ -32,7 +32,5 @@ export const buildSignupTemplate = ({
       support_email: supportEmail,
       brand_address: brandAddress,
     },
-    from: `info@${ENV.SENDGRID_DOMAIN}`,
-    fromName: ENV.SENDGRID_NAME,
   };
 };
