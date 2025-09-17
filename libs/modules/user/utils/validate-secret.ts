@@ -10,6 +10,7 @@ import {
   SECRET_EXPIRY_MINUTES,
 } from "../use-cases/forgot-password/utils/values";
 import {
+  deleteValidateEmailSecret,
   getValidateEmailSecret,
   getValidateNewEmailSecret,
   getValidationSecret,
@@ -63,6 +64,8 @@ const validateSecret = async <
     throw errors.INVALID_FORGOT_SECRET();
   }
   if (secret.expiresAt < getDateTime()) throw errors.FORGOT_SECRET_EXPIRED();
+
+  await deleteValidateEmailSecret(key);
 
   return secret;
 };
