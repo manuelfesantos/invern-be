@@ -13,13 +13,22 @@ export const successResponse = {
     data?: unknown,
     headers?: Record<string, string>,
     issues?: string[],
+    accessToken?: string,
   ): Response =>
-    buildSuccessResponse(message, HttpStatusEnum.OK, data, headers, issues),
+    buildSuccessResponse(
+      message,
+      HttpStatusEnum.OK,
+      data,
+      headers,
+      issues,
+      accessToken,
+    ),
   CREATED: (
     message: string,
     data?: unknown,
     headers?: Record<string, string>,
     issues?: string[],
+    accessToken?: string,
   ): Response =>
     buildSuccessResponse(
       message,
@@ -27,6 +36,7 @@ export const successResponse = {
       data,
       headers,
       issues,
+      accessToken,
     ),
 };
 
@@ -43,12 +53,10 @@ export const protectedSuccessResponse = {
 
     const response = successResponse.OK(
       message,
-      {
-        ...(data && typeof data === "object" ? data : {}),
-        accessToken,
-      },
+      typeof data === "object" ? data : {},
       undefined,
       issues,
+      accessToken,
     );
 
     setCookieInResponse(response, getTokenCookie(refreshToken, remember));
@@ -92,6 +100,11 @@ export const buildSuccessResponse = (
   data?: unknown,
   headers?: Record<string, string>,
   issues?: string[],
+  accessToken?: string,
 ): Response => {
-  return buildResponse({ message, data, issues }, { status }, headers);
+  return buildResponse(
+    { message, data, issues, accessToken },
+    { status },
+    headers,
+  );
 };

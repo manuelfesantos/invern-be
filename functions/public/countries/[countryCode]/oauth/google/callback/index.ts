@@ -1,14 +1,8 @@
 import { google } from "worker-auth-providers";
-
 import { requestHandler } from "@decorator-utils";
-import { successResponse } from "@response-entity";
-import {
-  deleteCookieFromResponse,
-  getCookies,
-  getRememberCookieHeader,
-  setCookieInResponse,
-} from "@http-utils";
-import { getLoggedInToken, getTokenCookie } from "@jwt-utils";
+import { protectedSuccessResponse } from "@response-entity";
+import { deleteCookieFromResponse, getCookies } from "@http-utils";
+import { getLoggedInToken } from "@jwt-utils";
 import { CookieNameEnum } from "@http-entity";
 import { errors } from "@error-handling-utils";
 import { logger } from "@logger-utils";
@@ -57,18 +51,21 @@ export const onRequestGet = requestHandler(async ({ request }) => {
   const { user, refreshToken, isNewUser } =
     await getGoogleOauthUser(providerUser);
 
-  const response = successResponse.OK(
+  const response = protectedSuccessResponse.OK(
     "Successfully signed in with google oauth",
     {
       isNewUser,
       cart: extendCart(toCartDTO(user.cart ?? EMPTY_CART)),
       user: userDTOSchema.parse(user),
+    },
+    undefined,
+    {
       accessToken: await getLoggedInToken(user.id, user.cart?.id),
+      refreshToken: refreshToken,
+      remember: true,
     },
   );
 
-  setCookieInResponse(response, getTokenCookie(refreshToken, true));
-  setCookieInResponse(response, getRememberCookieHeader());
   deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
 
   return response;
