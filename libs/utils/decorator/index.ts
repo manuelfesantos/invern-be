@@ -1,6 +1,6 @@
 import { generateErrorResponse } from "@response-entity";
 import type { Data } from "@http-entity";
-import type { Env } from "@env-entity";
+import type Env from "@env-entity";
 
 export interface RequestHandlerProps {
   errorHandler?: (error: unknown) => Response;

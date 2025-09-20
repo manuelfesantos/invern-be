@@ -1,4 +1,4 @@
-import type { Env } from "@env-entity";
+import type Env from "@env-entity";
 
 type EnvironmentServiceProxy = Readonly<Env>;
 type EnvObject = {

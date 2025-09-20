@@ -17,3 +17,9 @@ id = "validation_kv"
 [[kv_namespaces]]
 binding = "STOCK_KV"
 id = "stock_kv"
+
+[[d1_databases]]
+binding = "INVERN_DB"
+database_name = "invern-db"
+database_id = "e1b1be5c-cc8f-4c0c-baf1-81e8e5ce48fc"
+migrations_dir = "./drizzle"

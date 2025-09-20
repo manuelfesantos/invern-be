@@ -1,4 +1,4 @@
-import type { ExtendedCart} from "@cart-entity";
+import type { ExtendedCart } from "@cart-entity";
 import { toCartDTO } from "@cart-entity";
 import { getCartId } from "./utils/get-cart-id";
 import { extendCart } from "@extender-utils";

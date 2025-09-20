@@ -1,1 +1,1 @@
-export * from "./turso-db-client";
+export * from "./d1-db-client";

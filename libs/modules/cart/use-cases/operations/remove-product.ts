@@ -19,5 +19,5 @@ export const removeProductOperation = async (
 
   if (!cart) throw errors.CART_NOT_FOUND();
 
-  return [resultSet.rowsAffected > ZERO, cart];
+  return [resultSet.meta.rows_written > ZERO, cart];
 };

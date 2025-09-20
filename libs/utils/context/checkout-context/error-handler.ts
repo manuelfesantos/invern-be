@@ -1,16 +1,13 @@
 import { middlewareRequestHandler, requestHandler } from "@decorator-utils";
 import type { CookieName, Data } from "@http-entity";
-import type { Env } from "@env-entity";
+import type Env from "@env-entity";
 import {
   contextStore,
   getClientCheckoutStages,
   getRemoveCookieNamesFromInvalidCheckoutStage,
 } from "@context-utils";
-import type {
-  CheckoutStageName} from "@checkout-session-entity";
-import {
-  checkoutStageToCookie,
-} from "@checkout-session-entity";
+import type { CheckoutStageName } from "@checkout-session-entity";
+import { checkoutStageToCookie } from "@checkout-session-entity";
 import {
   errorResponse,
   protectedSuccessResponse,

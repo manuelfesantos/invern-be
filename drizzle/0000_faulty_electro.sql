@@ -1,13 +1,15 @@
-CREATE TABLE IF NOT EXISTS `carts` (
+CREATE TABLE `carts` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
-	`lastModifiedAt` integer NOT NULL,
 	`isLoggedIn` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `checkoutSessions` (
+CREATE TABLE `checkoutSessions` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`products` text NOT NULL,
-	`createdAt` text NOT NULL,
 	`expiresAt` text NOT NULL,
 	`userId` text,
 	`cartId` text,
@@ -20,42 +22,53 @@ CREATE TABLE IF NOT EXISTS `checkoutSessions` (
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `collections` (
+CREATE TABLE `collections` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`description` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `countries` (
+CREATE TABLE `countries` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`name` text NOT NULL,
 	`code` text PRIMARY KEY NOT NULL,
 	`locale` text NOT NULL,
 	`currencyCode` text NOT NULL,
-	FOREIGN KEY (`currencyCode`) REFERENCES `currencies`(`currencyId`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`currencyCode`) REFERENCES `currencies`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `currencies` (
-	`currencyId` text PRIMARY KEY NOT NULL,
+CREATE TABLE `currencies` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`code` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`symbol` text NOT NULL,
 	`rateToEuro` real NOT NULL,
 	`stripeName` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `images` (
+CREATE TABLE `images` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`url` text PRIMARY KEY NOT NULL,
 	`alt` text NOT NULL,
 	`productId` text NOT NULL,
 	`collectionId` text,
+	`isThumbnail` integer DEFAULT false NOT NULL,
 	FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `orders` (
+CREATE UNIQUE INDEX `images_collectionId_unique` ON `images` (`collectionId`);--> statement-breakpoint
+CREATE INDEX `productId_index` ON `images` (`productId`);--> statement-breakpoint
+CREATE TABLE `orders` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`stripeId` text NOT NULL,
-	`createdAt` text NOT NULL,
 	`userId` text,
 	`paymentId` text,
 	`shippingTransactionId` text NOT NULL,
@@ -70,17 +83,20 @@ CREATE TABLE IF NOT EXISTS `orders` (
 	FOREIGN KEY (`shippingTransactionId`) REFERENCES `shippingTransactions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `paymentMethods` (
+CREATE UNIQUE INDEX `orders_stripeId_unique` ON `orders` (`stripeId`);--> statement-breakpoint
+CREATE TABLE `paymentMethods` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`type` text NOT NULL,
 	`issuer` text,
 	`last4` text
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `payments` (
+CREATE TABLE `payments` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
-	`createdAt` text NOT NULL,
 	`state` text NOT NULL,
 	`netAmount` integer DEFAULT 0 NOT NULL,
 	`grossAmount` integer NOT NULL,
@@ -88,7 +104,9 @@ CREATE TABLE IF NOT EXISTS `payments` (
 	FOREIGN KEY (`paymentMethodId`) REFERENCES `paymentMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `products` (
+CREATE TABLE `products` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`description` text NOT NULL,
@@ -99,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `products` (
 	FOREIGN KEY (`collectionId`) REFERENCES `collections`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `productsOnCarts` (
+CREATE TABLE `productsOnCarts` (
 	`cartId` text NOT NULL,
 	`productId` text NOT NULL,
 	`quantity` integer NOT NULL,
@@ -108,12 +126,16 @@ CREATE TABLE IF NOT EXISTS `productsOnCarts` (
 	FOREIGN KEY (`productId`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `shippingMethods` (
+CREATE TABLE `shippingMethods` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `shippingRates` (
+CREATE TABLE `shippingRates` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`priceInCents` integer NOT NULL,
 	`minWeight` integer NOT NULL,
@@ -123,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `shippingRates` (
 	FOREIGN KEY (`shippingMethodId`) REFERENCES `shippingMethods`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `shippingRatesToCountries` (
+CREATE TABLE `shippingRatesToCountries` (
 	`shippingRateId` text NOT NULL,
 	`countryCode` text NOT NULL,
 	PRIMARY KEY(`shippingRateId`, `countryCode`),
@@ -131,15 +153,17 @@ CREATE TABLE IF NOT EXISTS `shippingRatesToCountries` (
 	FOREIGN KEY (`countryCode`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `shippingTransactions` (
+CREATE TABLE `shippingTransactions` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`status` text NOT NULL,
-	`createdAt` text NOT NULL,
-	`updatedAt` text NOT NULL,
 	`trackingUrl` text
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `taxes` (
+CREATE TABLE `taxes` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`rate` integer,
@@ -147,7 +171,9 @@ CREATE TABLE IF NOT EXISTS `taxes` (
 	FOREIGN KEY (`countryId`) REFERENCES `countries`(`code`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
+	`createdAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
+	`lastModifiedAt` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')) NOT NULL,
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,
 	`firstName` text NOT NULL,
@@ -159,8 +185,9 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`address` text,
 	`isOauth` integer DEFAULT false NOT NULL,
 	`googleUserId` text,
+	`isValidated` integer DEFAULT false NOT NULL,
 	FOREIGN KEY (`cartId`) REFERENCES `carts`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS `users_googleUserId_unique` ON `users` (`googleUserId`);
+CREATE UNIQUE INDEX `users_cartId_unique` ON `users` (`cartId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_googleUserId_unique` ON `users` (`googleUserId`);

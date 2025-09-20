@@ -1,4 +1,4 @@
-export interface Env {
+interface Env {
   AUTH_KV: KVNamespace;
   CACHE_API_EMAIL: string;
   CACHE_API_KEY: string;
@@ -38,3 +38,5 @@ export interface Env {
   VALIDATION_KV: KVNamespace;
   ZONE_ID: string;
 }
+
+export default Env;

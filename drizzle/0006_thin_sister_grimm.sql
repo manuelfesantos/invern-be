@@ -1,1 +1,0 @@
-ALTER TABLE `images` ADD `isThumbnail` integer DEFAULT false NOT NULL;

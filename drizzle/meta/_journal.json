@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1742344919297,
-      "tag": "0000_gifted_tomas",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1742691098566,
-      "tag": "0001_amused_mojo",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1742925604843,
-      "tag": "0002_pink_shinko_yamashiro",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1742926608954,
-      "tag": "0003_ordinary_komodo",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1742988776590,
-      "tag": "0004_violet_roxanne_simpson",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1744247683880,
-      "tag": "0005_careful_mariko_yashida",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1757359854914,
-      "tag": "0006_thin_sister_grimm",
+      "when": 1758411190990,
+      "tag": "0000_faulty_electro",
       "breakpoints": true
     }
   ]

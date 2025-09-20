@@ -59,7 +59,19 @@ export const insertImages = async (
     collections,
     "Contour",
   );
-  await db().insert(imagesTable).values(imagesList);
+
+  const len = imagesList.length;
+  const batches = [
+    imagesList.slice(0, len / 3),
+    imagesList.slice(len / 3, (len / 3) * 2),
+    imagesList.slice((len / 3) * 2),
+  ];
+
+  await Promise.all(
+    batches.map((batch) => {
+      db().insert(imagesTable).values(batch).run();
+    }),
+  );
 };
 
 const indexToProductNumber = (index: number): number =>

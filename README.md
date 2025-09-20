@@ -44,11 +44,15 @@ Follow these instructions to set up and run the project on your local machine.
    cd invern-be
    ```
 
-3. **Initialize the Project**:
+3. **Install Dependencies**:
    ```bash
-   npm run init
+   npm install
    ```
-   This command installs all dependencies, sets up Husky for Git hooks, and pulls the turso docker image from the remote registry.
+
+4. **Build the Local Database**:
+   ```bash
+   npm run db:migrate:local
+   ```
 
 ### Environment Variables
 The application requires specific environment variables to function correctly.
@@ -97,6 +101,26 @@ When running the application for the first time, you need to complete two additi
    }
    ```
    This will initialize the local stock bucket required for the application to function properly.
+
+## Database Migration
+
+1. **Generate the migration files**:
+    ```bash
+    npm run db:generate
+    ```
+2. **Apply the migration**:
+    - Local
+        ```bash
+        npm run db:migrate:local
+        ```
+    - Remote
+        ```bash
+        npm run db:migrate:remote
+        ```
+      This requires you to be logged in to your account via wrangler.
+      ```bash
+      npx wrangler login
+      ```
 
 ## API Overview
 

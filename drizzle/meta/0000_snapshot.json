@@ -1,23 +1,32 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6e6042df-79cb-4c84-8e1a-6beb063411f4",
+  "id": "52119d45-ace5-470d-b55b-740d8dde4983",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
       "name": "carts",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
-          "type": "integer",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -38,6 +47,22 @@
     "checkoutSessions": {
       "name": "checkoutSessions",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -47,13 +72,6 @@
         },
         "products": {
           "name": "products",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -152,6 +170,22 @@
     "collections": {
       "name": "collections",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -183,6 +217,22 @@
     "countries": {
       "name": "countries",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "name": {
           "name": "name",
           "type": "text",
@@ -214,15 +264,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "countries_currencyCode_currencies_currencyId_fk": {
-          "name": "countries_currencyCode_currencies_currencyId_fk",
+        "countries_currencyCode_currencies_code_fk": {
+          "name": "countries_currencyCode_currencies_code_fk",
           "tableFrom": "countries",
           "tableTo": "currencies",
           "columnsFrom": [
             "currencyCode"
           ],
           "columnsTo": [
-            "currencyId"
+            "code"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -235,8 +285,24 @@
     "currencies": {
       "name": "currencies",
       "columns": {
-        "currencyId": {
-          "name": "currencyId",
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "code": {
+          "name": "code",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
@@ -280,6 +346,22 @@
     "images": {
       "name": "images",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "url": {
           "name": "url",
           "type": "text",
@@ -307,6 +389,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "isThumbnail": {
+          "name": "isThumbnail",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         }
       },
       "indexes": {
@@ -316,6 +406,13 @@
             "collectionId"
           ],
           "isUnique": true
+        },
+        "productId_index": {
+          "name": "productId_index",
+          "columns": [
+            "productId"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -353,6 +450,22 @@
     "orders": {
       "name": "orders",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -362,13 +475,6 @@
         },
         "stripeId": {
           "name": "stripeId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -495,6 +601,22 @@
     "paymentMethods": {
       "name": "paymentMethods",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -533,17 +655,26 @@
     "payments": {
       "name": "payments",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "createdAt": {
           "name": "createdAt",
           "type": "text",
           "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
@@ -600,6 +731,22 @@
     "products": {
       "name": "products",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -739,6 +886,22 @@
     "shippingMethods": {
       "name": "shippingMethods",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -763,6 +926,22 @@
     "shippingRates": {
       "name": "shippingRates",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -888,6 +1067,22 @@
     "shippingTransactions": {
       "name": "shippingTransactions",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -897,20 +1092,6 @@
         },
         "status": {
           "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -933,6 +1114,22 @@
     "taxes": {
       "name": "taxes",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -985,6 +1182,22 @@
     "users": {
       "name": "users",
       "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
+        "lastModifiedAt": {
+          "name": "lastModifiedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
+        },
         "id": {
           "name": "id",
           "type": "text",
@@ -1064,6 +1277,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "isValidated": {
+          "name": "isValidated",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         }
       },
       "indexes": {
