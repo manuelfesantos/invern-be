@@ -1,5 +1,5 @@
 name = "invern-be"
-compatibility_date = "2025-03-27"
+compatibility_date = "2025-09-20"
 compatibility_flags = ["nodejs_compat"]
 
 [[r2_buckets]]
