@@ -1,22 +1,22 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "52119d45-ace5-470d-b55b-740d8dde4983",
+  "id": "3f213dc6-9fed-456a-8cac-e62648b2020d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "carts": {
       "name": "carts",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -30,8 +30,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "isLoggedIn": {
-          "name": "isLoggedIn",
+        "is_logged_in": {
+          "name": "is_logged_in",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -44,19 +44,19 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "checkoutSessions": {
-      "name": "checkoutSessions",
+    "checkout_sessions": {
+      "name": "checkout_sessions",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -77,36 +77,36 @@
           "notNull": true,
           "autoincrement": false
         },
-        "expiresAt": {
-          "name": "expiresAt",
+        "expires_at": {
+          "name": "expires_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "cartId": {
-          "name": "cartId",
+        "cart_id": {
+          "name": "cart_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "shippingMethod": {
-          "name": "shippingMethod",
+        "shipping_method": {
+          "name": "shipping_method",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "personalDetails": {
-          "name": "personalDetails",
+        "personal_details": {
+          "name": "personal_details",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -126,8 +126,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "orderId": {
-          "name": "orderId",
+        "order_id": {
+          "name": "order_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -136,12 +136,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "checkoutSessions_userId_users_id_fk": {
-          "name": "checkoutSessions_userId_users_id_fk",
-          "tableFrom": "checkoutSessions",
+        "checkout_sessions_user_id_users_id_fk": {
+          "name": "checkout_sessions_user_id_users_id_fk",
+          "tableFrom": "checkout_sessions",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -149,12 +149,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "checkoutSessions_cartId_carts_id_fk": {
-          "name": "checkoutSessions_cartId_carts_id_fk",
-          "tableFrom": "checkoutSessions",
+        "checkout_sessions_cart_id_carts_id_fk": {
+          "name": "checkout_sessions_cart_id_carts_id_fk",
+          "tableFrom": "checkout_sessions",
           "tableTo": "carts",
           "columnsFrom": [
-            "cartId"
+            "cart_id"
           ],
           "columnsTo": [
             "id"
@@ -170,16 +170,16 @@
     "collections": {
       "name": "collections",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -217,16 +217,16 @@
     "countries": {
       "name": "countries",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -254,8 +254,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "currencyCode": {
-          "name": "currencyCode",
+        "currency_code": {
+          "name": "currency_code",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -264,12 +264,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "countries_currencyCode_currencies_code_fk": {
-          "name": "countries_currencyCode_currencies_code_fk",
+        "countries_currency_code_currencies_code_fk": {
+          "name": "countries_currency_code_currencies_code_fk",
           "tableFrom": "countries",
           "tableTo": "currencies",
           "columnsFrom": [
-            "currencyCode"
+            "currency_code"
           ],
           "columnsTo": [
             "code"
@@ -285,16 +285,16 @@
     "currencies": {
       "name": "currencies",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -322,15 +322,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "rateToEuro": {
-          "name": "rateToEuro",
+        "rate_to_euro": {
+          "name": "rate_to_euro",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "stripeName": {
-          "name": "stripeName",
+        "stripe_name": {
+          "name": "stripe_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -346,16 +346,16 @@
     "images": {
       "name": "images",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -376,22 +376,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "collectionId": {
-          "name": "collectionId",
+        "collection_id": {
+          "name": "collection_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "isThumbnail": {
-          "name": "isThumbnail",
+        "is_thumbnail": {
+          "name": "is_thumbnail",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -400,28 +400,28 @@
         }
       },
       "indexes": {
-        "images_collectionId_unique": {
-          "name": "images_collectionId_unique",
+        "images_collection_id_unique": {
+          "name": "images_collection_id_unique",
           "columns": [
-            "collectionId"
+            "collection_id"
           ],
           "isUnique": true
         },
-        "productId_index": {
-          "name": "productId_index",
+        "product_id_index": {
+          "name": "product_id_index",
           "columns": [
-            "productId"
+            "product_id"
           ],
           "isUnique": false
         }
       },
       "foreignKeys": {
-        "images_productId_products_id_fk": {
-          "name": "images_productId_products_id_fk",
+        "images_product_id_products_id_fk": {
+          "name": "images_product_id_products_id_fk",
           "tableFrom": "images",
           "tableTo": "products",
           "columnsFrom": [
-            "productId"
+            "product_id"
           ],
           "columnsTo": [
             "id"
@@ -429,12 +429,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "images_collectionId_collections_id_fk": {
-          "name": "images_collectionId_collections_id_fk",
+        "images_collection_id_collections_id_fk": {
+          "name": "images_collection_id_collections_id_fk",
           "tableFrom": "images",
           "tableTo": "collections",
           "columnsFrom": [
-            "collectionId"
+            "collection_id"
           ],
           "columnsTo": [
             "id"
@@ -450,16 +450,16 @@
     "orders": {
       "name": "orders",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -473,29 +473,29 @@
           "notNull": true,
           "autoincrement": false
         },
-        "stripeId": {
-          "name": "stripeId",
+        "stripe_id": {
+          "name": "stripe_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "paymentId": {
-          "name": "paymentId",
+        "payment_id": {
+          "name": "payment_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "shippingTransactionId": {
-          "name": "shippingTransactionId",
+        "shipping_transaction_id": {
+          "name": "shipping_transaction_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -515,15 +515,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "personalDetails": {
-          "name": "personalDetails",
+        "personal_details": {
+          "name": "personal_details",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "shippingMethod": {
-          "name": "shippingMethod",
+        "shipping_method": {
+          "name": "shipping_method",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -536,8 +536,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "isCanceled": {
-          "name": "isCanceled",
+        "is_canceled": {
+          "name": "is_canceled",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -545,21 +545,21 @@
         }
       },
       "indexes": {
-        "orders_stripeId_unique": {
-          "name": "orders_stripeId_unique",
+        "orders_stripe_id_unique": {
+          "name": "orders_stripe_id_unique",
           "columns": [
-            "stripeId"
+            "stripe_id"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "orders_userId_users_id_fk": {
-          "name": "orders_userId_users_id_fk",
+        "orders_user_id_users_id_fk": {
+          "name": "orders_user_id_users_id_fk",
           "tableFrom": "orders",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -567,12 +567,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "orders_paymentId_payments_id_fk": {
-          "name": "orders_paymentId_payments_id_fk",
+        "orders_payment_id_payments_id_fk": {
+          "name": "orders_payment_id_payments_id_fk",
           "tableFrom": "orders",
           "tableTo": "payments",
           "columnsFrom": [
-            "paymentId"
+            "payment_id"
           ],
           "columnsTo": [
             "id"
@@ -580,12 +580,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "orders_shippingTransactionId_shippingTransactions_id_fk": {
-          "name": "orders_shippingTransactionId_shippingTransactions_id_fk",
+        "orders_shipping_transaction_id_shipping_transactions_id_fk": {
+          "name": "orders_shipping_transaction_id_shipping_transactions_id_fk",
           "tableFrom": "orders",
-          "tableTo": "shippingTransactions",
+          "tableTo": "shipping_transactions",
           "columnsFrom": [
-            "shippingTransactionId"
+            "shipping_transaction_id"
           ],
           "columnsTo": [
             "id"
@@ -598,19 +598,19 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "paymentMethods": {
-      "name": "paymentMethods",
+    "payment_methods": {
+      "name": "payment_methods",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -638,8 +638,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "last4": {
-          "name": "last4",
+        "last_4": {
+          "name": "last_4",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -655,16 +655,16 @@
     "payments": {
       "name": "payments",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -685,23 +685,23 @@
           "notNull": true,
           "autoincrement": false
         },
-        "netAmount": {
-          "name": "netAmount",
+        "net_amount": {
+          "name": "net_amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": 0
         },
-        "grossAmount": {
-          "name": "grossAmount",
+        "gross_amount": {
+          "name": "gross_amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "paymentMethodId": {
-          "name": "paymentMethodId",
+        "payment_method_id": {
+          "name": "payment_method_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -710,12 +710,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "payments_paymentMethodId_paymentMethods_id_fk": {
-          "name": "payments_paymentMethodId_paymentMethods_id_fk",
+        "payments_payment_method_id_payment_methods_id_fk": {
+          "name": "payments_payment_method_id_payment_methods_id_fk",
           "tableFrom": "payments",
-          "tableTo": "paymentMethods",
+          "tableTo": "payment_methods",
           "columnsFrom": [
-            "paymentMethodId"
+            "payment_method_id"
           ],
           "columnsTo": [
             "id"
@@ -731,16 +731,16 @@
     "products": {
       "name": "products",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -775,15 +775,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "collectionId": {
-          "name": "collectionId",
+        "collection_id": {
+          "name": "collection_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "priceInCents": {
-          "name": "priceInCents",
+        "price_in_cents": {
+          "name": "price_in_cents",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -799,12 +799,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "products_collectionId_collections_id_fk": {
-          "name": "products_collectionId_collections_id_fk",
+        "products_collection_id_collections_id_fk": {
+          "name": "products_collection_id_collections_id_fk",
           "tableFrom": "products",
           "tableTo": "collections",
           "columnsFrom": [
-            "collectionId"
+            "collection_id"
           ],
           "columnsTo": [
             "id"
@@ -817,18 +817,18 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "productsOnCarts": {
-      "name": "productsOnCarts",
+    "products_on_carts": {
+      "name": "products_on_carts",
       "columns": {
-        "cartId": {
-          "name": "cartId",
+        "cart_id": {
+          "name": "cart_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "productId": {
-          "name": "productId",
+        "product_id": {
+          "name": "product_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -844,12 +844,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "productsOnCarts_cartId_carts_id_fk": {
-          "name": "productsOnCarts_cartId_carts_id_fk",
-          "tableFrom": "productsOnCarts",
+        "products_on_carts_cart_id_carts_id_fk": {
+          "name": "products_on_carts_cart_id_carts_id_fk",
+          "tableFrom": "products_on_carts",
           "tableTo": "carts",
           "columnsFrom": [
-            "cartId"
+            "cart_id"
           ],
           "columnsTo": [
             "id"
@@ -857,12 +857,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "productsOnCarts_productId_products_id_fk": {
-          "name": "productsOnCarts_productId_products_id_fk",
-          "tableFrom": "productsOnCarts",
+        "products_on_carts_product_id_products_id_fk": {
+          "name": "products_on_carts_product_id_products_id_fk",
+          "tableFrom": "products_on_carts",
           "tableTo": "products",
           "columnsFrom": [
-            "productId"
+            "product_id"
           ],
           "columnsTo": [
             "id"
@@ -872,30 +872,30 @@
         }
       },
       "compositePrimaryKeys": {
-        "productsOnCarts_cartId_productId_pk": {
+        "products_on_carts_cart_id_product_id_pk": {
           "columns": [
-            "cartId",
-            "productId"
+            "cart_id",
+            "product_id"
           ],
-          "name": "productsOnCarts_cartId_productId_pk"
+          "name": "products_on_carts_cart_id_product_id_pk"
         }
       },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "shippingMethods": {
-      "name": "shippingMethods",
+    "shipping_methods": {
+      "name": "shipping_methods",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -923,19 +923,19 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "shippingRates": {
-      "name": "shippingRates",
+    "shipping_rates": {
+      "name": "shipping_rates",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -949,36 +949,36 @@
           "notNull": true,
           "autoincrement": false
         },
-        "priceInCents": {
-          "name": "priceInCents",
+        "price_in_cents": {
+          "name": "price_in_cents",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "minWeight": {
-          "name": "minWeight",
+        "min_weight": {
+          "name": "min_weight",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "maxWeight": {
-          "name": "maxWeight",
+        "max_weight": {
+          "name": "max_weight",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "deliveryTime": {
-          "name": "deliveryTime",
+        "delivery_time": {
+          "name": "delivery_time",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "shippingMethodId": {
-          "name": "shippingMethodId",
+        "shipping_method_id": {
+          "name": "shipping_method_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -987,12 +987,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "shippingRates_shippingMethodId_shippingMethods_id_fk": {
-          "name": "shippingRates_shippingMethodId_shippingMethods_id_fk",
-          "tableFrom": "shippingRates",
-          "tableTo": "shippingMethods",
+        "shipping_rates_shipping_method_id_shipping_methods_id_fk": {
+          "name": "shipping_rates_shipping_method_id_shipping_methods_id_fk",
+          "tableFrom": "shipping_rates",
+          "tableTo": "shipping_methods",
           "columnsFrom": [
-            "shippingMethodId"
+            "shipping_method_id"
           ],
           "columnsTo": [
             "id"
@@ -1005,18 +1005,18 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "shippingRatesToCountries": {
-      "name": "shippingRatesToCountries",
+    "shipping_rates_to_countries": {
+      "name": "shipping_rates_to_countries",
       "columns": {
-        "shippingRateId": {
-          "name": "shippingRateId",
+        "shipping_rate_id": {
+          "name": "shipping_rate_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "countryCode": {
-          "name": "countryCode",
+        "country_code": {
+          "name": "country_code",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1025,12 +1025,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "shippingRatesToCountries_shippingRateId_shippingRates_id_fk": {
-          "name": "shippingRatesToCountries_shippingRateId_shippingRates_id_fk",
-          "tableFrom": "shippingRatesToCountries",
-          "tableTo": "shippingRates",
+        "shipping_rates_to_countries_shipping_rate_id_shipping_rates_id_fk": {
+          "name": "shipping_rates_to_countries_shipping_rate_id_shipping_rates_id_fk",
+          "tableFrom": "shipping_rates_to_countries",
+          "tableTo": "shipping_rates",
           "columnsFrom": [
-            "shippingRateId"
+            "shipping_rate_id"
           ],
           "columnsTo": [
             "id"
@@ -1038,12 +1038,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "shippingRatesToCountries_countryCode_countries_code_fk": {
-          "name": "shippingRatesToCountries_countryCode_countries_code_fk",
-          "tableFrom": "shippingRatesToCountries",
+        "shipping_rates_to_countries_country_code_countries_code_fk": {
+          "name": "shipping_rates_to_countries_country_code_countries_code_fk",
+          "tableFrom": "shipping_rates_to_countries",
           "tableTo": "countries",
           "columnsFrom": [
-            "countryCode"
+            "country_code"
           ],
           "columnsTo": [
             "code"
@@ -1053,30 +1053,30 @@
         }
       },
       "compositePrimaryKeys": {
-        "shippingRatesToCountries_shippingRateId_countryCode_pk": {
+        "shipping_rates_to_countries_shipping_rate_id_country_code_pk": {
           "columns": [
-            "shippingRateId",
-            "countryCode"
+            "shipping_rate_id",
+            "country_code"
           ],
-          "name": "shippingRatesToCountries_shippingRateId_countryCode_pk"
+          "name": "shipping_rates_to_countries_shipping_rate_id_country_code_pk"
         }
       },
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "shippingTransactions": {
-      "name": "shippingTransactions",
+    "shipping_transactions": {
+      "name": "shipping_transactions",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1097,8 +1097,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "trackingUrl": {
-          "name": "trackingUrl",
+        "tracking_url": {
+          "name": "tracking_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1114,16 +1114,16 @@
     "taxes": {
       "name": "taxes",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1151,8 +1151,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "countryId": {
-          "name": "countryId",
+        "country_id": {
+          "name": "country_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1161,12 +1161,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "taxes_countryId_countries_code_fk": {
-          "name": "taxes_countryId_countries_code_fk",
+        "taxes_country_id_countries_code_fk": {
+          "name": "taxes_country_id_countries_code_fk",
           "tableFrom": "taxes",
           "tableTo": "countries",
           "columnsFrom": [
-            "countryId"
+            "country_id"
           ],
           "columnsTo": [
             "code"
@@ -1182,16 +1182,16 @@
     "users": {
       "name": "users",
       "columns": {
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "(strftime('%Y-%m-%dT%H:%M:%f', 'now'))"
         },
-        "lastModifiedAt": {
-          "name": "lastModifiedAt",
+        "last_modified_at": {
+          "name": "last_modified_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1212,15 +1212,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "firstName": {
-          "name": "firstName",
+        "first_name": {
+          "name": "first_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "lastName": {
-          "name": "lastName",
+        "last_name": {
+          "name": "last_name",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1249,8 +1249,8 @@
           "autoincrement": false,
           "default": "'USER'"
         },
-        "cartId": {
-          "name": "cartId",
+        "cart_id": {
+          "name": "cart_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1263,23 +1263,23 @@
           "notNull": false,
           "autoincrement": false
         },
-        "isOauth": {
-          "name": "isOauth",
+        "is_oauth": {
+          "name": "is_oauth",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": false
         },
-        "googleUserId": {
-          "name": "googleUserId",
+        "google_user_id": {
+          "name": "google_user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "isValidated": {
-          "name": "isValidated",
+        "is_validated": {
+          "name": "is_validated",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -1288,28 +1288,35 @@
         }
       },
       "indexes": {
-        "users_cartId_unique": {
-          "name": "users_cartId_unique",
+        "users_email_unique": {
+          "name": "users_email_unique",
           "columns": [
-            "cartId"
+            "email"
           ],
           "isUnique": true
         },
-        "users_googleUserId_unique": {
-          "name": "users_googleUserId_unique",
+        "users_cart_id_unique": {
+          "name": "users_cart_id_unique",
           "columns": [
-            "googleUserId"
+            "cart_id"
+          ],
+          "isUnique": true
+        },
+        "users_google_user_id_unique": {
+          "name": "users_google_user_id_unique",
+          "columns": [
+            "google_user_id"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "users_cartId_carts_id_fk": {
-          "name": "users_cartId_carts_id_fk",
+        "users_cart_id_carts_id_fk": {
+          "name": "users_cart_id_carts_id_fk",
           "tableFrom": "users",
           "tableTo": "carts",
           "columnsFrom": [
-            "cartId"
+            "cart_id"
           ],
           "columnsTo": [
             "id"

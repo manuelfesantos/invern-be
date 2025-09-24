@@ -14,10 +14,10 @@ const VALUE_ZERO = 0;
 //-----------------------------------SCHEMA-----------------------------------//
 
 const baseResource = {
-  createdAt: text("createdAt")
+  createdAt: text("created_at")
     .notNull()
     .default(sql`(strftime('%Y-%m-%dT%H:%M:%f', 'now'))`),
-  lastModifiedAt: text("lastModifiedAt")
+  lastModifiedAt: text("last_modified_at")
     .notNull()
     .default(sql`(strftime('%Y-%m-%dT%H:%M:%f', 'now'))`),
 };
@@ -29,7 +29,7 @@ const baseResourceWithId = {
 
 export const cartsTable = sqliteTable("carts", {
   ...baseResourceWithId,
-  isLoggedIn: int("isLoggedIn", {
+  isLoggedIn: int("is_logged_in", {
     mode: "boolean",
   }).notNull(),
 });
@@ -37,26 +37,26 @@ export const cartsTable = sqliteTable("carts", {
 export const usersTable = sqliteTable("users", {
   ...baseResourceWithId,
   email: text("email").unique().notNull(),
-  firstName: text("firstName").notNull(),
-  lastName: text("lastName"),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name"),
   password: text("password"),
   version: int("version").notNull().default(DEFAULT_VERSION),
   role: text("role", { enum: ["ADMIN", "USER"] })
     .notNull()
     .default("USER"),
-  cartId: text("cartId")
+  cartId: text("cart_id")
     .unique()
     .references(() => cartsTable.id, {
       onDelete: "set null",
     }),
   address: text("address"),
-  isOauth: int("isOauth", {
+  isOauth: int("is_oauth", {
     mode: "boolean",
   })
     .notNull()
     .default(false),
-  googleUserId: text("googleUserId").unique(),
-  isValidated: int("isValidated", {
+  googleUserId: text("google_user_id").unique(),
+  isValidated: int("is_validated", {
     mode: "boolean",
   })
     .notNull()
@@ -74,10 +74,10 @@ export const productsTable = sqliteTable("products", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   stock: int("stock").notNull(),
-  collectionId: text("collectionId")
+  collectionId: text("collection_id")
     .notNull()
     .references(() => collectionsTable.id, { onDelete: "cascade" }),
-  priceInCents: int("priceInCents").notNull(),
+  priceInCents: int("price_in_cents").notNull(),
   weight: int("weight").notNull(),
 });
 
@@ -87,28 +87,28 @@ export const imagesTable = sqliteTable(
     ...baseResource,
     url: text("url").notNull().primaryKey(),
     alt: text("alt").notNull(),
-    productId: text("productId")
+    productId: text("product_id")
       .notNull()
       .references(() => productsTable.id, { onDelete: "cascade" }),
-    collectionId: text("collectionId")
+    collectionId: text("collection_id")
       .unique()
       .references(() => collectionsTable.id, { onDelete: "set null" }),
-    isThumbnail: int("isThumbnail", {
+    isThumbnail: int("is_thumbnail", {
       mode: "boolean",
     })
       .notNull()
       .default(false),
   },
-  (t) => [index("productId_index").on(t.productId)],
+  (t) => [index("product_id_index").on(t.productId)],
 );
 
 export const productsToCartsTable = sqliteTable(
-  "productsOnCarts",
+  "products_on_carts",
   {
-    cartId: text("cartId")
+    cartId: text("cart_id")
       .notNull()
       .references(() => cartsTable.id, { onDelete: "cascade" }),
-    productId: text("productId")
+    productId: text("product_id")
       .notNull()
       .references(() => productsTable.id, { onDelete: "cascade" }),
     quantity: int("quantity").notNull(),
@@ -120,24 +120,24 @@ export const productsToCartsTable = sqliteTable(
 
 export const ordersTable = sqliteTable("orders", {
   ...baseResourceWithId,
-  stripeId: text("stripeId").notNull().unique(),
-  userId: text("userId").references(() => usersTable.id, {
+  stripeId: text("stripe_id").notNull().unique(),
+  userId: text("user_id").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
-  paymentId: text("paymentId").references(() => paymentsTable.id, {
+  paymentId: text("payment_id").references(() => paymentsTable.id, {
     onDelete: "cascade",
   }),
-  shippingTransactionId: text("shippingTransactionId")
+  shippingTransactionId: text("shipping_transaction_id")
     .references(() => shippingTransactionsTable.id, {
       onDelete: "cascade",
     })
     .notNull(),
   address: text("address").notNull(),
   country: text("country").notNull(),
-  personalDetails: text("personalDetails").notNull(),
-  shippingMethod: text("shippingMethod").notNull(),
+  personalDetails: text("personal_details").notNull(),
+  shippingMethod: text("shipping_method").notNull(),
   products: text("products").notNull(),
-  isCanceled: int("isCanceled", {
+  isCanceled: int("is_canceled", {
     mode: "boolean",
   }),
 });
@@ -147,15 +147,15 @@ export const currenciesTable = sqliteTable("currencies", {
   code: text("code").primaryKey(),
   name: text("name").notNull(),
   symbol: text("symbol").notNull(),
-  rateToEuro: real("rateToEuro").notNull(),
-  stripeName: text("stripeName").notNull(),
+  rateToEuro: real("rate_to_euro").notNull(),
+  stripeName: text("stripe_name").notNull(),
 });
 
 export const taxesTable = sqliteTable("taxes", {
   ...baseResourceWithId,
   name: text("name").notNull(),
   rate: int("rate"),
-  countryCode: text("countryId")
+  countryCode: text("country_id")
     .notNull()
     .references(() => countriesTable.code, {
       onDelete: "cascade",
@@ -167,7 +167,7 @@ export const countriesTable = sqliteTable("countries", {
   name: text("name").notNull(),
   code: text("code").notNull().primaryKey(),
   locale: text("locale").notNull(),
-  currencyCode: text("currencyCode")
+  currencyCode: text("currency_code")
     .notNull()
     .references(() => currenciesTable.code, {
       onDelete: "cascade",
@@ -179,9 +179,9 @@ export const paymentsTable = sqliteTable("payments", {
   state: text("state", {
     enum: ["draft", "succeeded", "canceled", "created", "processing", "failed"],
   }).notNull(),
-  netAmount: int("netAmount").notNull().default(VALUE_ZERO),
-  grossAmount: int("grossAmount").notNull(),
-  paymentMethodId: text("paymentMethodId").references(
+  netAmount: int("net_amount").notNull().default(VALUE_ZERO),
+  grossAmount: int("gross_amount").notNull(),
+  paymentMethodId: text("payment_method_id").references(
     () => paymentMethodsTable.id,
     {
       onDelete: "cascade",
@@ -189,43 +189,43 @@ export const paymentsTable = sqliteTable("payments", {
   ),
 });
 
-export const paymentMethodsTable = sqliteTable("paymentMethods", {
+export const paymentMethodsTable = sqliteTable("payment_methods", {
   ...baseResourceWithId,
   type: text("type", { enum: ["card", "paypal"] }).notNull(),
   brand: text("issuer"),
-  last4: text("last4"),
+  last4: text("last_4"),
 });
 
-export const checkoutSessionsTable = sqliteTable("checkoutSessions", {
+export const checkoutSessionsTable = sqliteTable("checkout_sessions", {
   ...baseResourceWithId,
   products: text("products").notNull(),
-  expiresAt: text("expiresAt").notNull(),
-  userId: text("userId").references(() => usersTable.id, {
+  expiresAt: text("expires_at").notNull(),
+  userId: text("user_id").references(() => usersTable.id, {
     onDelete: "cascade",
   }),
-  cartId: text("cartId").references(() => cartsTable.id, {
+  cartId: text("cart_id").references(() => cartsTable.id, {
     onDelete: "cascade",
   }),
-  shippingMethod: text("shippingMethod").notNull(),
-  personalDetails: text("personalDetails").notNull(),
+  shippingMethod: text("shipping_method").notNull(),
+  personalDetails: text("personal_details").notNull(),
   country: text("country").notNull(),
   address: text("address").notNull(),
-  orderId: text("orderId").notNull(),
+  orderId: text("order_id").notNull(),
 });
 
-export const shippingMethodsTable = sqliteTable("shippingMethods", {
+export const shippingMethodsTable = sqliteTable("shipping_methods", {
   ...baseResourceWithId,
   name: text("name").notNull(),
 });
 
-export const shippingRatesTable = sqliteTable("shippingRates", {
+export const shippingRatesTable = sqliteTable("shipping_rates", {
   ...baseResourceWithId,
-  priceInCents: int("priceInCents").notNull(),
-  minWeight: int("minWeight").notNull(),
-  maxWeight: int("maxWeight").notNull(),
+  priceInCents: int("price_in_cents").notNull(),
+  minWeight: int("min_weight").notNull(),
+  maxWeight: int("max_weight").notNull(),
   // Delivery time in business days
-  deliveryTime: int("deliveryTime").notNull(),
-  shippingMethodId: text("shippingMethodId")
+  deliveryTime: int("delivery_time").notNull(),
+  shippingMethodId: text("shipping_method_id")
     .references(() => shippingMethodsTable.id, {
       onDelete: "cascade",
     })
@@ -233,14 +233,14 @@ export const shippingRatesTable = sqliteTable("shippingRates", {
 });
 
 export const shippingRatesToCountriesTable = sqliteTable(
-  "shippingRatesToCountries",
+  "shipping_rates_to_countries",
   {
-    shippingRateId: text("shippingRateId")
+    shippingRateId: text("shipping_rate_id")
       .notNull()
       .references(() => shippingRatesTable.id, {
         onDelete: "cascade",
       }),
-    countryCode: text("countryCode")
+    countryCode: text("country_code")
       .notNull()
       .references(() => countriesTable.code, {
         onDelete: "cascade",
@@ -251,12 +251,12 @@ export const shippingRatesToCountriesTable = sqliteTable(
   }),
 );
 
-export const shippingTransactionsTable = sqliteTable("shippingTransactions", {
+export const shippingTransactionsTable = sqliteTable("shipping_transactions", {
   ...baseResourceWithId,
   status: text("status", {
     enum: ["processing", "shipped", "delivered", "canceled"],
   }).notNull(),
-  trackingUrl: text("trackingUrl"),
+  trackingUrl: text("tracking_url"),
 });
 
 //---------------------------------RELATIONS---------------------------------//
