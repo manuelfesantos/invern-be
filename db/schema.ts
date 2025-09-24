@@ -36,7 +36,7 @@ export const cartsTable = sqliteTable("carts", {
 
 export const usersTable = sqliteTable("users", {
   ...baseResourceWithId,
-  email: text("email").notNull(),
+  email: text("email").unique().notNull(),
   firstName: text("firstName").notNull(),
   lastName: text("lastName"),
   password: text("password"),
