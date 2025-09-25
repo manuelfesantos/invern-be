@@ -23,28 +23,35 @@ const handlerOptions: RequestHandlerProps = {
   },
 };
 
-export const onRequestPut = requestHandler(async ({ request, params }) => {
-  const { id: productId } = params;
+export const onRequestPut = requestHandler(
+  async ({ request, params, waitUntil }) => {
+    const { id: productId } = params;
 
-  const body = await getBodyFromRequest(request);
-  const { quantity } = cartItemUpdateBodySchema.parse(body);
+    const body = await getBodyFromRequest(request);
+    const { quantity } = cartItemUpdateBodySchema.parse(body);
 
-  const cart = await updateCartItemQuantity(productId as string, quantity);
-
-  const response = protectedSuccessResponse.OK(
-    "Successfully updated product quantity in cart",
-    cart,
-  );
-
-  if (contextStore.context.isLoggedOut && contextStore.context.cartId) {
-    setCookieInResponse(
-      response,
-      getCartIdCookieHeader(contextStore.context.cartId),
+    const cart = await updateCartItemQuantity(
+      productId as string,
+      quantity,
+      waitUntil,
     );
-  }
 
-  return response;
-}, handlerOptions);
+    const response = protectedSuccessResponse.OK(
+      "Successfully updated product quantity in cart",
+      cart,
+    );
+
+    if (contextStore.context.isLoggedOut && contextStore.context.cartId) {
+      setCookieInResponse(
+        response,
+        getCartIdCookieHeader(contextStore.context.cartId),
+      );
+    }
+
+    return response;
+  },
+  handlerOptions,
+);
 
 // Deprecated for now
 // export const onRequestPatch = requestHandler(async ({ request, params }) => {

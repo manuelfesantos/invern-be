@@ -11,6 +11,7 @@ import { stockClient } from "@r2-adapter";
 export const updateCartItemQuantity = async (
   productId: string,
   quantity: number,
+  waitUntil: ExecutionContext["waitUntil"],
 ): Promise<ExtendedCart> => {
   const cartId = await getCartId();
 
@@ -21,11 +22,10 @@ export const updateCartItemQuantity = async (
   }
 
   let stock: number | null | undefined = await stockClient.get(productId);
-  let updateKVPromise: Promise<void> | undefined;
   if (stock === null) {
     stock = await getSelectProductStockByIdAction(productId).run();
     if (stock === undefined) throw errors.PRODUCT_NOT_FOUND();
-    updateKVPromise = stockClient.setKV(productId, stock);
+    waitUntil(stockClient.setKV(productId, stock));
   }
 
   if (quantity > stock) {
@@ -33,6 +33,5 @@ export const updateCartItemQuantity = async (
   }
 
   const cart = await cartOperationMap.UPSERT(productId, cartId, quantity);
-  await updateKVPromise;
   return extendCart(toCartDTO(cart));
 };
