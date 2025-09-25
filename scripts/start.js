@@ -24,7 +24,7 @@ function executeCommand(command, options = {}, ignoreError = false) {
 
 // Start the development server
 executeCommand(
-  `npx wrangler pages dev functions --local-protocol=${protocol} --show-interactive-dev-session=false`,
+  `wrangler pages dev functions --local-protocol=${protocol} --show-interactive-dev-session=false`,
 );
 
 // Handle termination signals to stop the development server gracefully
