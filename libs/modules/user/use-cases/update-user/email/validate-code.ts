@@ -6,8 +6,11 @@ import { validateNewEmailSecret } from "@user-module";
 import { logCredentials } from "@logger-utils";
 import { sendEmailChangeSuccessfulEmail } from "@sendgrid-adapter";
 import { ENV } from "@env-utils";
+import { type UserDTO, userDTOSchema } from "@user-entity";
 
-export const validateUpdateEmailCode = async (body: unknown): Promise<void> => {
+export const validateUpdateEmailCode = async (
+  body: unknown,
+): Promise<UserDTO> => {
   const { code } = validateSubmitEmailCodeBodySchema.parse(body);
   const { userId, cartId, country } = contextStore.context;
   if (!userId) {
@@ -23,7 +26,7 @@ export const validateUpdateEmailCode = async (body: unknown): Promise<void> => {
 
   const secret = await validateNewEmailSecret(user.email, code);
 
-  await getUpdateUserAction(userId, {
+  const updatedUser = await getUpdateUserAction(userId, {
     email: secret.newEmail,
   }).run();
 
@@ -32,4 +35,6 @@ export const validateUpdateEmailCode = async (body: unknown): Promise<void> => {
     secret.newEmail,
     `${ENV.FRONTEND_HOST}/${country.code.toLowerCase()}/profile/user-details`,
   );
+
+  return userDTOSchema.parse(updatedUser);
 };
