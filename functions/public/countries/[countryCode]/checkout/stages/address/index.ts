@@ -16,6 +16,7 @@ import {
 } from "@context-utils";
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
+import { getCheckoutStageData } from "../index";
 
 export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
@@ -30,6 +31,7 @@ export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   contextStore.context.address = encryptedAddress;
 
   const response = protectedSuccessResponse.OK("Successfully created address", {
+    ...(await getCheckoutStageData(CheckoutStageNameEnum.SHIPPING)),
     address,
     availableCheckoutStages: getClientCheckoutStages(),
   });

@@ -1,4 +1,5 @@
 import type { CheckoutStageName } from "@checkout-session-entity";
+import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import * as z from "zod";
 
 export interface CheckoutStage {
@@ -11,7 +12,12 @@ export interface CheckoutStage {
 }
 
 export const clientCheckoutStageSchema = z.object({
-  name: z.string(),
+  name: z.enum([
+    CheckoutStageNameEnum.PERSONAL_DETAILS,
+    CheckoutStageNameEnum.ADDRESS,
+    CheckoutStageNameEnum.SHIPPING,
+    CheckoutStageNameEnum.REVIEW,
+  ]),
   isEnabled: z.boolean(),
   title: z.string(),
 });

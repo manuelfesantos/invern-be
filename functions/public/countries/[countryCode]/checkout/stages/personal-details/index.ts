@@ -14,6 +14,7 @@ import {
 } from "@context-utils";
 import { CheckoutStageNameEnum } from "@checkout-session-entity";
 import { errors } from "@error-handling-utils";
+import { getCheckoutStageData } from "../index";
 
 export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
@@ -25,6 +26,7 @@ export const onRequestPost = checkoutRequestHandler(async ({ request }) => {
   const response = protectedSuccessResponse.OK(
     "Successfully created user details",
     {
+      ...(await getCheckoutStageData(CheckoutStageNameEnum.ADDRESS)),
       personalDetails: userDetails,
       availableCheckoutStages: getClientCheckoutStages(),
     },

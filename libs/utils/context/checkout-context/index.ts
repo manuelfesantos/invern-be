@@ -2,17 +2,14 @@ import { contextStore } from "../context-store";
 import { validations } from "./validations";
 import { firstStage } from "./stages";
 import type {
-  CheckoutStageName} from "@checkout-session-entity";
-import {
-  checkoutStageToCookie,
+  CheckoutStageName,
+  CheckoutStageNameEnum,
 } from "@checkout-session-entity";
-import type {
-  CheckoutStage,
-  ClientCheckoutStage} from "./types";
-import {
-  clientCheckoutStageSchema,
-} from "./types";
+import { checkoutStageToCookie } from "@checkout-session-entity";
+import type { CheckoutStage, ClientCheckoutStage } from "./types";
+import { clientCheckoutStageSchema } from "./types";
 import type { CookieName } from "@http-entity";
+import { errors } from "@error-handling-utils";
 
 export const setupCheckoutStages = async (): Promise<void> => {
   let stage: CheckoutStage = firstStage;
@@ -47,6 +44,24 @@ export const getClientCheckoutStages = (): ClientCheckoutStage[] => {
     : stages;
 
   return stagesToShow.map((stage) => clientCheckoutStageSchema.parse(stage));
+};
+
+export const getNextClientCheckoutStage = (
+  stage: Omit<CheckoutStageName, typeof CheckoutStageNameEnum.REVIEW>,
+): ClientCheckoutStage => {
+  const { firstCheckoutStage } = contextStore.context;
+  let currentStage: CheckoutStage | undefined = firstCheckoutStage;
+  while (currentStage) {
+    if (currentStage.name === stage) {
+      return {
+        name: currentStage.name,
+        isEnabled: currentStage.isEnabled,
+        title: currentStage.title,
+      };
+    }
+    currentStage = currentStage.next;
+  }
+  throw errors.GENERIC("Next checkout stage not found");
 };
 
 export const enableNextCheckoutStage = (stage: CheckoutStageName): void =>

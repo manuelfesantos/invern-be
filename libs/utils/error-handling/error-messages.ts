@@ -2,6 +2,11 @@ import { CustomError } from "./custom-error";
 import { HttpStatusEnum } from "@http-entity";
 
 export const errors = {
+  GENERIC: (errorMessage?: string): CustomError =>
+    new CustomError(
+      errorMessage ?? "Something went wrong",
+      HttpStatusEnum.INTERNAL_SERVER_ERROR,
+    ),
   COUNTRY_NOT_FOUND: (): CustomError =>
     new CustomError("Country not found", HttpStatusEnum.NOT_FOUND),
   CURRENCY_NOT_FOUND: (): CustomError =>
