@@ -65,7 +65,5 @@ const validateSecret = async <
   }
   if (secret.expiresAt < getDateTime()) throw errors.FORGOT_SECRET_EXPIRED();
 
-  await deleteValidateEmailSecret(key);
-
   return secret;
 };
