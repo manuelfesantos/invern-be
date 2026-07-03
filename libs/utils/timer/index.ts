@@ -22,6 +22,9 @@ const DAYS_IN_WEEK = 7;
 const SECONDS_IN_WEEK = SECONDS_IN_DAY * DAYS_IN_WEEK;
 
 export const TOKEN_COOKIE_MAX_AGE = SECONDS_IN_WEEK * TWO_WEEKS;
+// Refresh-token lifetime, aligned to the cookie Max-Age. Also used as the
+// AUTH_KV TTL so the stored refresh secret self-expires.
+export const REFRESH_TOKEN_EXPIRY = SECONDS_IN_WEEK * TWO_WEEKS;
 export const TOKEN_EXPIRY = SECONDS_IN_MINUTE * FIFTEEN_MINUTES;
 export const SESSION_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;
 export const SIGNUP_EMAIL_EXPIRY = SECONDS_IN_MINUTE * THIRTY_MINUTES;

@@ -1,5 +1,6 @@
 import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { verifyPassword } from "@crypto-utils";
+import { deleteAuthSecret } from "@kv-adapter";
 import { contextStore } from "@context-utils";
 import { updatePasswordBodySchema } from "../types/update-user";
 import { errors } from "@error-handling-utils";
@@ -38,6 +39,10 @@ export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {
   await getUpdateUserAction(userId, {
     password: newPassword,
   }).run();
+
+  // Invalidate prior sessions: drop the stored refresh secret so refresh tokens
+  // issued before the password change stop working.
+  await deleteAuthSecret(userId);
 
   const updatedUser = await getSelectUserByIdAction(userId).run();
 

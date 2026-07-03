@@ -1,6 +1,7 @@
 import { getAnonymousTokens } from "@jwt-utils";
 import { errors } from "@error-handling-utils";
 import { contextStore } from "@context-utils";
+import { deleteAuthSecret } from "@kv-adapter";
 import type { ResponseContext } from "@http-entity";
 import { extendCart } from "@extender-utils";
 import type { ExtendedCart} from "@cart-entity";
@@ -19,6 +20,13 @@ export const logout = async (): Promise<ReturnType> => {
 
   if (isLoggedOut) {
     throw errors.UNAUTHORIZED("not logged in");
+  }
+
+  // Revoke the server-side refresh secret so the pre-logout refresh token can
+  // no longer authenticate (single userId-keyed secret → revokes all of this
+  // user's sessions).
+  if (userId) {
+    await deleteAuthSecret(userId);
   }
 
   return {

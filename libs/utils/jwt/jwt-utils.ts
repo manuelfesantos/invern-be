@@ -3,6 +3,7 @@ import { jwtSchema, userJwtSchema } from "@jwt-entity";
 import type { Role } from "@user-entity";
 import {
   getFutureDate,
+  REFRESH_TOKEN_EXPIRY,
   TOKEN_COOKIE_MAX_AGE,
   TOKEN_EXPIRY,
 } from "@timer-utils";
@@ -66,4 +67,8 @@ export const getLoggedInToken = async (
 
 export const getLoggedInRefreshToken = async (
   userId: string,
-): Promise<string> => await signJwt({ userId }, ENV.REFRESH_TOKEN_SECRET);
+): Promise<string> =>
+  await signJwt(
+    { userId, exp: getFutureDate(REFRESH_TOKEN_EXPIRY) },
+    ENV.REFRESH_TOKEN_SECRET,
+  );
