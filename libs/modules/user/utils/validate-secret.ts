@@ -10,7 +10,6 @@ import {
   SECRET_EXPIRY_MINUTES,
 } from "../use-cases/forgot-password/utils/values";
 import {
-  deleteValidateEmailSecret,
   getValidateEmailSecret,
   getValidateNewEmailSecret,
   getValidationSecret,

@@ -7,7 +7,7 @@
   "scripts": {
     "init": "node ./scripts/init.js",
     "start": "node ./scripts/start.js",
-    "test": "jest --coverage --passWithNoTests",
+    "test": "jest --coverage",
     "lint": "eslint functions/** libs/**",
     "lint:fix": "eslint functions/** libs/** --fix",
     "build-remote-db": "wrangler d1 create invern-db-preview --location weur",
