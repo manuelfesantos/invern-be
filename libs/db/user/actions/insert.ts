@@ -24,7 +24,7 @@ const preProcessUserInsert = async (
   user: InsertUser,
 ): Promise<[user: InsertUser]> => {
   if (user.password) {
-    user.password = await hashPassword(user.password, user.id);
+    user.password = await hashPassword(user.password);
   }
   return [user];
 };

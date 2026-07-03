@@ -30,7 +30,7 @@ const preProcessUserUpdate = async (
   changes: Partial<InsertUser>,
 ): Promise<[userId: string, changes: Partial<InsertUser>]> => {
   if (changes.password) {
-    changes.password = await hashPassword(changes.password, userId);
+    changes.password = await hashPassword(changes.password);
   }
   return [userId, changes];
 };

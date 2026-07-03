@@ -1,5 +1,5 @@
 import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
-import { hashPassword } from "@crypto-utils";
+import { verifyPassword } from "@crypto-utils";
 import { contextStore } from "@context-utils";
 import { updatePasswordBodySchema } from "../types/update-user";
 import { errors } from "@error-handling-utils";
@@ -25,9 +25,13 @@ export const updateUserPassword = async (body: unknown): Promise<UserDTO> => {
   }
   const { password } = user;
 
-  const hashedCurrentPassword = await hashPassword(currentPassword, userId);
+  if (!password) {
+    throw errors.UNAUTHORIZED("current password is incorrect");
+  }
 
-  if (hashedCurrentPassword !== password) {
+  const { valid } = await verifyPassword(currentPassword, password, userId);
+
+  if (!valid) {
     throw errors.UNAUTHORIZED("current password is incorrect");
   }
 

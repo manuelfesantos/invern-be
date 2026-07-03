@@ -1,25 +1,12 @@
 import { encode } from "@encoding-utils";
-import { ENV } from "@env-utils";
 
 const SIXTEEN = 16;
 const TWO = 2;
 
-let salt: string | null = null;
-
-const getSalt = (): string => {
-  if (!salt) {
-    salt = ENV.SALT;
-  }
-  return salt;
-};
-
-export const hashPassword = async (
-  password: string,
-  id: string,
-): Promise<string> => {
-  return hashString(`${password}${getSalt()}${id}`);
-};
-
+/**
+ * Plain SHA-256 hex digest. Used for non-secret hashing (e.g. hashing a Google
+ * user id). NOT for passwords — those use PBKDF2 via `./password`.
+ */
 export const hashString = async (input: string): Promise<string> => {
   const data = encode(input);
 

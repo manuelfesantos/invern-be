@@ -2,7 +2,7 @@ import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
 import type { User, UserDTO } from "@user-entity";
 import { toUserDTO, UserValidationStatusEnum } from "@user-entity";
 import { errors } from "@error-handling-utils";
-import { getRandomUUID, hashPassword } from "@crypto-utils";
+import { getRandomUUID, verifyPassword } from "@crypto-utils";
 import { getAuthSecret, setAuthSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken, getLoggedInToken } from "@jwt-utils";
 import type { ResponseContext } from "@http-entity";
@@ -123,9 +123,24 @@ const validatePassword = async (
   passwordText: string,
   user: User,
 ): Promise<void> => {
-  const password = await hashPassword(passwordText, user.id);
-
-  if (password !== user.password) {
+  if (!user.password) {
+    // OAuth-only accounts have no password and cannot log in with one.
     throw errors.INVALID_CREDENTIALS();
+  }
+
+  const { valid, needsRehash } = await verifyPassword(
+    passwordText,
+    user.password,
+    user.id,
+  );
+
+  if (!valid) {
+    throw errors.INVALID_CREDENTIALS();
+  }
+
+  if (needsRehash) {
+    // Transparently upgrade a legacy/weaker hash to the current KDF; the update
+    // action re-hashes the submitted plaintext with the new scheme.
+    await getUpdateUserAction(user.id, { password: passwordText }).run();
   }
 };
