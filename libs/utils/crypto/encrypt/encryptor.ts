@@ -2,6 +2,10 @@ import { decode, encode } from "@encoding-utils";
 import { ENV } from "@env-utils";
 
 const NUMBER_ZERO = 0;
+const IV_BYTES = 12;
+// Marks the per-message-IV format. The '.' is not a base64 character, so a
+// legacy (bare-base64) ciphertext can never start with this prefix.
+const NEW_FORMAT_PREFIX = "v1.";
 
 let encryptionKey: CryptoKey | null = null;
 let defaultIV: string | null = null;
@@ -26,30 +30,48 @@ const getEncryptionKey = async (): Promise<CryptoKey> => {
   return encryptionKey;
 };
 
-export const encrypt = async (data: string, iv?: string): Promise<string> => {
-  const dataBuffer = encode(data);
+export const encrypt = async (data: string): Promise<string> => {
+  // Fresh random nonce per message — reusing a fixed IV under one key breaks
+  // AES-GCM. The IV is not secret, only unique; it is prepended to the output.
+  const iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
 
   const encryptedData = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: encode(iv ?? getDefaultIV()) },
+    { name: "AES-GCM", iv },
     await getEncryptionKey(),
-    dataBuffer,
+    encode(data),
   );
 
-  return arrayBufferToBase64(encryptedData);
+  const cipherBytes = new Uint8Array(encryptedData);
+  const combined = new Uint8Array(iv.length + cipherBytes.length);
+  combined.set(iv, NUMBER_ZERO);
+  combined.set(cipherBytes, iv.length);
+
+  return NEW_FORMAT_PREFIX + arrayBufferToBase64(combined.buffer);
 };
 
-export const decrypt = async (
-  encryptedDataBase64: string,
-  iv?: string,
-): Promise<string> => {
-  const encryptedData = base64ToArrayBuffer(encryptedDataBase64);
+export const decrypt = async (encryptedData: string): Promise<string> => {
+  if (encryptedData.startsWith(NEW_FORMAT_PREFIX)) {
+    const combined = new Uint8Array(
+      base64ToArrayBuffer(encryptedData.slice(NEW_FORMAT_PREFIX.length)),
+    );
+    const iv = combined.slice(NUMBER_ZERO, IV_BYTES);
+    const cipher = combined.slice(IV_BYTES);
 
+    const decryptedData = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv },
+      await getEncryptionKey(),
+      cipher,
+    );
+    return decode(decryptedData);
+  }
+
+  // Legacy format: bare base64, encrypted with the fixed DEFAULT_IV. Kept so
+  // data written before this change (stored addresses, live sessions) decrypts.
   const decryptedData = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv: encode(iv ?? getDefaultIV()) },
+    { name: "AES-GCM", iv: encode(getDefaultIV()) },
     await getEncryptionKey(),
-    encryptedData,
+    base64ToArrayBuffer(encryptedData),
   );
-
   return decode(decryptedData);
 };
 
