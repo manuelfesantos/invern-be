@@ -5,27 +5,25 @@ on:
     branches:
       - main
 
+# Minimal permissions: the source-branch check only reads PR metadata.
+permissions:
+  contents: read
+
 jobs:
-  validate-pr:
+  validate-source-branch:
     name: Validate PR source branch
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Validate PR source branch
-        id: validate
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Require the source branch to be 'preview'
         run: |
           if [[ "${{ github.event.pull_request.head.ref }}" != "preview" ]]; then
-            echo "Error: PR must come from the 'Preview' branch."
-            gh pr close ${{ github.event.pull_request.head.ref }}
+            echo "::error::PRs into 'main' must come from the 'preview' branch (got '${{ github.event.pull_request.head.ref }}')."
             exit 1
           fi
+          echo "PR source branch is 'preview' — ok."
 
-      - name: Continue with your workflow
-        run: |
-          # Your workflow steps here
-          echo "PR from 'Preview' branch is valid. Proceeding with the workflow."
+  quality-gate:
+    # Only run the (more expensive) gate once the promotion flow is valid.
+    needs: validate-source-branch
+    # lint + test + type-check (shared with validate-pr-to-preview)
+    uses: ./.github/workflows/quality-gate.yml
