@@ -20,7 +20,6 @@ export const onRequestGet = requestHandler(async ({ params }) => {
     return errorResponse.NOT_FOUND("product not found");
   }
 
-  return successResponse.OK("success getting stock", response, {
-    "Access-Control-Allow-Origin": ENV.FRONTEND_HOST,
-  });
+  // CORS is applied centrally by the global middleware (applyCorsHeaders).
+  return successResponse.OK("success getting stock", response);
 });

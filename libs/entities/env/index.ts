@@ -1,5 +1,6 @@
 interface Env {
   AUTH_KV: KVNamespace;
+  BACKOFFICE_HOST: string;
   CACHE_API_EMAIL: string;
   CACHE_API_KEY: string;
   COUNTRIES_BUCKET: R2Bucket;

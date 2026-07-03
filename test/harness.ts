@@ -103,6 +103,7 @@ export const makeTestEnv = (
     // Hosts / misc config.
     DOMAIN: "localhost",
     FRONTEND_HOST: "http://localhost:8081",
+    BACKOFFICE_HOST: "http://localhost:5173",
     STOCK_HOST: "http://localhost/stock",
     IMAGES_HOST: "http://localhost/images",
     COUNTRIES_HOST: "http://localhost/countries",

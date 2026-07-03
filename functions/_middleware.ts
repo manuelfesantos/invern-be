@@ -5,25 +5,27 @@ import { withLogger } from "@logger-utils";
 import { middlewareRequestHandler } from "@decorator-utils";
 import { contextStore } from "@context-utils";
 import { setEnv } from "@env-utils";
+import {
+  applyCorsHeaders,
+  corsPreflightResponse,
+  getAllowedOrigins,
+} from "@http-utils";
 
 export const startLogger = middlewareRequestHandler(async (context) => {
   const { env, request } = context;
-  if (
-    request.method === HttpMethodEnum.HEAD ||
-    request.method === HttpMethodEnum.OPTIONS
-  ) {
-    if (env.ENV !== "local") {
-      return new Response("Method not allowed", {
-        status: 405,
-      });
-    } else {
-      const response = new Response("All ok", {
-        status: 200,
-      });
-      addLocalCorsHeaders(response);
-      return response;
-    }
+
+  // Answer CORS preflight in every environment, without auth, echoing an
+  // allow-listed origin. Runs before `setEnv`, so origins come from `env`.
+  if (request.method === HttpMethodEnum.OPTIONS) {
+    return corsPreflightResponse(request, getAllowedOrigins(env));
   }
+
+  if (request.method === HttpMethodEnum.HEAD) {
+    return new Response("Method not allowed", {
+      status: 405,
+    });
+  }
+
   return honeyCombPlugin({
     apiKey: env.HONEYCOMB_API_KEY,
     dataset: env.HONEYCOMB_DATASET,
@@ -60,28 +62,8 @@ export const setGlobalEnvs = middlewareRequestHandler<PluginData>(
 
     const response = await contextStore.run(() => withLogger(logger, next));
 
-    if (env.ENV === "local") {
-      addLocalCorsHeaders(response);
-    }
-    return response;
+    return applyCorsHeaders(request, response, getAllowedOrigins(env));
   },
 );
-
-const addLocalCorsHeaders = (response: Response): Response => {
-  response.headers.append(
-    "Access-Control-Allow-Origin",
-    "https://localhost:8081",
-  );
-  response.headers.append("Access-Control-Allow-Credentials", "true");
-  response.headers.append(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, CF-Access-Client-Id, CF-Access-Client-Secret",
-  );
-  response.headers.append(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
-  );
-  return response;
-};
 
 export const onRequest = [startLogger, setGlobalEnvs];
