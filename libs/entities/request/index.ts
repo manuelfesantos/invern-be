@@ -1,3 +1,5 @@
+import type { Role } from "@user-entity";
+
 export type Credentials = {
   userId?: string;
   cartId?: string;
@@ -8,4 +10,6 @@ export type Credentials = {
   address?: string;
   userDetails?: string;
   shippingMethod?: string;
+  /** Only set for logged-in callers; undefined for anonymous. */
+  role?: Role;
 };

@@ -1,5 +1,6 @@
 import type { JWT, UserJWT } from "@jwt-entity";
 import { jwtSchema, userJwtSchema } from "@jwt-entity";
+import type { Role } from "@user-entity";
 import {
   getFutureDate,
   TOKEN_COOKIE_MAX_AGE,
@@ -56,9 +57,10 @@ export const getTokenCookie = (token: string, remember?: boolean): string =>
 export const getLoggedInToken = async (
   userId: string,
   cartId?: string,
+  role?: Role,
 ): Promise<string> =>
   await signJwt(
-    { userId, cartId, exp: getFutureDate(TOKEN_EXPIRY) },
+    { userId, cartId, role, exp: getFutureDate(TOKEN_EXPIRY) },
     ENV.TOKEN_SECRET,
   );
 

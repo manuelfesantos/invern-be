@@ -69,13 +69,14 @@ const handleLoggedInToken = (
   refreshToken: string,
 ): Credentials => {
   const remember = getRememberValue(headers);
-  const { userId, cartId } = token;
+  const { userId, cartId, role } = token;
   const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);
 
   return {
     userId,
     cartId,
+    role,
     customerEmail,
     refreshToken,
     remember,
@@ -131,10 +132,11 @@ const handleLoggedInRefreshToken = async (
     await getUpdateUserAction(userId, { cartId: cartId }).run();
   }
 
-  const accessToken = await getLoggedInToken(userId, cartId);
+  const accessToken = await getLoggedInToken(userId, cartId, user.role);
   return {
     userId,
     cartId: cartId,
+    role: user.role,
     accessToken,
     customerEmail,
     refreshToken,

@@ -4,3 +4,5 @@ export const rolesSchema = z.enum(["ADMIN", "USER"], {
   message: "Invalid role",
 });
 export const RolesEnum = rolesSchema.enum;
+
+export type Role = z.infer<typeof rolesSchema>;

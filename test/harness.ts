@@ -87,10 +87,11 @@ export const makeTestEnv = (
     STRIPE_ENV: "test",
     LOGGER_LEVEL: "100", // above all levels → logging is silent in tests by default
 
-    // Crypto material — ENCRYPTION_KEY must be a valid AES-GCM key length (32).
+    // Crypto material — ENCRYPTION_KEY must be a valid AES-GCM key length
+    // (exactly 16/24/32 chars → bytes); 32 here.
     TOKEN_SECRET: "test-token-secret-000000000000000",
     REFRESH_TOKEN_SECRET: "test-refresh-secret-00000000000000",
-    ENCRYPTION_KEY: "test-encryption-key-0123456789012",
+    ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef",
     DEFAULT_IV: "test-iv-01234567",
     SALT: "test-salt-012345",
 
