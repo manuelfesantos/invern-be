@@ -62,7 +62,7 @@ tags:
     description: Webhooks for receiving events from Stripe.
 
 security:
-  - AdminSecretKey: [] # Define a scheme for private endpoints needing a secret key
+  - AdminBearer: [] # Define a scheme for private endpoints needing a secret key
 
 paths:
   # -------------------- Public - Countries --------------------
@@ -1265,7 +1265,7 @@ paths:
   # -------------------- Private - Currencies --------------------
   /private/currencies:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Currencies
@@ -1323,7 +1323,7 @@ paths:
 
   /private/currencies/{code}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - name: code
         in: path
@@ -1412,7 +1412,7 @@ paths:
   # -------------------- Private - Countries --------------------
   /private/countries:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Countries
@@ -1470,7 +1470,7 @@ paths:
 
   /private/countries/{code}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - name: code
         in: path
@@ -1559,7 +1559,7 @@ paths:
   # -------------------- Private - Products Admin --------------------
   /private/products:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Products Admin
@@ -1621,7 +1621,7 @@ paths:
 
   /private/products/{id}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/ProductId'
     get:
@@ -1705,7 +1705,7 @@ paths:
   # -------------------- Private - Collections Admin --------------------
   /private/collections:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Collections Admin
@@ -1761,7 +1761,7 @@ paths:
 
   /private/collections/{id}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/CollectionId'
     get:
@@ -1844,7 +1844,7 @@ paths:
   # -------------------- Private - Carts Admin (NEW) --------------------
   /private/carts:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Carts Admin
@@ -1877,7 +1877,7 @@ paths:
 
   /private/carts/{id}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/CartId'
     get:
@@ -1931,7 +1931,7 @@ paths:
   # -------------------- Private - Users Admin (NEW) --------------------
   /private/users:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Users Admin
@@ -1964,7 +1964,7 @@ paths:
 
   /private/users/{id}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/UserId'
     get:
@@ -2017,7 +2017,7 @@ paths:
   # -------------------- Private - Orders Admin --------------------
   /private/orders:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     get:
       tags:
         - Private - Orders Admin
@@ -2075,7 +2075,7 @@ paths:
 
   /private/orders/{id}:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/OrderId'
     get:
@@ -2139,7 +2139,7 @@ paths:
 
   /private/orders/{id}/cancel:
     security:
-      - AdminSecretKey: []
+      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/OrderId'
     put:
@@ -2175,9 +2175,9 @@ paths:
       tags:
         - Private - Scheduled Tasks
       summary: Check and Expire Checkout Sessions
-      description: Endpoint typically triggered by a cron schedule to find and invalidate expired Stripe Checkout sessions and release associated product stock. Auth handled by Cloudflare infrastructure (e.g., Cron Trigger auth header) or requires AdminSecretKey.
+      description: Endpoint typically triggered by a cron schedule to find and invalidate expired Stripe Checkout sessions and release associated product stock. Auth handled by Cloudflare infrastructure (e.g., Cron Trigger auth header) or requires AdminBearer.
       security:
-        - AdminSecretKey: [] # Or implied Cron Trigger auth
+        - AdminBearer: [] # Or implied Cron Trigger auth
       responses:
         '200':
           description: Operation completed. Message indicates if sessions were expired.
@@ -2190,7 +2190,7 @@ paths:
                     type: string
                     example: No sessions were expired
         '401':
-          $ref: '#/components/responses/Unauthorized' # If using AdminSecretKey and it's invalid
+          $ref: '#/components/responses/Unauthorized' # If using AdminBearer and it's invalid
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -3779,11 +3779,20 @@ components:
         - type
 
   securitySchemes:
-    AdminSecretKey: # Define scheme for admin endpoints
-      type: apiKey
-      in: header
-      name: X-Admin-Secret-Key # Or choose another header name
-      description: Secret key required for accessing private administrative endpoints.
+    AdminBearer: # Real admin auth: JWT access token + refresh cookie
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Admin access token (JWT) sent as `Authorization: Bearer <token>`. The
+        token must carry `role: ADMIN`, enforced by
+        `functions/private/_middleware.ts`. The refresh-token cookie (`s_r`)
+        must also be present on the request — `getCredentials` requires both the
+        access token and the refresh token. Obtain both by logging in
+        (`POST /public/countries/{countryCode}/user/login`) as an ADMIN user.
+        The maintenance routes (`insert-test-data`, `stock/setup`) instead
+        validate a `secretKey` field in their request body and are not covered
+        by this scheme.
 
   responses:
     BadRequest:
