@@ -16,3 +16,27 @@ body:json {
     "code": "12345678"
   }
 }
+
+script:post-response {
+  if (res.body && res.body.accessToken) {
+    bru.setEnvVar("accessToken", res.body.accessToken);
+  }
+  let sc = res.headers["set-cookie"];
+  if (sc) {
+    if (!Array.isArray(sc)) sc = [sc];
+    for (const c of sc) {
+      const m = /(?:^|;\s*)s_r=([^;]+)/.exec(c);
+      if (m) { bru.setEnvVar("refreshToken", m[1]); break; }
+    }
+  }
+}
+
+docs {
+  Completes signup: validates the code, marks the account validated, and LOGS
+  YOU IN — this response carries the accessToken + s_r cookie (stored here),
+  unlike Signup itself.
+
+  Requires the anonymous session first (run **Get Anonymous Session**). Use the
+  same `email` you signed up with; get the `code` from the email (or, in local
+  dev, from KV — see the Signup request's docs).
+}

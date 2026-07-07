@@ -15,10 +15,20 @@ body:json {
     "email": "someone@example.com",
     "password": "a-strong-password",
     "firstName": "Ana",
-    "lastName": "Silva"
+    "lastName": "Silva",
+    "remember": true
   }
 }
 
 docs {
-  Creates an unvalidated USER and sends a verification email (Brevo).
+  Creates an **unvalidated** USER and emails an 8-digit code. This does NOT log
+  you in — the response carries no token/cookie. Next step: **Verify Email**.
+
+  New signups are always role USER + unvalidated, so `login` will reject them
+  until verified. To create an admin instead, use `npm run create-admin`.
+
+  Requires the anonymous session first (run **Get Anonymous Session**).
+
+  Local dev — read the emailed code straight from KV:
+  `npx wrangler kv key get "someone@example.com" --binding VALIDATION_KV --local`
 }

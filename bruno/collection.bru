@@ -18,4 +18,12 @@ docs {
   `/private/*` requires BOTH a valid ADMIN access token and the refresh cookie.
 
   Create an admin first with: `npm run create-admin -- --email=... --password=...`
+
+  ## Two auth paths
+  - **Admin**: `npm run create-admin` (makes a validated ADMIN) -> **Login (Admin)**.
+  - **End user**: **Signup** -> **Verify Email** (with the emailed code). Signup
+    does NOT log you in and always creates an unvalidated USER; `login` rejects
+    an account until it's verified. **Verify Email** is what establishes the
+    session. Every `/user/*` call (signup, login, verify) needs the anonymous
+    session first.
 }
