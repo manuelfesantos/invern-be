@@ -21,34 +21,9 @@
  *   --dry-run                    print the generated SQL and exit
  */
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
-import { writeFileSync, unlinkSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { resolveTarget, executeSql, sqlValue } from "./lib/d1.mjs";
 
-// ---------------------------------------------------------------- CLI args ---
-const argv = process.argv.slice(2);
-const getFlag = (name, def) => {
-  const eq = argv.find((a) => a.startsWith(`--${name}=`));
-  if (eq) return eq.split("=").slice(1).join("=");
-  const idx = argv.indexOf(`--${name}`);
-  if (idx !== -1) {
-    const next = argv[idx + 1];
-    return next && !next.startsWith("--") ? next : true;
-  }
-  return def;
-};
-const ENV = String(getFlag("env", "local"));
-const DATABASE = String(getFlag("database", "invern-db"));
-const CONFIRM = Boolean(getFlag("yes", false));
-const DRY_RUN = Boolean(getFlag("dry-run", false));
-
-const ENVS = { local: { remote: false }, preview: { remote: true }, prod: { remote: true } };
-if (!ENVS[ENV]) {
-  console.error(`✗ Unknown --env "${ENV}". Use one of: ${Object.keys(ENVS).join(", ")}`);
-  process.exit(1);
-}
-const REMOTE = ENVS[ENV].remote;
+const target = resolveTarget(process.argv.slice(2));
 
 // ------------------------------------------------------------ seed data -----
 // Deterministic uuid-v4-shaped id from a stable key (so re-runs hit the same
@@ -154,12 +129,7 @@ for (const [country, rates] of Object.entries(shippingRatesRaw)) {
 }
 
 // ----------------------------------------------------------- SQL builders ---
-const q = (v) => {
-  if (v === null || v === undefined) return "NULL";
-  if (typeof v === "number") return String(v);
-  if (typeof v === "boolean") return v ? "1" : "0";
-  return `'${String(v).replace(/'/g, "''")}'`;
-};
+const q = sqlValue;
 const upsert = (table, rows, cols, pk) => {
   if (!rows.length) return "";
   const updates = cols.filter((c) => !pk.includes(c));
@@ -186,31 +156,7 @@ const sql = `PRAGMA foreign_keys = ON;\n\n${statements.join("\n\n")}\n`;
 
 // --------------------------------------------------------------- execute ----
 const counts = { collections: collections.length, products: products.length, images: images.length, currencies: currencies.length, countries: countries.length, taxes: taxes.length, shipping_methods: shippingMethods.length, shipping_rates: shippingRates.length };
-console.log(`Invern seed → env=${ENV} database=${DATABASE} ${REMOTE ? "(REMOTE)" : "(local)"}`);
+console.log(`Invern seed → env=${target.env} database=${target.database} ${target.remote ? "(REMOTE)" : "(local)"}`);
 console.log(`  rows: ${Object.entries(counts).map(([k, v]) => `${k}=${v}`).join(", ")}`);
 
-if (DRY_RUN) {
-  console.log("\n--- dry run: SQL below, not executed ---\n");
-  console.log(sql);
-  process.exit(0);
-}
-
-if (REMOTE && !CONFIRM) {
-  console.error(`\n✗ Refusing to write to a REMOTE (${ENV}) database without --yes.`);
-  console.error(`  Re-run with: node scripts/seed.mjs --env=${ENV} --yes`);
-  process.exit(1);
-}
-
-const file = join(tmpdir(), `invern-seed-${process.pid}-${Date.now()}.sql`);
-writeFileSync(file, sql);
-try {
-  const args = ["wrangler", "d1", "execute", DATABASE, REMOTE ? "--remote" : "--local", "--file", file];
-  console.log(`\n  running: npx ${args.join(" ")}\n`);
-  execFileSync("npx", args, { stdio: "inherit" });
-  console.log("\n✓ Seed complete.");
-} catch (err) {
-  console.error("\n✗ Seed failed.", err?.message ?? err);
-  process.exitCode = 1;
-} finally {
-  try { unlinkSync(file); } catch { /* ignore */ }
-}
+if (executeSql(sql, target)) console.log("\n✓ Seed complete.");

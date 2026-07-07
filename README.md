@@ -99,6 +99,15 @@ When running the application for the first time, you need to complete two additi
    ```
    This will initialize the local stock bucket required for the application to function properly.
 
+3. **Create an admin user**:
+   Admin (`/private/*`) access requires a user with `role = ADMIN`. New signups
+   are always `USER`, so create the first admin explicitly:
+   ```bash
+   npm run create-admin -- --email=you@example.com --password='a-strong-password'
+   # remote: npm run create-admin -- --email=... --password=... --env=preview --yes
+   ```
+   Upserts on email (re-running resets the password). See `scripts/create-admin.mjs`.
+
 ## Database Migration
 
 1. **Generate the migration files**:
