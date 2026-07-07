@@ -10,6 +10,31 @@ post {
   auth: none
 }
 
+script:post-response {
+  // Logout revokes the server-side refresh secret and hands back fresh
+  // ANONYMOUS tokens. Adopt them so the collection stops sending the logged-in
+  // token — otherwise the still-valid (stateless) access token keeps you logged
+  // in until it expires.
+  if (res.body && res.body.accessToken) {
+    bru.setEnvVar("accessToken", res.body.accessToken);
+  }
+  let sc = res.headers["set-cookie"];
+  if (sc) {
+    if (!Array.isArray(sc)) sc = [sc];
+    for (const c of sc) {
+      const m = /(?:^|;\s*)s_r=([^;]+)/.exec(c);
+      if (m) { bru.setEnvVar("refreshToken", m[1]); break; }
+    }
+  }
+}
+
 docs {
-  Revokes the refresh secret server-side.
+  Revokes the server-side refresh secret and returns fresh ANONYMOUS tokens,
+  which this request stores into `accessToken`/`refreshToken` — leaving you in a
+  logged-out (anonymous) session.
+
+  Note: the previously issued access token is a stateless JWT and stays valid
+  until it expires; logout can't revoke it, only the refresh secret. Adopting
+  the anonymous tokens (as this script does) is what actually ends the session
+  client-side.
 }
