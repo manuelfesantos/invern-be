@@ -90,7 +90,7 @@ export const generateErrorResponse = (
     logger().addRedactedData({ error: zodError });
 
     return errorResponse.BAD_REQUEST(
-      { issues: zodError.issues.map(({ message }) => message) },
+      { issues: zodError.issues.map(formatZodIssue) },
       headers,
     );
   }
@@ -138,6 +138,22 @@ export const buildErrorResponse = (
   status: number,
   headers?: Record<string, string>,
 ): Response => buildResponse(error, { status }, headers);
+
+const formatIssuePath = (path: readonly PropertyKey[]): string =>
+  path.reduce<string>((acc, key) => {
+    if (typeof key === "number") return `${acc}[${key}]`;
+    return acc ? `${acc}.${String(key)}` : String(key);
+  }, "");
+
+/**
+ * Renders a Zod issue as "<field path>: <message>" so responses identify which
+ * field failed (e.g. "remember: is required") instead of a naked message.
+ * Top-level issues (empty path) fall back to the bare message.
+ */
+export const formatZodIssue = (issue: z.core.$ZodIssue): string => {
+  const path = formatIssuePath(issue.path);
+  return path ? `${path}: ${issue.message}` : issue.message;
+};
 
 export const simplifyZodError = (error: z.ZodError): SimplifiedZodError => {
   return {
