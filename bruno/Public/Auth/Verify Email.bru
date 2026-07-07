@@ -13,7 +13,7 @@ post {
 body:json {
   {
     "email": "someone@example.com",
-    "code": "12345678"
+    "code": "{{verificationCode}}"
   }
 }
 
@@ -37,6 +37,7 @@ docs {
   unlike Signup itself.
 
   Requires the anonymous session first (run **Get Anonymous Session**). Use the
-  same `email` you signed up with; get the `code` from the email (or, in local
-  dev, from KV — see the Signup request's docs).
+  same `email` you signed up with. Locally the `code` is auto-filled from the
+  `verificationCode` env var that **Signup** stored; in other envs, paste the
+  code from the email.
 }

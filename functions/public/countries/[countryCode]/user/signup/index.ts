@@ -12,9 +12,14 @@ import { CookieNameEnum } from "@http-entity";
 export const onRequestPost = requestHandler(async ({ request }) => {
   const body = await getBodyFromRequest(request);
 
-  await signup(body);
+  const { verificationCode } = await signup(body);
 
-  const response = protectedSuccessResponse.OK("successfully signed up");
+  // Locally, `signup` returns the code (no email is sent) so the verify-email
+  // flow is testable without Brevo; it's undefined in every other environment.
+  const response = protectedSuccessResponse.OK(
+    "successfully signed up",
+    verificationCode ? { verificationCode } : undefined,
+  );
 
   deleteCookieFromResponse(response, CookieNameEnum.CART_ID);
   deleteCheckoutCookiesFromResponse(response);

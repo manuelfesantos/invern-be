@@ -12,11 +12,12 @@ import { setAuthSecret, setValidationSecret } from "@kv-adapter";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { contextStore } from "@context-utils";
 import { generateRandomEightDigitCode } from "@number-utils";
+import { isLocalEnv } from "@http-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
 import { sendSignupEmail } from "./utils/send-email";
 import { getRandomUUID } from "@crypto-utils";
 import { runBatchOperation } from "@generics-db";
-import { logCredentials } from "@logger-utils";
+import { localLogger, logCredentials } from "@logger-utils";
 import * as z from "zod";
 
 export const signupBodySchema = insertUserSchema
@@ -30,7 +31,9 @@ export const signupBodySchema = insertUserSchema
     remember: z.boolean(),
   });
 
-export const signup = async (body: unknown): Promise<void> => {
+export const signup = async (
+  body: unknown,
+): Promise<{ verificationCode?: string }> => {
   const { isLoggedIn, cartId } = contextStore.context;
 
   if (isLoggedIn) {
@@ -125,7 +128,18 @@ export const signup = async (body: unknown): Promise<void> => {
 
   await setValidationSecret(user.email, validationSecretBody);
 
+  if (isLocalEnv()) {
+    // Locally, skip the real email provider and surface the code directly so
+    // the verify-email flow stays testable without hitting Brevo.
+    localLogger.info(
+      `signup verification code for ${user.email}: ${validationCode}`,
+    );
+    return { verificationCode: validationCode };
+  }
+
   await sendSignupEmail(user, validationCode);
+
+  return {};
 };
 
 const getUser = async (email: string): Promise<User | undefined> => {

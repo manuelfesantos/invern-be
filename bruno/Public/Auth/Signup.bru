@@ -20,15 +20,25 @@ body:json {
   }
 }
 
+script:post-response {
+  // Local dev returns the verification code in the body (no email is sent);
+  // store it so **Verify Email** can use it automatically.
+  if (res.body && res.body.data && res.body.data.verificationCode) {
+    bru.setEnvVar("verificationCode", res.body.data.verificationCode);
+  }
+}
+
 docs {
-  Creates an **unvalidated** USER and emails an 8-digit code. This does NOT log
-  you in — the response carries no token/cookie. Next step: **Verify Email**.
+  Creates an **unvalidated** USER. This does NOT log you in — the response
+  carries no token/cookie. Next step: **Verify Email**.
 
   New signups are always role USER + unvalidated, so `login` will reject them
   until verified. To create an admin instead, use `npm run create-admin`.
 
   Requires the anonymous session first (run **Get Anonymous Session**).
 
-  Local dev — read the emailed code straight from KV:
-  `npx wrangler kv key get "someone@example.com" --binding VALIDATION_KV --local`
+  - **Local**: no email is sent — the response includes `verificationCode`,
+    which this request stores into the `verificationCode` env var for
+    **Verify Email**.
+  - **Other envs**: an 8-digit code is emailed via Brevo instead.
 }
