@@ -1,0 +1,11 @@
+meta {
+  name: Get Address
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages/address
+  body: none
+  auth: none
+}

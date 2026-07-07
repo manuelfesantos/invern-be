@@ -1,0 +1,17 @@
+meta {
+  name: Update Email - Validate Code
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/update/email/validate-code
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "12345678"
+  }
+}

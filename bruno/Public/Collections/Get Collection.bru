@@ -1,0 +1,11 @@
+meta {
+  name: Get Collection
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/collections/{{collectionId}}
+  body: none
+  auth: none
+}

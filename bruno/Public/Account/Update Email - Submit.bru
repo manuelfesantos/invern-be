@@ -1,0 +1,17 @@
+meta {
+  name: Update Email - Submit
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/update/email/submit
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "new-email@example.com"
+  }
+}

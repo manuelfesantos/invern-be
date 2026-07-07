@@ -1,0 +1,15 @@
+meta {
+  name: Delete Expired Carts
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/private/expired/carts
+  body: none
+  auth: none
+}
+
+docs {
+  Maintenance (currently unauthenticated — see feature 06).
+}

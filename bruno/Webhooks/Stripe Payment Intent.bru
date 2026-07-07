@@ -1,0 +1,21 @@
+meta {
+  name: Stripe Payment Intent
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/stripe/payment-intent
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "note": "Send a raw Stripe event; requires a valid stripe-signature header."
+  }
+}
+
+docs {
+  Signature-verified against STRIPE_PAYMENT_SECRET.
+}

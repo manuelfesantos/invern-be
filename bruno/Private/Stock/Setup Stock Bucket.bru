@@ -1,0 +1,21 @@
+meta {
+  name: Setup Stock Bucket
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/stock/setup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "secretKey": "<SETUP_STOCK_SECRET>"
+  }
+}
+
+docs {
+  Self-gated by SETUP_STOCK_SECRET (not admin RBAC). Rebuilds the stock bucket from D1.
+}

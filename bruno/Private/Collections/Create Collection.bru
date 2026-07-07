@@ -1,0 +1,22 @@
+meta {
+  name: Create Collection
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/collections
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "New Collection",
+    "description": "A description of the collection."
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

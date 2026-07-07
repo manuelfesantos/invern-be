@@ -1,0 +1,19 @@
+meta {
+  name: Save Personal Details
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages/personal-details
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "someone@example.com",
+    "firstName": "Ana",
+    "lastName": "Silva"
+  }
+}

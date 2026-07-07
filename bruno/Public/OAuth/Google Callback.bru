@@ -1,0 +1,15 @@
+meta {
+  name: Google Callback
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/oauth/google/callback?code=<google-code>
+  body: none
+  auth: none
+}
+
+docs {
+  Browser flow — Google redirects here with ?code=...
+}

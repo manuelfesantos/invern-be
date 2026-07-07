@@ -1,0 +1,17 @@
+meta {
+  name: Patch Cart Item
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/cart/items/{{productId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "quantity": 1
+  }
+}

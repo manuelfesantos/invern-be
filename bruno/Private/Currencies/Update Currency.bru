@@ -1,0 +1,25 @@
+meta {
+  name: Update Currency
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/private/currencies/{{currencyCode}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "EUR",
+    "name": "Euro",
+    "symbol": "€",
+    "rateToEuro": 1,
+    "stripeName": "eur"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

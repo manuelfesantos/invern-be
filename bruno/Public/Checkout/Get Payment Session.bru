@@ -1,0 +1,15 @@
+meta {
+  name: Get Payment Session
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages/payment
+  body: none
+  auth: none
+}
+
+docs {
+  Creates a Stripe Checkout session (needs a valid cart + Stripe test key).
+}

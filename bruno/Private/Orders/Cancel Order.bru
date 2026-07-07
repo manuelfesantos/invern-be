@@ -1,0 +1,15 @@
+meta {
+  name: Cancel Order
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/private/orders/{{orderId}}/cancel
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Delete Expired Sessions
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/private/expired/sessions
+  body: none
+  auth: none
+}
+
+docs {
+  Maintenance (currently unauthenticated).
+}

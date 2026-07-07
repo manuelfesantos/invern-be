@@ -1,0 +1,24 @@
+meta {
+  name: Create Country
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/countries
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "FR",
+    "name": "France",
+    "locale": "fr-FR",
+    "currencyCode": "EUR"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

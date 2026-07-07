@@ -1,0 +1,37 @@
+meta {
+  name: Login (Admin)
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}",
+    "remember": true
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.accessToken) {
+    bru.setEnvVar("accessToken", res.body.accessToken);
+  }
+  let sc = res.headers["set-cookie"];
+  if (sc) {
+    if (!Array.isArray(sc)) sc = [sc];
+    for (const c of sc) {
+      const m = /(?:^|;\s*)s_r=([^;]+)/.exec(c);
+      if (m) { bru.setEnvVar("refreshToken", m[1]); break; }
+    }
+  }
+}
+
+docs {
+  Logs in and stores the LOGGED-IN accessToken + refreshToken, unlocking /private/*.
+}

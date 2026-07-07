@@ -1,0 +1,15 @@
+meta {
+  name: Get Stock (local-only)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/private/stock/{{productId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403. Only served when ENV=local.
+}

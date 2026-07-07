@@ -1,0 +1,22 @@
+meta {
+  name: Update Order
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/private/orders/{{orderId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "address": "{}",
+    "personalDetails": "{}"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403. (Fields are constrained server-side.)
+}

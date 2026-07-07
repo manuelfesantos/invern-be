@@ -1,0 +1,15 @@
+meta {
+  name: Google Redirect
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/oauth/google/redirect
+  body: none
+  auth: none
+}
+
+docs {
+  Browser flow — returns a redirect to Google's consent screen.
+}

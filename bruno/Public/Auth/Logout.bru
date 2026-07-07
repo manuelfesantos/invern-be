@@ -1,0 +1,15 @@
+meta {
+  name: Logout
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/logout
+  body: none
+  auth: none
+}
+
+docs {
+  Revokes the refresh secret server-side.
+}

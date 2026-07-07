@@ -1,0 +1,21 @@
+meta {
+  name: Stripe Session Result
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/stripe/session-result
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "note": "Send a raw Stripe event; requires a valid stripe-signature header (use `stripe listen`/CLI forwarding)."
+  }
+}
+
+docs {
+  Signature-verified against STRIPE_CHECKOUT_SECRET. Use the Stripe CLI to forward real events.
+}

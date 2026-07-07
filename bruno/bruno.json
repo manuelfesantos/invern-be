@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Invern Backend",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

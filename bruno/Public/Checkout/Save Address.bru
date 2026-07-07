@@ -1,0 +1,21 @@
+meta {
+  name: Save Address
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages/address
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "street": "Rua Example 1",
+    "city": "Porto",
+    "postalCode": "4000-001",
+    "country": "PT",
+    "saveAddress": false
+  }
+}

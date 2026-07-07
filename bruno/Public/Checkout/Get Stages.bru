@@ -1,0 +1,11 @@
+meta {
+  name: Get Stages
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages
+  body: none
+  auth: none
+}

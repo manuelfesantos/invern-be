@@ -1,0 +1,21 @@
+headers {
+  Authorization: Bearer {{accessToken}}
+  Cookie: s_r={{refreshToken}}
+}
+
+docs {
+  # Invern Backend
+
+  ## Setup
+  1. Select the **Local** environment (top-right).
+  2. Run **Public / Auth / Get Anonymous Session** — it stores anonymous
+     accessToken + refreshToken (needed for cart/checkout/orders/account).
+  3. Run **Public / Auth / Login (Admin)** — swaps them for a logged-in ADMIN
+     session, unlocking every `/private/*` request.
+
+  Both requests set `accessToken` and `refreshToken` env vars automatically;
+  the collection sends them on every request (Authorization bearer + s_r cookie).
+  `/private/*` requires BOTH a valid ADMIN access token and the refresh cookie.
+
+  Create an admin first with: `npm run create-admin -- --email=... --password=...`
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Create Currency
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/currencies
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "USD",
+    "name": "US Dollar",
+    "symbol": "$",
+    "rateToEuro": 1.08,
+    "stripeName": "usd"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

@@ -1,0 +1,11 @@
+meta {
+  name: Get Shipping Methods
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/checkout/stages/shipping
+  body: none
+  auth: none
+}

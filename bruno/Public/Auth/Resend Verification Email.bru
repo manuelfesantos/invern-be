@@ -1,0 +1,17 @@
+meta {
+  name: Resend Verification Email
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/signup/resend-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "someone@example.com"
+  }
+}

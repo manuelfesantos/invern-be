@@ -1,0 +1,11 @@
+meta {
+  name: Remove Cart Item
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/cart/items/{{productId}}
+  body: none
+  auth: none
+}

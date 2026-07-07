@@ -1,0 +1,15 @@
+meta {
+  name: List Products
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/private/products
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+}

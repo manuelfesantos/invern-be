@@ -1,0 +1,15 @@
+meta {
+  name: Delete Expired Users
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/private/expired/users
+  body: none
+  auth: none
+}
+
+docs {
+  Maintenance (currently unauthenticated).
+}

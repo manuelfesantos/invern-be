@@ -1,0 +1,17 @@
+meta {
+  name: Update Cart Item
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/cart/items/{{productId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "quantity": 2
+  }
+}

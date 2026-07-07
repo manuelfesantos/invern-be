@@ -1,0 +1,18 @@
+meta {
+  name: Verify Email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/signup/verify-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "someone@example.com",
+    "code": "12345678"
+  }
+}

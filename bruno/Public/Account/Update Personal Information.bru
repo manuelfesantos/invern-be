@@ -1,0 +1,18 @@
+meta {
+  name: Update Personal Information
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user/update/personal-information
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "Ana",
+    "lastName": "Silva"
+  }
+}

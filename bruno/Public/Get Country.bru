@@ -1,0 +1,11 @@
+meta {
+  name: Get Country
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}
+  body: none
+  auth: none
+}

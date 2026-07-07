@@ -1,0 +1,11 @@
+meta {
+  name: Delete User (GDPR)
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/user
+  body: none
+  auth: none
+}

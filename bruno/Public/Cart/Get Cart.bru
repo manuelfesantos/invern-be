@@ -1,0 +1,29 @@
+meta {
+  name: Get Cart
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/public/countries/{{countryCode}}/cart
+  body: none
+  auth: none
+}
+
+script:post-response {
+  if (res.body && res.body.accessToken) {
+    bru.setEnvVar("accessToken", res.body.accessToken);
+  }
+  let sc = res.headers["set-cookie"];
+  if (sc) {
+    if (!Array.isArray(sc)) sc = [sc];
+    for (const c of sc) {
+      const m = /(?:^|;\s*)s_r=([^;]+)/.exec(c);
+      if (m) { bru.setEnvVar("refreshToken", m[1]); break; }
+    }
+  }
+}
+
+docs {
+  Returns/creates the cart. May rotate tokens (stored).
+}
