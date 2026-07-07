@@ -16,6 +16,7 @@
     "query-preview": "wrangler d1 execute invern-db --remote --command",
     "db:migrate:local": "wrangler d1 migrations apply invern-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply invern-db --remote",
+    "seed": "node scripts/seed.mjs",
     "prepare": "husky",
     "db:generate": "drizzle-kit generate",
     "type-check": "tsc --noEmit",

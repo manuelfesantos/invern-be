@@ -9,14 +9,14 @@ const PRIVATE_SEGMENT = "/private/";
 /**
  * Routes under `/private` that authenticate themselves or are machine-invoked;
  * the admin RBAC gate skips them:
- *   - `insert-test-data`, `stock/setup` — validate their own body `secretKey`.
+ *   - `stock/setup` — validates its own body `secretKey`.
  *   - `expired/*` — maintenance (delete-expired carts/sessions/users). These
  *     are currently unauthenticated (pre-existing); no cron trigger, scheduled
  *     handler, or HTTP caller exists in the repo. Left out of the RBAC gate to
  *     preserve behaviour for any external scheduler; adding a service-token /
  *     scheduler auth is tracked in feature 06 (ops runbook).
  */
-const SELF_GATED_PREFIXES = ["insert-test-data", "stock/setup", "expired/"];
+const SELF_GATED_PREFIXES = ["stock/setup", "expired/"];
 
 /**
  * Authenticates the caller and requires `role === ADMIN` before any

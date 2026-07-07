@@ -98,7 +98,6 @@ export const makeTestEnv = (
     // Local-convention secrets.
     SETUP_STOCK_SECRET: "test-setup-stock",
     SETUP_COUNTRIES_SECRET: "test-setup-countries",
-    INSERT_TEST_DATA_SECRET: "test-insert-data",
 
     // Hosts / misc config.
     DOMAIN: "localhost",

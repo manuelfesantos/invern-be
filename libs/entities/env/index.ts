@@ -16,7 +16,6 @@ interface Env {
   HONEYCOMB_API_KEY: string;
   HONEYCOMB_DATASET: string;
   IMAGES_HOST: string;
-  INSERT_TEST_DATA_SECRET: string;
   INVERN_DB: D1Database;
   LOGGER_LEVEL: string;
   REFRESH_TOKEN_SECRET: string;

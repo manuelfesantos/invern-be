@@ -76,17 +76,14 @@ This command starts the local database server and the local application server i
 When running the application for the first time, you need to complete two additional steps:
 
 1. **Populate the Database**:
-   Make a POST request to:
+   Run the seed script (idempotent — safe to re-run):
+   ```bash
+   npm run seed              # seeds the local D1
+   # npm run seed -- --env=preview --yes   # remote (preview/prod) needs --yes
    ```
-   /private/insert-test-data
-   ```
-   Include a JSON body with the `secretKey` property matching the value in your `INSERT_TEST_DATA_SECRET` environment variable:
-   ```json
-   {
-     "secretKey": "your-insert-test-data-secret-value"
-   }
-   ```
-   This will populate your database with the necessary initial data.
+   This populates your database with the necessary initial data (collections,
+   products, images, currencies, countries, taxes, shipping methods/rates).
+   See `scripts/seed.mjs` for options (`--env`, `--database`, `--dry-run`).
 
 
 2. **Initialize Stock Bucket**:
@@ -255,9 +252,12 @@ Authorization: Bearer {access-token}
 
 #### Test Data
 
-| Endpoint                    | Method | Description                 |
-|-----------------------------|--------|-----------------------------|
-| `/private/insert-test-data` | POST   | Add test data to the system |
+| Endpoint                 | Method | Description                          |
+|--------------------------|--------|--------------------------------------|
+| `/private/stock/setup`   | POST   | Initialise the stock bucket from D1  |
+
+> Test data is seeded with the `npm run seed` script (`scripts/seed.mjs`), not
+> an endpoint.
 
 ### Response Format
 

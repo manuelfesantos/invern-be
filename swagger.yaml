@@ -2194,35 +2194,6 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  # -------------------- Private - Test Data --------------------
-  /private/insert-test-data:
-    post:
-      tags:
-        - Private - Test Data
-      summary: Insert Test Data
-      description: Populates the database with initial test data (products, collections, countries, etc.). Requires a secret key for authorization.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SecretKeyInput'
-      responses:
-        '200':
-          description: Test data successfully inserted.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: success inserting test data
-        '401':
-          $ref: '#/components/responses/Unauthorized' # Missing or incorrect secret key
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
   # -------------------- Private - Stock --------------------
   /private/stock/setup:
     post:
@@ -3790,9 +3761,8 @@ components:
         must also be present on the request — `getCredentials` requires both the
         access token and the refresh token. Obtain both by logging in
         (`POST /public/countries/{countryCode}/user/login`) as an ADMIN user.
-        The maintenance routes (`insert-test-data`, `stock/setup`) instead
-        validate a `secretKey` field in their request body and are not covered
-        by this scheme.
+        The maintenance route `stock/setup` instead validates a `secretKey`
+        field in its request body and is not covered by this scheme.
 
   responses:
     BadRequest:
