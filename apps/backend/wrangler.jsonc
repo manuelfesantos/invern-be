@@ -1,0 +1,22 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "invern-backend",
+  "main": "src/server.ts",
+  "compatibility_date": "2025-09-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "INVERN_DB",
+      "database_name": "invern-db",
+      "database_id": "ddf70d9c-9ea3-4279-abe6-614941edfddc",
+      "migrations_dir": "../../drizzle"
+    }
+  ],
+  "r2_buckets": [{ "binding": "STOCK_BUCKET", "bucket_name": "stock-local" }],
+  "kv_namespaces": [
+    { "binding": "AUTH_KV", "id": "auth_kv" },
+    { "binding": "VALIDATION_KV", "id": "validation_kv" },
+    { "binding": "STOCK_KV", "id": "stock_kv" }
+  ]
+}

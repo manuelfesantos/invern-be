@@ -3,13 +3,16 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Invern Spirit Backend",
-  "main": "functions/index.ts",
+  "main": "apps/backend/src/server.ts",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "init": "node ./scripts/init.js",
-    "start": "node ./scripts/start.js",
+    "start": "npm run dev --workspace=backend",
     "test": "jest --coverage",
-    "lint": "eslint functions/** libs/**",
-    "lint:fix": "eslint functions/** libs/** --fix",
+    "lint": "eslint libs apps/*/src",
+    "lint:fix": "eslint libs apps/*/src --fix",
     "build-remote-db": "wrangler d1 create invern-db-preview --location weur",
     "build-preview-db": "wrangler d1 create invern-db-preview --location weur",
     "query-local": "wrangler d1 execute invern-db --local --command",
@@ -21,6 +24,10 @@
     "prepare": "husky",
     "db:generate": "drizzle-kit generate",
     "type-check": "tsc --noEmit",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:backend": "turbo run dev --filter=backend",
+    "type-check:apps": "turbo run type-check",
     "docs": "http-server ./ -p 8081 -S -c-1 -C ./docs/cert.pem -K docs/key.pem --cors"
   },
   "keywords": [],
@@ -45,6 +52,7 @@
     "prettier": "^3.2.5",
     "swagger-ui-dist": "^5.20.5",
     "ts-jest": "^29.1.2",
+    "turbo": "^2.10.4",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.29.0",
     "wrangler": "^4.40.0"
@@ -60,5 +68,6 @@
     "stripe": "^18.5.0",
     "worker-auth-providers": "^0.0.14",
     "zod": "^4.1.8"
-  }
+  },
+  "packageManager": "npm@11.6.2"
 }

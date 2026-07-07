@@ -1,0 +1,236 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "esnext"
+    ],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "types": [
+      "@cloudflare/workers-types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@address-db": [
+        "../../libs/db/address"
+      ],
+      "@address-entity": [
+        "../../libs/entities/address"
+      ],
+      "@address-module": [
+        "../../libs/modules/address"
+      ],
+      "@auth-utils": [
+        "../../libs/utils/auth"
+      ],
+      "@cache-utils": [
+        "../../libs/utils/cache"
+      ],
+      "@cart-db": [
+        "../../libs/db/cart"
+      ],
+      "@cart-entity": [
+        "../../libs/entities/cart"
+      ],
+      "@cart-module": [
+        "../../libs/modules/cart"
+      ],
+      "@checkout-session-db": [
+        "../../libs/db/checkout-session"
+      ],
+      "@checkout-session-entity": [
+        "../../libs/entities/checkout-session"
+      ],
+      "@collection-db": [
+        "../../libs/db/collection"
+      ],
+      "@collection-entity": [
+        "../../libs/entities/collection"
+      ],
+      "@collection-module": [
+        "../../libs/modules/collection"
+      ],
+      "@config-module": [
+        "../../libs/modules/config"
+      ],
+      "@context-utils": [
+        "../../libs/utils/context"
+      ],
+      "@country-db": [
+        "../../libs/db/country"
+      ],
+      "@country-entity": [
+        "../../libs/entities/country"
+      ],
+      "@country-module": [
+        "../../libs/modules/country"
+      ],
+      "@crypto-utils": [
+        "../../libs/utils/crypto"
+      ],
+      "@currency-db": [
+        "../../libs/db/currency"
+      ],
+      "@currency-module": [
+        "../../libs/modules/currency"
+      ],
+      "@currency-entity": [
+        "../../libs/entities/currency"
+      ],
+      "@db": [
+        "../../libs/db"
+      ],
+      "@db-schema": [
+        "../../db/schema"
+      ],
+      "@decorator-utils": [
+        "../../libs/utils/decorator"
+      ],
+      "@encoding-utils": [
+        "../../libs/utils/encoding"
+      ],
+      "@env-entity": [
+        "../../libs/entities/env"
+      ],
+      "@env-utils": [
+        "../../libs/utils/env"
+      ],
+      "@error-handling-utils": [
+        "../../libs/utils/error-handling"
+      ],
+      "@extender-utils": [
+        "../../libs/utils/extender"
+      ],
+      "@generics-db": [
+        "../../libs/db/generics"
+      ],
+      "@http-entity": [
+        "../../libs/entities/http"
+      ],
+      "@http-utils": [
+        "../../libs/utils/http"
+      ],
+      "@image-db": [
+        "../../libs/db/image"
+      ],
+      "@image-entity": [
+        "../../libs/entities/image"
+      ],
+      "@jwt-entity": [
+        "../../libs/entities/jwt"
+      ],
+      "@jwt-utils": [
+        "../../libs/utils/jwt"
+      ],
+      "@kv-adapter": [
+        "../../libs/adapters/kv"
+      ],
+      "@logger-entity": [
+        "../../libs/entities/logger"
+      ],
+      "@logger-utils": [
+        "../../libs/utils/logger"
+      ],
+      "@mocks-utils": [
+        "../../libs/utils/__mocks__"
+      ],
+      "@number-utils": [
+        "../../libs/utils/number"
+      ],
+      "@order-db": [
+        "../../libs/db/order"
+      ],
+      "@order-entity": [
+        "../../libs/entities/order"
+      ],
+      "@order-module": [
+        "../../libs/modules/order"
+      ],
+      "@payment-entity": [
+        "../../libs/entities/payment"
+      ],
+      "@payment-db": [
+        "../../libs/db/payment"
+      ],
+      "@payment-method-db": [
+        "../../libs/db/payment-method"
+      ],
+      "@product-db": [
+        "../../libs/db/product"
+      ],
+      "@product-entity": [
+        "../../libs/entities/product"
+      ],
+      "@product-module": [
+        "../../libs/modules/product"
+      ],
+      "@r2-adapter": [
+        "../../libs/adapters/r2"
+      ],
+      "@request-entity": [
+        "../../libs/entities/request"
+      ],
+      "@response-entity": [
+        "../../libs/entities/response"
+      ],
+      "@schema": [
+        "../../db/schema"
+      ],
+      "@sendgrid-adapter": [
+        "../../libs/adapters/sendgrid"
+      ],
+      "@shipping-db": [
+        "../../libs/db/shipping"
+      ],
+      "@shipping-entity": [
+        "../../libs/entities/shipping"
+      ],
+      "@shipping-module": [
+        "../../libs/modules/shipping"
+      ],
+      "@shipping-transaction-db": [
+        "../../libs/db/shipping-transaction"
+      ],
+      "@shipping-transaction-entity": [
+        "../../libs/entities/shipping-transaction"
+      ],
+      "@string-utils": [
+        "../../libs/utils/string"
+      ],
+      "@stripe-adapter": [
+        "../../libs/adapters/stripe"
+      ],
+      "@stripe-entity": [
+        "../../libs/entities/stripe"
+      ],
+      "@tax-entity": [
+        "../../libs/entities/tax"
+      ],
+      "@timer-utils": [
+        "../../libs/utils/timer"
+      ],
+      "@user-db": [
+        "../../libs/db/user"
+      ],
+      "@user-entity": [
+        "../../libs/entities/user"
+      ],
+      "@user-module": [
+        "../../libs/modules/user"
+      ],
+      "@email-entity": [
+        "../../libs/entities/email"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../libs/**/*.ts",
+    "../../db/**/*.ts"
+  ]
+}

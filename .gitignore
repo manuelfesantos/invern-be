@@ -11,3 +11,5 @@ mock-frontend
 coverage
 bun.lock
 turso
+# turbo
+.turbo

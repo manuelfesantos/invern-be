@@ -4,7 +4,14 @@ import tseslint from "typescript-eslint";
 import pluginImport from "eslint-plugin-import";
 import { globalIgnores, defineConfig } from "eslint/config";
 export default defineConfig([
-  globalIgnores(["docs/*", "scripts/*"]),
+  globalIgnores([
+    "docs/*",
+    "scripts/*",
+    "**/.wrangler/**",
+    "**/dist/**",
+    "**/.turbo/**",
+    "coverage/**",
+  ]),
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.strict,
@@ -45,33 +52,19 @@ export default defineConfig([
           zones: [
             {
               target: "./libs/adapters/**/*",
-              from: [
-                "./libs/db/**/*",
-                "./libs/modules/**/*",
-                "./functions/**/*",
-              ],
-              message: "Adapters cannot import from db, modules, or functions",
+              from: ["./libs/db/**/*", "./libs/modules/**/*"],
+              message: "Adapters cannot import from db or modules",
             },
             {
-              from: [
-                "./libs/modules/**/*",
-                "./functions/**/*",
-                "./libs/adapters/**/*",
-              ],
+              from: ["./libs/modules/**/*", "./libs/adapters/**/*"],
               target: "./libs/db/**/*",
               message: "Cannot import directly from the db layer",
             },
             {
-              from: ["./libs/adapters/**/*", "./libs/db/**/*"],
-              target: "./functions/**/*",
-              message: "Adapters/db cannot import from functions",
-            },
-            {
               from: [
                 "./libs/modules/**/*",
                 "./libs/adapters/**/*",
                 "./libs/db/**/*",
-                "./functions/**/*",
               ],
               target: "./libs/utils/**/*",
               message: "Cannot import from utils in these layers",
@@ -81,7 +74,6 @@ export default defineConfig([
               from: [
                 "./libs/adapters/**/*",
                 "./libs/db/**/*",
-                "./functions/**/*",
                 "./libs/modules/**/*",
                 "./libs/utils/**/*",
               ],
@@ -106,6 +98,16 @@ export default defineConfig([
     files: ["libs/db/**/*.ts"],
     rules: {
       "@typescript-eslint/explicit-function-return-type": "off",
+    },
+  },
+  {
+    // Apps are the composition root: relative parent imports and Node/Workers
+    // globals are expected, and they may wire together any lib layer.
+    files: ["apps/**/*.ts"],
+    languageOptions: { globals: { ...globals.node } },
+    rules: {
+      "@typescript-eslint/no-restricted-imports": "off",
+      "import/no-restricted-paths": "off",
     },
   },
 ]);
