@@ -133,11 +133,36 @@ export const generateErrorResponse = (
   );
 };
 
+const isIssuesBody = (value: unknown): value is { issues: string[] } =>
+  typeof value === "object" &&
+  value !== null &&
+  Array.isArray((value as { issues?: unknown }).issues);
+
+/**
+ * Normalizes anything passed to an error response into the public
+ * `{ issues: string[] }` shape. This is the single choke point for every error
+ * body, so no path (including direct `errorResponse.*()` calls in middleware)
+ * can leak internal fields — `name`, `cause`, and especially `stack` — or emit
+ * an inconsistent bare-string body.
+ */
+const toIssuesBody = (error: unknown): { issues: string[] } => {
+  if (isIssuesBody(error)) return { issues: error.issues };
+  if (typeof error === "string") return { issues: [error] };
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    typeof (error as { message?: unknown }).message === "string"
+  ) {
+    return { issues: [(error as { message: string }).message] };
+  }
+  return { issues: ["unknown error"] };
+};
+
 export const buildErrorResponse = (
   error: unknown,
   status: number,
   headers?: Record<string, string>,
-): Response => buildResponse(error, { status }, headers);
+): Response => buildResponse(toIssuesBody(error), { status }, headers);
 
 const formatIssuePath = (path: readonly PropertyKey[]): string =>
   path.reduce<string>((acc, key) => {
