@@ -42,6 +42,9 @@ const selectOrdersByUserIdQuery = (userId: string) =>
 
 const selectOrdersByIdQuery = (id: string) => selectOrdersQuery("id", id);
 
+const selectOrdersByStripeIdQuery = (stripeId: string) =>
+  selectOrdersQuery("stripeId", stripeId);
+
 const selectOrdersByPaymentIdQuery = (paymentId: string) =>
   selectOrdersQuery("paymentId", paymentId);
 
@@ -68,6 +71,11 @@ export const getSelectOrdersByUserIdAction = actionBuilder(
 
 export const getSelectOrdersByIdAction = actionBuilder(
   selectOrdersByIdQuery,
+  mapOrdersFromQueryResult,
+);
+
+export const getSelectOrdersByStripeIdAction = actionBuilder(
+  selectOrdersByStripeIdQuery,
   mapOrdersFromQueryResult,
 );
 

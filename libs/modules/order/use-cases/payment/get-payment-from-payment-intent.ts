@@ -33,20 +33,31 @@ export const getPaymentFromPaymentIntentSucceededEvent = async (
     paymentIntent,
     PaymentIntentState.succeeded,
   );
-  const { id } = (await getSelectPaymentByIdAction(payment.id).run()) ?? {};
+  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
 
   logger().info("Processing PaymentIntentSucceeded Event", {
     useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
     data: {
       payment,
-      id,
+      savedPayment,
     },
   });
 
   await savePaymentMethod(paymentMethod);
 
-  if (id) {
-    const [updatedPayment] = await getUpdatePaymentAction(id, payment).run();
+  if (savedPayment) {
+    // Precedence: a late `succeeded` must not regress an already-terminal
+    // (canceled/failed) payment. succeeded→succeeded is an idempotent no-op.
+    if (
+      savedPayment.state === PaymentIntentState.canceled ||
+      savedPayment.state === PaymentIntentState.failed
+    ) {
+      throw errors.PAYMENT_ALREADY_EXISTS();
+    }
+    const [updatedPayment] = await getUpdatePaymentAction(
+      savedPayment.id,
+      payment,
+    ).run();
     return updatedPayment;
   }
   const [insertedPayment] =
@@ -157,6 +168,27 @@ export const getPaymentFromPaymentIntentFailedEvent = async (
 const handleFailedPayment = async (
   payment: InsertPayment,
 ): Promise<Payment> => {
+  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
+
+  logger().info("Processing Failed Payment Event", {
+    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
+    data: {
+      payment,
+      savedPayment,
+    },
+  });
+
+  // Idempotency BEFORE the stock release: a replayed canceled/failed (or one
+  // arriving after a terminal state) must not release stock a second time.
+  if (
+    savedPayment &&
+    (savedPayment.state === PaymentIntentState.succeeded ||
+      savedPayment.state === PaymentIntentState.canceled ||
+      savedPayment.state === PaymentIntentState.failed)
+  ) {
+    throw errors.PAYMENT_ALREADY_EXISTS();
+  }
+
   const [{ products, id }] = await getSelectOrderProductsByPaymentIdAction(
     payment.id,
   ).run();
@@ -169,24 +201,8 @@ const handleFailedPayment = async (
 
     await getUpdateOrderAction(id, { isCanceled: true }).run();
   }
-  const savedPayment = await getSelectPaymentByIdAction(payment.id).run();
-
-  logger().info("Processing Failed Payment Event", {
-    useCase: LoggerUseCaseEnum.GET_PAYMENT_INTENT,
-    data: {
-      payment,
-      savedPayment,
-    },
-  });
 
   if (savedPayment) {
-    if (
-      savedPayment?.state === PaymentIntentState.succeeded ||
-      savedPayment?.state === PaymentIntentState.canceled ||
-      savedPayment?.state === PaymentIntentState.failed
-    ) {
-      throw errors.PAYMENT_ALREADY_EXISTS();
-    }
     const [updatedPayment] = await getUpdatePaymentAction(
       payment.id,
       payment,

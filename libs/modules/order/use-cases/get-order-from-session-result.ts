@@ -1,5 +1,9 @@
 import type { StripeSessionResult } from "@stripe-entity";
-import { getSelectOrdersByIdAction, getInsertOrderAction } from "@order-db";
+import {
+  getSelectOrdersByIdAction,
+  getSelectOrdersByStripeIdAction,
+  getInsertOrderAction,
+} from "@order-db";
 import {
   getSelectPaymentByIdAction,
   getInsertPaymentReturningIdAction,
@@ -8,7 +12,6 @@ import {
 import type { InsertPayment } from "@payment-entity";
 import type { BaseOrder, ClientOrder } from "@order-entity";
 import { clientOrderSchema, insertOrderSchema } from "@order-entity";
-import { errors } from "@error-handling-utils";
 import { getDeleteCartAction, getInsertCartAction } from "@cart-db";
 import { getIncrementUserVersionAction, getUpdateUserAction } from "@user-db";
 import {
@@ -32,6 +35,21 @@ export const getOrderFromSessionResult = async (
   sessionResult: StripeSessionResult,
 ): Promise<ClientOrder> => {
   logger().addRedactedData({ orderId: sessionResult.id });
+
+  // Idempotency: a replayed webhook for an already-processed session must not
+  // create a second order or resend the email. Match on `stripeId` (the order's
+  // id is a separate UUID) and acknowledge the replay with the existing order —
+  // the handler returns 2xx so Stripe stops retrying.
+  const [existingOrder] = await getSelectOrdersByStripeIdAction(
+    sessionResult.id,
+  ).run();
+  if (existingOrder) {
+    logger().info("Order already processed for session; acknowledging replay", {
+      useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
+      data: { stripeId: sessionResult.id },
+    });
+    return clientOrderSchema.parse(existingOrder);
+  }
 
   const { payment: checkoutSessionPayment, checkoutSession } =
     await getCheckoutData(sessionResult.id, sessionResult);
@@ -156,19 +174,10 @@ const getCheckoutData = async (
   const { payment: paymentFromSessionResult } =
     getPaymentFromSessionResult(sessionResult);
 
-  const selectCheckoutSessionByIdAction =
-    getSelectCheckoutSessionByIdAction(sessionId);
-
-  const selectOrdersByIdAction = getSelectOrdersByIdAction(sessionId);
-
-  const [checkoutSession, [order]] = await runBatchOperation(
-    selectCheckoutSessionByIdAction,
-    selectOrdersByIdAction,
-  );
-
-  if (order) {
-    throw errors.ORDER_ALREADY_EXISTS();
-  }
+  // Duplicate detection is handled earlier by the stripeId idempotency check in
+  // `getOrderFromSessionResult`; here we only need the checkout session.
+  const checkoutSession =
+    await getSelectCheckoutSessionByIdAction(sessionId).run();
 
   if (!checkoutSession) {
     throw new Error("Checkout session not found");
