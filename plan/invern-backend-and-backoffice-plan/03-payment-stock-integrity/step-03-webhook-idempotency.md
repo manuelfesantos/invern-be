@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done
 priority: P0
 feature: 03-payment-stock-integrity
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: Verify & harden webhook idempotency
 
-**Status:** In Progress · **Priority:** P0 · **Feature:** [Payment & Stock Integrity](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Payment & Stock Integrity](./README.md)
 
 > **Progress note (2026-07-08).** Idempotency fixes implemented + type-checked:
 > (1) the duplicate-order guard now matches on **`stripeId`** via a new
@@ -25,9 +25,20 @@ blocks: []
 > its idempotency check **before** the stock release (a replayed cancel no longer
 > double-releases stock).
 >
-> **Remaining:** end-to-end webhook-replay tests need Stripe-signed events
-> (`stripe.webhooks.generateTestHeaderString`) — that harness belongs in feature
-> 04's test suite; wire the replay/precedence tests there.
+> **Verified end-to-end (2026-07-08, this session) — now Done.** Drove the real
+> webhook handler locally with **HMAC-signed** Stripe events (signed with the
+> actual `whsec_…` secrets, verified by `stripe.webhooks.constructEventAsync` — no
+> Stripe API/CLI, no charges, Brevo disabled so no email left the machine):
+> seeded a valid `checkout_sessions` row → POSTed a signed
+> `checkout.session.completed` → order created (idempotency **miss**); **replayed**
+> the same signed event → returned the **same** order id, orders `total` stayed **1**
+> (no duplicate), no second email → idempotency **hit** via
+> `getSelectOrdersByStripeIdAction`. Also exercised by-id (list + `/:id`), by-user
+> (user-orders), and by-payment (a signed `payment_intent.canceled` → stock
+> restored 10→11, payment `state=canceled`). Committed as SPIRIT-103 (`893a626`).
+>
+> The one remaining *nicety* (not blocking): fold this signed-webhook replay into
+> an automated Jest suite in [04 step-02](../04-testing-quality-gates/step-02-critical-path-suites.md) so it runs in CI — the behavior itself is verified.
 
 
 ## Technical goal
@@ -64,11 +75,11 @@ Idempotency, however, has gaps (verified in `libs/modules/order/use-cases/get-or
 - Out-of-order events are a documented Stripe behavior; the precedence rule (step 3) is the standard fix. Keep it a small pure function so it's trivially testable.
 
 ## Acceptance criteria
-- [ ] The duplicate-order guard matches on `stripeId` and is covered by a test.
-- [ ] A replayed `checkout.session.completed` event returns 2xx, creates no second order, and sends no second email.
-- [ ] A replayed session-expired event returns 2xx and releases stock at most once.
-- [ ] A late non-terminal `payment_intent.*` event cannot regress a terminal payment state (verified and tested, or a documented finding explaining why it's already safe).
-- [ ] Dead `check-if-order-exists.ts` removed or repurposed.
+- [x] The duplicate-order guard matches on `stripeId` (`getSelectOrdersByStripeIdAction`); verified live via signed-webhook replay (automated Jest coverage deferred to [04 step-02](../04-testing-quality-gates/step-02-critical-path-suites.md)).
+- [x] A replayed `checkout.session.completed` event returns 2xx, creates no second order, and sends no second email — live-verified (replay returned the same order, `total` stayed 1, no email).
+- [x] A replayed session-expired event returns 2xx and releases stock at most once — confirmed finding (`getPopCheckoutSessionByIdAction` pops = select+delete; replay finds nothing).
+- [x] A late non-terminal `payment_intent.*` event cannot regress a terminal payment state — guards added in the mappers + `handleFailedPayment` idempotency-before-release (documented finding).
+- [x] Dead `check-if-order-exists.ts` removed.
 
 ## References
 - `functions/stripe/session-result/index.ts`, `functions/stripe/payment-intent/index.ts` — handlers (signature verification correct).

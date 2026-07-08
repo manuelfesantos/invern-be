@@ -2,6 +2,8 @@
 
 **Status:** In Progress · **Priority:** P0 · **Track:** Backend Hardening
 
+> **Progress:** step-01 (R2 lock race + format) **Done** (SPIRIT-103 `03d16f6`); step-03 (webhook idempotency) **Done** — committed + live-verified end-to-end with signed webhooks this session (`893a626`). Remaining: step-02 (tri-store stock consistency) is **partial** — negative-stock guard, lock-exhaustion throw, PUT-can't-change-stock, and delete-cleanup are done; the single unified `setProductStock` operation that all writers share was deliberately deferred.
+
 ## Summary
 Stock is tracked in three stores that must agree — `products.stock` in D1, a `STOCK_KV` cache, and `STOCK_BUCKET` (R2) as the source of truth guarded by an R2-based distributed lock. The lock has a check-then-act race on first acquisition **and** a data-format bug that makes renewed locks look expired. Separately, editing a product through the admin API writes D1 stock only, silently desyncing the other two stores — which directly threatens any backoffice "adjust stock" screen. This feature makes the lock correct, makes stock writes go through one consistent path across all three stores, and verifies the Stripe webhook handlers are idempotent under replay.
 

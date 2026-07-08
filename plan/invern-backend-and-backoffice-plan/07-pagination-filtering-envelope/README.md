@@ -1,6 +1,8 @@
 # 07 — Pagination, Filtering & Response Envelope
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P0 · **Track:** Backend API Completion
+
+> **Done (SPIRIT-107):** all three steps complete — the `{ data, page, pageSize, total }` envelope, every admin list endpoint paginated, and the allow-list-driven sort/filter contract (filtered `total`, 400 on non-allow-listed sort). Verified via 88 unit tests + a live authenticated sweep of all 7 list endpoints.
 
 ## Summary
 Admin list endpoints are inconsistent about pagination and have no standard response shape. `/private/users` and `/private/carts` paginate and return `{ count, users }` / `{ count, carts }`; `/private/orders` returns `{ count, orders }` but the use-case **drops** the page/pageSize the DB layer supports; `/private/products`, `/collections`, `/countries`, `/currencies` fetch the entire table and return a bare array. None support filtering or sorting. This feature defines one paginated-response envelope, applies it uniformly, finishes orders pagination, paginates the fetch-all endpoints, and adds a standard filter/sort query contract — the prerequisite for every backoffice data-table screen.
