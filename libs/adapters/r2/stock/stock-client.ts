@@ -45,15 +45,12 @@ const updateStock = async ({
   id: string;
   stock: number;
 }): Promise<void> => {
-  await setKVStock(productId, stock);
-
   const lockKey = `lock-${productId}`;
   const lockToken = crypto.randomUUID();
 
-  let stockUpdated = false;
   let retries = 0;
 
-  while (!stockUpdated && retries < MAX_RETRIES) {
+  while (retries < MAX_RETRIES) {
     const lock = await acquireLock(
       ENV.STOCK_BUCKET,
       lockKey,
@@ -62,13 +59,13 @@ const updateStock = async ({
     );
 
     if (lock) {
+      // R2 is the source of truth; write it first, then refresh the KV cache.
       await ENV.STOCK_BUCKET.put(productId, stringifyObject({ data: stock }));
       const cacheKey = getCacheKey(ENV.STOCK_HOST, productId);
       await purgeCache(cacheKey);
+      await setKVStock(productId, stock);
 
       await releaseLock(ENV.STOCK_BUCKET, lockKey, lockToken);
-
-      stockUpdated = true;
 
       logger().info("Updated stock in bucket", {
         useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
@@ -78,18 +75,28 @@ const updateStock = async ({
         },
       });
       return;
-    } else {
-      logger().warn("Failed to acquire lock, trying again", {
-        useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
-        data: {
-          productId,
-          stock,
-          retries,
-        },
-      });
     }
+
+    logger().warn("Failed to acquire lock, trying again", {
+      useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+      data: {
+        productId,
+        stock,
+        retries,
+      },
+    });
     retries++;
   }
+
+  // Lock never acquired: surface it (was a silent return) so callers'
+  // compensation runs. /private/stock/setup is the resync recovery tool.
+  logger().error("Failed to acquire stock lock; stock not written", {
+    useCase: LoggerUseCaseEnum.PUT_R2_STOCK,
+    data: { productId, stock, retries },
+  });
+  throw new Error(
+    `Failed to update stock for ${productId} after ${MAX_RETRIES} retries`,
+  );
 };
 
 const updateMany = async (

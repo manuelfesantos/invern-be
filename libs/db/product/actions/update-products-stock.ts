@@ -7,10 +7,13 @@ import { LoggerUseCaseEnum } from "@logger-entity";
 import { actionBuilder } from "@generics-db";
 
 const decreaseProductsStockQuery = (products: ProductIdAndQuantity[]) => {
+  // Guarded: only decrement when there is enough stock, so a concurrent
+  // over-decrement (two checkouts that both passed read-time validation) can
+  // never drive stock below zero. Insufficient rows are left unchanged.
   const setQuery = sql`CASE ${products
     .map(
       (product) =>
-        sql`WHEN id = ${product.id} THEN stock - ${product.quantity}`,
+        sql`WHEN id = ${product.id} AND stock >= ${product.quantity} THEN stock - ${product.quantity}`,
     )
     .reduce((acc, curr) => sql`${acc} ${curr}`)} ELSE stock END`;
 
