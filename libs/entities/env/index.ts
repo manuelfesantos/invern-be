@@ -1,3 +1,11 @@
+/**
+ * Cloudflare Workers Rate Limiting binding.
+ * https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+ */
+export interface RateLimit {
+  limit(options: { key: string }): Promise<{ success: boolean }>;
+}
+
 interface Env {
   AUTH_KV: KVNamespace;
   BACKOFFICE_HOST: string;
@@ -7,8 +15,10 @@ interface Env {
   COUNTRIES_HOST: string;
   DEFAULT_IV: string;
   DOMAIN: string;
+  EMAIL_RATE_LIMITER: RateLimit;
   ENCRYPTION_KEY: string;
   ENV: string;
+  LOGIN_RATE_LIMITER: RateLimit;
   FRONTEND_HOST: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;

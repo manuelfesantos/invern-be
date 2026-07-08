@@ -43,6 +43,12 @@ export const errorResponse = {
       HttpStatusEnum.CONFLICT,
       headers,
     ),
+  TOO_MANY_REQUESTS: (error?: unknown, headers?: Record<string, string>) =>
+    buildErrorResponse(
+      error || prepareError("too many requests"),
+      HttpStatusEnum.TOO_MANY_REQUESTS,
+      headers,
+    ),
   INTERNAL_SERVER_ERROR: (error?: unknown, headers?: Record<string, string>) =>
     buildErrorResponse(
       error || prepareError("internal server error"),

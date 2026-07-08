@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import * as z from "zod";
 import type { HonoEnv } from "../../types/hono";
 import { authContext } from "../../middleware/auth-context";
+import { rateLimitByEmail } from "../../middleware/rate-limit";
 import { protectedSuccessResponse, successResponse } from "@response-entity";
 import {
   deleteCheckoutCookiesFromResponse,
@@ -100,13 +101,17 @@ user.post("/signup/verify-email", async (c) => {
   return response;
 });
 
-user.post("/signup/resend-email", async (c) => {
-  const { email } = emailSchema.parse(await getBodyFromRequest(c.req.raw));
-  await resendEmail(email);
-  return protectedSuccessResponse.OK("successfully signed up");
-});
+user.post(
+  "/signup/resend-email",
+  rateLimitByEmail("EMAIL_RATE_LIMITER"),
+  async (c) => {
+    const { email } = emailSchema.parse(await getBodyFromRequest(c.req.raw));
+    await resendEmail(email);
+    return protectedSuccessResponse.OK("successfully signed up");
+  },
+);
 
-user.post("/login", async (c) => {
+user.post("/login", rateLimitByEmail("LOGIN_RATE_LIMITER"), async (c) => {
   const {
     user: loggedInUser,
     responseContext,
@@ -137,11 +142,15 @@ user.post("/logout", async () => {
 });
 
 // ---- forgot password --------------------------------------------------------
-user.post("/forgot-password/submit-email", async (c) => {
-  const { email } = emailSchema.parse(await getBodyFromRequest(c.req.raw));
-  await submitEmail(email);
-  return protectedSuccessResponse.OK("Email sent successfully");
-});
+user.post(
+  "/forgot-password/submit-email",
+  rateLimitByEmail("EMAIL_RATE_LIMITER"),
+  async (c) => {
+    const { email } = emailSchema.parse(await getBodyFromRequest(c.req.raw));
+    await submitEmail(email);
+    return protectedSuccessResponse.OK("Email sent successfully");
+  },
+);
 
 user.post("/forgot-password/validate-code", async (c) => {
   const { code, email } = validateCodeSchema.parse(

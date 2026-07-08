@@ -18,5 +18,19 @@
     { "binding": "AUTH_KV", "id": "auth_kv" },
     { "binding": "VALIDATION_KV", "id": "validation_kv" },
     { "binding": "STOCK_KV", "id": "stock_kv" }
+  ],
+  // Rate limiting on credential endpoints (per-email). period must be 10 or 60.
+  // namespace_id is an account-unique integer — no resource to provision.
+  "ratelimits": [
+    {
+      "name": "LOGIN_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 8, "period": 60 }
+    },
+    {
+      "name": "EMAIL_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": { "limit": 3, "period": 60 }
+    }
   ]
 }

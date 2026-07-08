@@ -12,6 +12,7 @@
  * test. See `test/README.md` for the DB-action mocking pattern.
  */
 import type Env from "@env-entity";
+import type { RateLimit } from "@env-entity";
 import { setEnv } from "@env-utils";
 import { contextStore } from "@context-utils";
 import { withLogger } from "@logger-utils";
@@ -48,6 +49,11 @@ export interface TestHarnessOptions {
   bindings?: Partial<TestEnvBindings>;
 }
 
+/** A rate limiter that always allows (tests override to assert throttling). */
+const passingRateLimit: RateLimit = {
+  limit: async () => ({ success: true }),
+};
+
 /** A D1 binding that throws if a test accidentally hits the database. */
 const throwingD1 = new Proxy(
   {},
@@ -82,6 +88,11 @@ export const makeTestEnv = (
     STOCK_BUCKET: asR2Bucket(bindings.stockBucket),
     COUNTRIES_BUCKET: asR2Bucket(bindings.countriesBucket),
     INVERN_DB: throwingD1,
+
+    // Rate limiters default to always-allow; a test overrides via `env` when it
+    // needs to assert throttling.
+    LOGIN_RATE_LIMITER: passingRateLimit,
+    EMAIL_RATE_LIMITER: passingRateLimit,
 
     ENV: "test",
     STRIPE_ENV: "test",
