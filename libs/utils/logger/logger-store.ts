@@ -1,5 +1,4 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import type { Logger } from "./honeycomb-logger";
 import type { LoggerUseCase } from "@logger-entity";
 import { buildLogObject } from "./build-log-object";
 import { localLogger } from "./local-logger";
@@ -12,6 +11,16 @@ const INFO_LEVEL = 30;
 const WARNING_LEVEL = 40;
 const ERROR_LEVEL = 50;
 const NO_SPACE = 0;
+
+/**
+ * Minimal tracer surface the store builds upon: an `addData`/`log` sink.
+ * Provided at runtime by the app's WorkerLogger (formerly the Honeycomb Pages
+ * plugin tracer).
+ */
+interface Logger {
+  addData(...args: unknown[]): void;
+  log(message: string): void;
+}
 
 type LoggerAction = (
   message: string,
@@ -29,12 +38,7 @@ interface LoggerStore extends Logger {
   addRedactedData: (...data: unknown[]) => void;
 }
 
-interface LoggerInstance extends LoggerStore {
-  currentLog: number;
-  incrementCurrentLog: () => void;
-}
-
-const buildLoggerInstance = (logger: Logger): LoggerInstance => {
+const buildLoggerInstance = (logger: Logger): LoggerStore => {
   const { LOGGER_LEVEL } = ENV;
   const loggerLevel = LOGGER_LEVEL ? Number(LOGGER_LEVEL) : DEBUG_LEVEL;
   const addRedactedData = (...data: unknown[]): void => {
@@ -74,19 +78,16 @@ const buildLoggerInstance = (logger: Logger): LoggerInstance => {
       localLogger.error(message, data);
     }
   };
-  const loggerInstance = (): LoggerInstance => {
-    logger.info = info;
-    logger.debug = debug;
-    logger.warn = warn;
-    logger.error = error;
-    logger.addRedactedData = addRedactedData;
-
-    return logger;
-  };
-  return loggerInstance();
+  return Object.assign(logger, {
+    info,
+    debug,
+    warn,
+    error,
+    addRedactedData,
+  });
 };
 
-const loggerStore = new AsyncLocalStorage<LoggerInstance>();
+const loggerStore = new AsyncLocalStorage<LoggerStore>();
 
 export const logger = (): LoggerStore => {
   const logger = loggerStore.getStore();

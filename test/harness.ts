@@ -86,7 +86,6 @@ export const makeTestEnv = (
     VALIDATION_KV: asKVNamespace(bindings.validationKv),
     STOCK_KV: asKVNamespace(bindings.stockKv),
     STOCK_BUCKET: asR2Bucket(bindings.stockBucket),
-    COUNTRIES_BUCKET: asR2Bucket(bindings.countriesBucket),
     INVERN_DB: throwingD1,
 
     // Rate limiters default to always-allow; a test overrides via `env` when it
@@ -108,7 +107,6 @@ export const makeTestEnv = (
 
     // Local-convention secrets.
     SETUP_STOCK_SECRET: "test-setup-stock",
-    SETUP_COUNTRIES_SECRET: "test-setup-countries",
 
     // Hosts / misc config.
     DOMAIN: "localhost",
@@ -116,7 +114,6 @@ export const makeTestEnv = (
     BACKOFFICE_HOST: "http://localhost:5173",
     STOCK_HOST: "http://localhost/stock",
     IMAGES_HOST: "http://localhost/images",
-    COUNTRIES_HOST: "http://localhost/countries",
 
     // Third-party (unused in unit tests; present so the proxy resolves).
     STRIPE_API_KEY: "sk_test_fake",
@@ -128,13 +125,9 @@ export const makeTestEnv = (
     GOOGLE_CLIENT_ID: "google-fake",
     GOOGLE_CLIENT_SECRET: "google-secret-fake",
     GOOGLE_REDIRECT_URI: "http://localhost/oauth",
-    HONEYCOMB_API_KEY: "",
-    HONEYCOMB_DATASET: "invern-test",
     CACHE_API_KEY: "cache-fake",
     CACHE_API_EMAIL: "test@example.com",
     ZONE_ID: "zone-fake",
-    TURSO_AUTH_TOKEN: "",
-    TURSO_CONNECTION_URL: "",
 
     ...overrides,
   };
