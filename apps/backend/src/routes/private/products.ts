@@ -5,17 +5,18 @@ import { successResponse } from "@response-entity";
 import {
   addProduct,
   deleteProduct,
-  getAllProducts,
   getProductDetails,
+  getProductsPage,
   updateProduct,
 } from "@product-module";
+import { paginationParams } from "../../http/query";
 
 const products = new Hono<HonoEnv>();
 
-products.get("/", async () =>
+products.get("/", async (c) =>
   successResponse.OK(
     "Products fetched successfully",
-    await getAllProducts(null, false),
+    await getProductsPage(paginationParams(c)),
   ),
 );
 

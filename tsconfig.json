@@ -83,7 +83,8 @@
       "@user-db": ["libs/db/user"],
       "@user-entity": ["libs/entities/user"],
       "@user-module": ["libs/modules/user"],
-      "@email-entity": ["libs/entities/email"]
+      "@email-entity": ["libs/entities/email"],
+      "@pagination-entity": ["libs/entities/pagination"]
     }
   }
 }

@@ -3,6 +3,7 @@ import { desc, eq, inArray, like, or } from "drizzle-orm";
 import { imagesTable, productsTable } from "@schema";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import { DEFAULT_PAGE } from "@number-utils";
 
 const selectProductsQuery = () =>
   db().query.productsTable.findMany({
@@ -20,6 +21,26 @@ const selectProductsQuery = () =>
         orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
+  });
+
+const selectProductsPageQuery = (page: number, pageSize: number) =>
+  db().query.productsTable.findMany({
+    columns: {
+      description: false,
+      collectionId: false,
+    },
+    with: {
+      images: {
+        limit: 1,
+        columns: {
+          productId: false,
+          collectionId: false,
+        },
+        orderBy: [desc(imagesTable.isThumbnail)],
+      },
+    },
+    limit: pageSize,
+    offset: (page - DEFAULT_PAGE) * pageSize,
   });
 
 const selectProductStockByIdQuery = (productId: string) =>
@@ -106,6 +127,10 @@ export const getSelectProductsByProductIdsAction = actionBuilder(
 );
 
 export const getSelectProductsAction = actionBuilder(selectProductsQuery);
+
+export const getSelectProductsPageAction = actionBuilder(
+  selectProductsPageQuery,
+);
 
 export const getSelectProductStockByIdAction = actionBuilder(
   selectProductStockByIdQuery,

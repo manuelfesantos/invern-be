@@ -11,6 +11,18 @@ import { clientCheckoutStageSchema } from "./types";
 import type { CookieName } from "@http-entity";
 import { errors } from "@error-handling-utils";
 
+/**
+ * Marks the active checkout stage so {@link checkoutErrorHandler} can scope its
+ * cookie cleanup to that stage.
+ */
+export const initializeCheckoutStage = (
+    checkoutStage: CheckoutStageName | null,
+): void => {
+  if (checkoutStage) {
+    contextStore.context.currentCheckoutStage = checkoutStage;
+  }
+};
+
 export const setupCheckoutStages = async (): Promise<void> => {
   let stage: CheckoutStage = firstStage;
 

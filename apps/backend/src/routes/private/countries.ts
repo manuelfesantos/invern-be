@@ -5,15 +5,19 @@ import { successResponse } from "@response-entity";
 import {
   addCountry,
   deleteCountry,
-  getAllCountries,
+  getCountriesPage,
   getCountryByCountryCode,
   updateCountry,
 } from "@country-module";
+import { paginationParams } from "../../http/query";
 
 const countries = new Hono<HonoEnv>();
 
-countries.get("/", async () =>
-  successResponse.OK("Countries fetched successfully", await getAllCountries()),
+countries.get("/", async (c) =>
+  successResponse.OK(
+    "Countries fetched successfully",
+    await getCountriesPage(paginationParams(c)),
+  ),
 );
 
 countries.post("/", async (c) => {

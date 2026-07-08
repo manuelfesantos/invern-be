@@ -10,6 +10,10 @@ delete {
   auth: none
 }
 
+vars:pre-request {
+  productId: 
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
 }

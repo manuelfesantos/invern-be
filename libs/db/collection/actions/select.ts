@@ -4,17 +4,25 @@ import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
 import { eq } from "drizzle-orm";
 import { collectionsTable } from "@schema";
+import { DEFAULT_PAGE } from "@number-utils";
+
+const collectionImagesWith = {
+  images: {
+    columns: {
+      collectionId: false,
+      productId: false,
+    },
+  },
+} as const;
 
 const selectAllCollectionsQuery = () =>
+  db().query.collectionsTable.findMany({ with: collectionImagesWith });
+
+const selectCollectionsPageQuery = (page: number, pageSize: number) =>
   db().query.collectionsTable.findMany({
-    with: {
-      images: {
-        columns: {
-          collectionId: false,
-          productId: false,
-        },
-      },
-    },
+    with: collectionImagesWith,
+    limit: pageSize,
+    offset: (page - DEFAULT_PAGE) * pageSize,
   });
 
 const mapCollectionsFromSelectAllQueryResult = (
@@ -56,6 +64,11 @@ const selectCollectionByIdQuery = (collectionId: string) =>
 
 export const getSelectCollectionsAction = actionBuilder(
   selectAllCollectionsQuery,
+  mapCollectionsFromSelectAllQueryResult,
+);
+
+export const getSelectCollectionsPageAction = actionBuilder(
+  selectCollectionsPageQuery,
   mapCollectionsFromSelectAllQueryResult,
 );
 

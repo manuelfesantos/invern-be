@@ -5,17 +5,18 @@ import { successResponse } from "@response-entity";
 import {
   addCurrency,
   deleteCurrency,
-  getAllCurrencies,
+  getCurrenciesPage,
   getCurrencyByCode,
   updateCurrency,
 } from "@currency-module";
+import { paginationParams } from "../../http/query";
 
 const currencies = new Hono<HonoEnv>();
 
-currencies.get("/", async () =>
+currencies.get("/", async (c) =>
   successResponse.OK(
     "Currencies fetched successfully",
-    await getAllCurrencies(),
+    await getCurrenciesPage(paginationParams(c)),
   ),
 );
 

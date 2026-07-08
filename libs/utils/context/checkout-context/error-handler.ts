@@ -16,18 +16,6 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
 /**
- * Marks the active checkout stage so {@link checkoutErrorHandler} can scope its
- * cookie cleanup to that stage.
- */
-export const initializeCheckoutStage = (
-  checkoutStage: CheckoutStageName | null,
-): void => {
-  if (checkoutStage) {
-    contextStore.context.currentCheckoutStage = checkoutStage;
-  }
-};
-
-/**
  * Renders a thrown checkout error gracefully (checkout never surfaces a hard
  * error to the client): inside a stage it returns the still-available stages
  * and clears cookies for the now-invalid stage; otherwise it reports the cart

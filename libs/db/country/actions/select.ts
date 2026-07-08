@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { countriesTable } from "@schema";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import { DEFAULT_PAGE } from "@number-utils";
 
 const selectCountryByCodeQuery = (countryCode: string) =>
   db().query.countriesTable.findFirst({
@@ -22,19 +23,28 @@ const selectCountryByCodeQuery = (countryCode: string) =>
     },
   });
 
-const selectAllCountriesQuery = () =>
-  db().query.countriesTable.findMany({
-    columns: {
-      currencyCode: false,
-    },
-    with: {
-      currency: {},
-      taxes: {
-        columns: {
-          countryCode: false,
-        },
+const countriesListConfig = {
+  columns: {
+    currencyCode: false,
+  },
+  with: {
+    currency: {},
+    taxes: {
+      columns: {
+        countryCode: false,
       },
     },
+  },
+} as const;
+
+const selectAllCountriesQuery = () =>
+  db().query.countriesTable.findMany(countriesListConfig);
+
+const selectCountriesPageQuery = (page: number, pageSize: number) =>
+  db().query.countriesTable.findMany({
+    ...countriesListConfig,
+    limit: pageSize,
+    offset: (page - DEFAULT_PAGE) * pageSize,
   });
 
 const mapCountryFromQueryResult = (
@@ -62,5 +72,10 @@ export const getSelectCountryByCodeAction = actionBuilder(
 
 export const getSelectAllCountriesAction = actionBuilder(
   selectAllCountriesQuery,
+  mapCountriesFromQueryResult,
+);
+
+export const getSelectCountriesPageAction = actionBuilder(
+  selectCountriesPageQuery,
   mapCountriesFromQueryResult,
 );

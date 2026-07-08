@@ -8,6 +8,7 @@ import {
   getOrder,
   updateOrder,
 } from "@order-module";
+import { paginationParams } from "../../http/query";
 
 const orders = new Hono<HonoEnv>();
 
@@ -25,11 +26,12 @@ orders.get("/", async (c) => {
     (key) => [key, params.get(key)] as const,
   ).find(([, value]) => value);
 
-  const { count, orders } = filter
-    ? await getAllOrders(filter[0], filter[1] as string)
-    : await getAllOrders();
+  const pagination = paginationParams(c);
+  const result = filter
+    ? await getAllOrders(filter[0], filter[1] as string, pagination)
+    : await getAllOrders(undefined, undefined, pagination);
 
-  return successResponse.OK("Orders fetched successfully", { count, orders });
+  return successResponse.OK("Orders fetched successfully", result);
 });
 
 orders.get("/:id", async (c) => {
