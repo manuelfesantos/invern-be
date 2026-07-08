@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest, getPaginationParams } from "@http-utils";
+import { getBodyFromRequest, getListQueryParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import {
   addProduct,
@@ -15,7 +15,7 @@ const products = new Hono<HonoEnv>();
 products.get("/", async (c) =>
   successResponse.OK(
     "Products fetched successfully",
-    await getProductsPage(getPaginationParams(c.req.url)),
+    await getProductsPage(getListQueryParams(c.req.url)),
   ),
 );
 

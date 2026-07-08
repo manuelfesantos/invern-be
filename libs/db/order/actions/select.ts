@@ -9,20 +9,17 @@ import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
 
 const selectOrdersQuery = (
-  where?: "id" | "userId" | "paymentId" | "shippingTransactionId" | "stripeId",
-  selection?: string,
   page?: number,
   pageSize?: number,
-) => {
-  let whereClause: SQL | undefined = undefined;
-  if (where && selection) {
-    whereClause = eq(ordersTable[where], selection);
-  }
-  return db().query.ordersTable.findMany({
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
+  db().query.ordersTable.findMany({
     columns: {
       paymentId: false,
     },
-    ...(whereClause && { where: whereClause }),
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     with: {
       payment: {
         with: {
@@ -35,18 +32,18 @@ const selectOrdersQuery = (
     offset:
       ((page ?? DEFAULT_PAGE) - DEFAULT_PAGE) * (pageSize ?? DEFAULT_PAGE_SIZE),
   });
-};
 
 const selectOrdersByUserIdQuery = (userId: string) =>
-  selectOrdersQuery("userId", userId);
+  selectOrdersQuery(undefined, undefined, eq(ordersTable.userId, userId));
 
-const selectOrdersByIdQuery = (id: string) => selectOrdersQuery("id", id);
+const selectOrdersByIdQuery = (id: string) =>
+  selectOrdersQuery(undefined, undefined, eq(ordersTable.id, id));
 
 const selectOrdersByStripeIdQuery = (stripeId: string) =>
-  selectOrdersQuery("stripeId", stripeId);
+  selectOrdersQuery(undefined, undefined, eq(ordersTable.stripeId, stripeId));
 
 const selectOrdersByPaymentIdQuery = (paymentId: string) =>
-  selectOrdersQuery("paymentId", paymentId);
+  selectOrdersQuery(undefined, undefined, eq(ordersTable.paymentId, paymentId));
 
 const mapOrdersFromQueryResult = async (
   queryResults: Result<typeof selectOrdersQuery>,

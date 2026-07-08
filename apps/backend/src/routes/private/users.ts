@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getPaginationParams } from "@http-utils";
+import { getListQueryParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import { deleteUser, getAllUsers, getUser } from "@user-module";
 
@@ -9,7 +9,7 @@ const users = new Hono<HonoEnv>();
 users.get("/", async (c) =>
   successResponse.OK(
     "Users fetched successfully",
-    await getAllUsers(getPaginationParams(c.req.url)),
+    await getAllUsers(getListQueryParams(c.req.url)),
   ),
 );
 

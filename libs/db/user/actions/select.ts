@@ -8,6 +8,7 @@ import { db } from "@db";
 import { DEFAULT_PAGE } from "@number-utils";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import type { SQL } from "drizzle-orm";
 import { and, eq } from "drizzle-orm";
 import { usersTable } from "@schema";
 
@@ -112,8 +113,15 @@ const mapUserVersionFromSelectVersionResult = (
   return queryResult?.version ?? NO_USER_VERSION;
 };
 
-const selectAllUsersQuery = (page: number, pageSize: number) =>
+const selectAllUsersQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
   db().query.usersTable.findMany({
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     limit: pageSize,
     offset: (page - DEFAULT_PAGE) * pageSize,
   });

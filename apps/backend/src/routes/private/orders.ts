@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest, getPaginationParams } from "@http-utils";
+import { getBodyFromRequest, getListQueryParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import {
   cancelOrder,
@@ -11,27 +11,12 @@ import {
 
 const orders = new Hono<HonoEnv>();
 
-// Optional single filter (userId | paymentId | shippingTransactionId | stripeId).
-const ORDER_FILTERS = [
-  "userId",
-  "paymentId",
-  "shippingTransactionId",
-  "stripeId",
-] as const;
-
-orders.get("/", async (c) => {
-  const params = new URL(c.req.url).searchParams;
-  const filter = ORDER_FILTERS.map(
-    (key) => [key, params.get(key)] as const,
-  ).find(([, value]) => value);
-
-  const pagination = getPaginationParams(c.req.url);
-  const result = filter
-    ? await getAllOrders(filter[0], filter[1] as string, pagination)
-    : await getAllOrders(undefined, undefined, pagination);
-
-  return successResponse.OK("Orders fetched successfully", result);
-});
+orders.get("/", async (c) =>
+  successResponse.OK(
+    "Orders fetched successfully",
+    await getAllOrders(getListQueryParams(c.req.url)),
+  ),
+);
 
 orders.get("/:id", async (c) => {
   const order = await getOrder(c.req.param("id"), false);

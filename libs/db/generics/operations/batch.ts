@@ -1,4 +1,4 @@
-import type { TableConfig } from "drizzle-orm";
+import type { SQL, TableConfig } from "drizzle-orm";
 import { count } from "drizzle-orm";
 import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import { db } from "@db";
@@ -74,21 +74,33 @@ export const runBatchOperation = async <Actions extends ActionsType>(
   return mappedResults as BatchOperationResult<Actions>;
 };
 
-const countQuery = <T extends TableConfig>(table: SQLiteTableWithColumns<T>) =>
-  db().select({ count: count() }).from(table);
+const countQuery = <T extends TableConfig>(
+  table: SQLiteTableWithColumns<T>,
+  where?: SQL,
+) => {
+  const query = db().select({ count: count() }).from(table);
+  return where ? query.where(where) : query;
+};
 
+/**
+ * Runs a data action alongside a `COUNT(*)` in one batch. When `where` is
+ * supplied it is applied to the count too, so the paginated envelope's `total`
+ * reflects the same filter as the data query (the data action must apply the
+ * matching `where` itself).
+ */
 export const runBatchOperationWithCount = async <
   T extends TableConfig,
-  Actions extends ActionsType,
+  Action extends BaseAction,
 >(
   table: SQLiteTableWithColumns<T>,
-  ...actions: Actions
-): Promise<[count: number, ...results: BatchOperationResult<Actions>]> => {
+  action: Action,
+  where?: SQL,
+): Promise<[count: number, result: ActionFinalReturnType<Action>]> => {
   const countQueryAction = actionBuilder(countQuery);
-  const [countRawResult, ...results] = await runBatchOperation(
-    countQueryAction(table),
-    ...actions,
+  const [countRawResult, result] = await runBatchOperation(
+    countQueryAction(table, where),
+    action,
   );
   const countResult = countRawResult[FIRST_INDEX] ?? NO_COUNT;
-  return [countResult.count, ...results];
+  return [countResult.count, result as ActionFinalReturnType<Action>];
 };

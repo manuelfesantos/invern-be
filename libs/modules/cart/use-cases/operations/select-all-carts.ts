@@ -1,3 +1,4 @@
+import type { SQL } from "drizzle-orm";
 import type { Cart } from "@cart-entity";
 import { runBatchOperationWithCount } from "@generics-db";
 import { cartsTable } from "@schema";
@@ -6,10 +7,13 @@ import { getSelectAllCartsAction } from "@cart-db";
 export const selectAllCartsOperation = async (
   page: number,
   pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
 ): Promise<{ count: number; carts: Cart[] }> => {
   const [count, carts] = await runBatchOperationWithCount(
     cartsTable,
-    getSelectAllCartsAction(page, pageSize),
+    getSelectAllCartsAction(page, pageSize, where, orderBy),
+    where,
   );
   return {
     count,

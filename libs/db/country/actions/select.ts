@@ -1,6 +1,7 @@
 import type { Country } from "@country-entity";
 import { countrySchema } from "@country-entity";
 import { db } from "@db";
+import type { SQL } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 import { countriesTable } from "@schema";
 import type { Result } from "@generics-db";
@@ -40,9 +41,16 @@ const countriesListConfig = {
 const selectAllCountriesQuery = () =>
   db().query.countriesTable.findMany(countriesListConfig);
 
-const selectCountriesPageQuery = (page: number, pageSize: number) =>
+const selectCountriesPageQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
   db().query.countriesTable.findMany({
     ...countriesListConfig,
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     limit: pageSize,
     offset: (page - DEFAULT_PAGE) * pageSize,
   });

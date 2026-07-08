@@ -22,6 +22,36 @@ export const paginationQuerySchema = z.object({
 
 export type PaginationQuery = z.infer<typeof paginationQuerySchema>;
 
+/** Allowed sort directions. Defaults to ascending when omitted. */
+export const SORT_ORDERS = ["asc", "desc"] as const;
+export type SortOrder = (typeof SORT_ORDERS)[number];
+
+/** Validated admin-list query: pagination + an allow-listed sort. */
+export interface ListQuery<F extends string> {
+  page: number;
+  pageSize: number;
+  sortBy?: F;
+  sortOrder: SortOrder;
+}
+
+/**
+ * Validates an entity's admin-list query: pagination plus a `sortBy` constrained
+ * to that entity's allow-listed `sortableFields` and a bounded `sortOrder`. An
+ * out-of-allow-list `sortBy` fails validation → 400 (never reaches SQL). Filter
+ * params are validated/translated per entity against a column map (see
+ * `@generics-db` `buildWhere`); unknown query keys are ignored, not errored.
+ */
+export const parseListQuery = <F extends string>(
+  sortableFields: readonly [F, ...F[]],
+  query: unknown,
+): ListQuery<F> =>
+  paginationQuerySchema
+    .extend({
+      sortBy: z.enum(sortableFields).optional(),
+      sortOrder: z.enum(SORT_ORDERS).default("asc"),
+    })
+    .parse(query ?? {});
+
 /** The shared paginated-response envelope every admin list endpoint returns. */
 export interface Paginated<T> {
   data: T[];

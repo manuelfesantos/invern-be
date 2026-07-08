@@ -1270,7 +1270,33 @@ paths:
       tags:
         - Private - Currencies
       summary: Get All Currencies (Admin)
-      description: Retrieves a list of all currencies configured in the system. Requires Admin Authentication.
+      description: >-
+        Retrieves a paginated list of currencies. Supports sorting and
+        filtering; the response `total` reflects any applied filter. Requires
+        Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [name, code, rateToEuro, createdAt]
+        - name: name
+          in: query
+          required: false
+          description: Filter to currencies whose name contains this term.
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: false
+          description: Filter to currencies whose code contains this term.
+          schema:
+            type: string
       responses:
         '200':
           description: A list of currencies.
@@ -1417,7 +1443,39 @@ paths:
       tags:
         - Private - Countries
       summary: Get All Countries (Admin)
-      description: Retrieves a list of all countries configured in the system. Requires Admin Authentication.
+      description: >-
+        Retrieves a paginated list of countries. Supports sorting and
+        filtering; the response `total` reflects any applied filter. Requires
+        Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [name, code, createdAt]
+        - name: name
+          in: query
+          required: false
+          description: Filter to countries whose name contains this term.
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: false
+          description: Filter to countries whose code contains this term.
+          schema:
+            type: string
+        - name: currencyCode
+          in: query
+          required: false
+          description: Filter to countries using this currency (exact match).
+          schema:
+            type: string
       responses:
         '200':
           description: A list of countries.
@@ -1564,7 +1622,40 @@ paths:
       tags:
         - Private - Products Admin
       summary: Get All Products (Admin)
-      description: Retrieves a list of all products in the system without extended pricing. Requires Admin Authentication.
+      description: >-
+        Retrieves a paginated list of products without extended pricing.
+        Supports sorting and filtering; the response `total` reflects any
+        applied filter. Requires Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [name, stock, priceInCents, createdAt]
+        - name: collectionId
+          in: query
+          required: false
+          description: Filter to products in this collection (exact match).
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: false
+          description: Filter to products whose name contains this term.
+          schema:
+            type: string
+        - name: maxStock
+          in: query
+          required: false
+          description: Filter to products with stock at or below this value (low-stock).
+          schema:
+            type: integer
+            minimum: 0
       responses:
         '200':
           description: A list of products.
@@ -1710,7 +1801,27 @@ paths:
       tags:
         - Private - Collections Admin
       summary: Get All Collections (Admin)
-      description: Retrieves a list of all collections in the system. Requires Admin Authentication.
+      description: >-
+        Retrieves a paginated list of collections. Supports sorting and
+        filtering; the response `total` reflects any applied filter. Requires
+        Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [name, createdAt]
+        - name: name
+          in: query
+          required: false
+          description: Filter to collections whose name contains this term.
+          schema:
+            type: string
       responses:
         '200':
           description: A list of collections.
@@ -1849,10 +1960,27 @@ paths:
       tags:
         - Private - Carts Admin
       summary: Get All Carts (Admin)
-      description: Retrieves a list of all carts in the system. Requires Admin Authentication. Supports pagination.
+      description: >-
+        Retrieves a paginated list of carts. Supports sorting and filtering;
+        the response `total` reflects any applied filter. Requires Admin
+        Authentication.
       parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/PageSizeQuery'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [createdAt, lastModifiedAt]
+        - name: isLoggedIn
+          in: query
+          required: false
+          description: Filter carts by logged-in state.
+          schema:
+            type: boolean
       responses:
         '200':
           description: A list of carts.
@@ -1936,10 +2064,40 @@ paths:
       tags:
         - Private - Users Admin
       summary: Get All Users (Admin)
-      description: Retrieves a list of all users in the system. Requires Admin Authentication. Supports pagination.
+      description: >-
+        Retrieves a paginated list of users. Supports sorting and filtering;
+        the response `total` reflects any applied filter. Requires Admin
+        Authentication.
       parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/PageSizeQuery'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [createdAt, email]
+        - name: email
+          in: query
+          required: false
+          description: Filter to users whose email contains this term.
+          schema:
+            type: string
+        - name: role
+          in: query
+          required: false
+          description: Filter users by role (exact match).
+          schema:
+            type: string
+            enum: [ADMIN, USER]
+        - name: isValidated
+          in: query
+          required: false
+          description: Filter users by email-validation state.
+          schema:
+            type: boolean
       responses:
         '200':
           description: A list of users.
@@ -2022,10 +2180,21 @@ paths:
       tags:
         - Private - Orders Admin
       summary: Get All Orders (Admin)
-      description: Retrieves a list of all orders in the system. Requires Admin Authentication. Supports querying by userId, paymentId, etc.
+      description: >-
+        Retrieves a paginated list of orders. Supports sorting and filtering
+        (the exact-match id filters combine with AND); the response `total`
+        reflects any applied filter. Requires Admin Authentication.
       parameters:
-        - $ref: '#/components/parameters/PageQuery'
-        - $ref: '#/components/parameters/PageSizeQuery'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [createdAt, lastModifiedAt, isCanceled]
         - name: userId
           in: query
           required: false
@@ -2052,6 +2221,12 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: isCanceled
+          in: query
+          required: false
+          description: Filter orders by cancellation state.
+          schema:
+            type: boolean
       responses:
         '200':
           description: A list of all orders matching the filters.
@@ -3853,6 +4028,17 @@ components:
         minimum: 1
         maximum: 100
         default: 10
+    SortOrderParam:
+      name: sortOrder
+      in: query
+      required: false
+      description: >-
+        Sort direction for admin list endpoints. Only applied when `sortBy` is
+        set. Defaults to ascending.
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
     CountryCode:
       name: countryCode
       in: path

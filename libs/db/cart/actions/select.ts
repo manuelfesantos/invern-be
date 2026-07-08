@@ -1,5 +1,6 @@
 import { db } from "@db";
 import { DEFAULT_PAGE } from "@number-utils";
+import type { SQL } from "drizzle-orm";
 import { and, desc, eq } from "drizzle-orm";
 import { cartsTable, imagesTable, productsToCartsTable } from "@schema";
 import type { Cart} from "@cart-entity";
@@ -7,8 +8,15 @@ import { cartSchema } from "@cart-entity";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
 
-const selectAllCartsQuery = (page: number, pageSize: number) =>
+const selectAllCartsQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
   db().query.cartsTable.findMany({
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     with: {
       productsToCarts: {
         with: {

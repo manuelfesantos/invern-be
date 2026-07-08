@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest, getPaginationParams } from "@http-utils";
+import { getBodyFromRequest, getListQueryParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import { addCollection, getCollectionsPage } from "@collection-module";
 
@@ -9,7 +9,7 @@ const collections = new Hono<HonoEnv>();
 collections.get("/", async (c) =>
   successResponse.OK(
     "Collections fetched successfully",
-    await getCollectionsPage(getPaginationParams(c.req.url)),
+    await getCollectionsPage(getListQueryParams(c.req.url)),
   ),
 );
 

@@ -2,6 +2,7 @@ import type { Collection } from "@collection-entity";
 import { db } from "@db";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import type { SQL } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 import { collectionsTable } from "@schema";
 import { DEFAULT_PAGE } from "@number-utils";
@@ -18,9 +19,16 @@ const collectionImagesWith = {
 const selectAllCollectionsQuery = () =>
   db().query.collectionsTable.findMany({ with: collectionImagesWith });
 
-const selectCollectionsPageQuery = (page: number, pageSize: number) =>
+const selectCollectionsPageQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
   db().query.collectionsTable.findMany({
     with: collectionImagesWith,
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     limit: pageSize,
     offset: (page - DEFAULT_PAGE) * pageSize,
   });

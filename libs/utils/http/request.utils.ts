@@ -33,19 +33,13 @@ export const getQueryFromUrl = (url: string): URLSearchParams | null => {
 };
 
 /**
- * Raw `page`/`pageSize` query params (strings, or undefined when absent) from a
- * request URL — framework-agnostic so any app can reuse it. The paginated
- * use-cases coerce, default and validate these via `paginationQuerySchema`.
+ * All query params of a request URL as a flat string record — the input to the
+ * admin list use-cases, which validate `page`/`pageSize`/`sortBy`/`sortOrder`
+ * and pick their allow-listed filter keys from it. Framework-agnostic; unknown
+ * keys are simply ignored downstream.
  */
-export const getPaginationParams = (
-  url: string,
-): { page?: string; pageSize?: string } => {
-  const query = getQueryFromUrl(url);
-  return {
-    page: query?.get("page") ?? undefined,
-    pageSize: query?.get("pageSize") ?? undefined,
-  };
-};
+export const getListQueryParams = (url: string): Record<string, string> =>
+  Object.fromEntries(getQueryFromUrl(url) ?? []);
 
 export const isLocalEnv = (): boolean => {
   return ENV.ENV === "local";

@@ -1,4 +1,5 @@
 import { db } from "@db";
+import type { SQL } from "drizzle-orm";
 import { desc, eq, inArray, like, or } from "drizzle-orm";
 import { imagesTable, productsTable } from "@schema";
 import type { Result } from "@generics-db";
@@ -23,7 +24,12 @@ const selectProductsQuery = () =>
     },
   });
 
-const selectProductsPageQuery = (page: number, pageSize: number) =>
+const selectProductsPageQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
   db().query.productsTable.findMany({
     columns: {
       description: false,
@@ -39,6 +45,8 @@ const selectProductsPageQuery = (page: number, pageSize: number) =>
         orderBy: [desc(imagesTable.isThumbnail)],
       },
     },
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
     limit: pageSize,
     offset: (page - DEFAULT_PAGE) * pageSize,
   });
