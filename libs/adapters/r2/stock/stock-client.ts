@@ -48,19 +48,25 @@ const updateStock = async ({
   await setKVStock(productId, stock);
 
   const lockKey = `lock-${productId}`;
+  const lockToken = crypto.randomUUID();
 
   let stockUpdated = false;
   let retries = 0;
 
   while (!stockUpdated && retries < MAX_RETRIES) {
-    const lock = await acquireLock(ENV.STOCK_BUCKET, lockKey, STOCK_LOCK_TTL);
+    const lock = await acquireLock(
+      ENV.STOCK_BUCKET,
+      lockKey,
+      STOCK_LOCK_TTL,
+      lockToken,
+    );
 
     if (lock) {
       await ENV.STOCK_BUCKET.put(productId, stringifyObject({ data: stock }));
       const cacheKey = getCacheKey(ENV.STOCK_HOST, productId);
       await purgeCache(cacheKey);
 
-      await releaseLock(ENV.STOCK_BUCKET, lockKey);
+      await releaseLock(ENV.STOCK_BUCKET, lockKey, lockToken);
 
       stockUpdated = true;
 
