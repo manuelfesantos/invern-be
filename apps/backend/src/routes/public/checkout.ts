@@ -1,16 +1,17 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import type { HonoEnv } from "../../types/hono";
 import { authContext } from "../../middleware/auth-context";
 import { checkoutContext } from "../../middleware/checkout-context";
-import { adapt } from "../../http/pages-adapter";
 import { protectedSuccessResponse } from "@response-entity";
 import { validateCartId } from "@cart-db";
 import {
-  checkoutRequestHandler,
+  checkoutErrorHandler,
   contextStore,
   enableNextCheckoutStage,
   getClientCheckoutStages,
   getRemoveCookieNamesFromInvalidCheckoutStage,
+  initializeCheckoutStage,
   isCheckoutStageEnabled,
 } from "@context-utils";
 import { errors } from "@error-handling-utils";
@@ -32,7 +33,29 @@ import { getAddress, handleAddressPost } from "@address-module";
 import { getCheckoutReview, getCheckoutSession } from "@order-module";
 import { getShippingMethods, handleShippingMethodPost } from "@shipping-module";
 
-/** Shared: hydrates the data payload for a given checkout stage. */
+type CheckoutHandler = (c: Context<HonoEnv>) => Response | Promise<Response>;
+
+/**
+ * Native Hono equivalent of the Pages `checkoutRequestHandler`: marks the
+ * active stage, then catches any thrown error and renders it through the shared
+ * `checkoutErrorHandler` so checkout always responds gracefully. Catching here —
+ * inside the handler — keeps the error away from Hono's `app.onError`.
+ */
+const checkoutRoute =
+  (
+    stage: CheckoutStageName | null,
+    handler: CheckoutHandler,
+  ): CheckoutHandler =>
+  async (c) => {
+    initializeCheckoutStage(stage);
+    try {
+      return await handler(c);
+    } catch (error) {
+      return checkoutErrorHandler(error);
+    }
+  };
+
+/** Hydrates the data payload for a given checkout stage. */
 const getCheckoutStageData = async (
   stage: CheckoutStageName | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +79,7 @@ const getCheckoutStageData = async (
   }
 };
 
-const getStages = checkoutRequestHandler(async () => {
+const getStages: CheckoutHandler = async () => {
   try {
     const cart = await validateCartId(contextStore.context.cartId);
     if (!cart.products?.length) {
@@ -84,9 +107,9 @@ const getStages = checkoutRequestHandler(async () => {
       isCheckoutPossible: false,
     });
   }
-}, null);
+};
 
-const getPersonalDetails = checkoutRequestHandler(async () => {
+const getPersonalDetails: CheckoutHandler = async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
@@ -95,13 +118,13 @@ const getPersonalDetails = checkoutRequestHandler(async () => {
     ...(userDetails && { personalDetails: userDetails }),
     availableCheckoutStages: getClientCheckoutStages(),
   });
-}, CheckoutStageNameEnum.PERSONAL_DETAILS);
+};
 
-const postPersonalDetails = checkoutRequestHandler(async ({ request }) => {
+const postPersonalDetails: CheckoutHandler = async (c) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.PERSONAL_DETAILS)) {
     throw errors.NOT_ALLOWED("Personal details checkout stage is not enabled");
   }
-  const body = await getBodyFromRequest(request);
+  const body = await getBodyFromRequest(c.req.raw);
   const { userDetails, encryptedUserDetails } = await handleDetailsPost(body);
   enableNextCheckoutStage(CheckoutStageNameEnum.PERSONAL_DETAILS);
   const response = protectedSuccessResponse.OK(
@@ -117,9 +140,9 @@ const postPersonalDetails = checkoutRequestHandler(async ({ request }) => {
     getCookieHeader(CookieNameEnum.USER_DETAILS, encryptedUserDetails),
   );
   return response;
-}, CheckoutStageNameEnum.PERSONAL_DETAILS);
+};
 
-const getAddressStage = checkoutRequestHandler(async () => {
+const getAddressStage: CheckoutHandler = async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
     throw errors.NOT_ALLOWED("Address checkout stage is not enabled");
   }
@@ -128,10 +151,10 @@ const getAddressStage = checkoutRequestHandler(async () => {
     ...(address && { address }),
     availableCheckoutStages: getClientCheckoutStages(),
   });
-}, CheckoutStageNameEnum.ADDRESS);
+};
 
-const postAddressStage = checkoutRequestHandler(async ({ request }) => {
-  const body = await getBodyFromRequest(request);
+const postAddressStage: CheckoutHandler = async (c) => {
+  const body = await getBodyFromRequest(c.req.raw);
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.ADDRESS)) {
     throw errors.NOT_ALLOWED("Address checkout stage is not enabled");
   }
@@ -148,9 +171,9 @@ const postAddressStage = checkoutRequestHandler(async ({ request }) => {
     getCookieHeader(CookieNameEnum.ADDRESS, encryptedAddress),
   );
   return response;
-}, CheckoutStageNameEnum.ADDRESS);
+};
 
-const getShipping = checkoutRequestHandler(async () => {
+const getShipping: CheckoutHandler = async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
@@ -161,13 +184,13 @@ const getShipping = checkoutRequestHandler(async () => {
     selectedShippingMethod,
     availableCheckoutStages: getClientCheckoutStages(),
   });
-}, CheckoutStageNameEnum.SHIPPING);
+};
 
-const postShipping = checkoutRequestHandler(async ({ request }) => {
+const postShipping: CheckoutHandler = async (c) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.SHIPPING)) {
     throw errors.NOT_ALLOWED("Shipping checkout stage is not enabled");
   }
-  const body = await getBodyFromRequest(request);
+  const body = await getBodyFromRequest(c.req.raw);
   const { encryptedShippingMethodId, shippingMethod } =
     await handleShippingMethodPost(body);
   enableNextCheckoutStage(CheckoutStageNameEnum.SHIPPING);
@@ -182,9 +205,9 @@ const postShipping = checkoutRequestHandler(async ({ request }) => {
     getCookieHeader(CookieNameEnum.SHIPPING_METHOD, encryptedShippingMethodId),
   );
   return response;
-}, CheckoutStageNameEnum.SHIPPING);
+};
 
-const getReview = checkoutRequestHandler(async () => {
+const getReview: CheckoutHandler = async () => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
     throw errors.NOT_ALLOWED("Review checkout stage is not enabled");
   }
@@ -197,13 +220,13 @@ const getReview = checkoutRequestHandler(async () => {
     personalDetails,
     address,
   });
-}, CheckoutStageNameEnum.REVIEW);
+};
 
-const getPayment = checkoutRequestHandler(async ({ request }) => {
+const getPayment: CheckoutHandler = async (c) => {
   if (!isCheckoutStageEnabled(CheckoutStageNameEnum.REVIEW)) {
     throw errors.NOT_ALLOWED("Payment checkout stage is not enabled");
   }
-  const origin = request.headers.get("origin") || undefined;
+  const origin = c.req.header("origin") || undefined;
   const { url, checkoutSessionId } = await getCheckoutSession(origin);
   const checkoutSessionToken = await encrypt(checkoutSessionId);
   const response = protectedSuccessResponse.OK("checkout session created", {
@@ -218,21 +241,28 @@ const getPayment = checkoutRequestHandler(async ({ request }) => {
     ),
   );
   return response;
-}, null);
+};
 
 const checkout = new Hono<HonoEnv>();
 
 checkout.use("*", authContext);
 checkout.use("*", checkoutContext);
 
-checkout.get("/stages", adapt(getStages));
-checkout.get("/stages/personal-details", adapt(getPersonalDetails));
-checkout.post("/stages/personal-details", adapt(postPersonalDetails));
-checkout.get("/stages/address", adapt(getAddressStage));
-checkout.post("/stages/address", adapt(postAddressStage));
-checkout.get("/stages/shipping", adapt(getShipping));
-checkout.post("/stages/shipping", adapt(postShipping));
-checkout.get("/stages/review", adapt(getReview));
-checkout.get("/stages/payment", adapt(getPayment));
+const S = CheckoutStageNameEnum;
+checkout.get("/stages", checkoutRoute(null, getStages));
+checkout.get(
+  "/stages/personal-details",
+  checkoutRoute(S.PERSONAL_DETAILS, getPersonalDetails),
+);
+checkout.post(
+  "/stages/personal-details",
+  checkoutRoute(S.PERSONAL_DETAILS, postPersonalDetails),
+);
+checkout.get("/stages/address", checkoutRoute(S.ADDRESS, getAddressStage));
+checkout.post("/stages/address", checkoutRoute(S.ADDRESS, postAddressStage));
+checkout.get("/stages/shipping", checkoutRoute(S.SHIPPING, getShipping));
+checkout.post("/stages/shipping", checkoutRoute(S.SHIPPING, postShipping));
+checkout.get("/stages/review", checkoutRoute(S.REVIEW, getReview));
+checkout.get("/stages/payment", checkoutRoute(null, getPayment));
 
 export default checkout;

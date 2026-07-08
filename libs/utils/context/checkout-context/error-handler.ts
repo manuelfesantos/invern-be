@@ -1,6 +1,4 @@
-import { middlewareRequestHandler, requestHandler } from "@decorator-utils";
-import type { CookieName, Data } from "@http-entity";
-import type Env from "@env-entity";
+import type { CookieName } from "@http-entity";
 import {
   contextStore,
   getClientCheckoutStages,
@@ -17,23 +15,25 @@ import { deleteCookieFromResponse } from "@http-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 
-export const checkoutRequestHandler = <T extends Data>(
-  handler: PagesFunction<Env, string, T>,
+/**
+ * Marks the active checkout stage so {@link checkoutErrorHandler} can scope its
+ * cookie cleanup to that stage.
+ */
+export const initializeCheckoutStage = (
   checkoutStage: CheckoutStageName | null,
-): PagesFunction<Env, string, T> => {
-  return requestHandler(handler, {
-    errorHandler,
-    preProcess: () => initializeCheckoutStage(checkoutStage),
-  });
+): void => {
+  if (checkoutStage) {
+    contextStore.context.currentCheckoutStage = checkoutStage;
+  }
 };
 
-export const checkoutMiddlewareRequestHandler = <T extends Data>(
-  fn: PagesFunction<Env, string, T>,
-): PagesFunction<Env, string, T> => {
-  return middlewareRequestHandler(fn, { errorHandler });
-};
-
-const errorHandler = (error: unknown): Response => {
+/**
+ * Renders a thrown checkout error gracefully (checkout never surfaces a hard
+ * error to the client): inside a stage it returns the still-available stages
+ * and clears cookies for the now-invalid stage; otherwise it reports the cart
+ * as un-checkout-able and clears every checkout cookie.
+ */
+export const checkoutErrorHandler = (error: unknown): Response => {
   const { currentCheckoutStage } = contextStore.context;
   if (error instanceof Error && currentCheckoutStage) {
     const cookiesToRemove = getCheckoutCookiesToRemove(currentCheckoutStage);
@@ -87,14 +87,6 @@ const getCheckoutCookiesToRemove = (
   checkoutStageName: CheckoutStageName,
 ): CookieName[] =>
   getRemoveCookieNamesFromInvalidCheckoutStage(checkoutStageName);
-
-const initializeCheckoutStage = (
-  checkoutStage: CheckoutStageName | null,
-): void => {
-  if (checkoutStage) {
-    contextStore.context.currentCheckoutStage = checkoutStage;
-  }
-};
 
 const getAllCheckoutCookies = (): CookieName[] => {
   return Object.values(checkoutStageToCookie);
