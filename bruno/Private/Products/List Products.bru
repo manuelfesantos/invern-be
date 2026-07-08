@@ -5,11 +5,27 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/private/products
+  url: {{baseUrl}}/private/products?page=1&pageSize=10
   body: none
   auth: none
 }
 
+params:query {
+  page: 1
+  pageSize: 10
+  ~sortBy: name
+  ~sortOrder: asc
+  ~name: jar
+  ~collectionId: {{collectionId}}
+  ~maxStock: 5
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Paginated envelope: { data, page, pageSize, total }. `total` reflects any applied filter.
+
+  Sorting (toggle sortBy/sortOrder): sortBy in [name, stock, priceInCents, createdAt]; sortOrder in [asc, desc] (default asc). A sortBy outside the list -> 400.
+
+  Filtering (toggle any): name (contains), collectionId (exact), maxStock (stock <= n, low-stock). Unknown filter keys are ignored.
 }

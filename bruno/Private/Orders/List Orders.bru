@@ -5,11 +5,29 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/private/orders
+  url: {{baseUrl}}/private/orders?page=1&pageSize=10
   body: none
   auth: none
 }
 
+params:query {
+  page: 1
+  pageSize: 10
+  ~sortBy: createdAt
+  ~sortOrder: desc
+  ~isCanceled: true
+  ~userId: {{userId}}
+  ~stripeId: cs_test_123
+  ~paymentId: pi_test_123
+  ~shippingTransactionId: 00000000-0000-4000-8000-000000000000
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Paginated envelope: { data, page, pageSize, total }. `total` reflects any applied filter.
+
+  Sorting (toggle sortBy/sortOrder): sortBy in [createdAt, lastModifiedAt, isCanceled]; sortOrder in [asc, desc] (default asc). A sortBy outside the list -> 400.
+
+  Filtering (toggle any, all AND-combined): isCanceled (bool), userId, stripeId, paymentId, shippingTransactionId (all exact). The legacy single-id filters are now combinable. Unknown filter keys are ignored.
 }

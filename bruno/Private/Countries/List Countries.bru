@@ -5,11 +5,27 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/private/countries
+  url: {{baseUrl}}/private/countries?page=1&pageSize=10
   body: none
   auth: none
 }
 
+params:query {
+  page: 1
+  pageSize: 10
+  ~sortBy: name
+  ~sortOrder: asc
+  ~name: portugal
+  ~code: PT
+  ~currencyCode: EUR
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Paginated envelope: { data, page, pageSize, total }. `total` reflects any applied filter.
+
+  Sorting (toggle sortBy/sortOrder): sortBy in [name, code, createdAt]; sortOrder in [asc, desc] (default asc). A sortBy outside the list -> 400.
+
+  Filtering (toggle any): name (contains), code (contains), currencyCode (exact). Unknown filter keys are ignored.
 }

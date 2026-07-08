@@ -10,6 +10,22 @@ get {
   auth: none
 }
 
+params:query {
+  page: 1
+  pageSize: 10
+  ~sortBy: email
+  ~sortOrder: asc
+  ~email: gmail
+  ~role: ADMIN
+  ~isValidated: true
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Paginated envelope: { data, page, pageSize, total }. `total` reflects any applied filter.
+
+  Sorting (toggle sortBy/sortOrder): sortBy in [createdAt, email]; sortOrder in [asc, desc] (default asc). A sortBy outside the list -> 400.
+
+  Filtering (toggle any): email (contains), role (ADMIN | USER, exact), isValidated (bool). Unknown filter keys are ignored.
 }
