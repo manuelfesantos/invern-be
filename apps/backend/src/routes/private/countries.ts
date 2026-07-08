@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest } from "@http-utils";
+import { getBodyFromRequest, getPaginationParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import {
   addCountry,
@@ -9,14 +9,13 @@ import {
   getCountryByCountryCode,
   updateCountry,
 } from "@country-module";
-import { paginationParams } from "../../http/query";
 
 const countries = new Hono<HonoEnv>();
 
 countries.get("/", async (c) =>
   successResponse.OK(
     "Countries fetched successfully",
-    await getCountriesPage(paginationParams(c)),
+    await getCountriesPage(getPaginationParams(c.req.url)),
   ),
 );
 

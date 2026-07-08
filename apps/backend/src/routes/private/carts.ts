@@ -1,15 +1,15 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
+import { getPaginationParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import { deleteCart, getAllCarts, getCart } from "@cart-module";
-import { paginationParams } from "../../http/query";
 
 const carts = new Hono<HonoEnv>();
 
 carts.get("/", async (c) =>
   successResponse.OK(
     "Carts fetched successfully",
-    await getAllCarts(paginationParams(c)),
+    await getAllCarts(getPaginationParams(c.req.url)),
   ),
 );
 

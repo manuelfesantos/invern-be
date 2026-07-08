@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest } from "@http-utils";
+import { getBodyFromRequest, getPaginationParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import {
   addCurrency,
@@ -9,14 +9,13 @@ import {
   getCurrencyByCode,
   updateCurrency,
 } from "@currency-module";
-import { paginationParams } from "../../http/query";
 
 const currencies = new Hono<HonoEnv>();
 
 currencies.get("/", async (c) =>
   successResponse.OK(
     "Currencies fetched successfully",
-    await getCurrenciesPage(paginationParams(c)),
+    await getCurrenciesPage(getPaginationParams(c.req.url)),
   ),
 );
 

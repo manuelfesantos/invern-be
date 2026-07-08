@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv } from "../../types/hono";
-import { getBodyFromRequest } from "@http-utils";
+import { getBodyFromRequest, getPaginationParams } from "@http-utils";
 import { successResponse } from "@response-entity";
 import {
   cancelOrder,
@@ -8,7 +8,6 @@ import {
   getOrder,
   updateOrder,
 } from "@order-module";
-import { paginationParams } from "../../http/query";
 
 const orders = new Hono<HonoEnv>();
 
@@ -26,7 +25,7 @@ orders.get("/", async (c) => {
     (key) => [key, params.get(key)] as const,
   ).find(([, value]) => value);
 
-  const pagination = paginationParams(c);
+  const pagination = getPaginationParams(c.req.url);
   const result = filter
     ? await getAllOrders(filter[0], filter[1] as string, pagination)
     : await getAllOrders(undefined, undefined, pagination);

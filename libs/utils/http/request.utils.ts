@@ -32,6 +32,21 @@ export const getQueryFromUrl = (url: string): URLSearchParams | null => {
   return query ? new URLSearchParams(query) : null;
 };
 
+/**
+ * Raw `page`/`pageSize` query params (strings, or undefined when absent) from a
+ * request URL — framework-agnostic so any app can reuse it. The paginated
+ * use-cases coerce, default and validate these via `paginationQuerySchema`.
+ */
+export const getPaginationParams = (
+  url: string,
+): { page?: string; pageSize?: string } => {
+  const query = getQueryFromUrl(url);
+  return {
+    page: query?.get("page") ?? undefined,
+    pageSize: query?.get("pageSize") ?? undefined,
+  };
+};
+
 export const isLocalEnv = (): boolean => {
   return ENV.ENV === "local";
 };
