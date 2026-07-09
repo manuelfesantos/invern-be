@@ -10,8 +10,13 @@ get {
   auth: none
 }
 
+vars:pre-request {
+  shippingMethodId: c809ba43-09a7-48bd-a35c-3026c0d00841
+  shippingRateId: 68e6bac5-4a3d-496f-b1e1-2ac23c4a1847
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
-
+  
   Returns the rate, including its countryCodes. Unknown id -> 404.
 }

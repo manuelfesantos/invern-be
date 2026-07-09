@@ -12,10 +12,12 @@ post {
 
 body:json {
   {
-    "secretKey": "<SETUP_STOCK_SECRET>"
+    "secretKey": "{{setupStockSecret}}"
   }
 }
 
 docs {
   Self-gated by SETUP_STOCK_SECRET (not admin RBAC). Rebuilds the stock bucket from D1.
+  Set `setupStockSecret` in your Bruno environment to the SETUP_STOCK_SECRET from
+  `.dev.vars` — never hardcode the secret in this file (it is committed to git).
 }

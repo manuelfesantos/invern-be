@@ -10,6 +10,10 @@ get {
   auth: none
 }
 
+vars:pre-request {
+  productId: 2fef20d6-4fa9-461a-8acb-ba87c3e15c5e
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403. Only served when ENV=local.
 }
