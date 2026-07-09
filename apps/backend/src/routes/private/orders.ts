@@ -6,6 +6,7 @@ import {
   cancelOrder,
   getAllOrders,
   getOrder,
+  updateFulfillment,
   updateOrder,
 } from "@order-module";
 
@@ -28,12 +29,20 @@ orders.put("/:id", async (c) => {
     c.req.param("id"),
     await getBodyFromRequest(c.req.raw),
   );
-  return successResponse.OK("Order cancelled successfully", order);
+  return successResponse.OK("Order updated successfully", order);
 });
 
 orders.put("/:id/cancel", async (c) => {
   const order = await cancelOrder(c.req.param("id"));
   return successResponse.OK("Order cancelled successfully", order);
+});
+
+orders.put("/:id/fulfillment", async (c) => {
+  const order = await updateFulfillment(
+    c.req.param("id"),
+    await getBodyFromRequest(c.req.raw),
+  );
+  return successResponse.OK("Order fulfillment updated successfully", order);
 });
 
 export default orders;

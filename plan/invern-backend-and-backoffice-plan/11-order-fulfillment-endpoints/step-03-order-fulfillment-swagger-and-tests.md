@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 11-order-fulfillment-endpoints
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: Order/fulfillment swagger + tests
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
 
 ## Technical goal
 Update `swagger.yaml` for the corrected order-update semantics and the new fulfillment endpoint, and add tests covering the mutable-field whitelist, the fulfillment state machine, and tracking-URL validation.

@@ -2,9 +2,10 @@ import { createInsertSchema } from "drizzle-zod";
 import { shippingTransactionsTable } from "@schema";
 import * as z from "zod";
 
-const shippingTransactionStatusEnumSchema = z.enum(
+export const shippingTransactionStatusSchema = z.enum(
   shippingTransactionsTable.status.enumValues,
 );
+const shippingTransactionStatusEnumSchema = shippingTransactionStatusSchema;
 
 export const shippingTransactionSchema = createInsertSchema(
   shippingTransactionsTable,

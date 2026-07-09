@@ -2344,6 +2344,52 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError' # E.g., failed to release stock
 
+  /private/orders/{id}/fulfillment:
+    security:
+      - AdminBearer: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags:
+        - Private - Orders Admin
+      summary: Update Order Fulfillment (Admin)
+      description: >-
+        Sets the order's shipping-transaction `status` (validated against the
+        transition state machine) and/or `trackingUrl`. Addressed by order id.
+        Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FulfillmentInput'
+      responses:
+        '200':
+          description: The order with its updated shipping transaction.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Order fulfillment updated successfully
+                  data:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          description: Missing status/trackingUrl, or trackingUrl is not an https URL.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Illegal fulfillment status transition.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   # -------------------- Private - Scheduled Tasks --------------------
   /private/check-expired-sessions:
     post:
@@ -3454,6 +3500,38 @@ components:
     UserDetails: # User details without address
       allOf:
         - $ref: '#/components/schemas/UserDetailsInput'
+    UpdateAdminOrderInput: # Constrained admin order update (PUT /private/orders/{id})
+      description: >-
+        The only fields an admin may correct on an existing order. Financial /
+        immutable fields (stripeId, paymentId, products, totals, userId,
+        shippingTransactionId, isCanceled) are NOT accepted — cancellation goes
+        through /cancel and fulfillment through /fulfillment. Unknown keys are
+        ignored. At least one field must be present.
+      type: object
+      minProperties: 1
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        personalDetails:
+          $ref: '#/components/schemas/UserDetails'
+    FulfillmentInput: # Update an order's fulfillment (PUT /private/orders/{id}/fulfillment)
+      description: Provide `status` and/or `trackingUrl` (at least one).
+      type: object
+      minProperties: 1
+      properties:
+        status:
+          type: string
+          enum: [processing, shipped, delivered, canceled]
+          description: >-
+            Must be a valid transition from the current status
+            (processing -> shipped -> delivered; -> canceled from
+            processing/shipped). Illegal jumps return 409.
+        trackingUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: Customer-visible; must be an https URL.
+          example: https://track.example.com/xyz
     UserDTO: # Data returned about the user (excluding sensitive info like password, role, internal IDs)
       allOf:
         - $ref: '#/components/schemas/UserDetails'
@@ -4241,20 +4319,6 @@ components:
               nullable: true # Explicitly defining as nullable
       required:
         - stripeId
-    UpdateAdminOrderInput:
-      type: object
-      description: Fields that can be updated on an order by an admin.
-      properties:
-        # Add fields that make sense for admin update, e.g., shipping status, notes
-        # Example:
-        # shippingTransactionId:
-        #   type: string
-        #   format: uuid
-        #   description: Update the associated shipping transaction.
-        isCanceled:
-          type: boolean
-          description: Explicitly mark the order as canceled (use /cancel endpoint for state change logic).
-      # Add other updatable fields as needed
     GetUserOrdersResponse:
       type: object
       properties:

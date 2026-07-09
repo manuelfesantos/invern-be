@@ -1,6 +1,11 @@
 # 11 — Order & Fulfillment Endpoint Improvements
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P0 · **Track:** Backend API Completion
+
+> **Done (SPIRIT-111):**
+> - **step-01** — `PUT /private/orders/{id}` now returns "Order updated successfully" and only accepts a **constrained** whitelist (`address`, `personalDetails`); financial/immutable fields (`stripeId`/`paymentId`/`products`/`isCanceled`/…) are stripped, never written. Edits are logged (redacted field names). Verified live: `stripeId` in the body is ignored.
+> - **step-02** — new `PUT /private/orders/{id}/fulfillment` sets shipping-transaction `status` (via a transition **state machine**: processing→shipped→delivered, →canceled from processing/shipped) and/or `trackingUrl` (**https-only**). `cancelOrder` now also cancels the transaction (unless already delivered). Verified live: full lifecycle, 409 illegal jump, 400 http/empty, 404 unknown order, cancel-coupling + delivered-guard.
+> - **step-03** — swagger (`FulfillmentInput`, a real `UpdateAdminOrderInput`, the fulfillment path) + Bruno (Update Fulfillment request, fixed Update Order body) + unit tests (transition matrix, cancel-coupling, constrained update). 116 tests / 25 suites.
 
 ## Summary
 Two concrete order-management gaps block a real fulfillment workflow. First, `PUT /private/orders/{id}` is a fully generic order update (it parses the whole `insertOrderSchema` and updates any field) but its route handler hardcodes the response message `"Order cancelled successfully"` regardless of what changed — a copy-paste leftover from the separate, correct `/cancel` endpoint. Second, there is no way to update fulfillment: `shippingTransactions.status` (`processing`/`shipped`/`delivered`/`canceled`) and `trackingUrl` exist in the schema and there's an `update` DB action, but **no use-case or route** exposes changing them (verified: `getUpdateShippingTransactionAction` is unused outside its own folder). This feature fixes the mislabeled update and adds a proper fulfillment-status/tracking endpoint so staff can mark orders shipped/delivered and attach tracking.

@@ -12,11 +12,25 @@ put {
 
 body:json {
   {
-    "address": "{}",
-    "personalDetails": "{}"
+    "address": {
+      "street": "Rua de Teste",
+      "houseNumber": "1",
+      "postalCode": "1000-001",
+      "city": "Lisboa",
+      "country": "PT"
+    },
+    "personalDetails": {
+      "email": "customer@example.com",
+      "firstName": "Ana",
+      "lastName": "Silva"
+    }
   }
 }
 
 docs {
-  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403. (Fields are constrained server-side.)
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Constrained update: only `address` and `personalDetails` are accepted. Financial/
+  immutable fields (stripeId, paymentId, products, isCanceled, ...) are ignored —
+  cancel via /cancel, fulfillment via /fulfillment.
 }

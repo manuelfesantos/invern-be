@@ -11,3 +11,4 @@ export * from "./checkout/review";
 export * from "./get-all-orders";
 export * from "./cancel-order";
 export * from "./update-order";
+export * from "./fulfillment";

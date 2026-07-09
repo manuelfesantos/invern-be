@@ -92,6 +92,11 @@ export const errors = {
     new CustomError("Payment already exists", HttpStatusEnum.CONFLICT),
   INVALID_PAYLOAD: (issue: string): CustomError =>
     new CustomError(`Invalid payload: ${issue}`, HttpStatusEnum.BAD_REQUEST),
+  INVALID_FULFILLMENT_TRANSITION: (from?: string, to?: string): CustomError =>
+    new CustomError(
+      `Invalid fulfillment status transition${from && to ? `: ${from} -> ${to}` : ""}`,
+      HttpStatusEnum.CONFLICT,
+    ),
   ORDER_NOT_FOUND: (): CustomError =>
     new CustomError("Order not found", HttpStatusEnum.NOT_FOUND),
   ORDERS_NOT_FOUND: (): CustomError =>

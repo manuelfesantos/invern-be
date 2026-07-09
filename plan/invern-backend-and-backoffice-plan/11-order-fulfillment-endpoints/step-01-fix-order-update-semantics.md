@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 11-order-fulfillment-endpoints
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["11-order-fulfillment-endpoints/step-03"]
 ---
 # Step 01: Fix the order-update message & define update vs cancel semantics
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
 
 ## Technical goal
 Correct the mislabeled `PUT /private/orders/{id}` response and constrain the update to a safe, explicit set of admin-mutable fields, so it stops being both misleading and financially dangerous — and so its role is distinct from `/cancel` and the new fulfillment endpoint.

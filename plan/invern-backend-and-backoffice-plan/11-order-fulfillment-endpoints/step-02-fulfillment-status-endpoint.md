@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 11-order-fulfillment-endpoints
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["11-order-fulfillment-endpoints/step-03"]
 ---
 # Step 02: Shipping-transaction status & tracking update endpoint
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Order & Fulfillment Endpoint Improvements](./README.md)
 
 ## Technical goal
 Add an admin use-case and route to update an order's fulfillment: set `shippingTransactions.status` (with valid transitions) and `trackingUrl`, so staff can mark orders shipped/delivered and attach tracking.

@@ -1,0 +1,29 @@
+meta {
+  name: Update Fulfillment
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/private/orders/{{orderId}}/fulfillment
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "shipped",
+    "trackingUrl": "https://track.example.com/xyz"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Sets the order's shipping-transaction status and/or trackingUrl. Provide status
+  and/or trackingUrl (at least one).
+
+  Transitions: processing -> shipped -> delivered; -> canceled from processing/shipped.
+  An illegal jump (e.g. delivered -> processing) returns 409. trackingUrl must be https
+  (http -> 400). Unknown order -> 404.
+}
