@@ -1,0 +1,16 @@
+meta {
+  name: Delete Tax
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/private/taxes/{{taxId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session. Archives the Stripe TaxRate (active:false) and deletes
+  the D1 row. Unknown id -> 404.
+}

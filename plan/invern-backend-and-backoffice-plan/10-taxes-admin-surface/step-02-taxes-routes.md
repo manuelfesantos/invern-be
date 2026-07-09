@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 10-taxes-admin-surface
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["10-taxes-admin-surface/step-03"]
 ---
 # Step 02: `/private/taxes` CRUD routes
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
 
 ## Technical goal
 Expose the tax module (from step-01) as admin-gated `/private/taxes` (+ `/{id}`) routes with list/create/detail/update/delete, using the pagination envelope and country filtering.

@@ -1,0 +1,15 @@
+meta {
+  name: Get Tax
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/private/taxes/{{taxId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session. Returns the tax (incl. countryCode). Unknown id -> 404.
+}

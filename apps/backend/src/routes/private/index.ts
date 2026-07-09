@@ -11,6 +11,7 @@ import orders from "./orders";
 import images from "./images";
 import shipping from "./shipping";
 import stock from "./stock";
+import taxes from "./taxes";
 import maintenance from "./maintenance";
 
 const privateRoutes = new Hono<HonoEnv>();
@@ -29,6 +30,7 @@ privateRoutes.route("/orders", orders);
 privateRoutes.route("/images", images);
 privateRoutes.route("/shipping", shipping);
 privateRoutes.route("/stock", stock);
+privateRoutes.route("/taxes", taxes);
 privateRoutes.route("/expired", maintenance);
 
 export default privateRoutes;

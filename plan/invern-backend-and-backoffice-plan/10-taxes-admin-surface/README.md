@@ -33,8 +33,8 @@ Admin staff: can view and correct per-country tax rates from the backoffice. Sho
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
 | 01 | [Tax module, rate-storage fix & Stripe-mirroring decision](./step-01-tax-module-and-rate-fix.md) | P1 | Done | — |
-| 02 | [`/private/taxes` CRUD routes](./step-02-taxes-routes.md) | P1 | Not Started | step-01, 01-admin-auth-rbac-cors/step-02 |
-| 03 | [Taxes swagger + tests](./step-03-taxes-swagger-and-tests.md) | P1 | Not Started | step-02 |
+| 02 | [`/private/taxes` CRUD routes](./step-02-taxes-routes.md) | P1 | Done | step-01, 01-admin-auth-rbac-cors/step-02 |
+| 03 | [Taxes swagger + tests](./step-03-taxes-swagger-and-tests.md) | P1 | Done | step-02 |
 
 ## Key risks
 - **Changing rate representation affects live pricing math.** The extender (`libs/utils/extender/utils/calculate-tax-amount.ts` etc.) consumes tax rates; any storage-format change must be matched there and covered by tests, or every price silently shifts.

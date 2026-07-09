@@ -1,0 +1,22 @@
+meta {
+  name: Update Tax
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/private/taxes/{{taxId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "IVA"
+  }
+}
+
+docs {
+  Requires an ADMIN session. Updates name/description/active (mirrored to Stripe).
+  rate and countryCode are immutable -> sending either returns 409. Unknown id -> 404.
+}

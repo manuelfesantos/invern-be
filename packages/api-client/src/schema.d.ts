@@ -4340,6 +4340,222 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/private/taxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Taxes (Admin)
+         * @description Paginated list of per-country tax rates. Filter by `countryCode`. `total` reflects the applied filter. Requires Admin Authentication.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description 1-based page number for admin list endpoints (default 1). */
+                    page?: components["parameters"]["PageParam"];
+                    /** @description Items per page for admin list endpoints (default 10, max 100). */
+                    pageSize?: components["parameters"]["PageSizeParam"];
+                    /** @description Sort direction for admin list endpoints. Only applied when `sortBy` is set. Defaults to ascending. */
+                    sortOrder?: components["parameters"]["SortOrderParam"];
+                    /** @description Field to sort by (allow-listed; other values → 400). */
+                    sortBy?: "name" | "createdAt";
+                    /** @description Filter to taxes for this exact country code. */
+                    countryCode?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description A list of taxes. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["PaginationMeta"] & {
+                                data: components["schemas"]["AdminTax"][];
+                            };
+                        };
+                    };
+                };
+                401: components["responses"]["Unauthorized"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        /**
+         * Create Tax (Admin)
+         * @description Creates a Stripe TaxRate and stores a D1 row keyed by its id (so checkout can charge via it). `rate` is a fraction; Stripe receives the percentage. Requires Admin Authentication.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateTaxInput"];
+                };
+            };
+            responses: {
+                /** @description Tax created. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["AdminTax"];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequest"];
+                401: components["responses"]["Unauthorized"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/private/taxes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The tax id (the Stripe TaxRate id, `txr_…`). */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** Get Tax (Admin) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The tax id (the Stripe TaxRate id, `txr_…`). */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The tax. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["AdminTax"];
+                        };
+                    };
+                };
+                401: components["responses"]["Unauthorized"];
+                404: components["responses"]["NotFound"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        /**
+         * Update Tax (Admin)
+         * @description Updates name/description/active (mirrored to the Stripe TaxRate). The rate and country are immutable (Stripe percentages can't change) — sending either returns 409. Requires Admin Authentication.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The tax id (the Stripe TaxRate id, `txr_…`). */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateTaxInput"];
+                };
+            };
+            responses: {
+                /** @description Tax updated. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["AdminTax"];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequest"];
+                401: components["responses"]["Unauthorized"];
+                404: components["responses"]["NotFound"];
+                /** @description Attempted to change an immutable field (rate or countryCode). */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        post?: never;
+        /**
+         * Delete Tax (Admin)
+         * @description Archives the Stripe TaxRate (active:false — they can't be hard-deleted) and removes the D1 row. Requires Admin Authentication.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The tax id (the Stripe TaxRate id, `txr_…`). */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tax deleted. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Tax deleted successfully */
+                            message?: string;
+                        };
+                    };
+                };
+                401: components["responses"]["Unauthorized"];
+                404: components["responses"]["NotFound"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stripe/session-result": {
         parameters: {
             query?: never;
@@ -4502,6 +4718,39 @@ export interface components {
             symbol?: string;
             /** @example eur */
             stripeName?: string;
+        };
+        AdminTax: {
+            /** @description The Stripe TaxRate id (txr_…) — checkout charges via this id. */
+            id?: string;
+            name?: string;
+            /**
+             * Format: float
+             * @description Fraction (e.g. 0.23 = 23%), as applied to prices.
+             */
+            rate?: number;
+            countryCode?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModifiedAt?: string;
+        };
+        CreateTaxInput: {
+            name: string;
+            countryCode: string;
+            /**
+             * Format: float
+             * @description Fraction (0.23 = 23%). Stripe receives the percentage.
+             */
+            rate: number;
+            /** @description Whether the tax is included in the price (default false). */
+            inclusive?: boolean;
+            description?: string;
+        };
+        UpdateTaxInput: {
+            name?: string;
+            description?: string;
+            /** @description Set false to deactivate the Stripe rate. */
+            active?: boolean;
         };
         Currency: components["schemas"]["ClientCurrency"] & {
             /**

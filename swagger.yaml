@@ -63,6 +63,8 @@ tags:
     description: Admin operations for viewing and managing all orders. Requires Admin Authentication. # Updated Description
   - name: Private - Stock
     description: Internal operations for managing product stock. Requires special auth/intended for specific triggers.
+  - name: Private - Taxes
+    description: Admin operations for managing per-country tax rates (mirrored to Stripe TaxRates). Requires Admin Authentication.
   - name: Private - Images
     description: Admin operations for uploading image files to R2 and managing image records (product/collection association).
   - name: Private - Test Data
@@ -3157,6 +3159,196 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Taxes --------------------
+  /private/taxes:
+    get:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Taxes
+      summary: List Taxes (Admin)
+      description: >-
+        Paginated list of per-country tax rates. Filter by `countryCode`. `total`
+        reflects the applied filter. Requires Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values → 400).
+          schema:
+            type: string
+            enum: [name, createdAt]
+        - name: countryCode
+          in: query
+          required: false
+          description: Filter to taxes for this exact country code.
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}$'
+      responses:
+        '200':
+          description: A list of taxes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/AdminTax'
+                        required:
+                          - data
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Taxes
+      summary: Create Tax (Admin)
+      description: >-
+        Creates a Stripe TaxRate and stores a D1 row keyed by its id (so checkout
+        can charge via it). `rate` is a fraction; Stripe receives the percentage.
+        Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaxInput'
+      responses:
+        '200':
+          description: Tax created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/AdminTax'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid body or unknown country
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/taxes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The tax id (the Stripe TaxRate id, `txr_…`).
+        schema:
+          type: string
+    get:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Taxes
+      summary: Get Tax (Admin)
+      responses:
+        '200':
+          description: The tax.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/AdminTax'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Taxes
+      summary: Update Tax (Admin)
+      description: >-
+        Updates name/description/active (mirrored to the Stripe TaxRate). The rate
+        and country are immutable (Stripe percentages can't change) — sending
+        either returns 409. Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaxInput'
+      responses:
+        '200':
+          description: Tax updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/AdminTax'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Attempted to change an immutable field (rate or countryCode).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Taxes
+      summary: Delete Tax (Admin)
+      description: >-
+        Archives the Stripe TaxRate (active:false — they can't be hard-deleted)
+        and removes the D1 row. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Tax deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tax deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # -------------------- Stripe Webhooks --------------------
   /stripe/session-result:
     post:
@@ -3304,6 +3496,61 @@ components:
         stripeName:
           type: string
           example: eur
+    AdminTax: # A per-country tax rate; `id` is the Stripe TaxRate id (txr_…)
+      type: object
+      properties:
+        id:
+          type: string
+          description: The Stripe TaxRate id (txr_…) — checkout charges via this id.
+        name:
+          type: string
+        rate:
+          type: number
+          format: float
+          description: Fraction (e.g. 0.23 = 23%), as applied to prices.
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+    CreateTaxInput: # Body for POST /private/taxes
+      type: object
+      required:
+        - name
+        - countryCode
+        - rate
+      properties:
+        name:
+          type: string
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        rate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Fraction (0.23 = 23%). Stripe receives the percentage.
+        inclusive:
+          type: boolean
+          description: Whether the tax is included in the price (default false).
+        description:
+          type: string
+    UpdateTaxInput: # Body for PUT /private/taxes/{id} — rate & country are immutable
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+          description: Set false to deactivate the Stripe rate.
+
     Currency: # Full currency details including rate
       allOf:
         - $ref: '#/components/schemas/ClientCurrency'

@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 10-taxes-admin-surface
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: Taxes swagger + tests
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
 
 ## Technical goal
 Document `/private/taxes` in `swagger.yaml` and add tests covering CRUD, rate validation/representation, country linkage, and the pricing-math neutrality of the rate-storage fix.

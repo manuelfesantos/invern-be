@@ -1,0 +1,34 @@
+meta {
+  name: Create Tax
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/taxes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "VAT",
+    "countryCode": "PT",
+    "rate": 0.23,
+    "inclusive": false
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setEnvVar("taxId", res.body.data.id);
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Creates a Stripe TaxRate and a D1 row keyed by its id (txr_...). Body:
+  { name, countryCode, rate (fraction 0..1), inclusive?, description? }. Unknown
+  country or rate outside 0..1 -> 400. Stores the new id in `taxId`.
+}

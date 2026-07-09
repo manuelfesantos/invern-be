@@ -1,0 +1,27 @@
+meta {
+  name: List Taxes
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/private/taxes?page=1&pageSize=10
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  pageSize: 10
+  ~sortBy: name
+  ~sortOrder: asc
+  ~countryCode: PT
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Paginated envelope: { data, page, pageSize, total }. Each tax includes countryCode.
+
+  Sorting: sortBy in [name, createdAt]; sortOrder in [asc, desc]. Filter: countryCode (exact).
+}
