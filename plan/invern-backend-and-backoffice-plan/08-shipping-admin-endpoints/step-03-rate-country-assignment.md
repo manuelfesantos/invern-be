@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 08-shipping-admin-endpoints
 track: backend-api-completion
@@ -8,7 +8,18 @@ blocks: ["08-shipping-admin-endpoints/step-04"]
 ---
 # Step 03: Rate-to-country assignment endpoints
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+
+## Verified implementation (SPIRIT-108)
+- **API shape — replace-set `PUT`** (the recommended option): `PUT /private/shipping/methods/:methodId/rates/:rateId/countries` with body `{ countryCodes: string[] }` replaces the rate's entire country set (matches a backoffice multi-select "save the whole list").
+- **Transactional replace** — new op `setRateCountriesOperation` (`libs/db/shipping/rate/operations/`) runs delete-all + insert-each in **one `runBatchOperation` batch** (the delete is always present so the batch is never empty, even for an empty set). New raw actions `getDeleteRateCountriesAction` / `getInsertRateCountryAction` back it.
+- **Validation** (use-case `setRateCountries`): rate must exist (→ 404); body codes validated by format (`^[A-Z]{2}$`) and **deduped**; every code checked against `countriesTable` (via `getSelectAllCountriesAction`) — unknown codes → **400** (`UNKNOWN_COUNTRY_CODES`, lists the offenders). Returns the rate with its resulting `countryCodes`.
+- **Empty set is allowed** (transactional delete-all) but documented as leaving the rate unselectable at checkout (no destination matches) — deliberate, not blocked.
+- Rate detail already includes `countryCodes` (step-02), so the read side is covered.
+
+Verified live (admin-authed, seeded PT/ES): set `[PT,ES]` → 200 (persisted on re-GET); replace with `[PT]` → ES removed; `[PT,PT]` → deduped to `[PT]`; `[XX]` → **400** ("Unknown country code(s): XX"); `[]` → 200 empty; unknown rate → **404**. type-check (root + apps) clean, lint 0 errors, jest 96/96.
+
+## ~~Technical steps~~ (superseded by the verified implementation above)
 
 ## Technical goal
 Expose endpoints to assign and unassign countries to a shipping rate (managing the `shippingRatesToCountries` join), over the existing rate-to-countries operation, so staff control where each rate applies.

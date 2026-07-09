@@ -120,6 +120,11 @@ export const errors = {
       "Weight band overlaps an existing rate for this method",
       HttpStatusEnum.CONFLICT,
     ),
+  UNKNOWN_COUNTRY_CODES: (codes?: string): CustomError =>
+    new CustomError(
+      `Unknown country code(s)${codes ? `: ${codes}` : ""}`,
+      HttpStatusEnum.BAD_REQUEST,
+    ),
   UNAUTHORIZED: (message?: string): CustomError =>
     new CustomError(message || "Unauthorized", HttpStatusEnum.UNAUTHORIZED),
   NOT_ALLOWED: (message?: string): CustomError =>

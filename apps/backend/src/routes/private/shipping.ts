@@ -11,6 +11,7 @@ import {
   getShippingMethodById,
   getShippingMethodsPage,
   getShippingRateById,
+  setRateCountries,
   updateShippingMethod,
   updateShippingRate,
 } from "@shipping-module";
@@ -83,6 +84,15 @@ shipping.put("/methods/:methodId/rates/:rateId", async (c) => {
 shipping.delete("/methods/:methodId/rates/:rateId", async (c) => {
   await deleteShippingRate(c.req.param("rateId"));
   return successResponse.OK("Shipping rate deleted successfully");
+});
+
+// Replace the full set of countries a rate applies to.
+shipping.put("/methods/:methodId/rates/:rateId/countries", async (c) => {
+  const rate = await setRateCountries(
+    c.req.param("rateId"),
+    await getBodyFromRequest(c.req.raw),
+  );
+  return successResponse.OK("Shipping rate countries updated successfully", rate);
 });
 
 export default shipping;
