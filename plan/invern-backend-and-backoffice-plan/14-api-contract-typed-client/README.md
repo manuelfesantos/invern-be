@@ -5,8 +5,8 @@
 > **Progress (SPIRIT-114):** step-01 + step-02 **Done**. Spec audited & reconciled
 > to code (91 ops / 63 paths, 0 drift; see [AUDIT.md](./AUDIT.md)); `npm run
 > openapi:check` (validator + route-freshness diff) wired into CI on PRs to preview
-> and main. Remaining: reusable `PaginatedEnvelope` schema (list-response shape
-> accuracy), then step-03 (generated typed client).
+> and main; all 8 admin list responses share a `PaginationMeta` schema. Remaining:
+> step-03 (generated typed client).
 
 ## Summary
 `swagger.yaml` is the OpenAPI contract for the API and is the intended source for auto-generating the backoffice's typed client — but it will only be trustworthy if it's kept complete and accurate as Track B adds endpoints, and if it describes auth as it truly works (today it declares a placeholder `X-Admin-Secret-Key` scheme that doesn't match reality). This feature makes the spec authoritative: audits it for completeness against the real routes, adds a CI check that fails when code and spec drift, and publishes a generated typed client the backoffice consumes so its types stay honest against the real API.

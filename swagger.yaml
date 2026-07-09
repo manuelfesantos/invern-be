@@ -1291,9 +1291,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Currency' # Full currency details including rateToEuro
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Currency' # Full currency details including rateToEuro
+                        required:
+                          - data
         '401':
           $ref: '#/components/responses/Unauthorized' # Invalid admin auth
         '500':
@@ -1476,9 +1483,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ClientCountry' # Use ClientCountry for listing
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ClientCountry' # Use ClientCountry for listing
+                        required:
+                          - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1662,9 +1676,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Product' # Basic product info
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Product' # Basic product info
+                        required:
+                          - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -1834,9 +1855,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Collection' # Basic collection info
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Collection' # Basic collection info
+                        required:
+                          - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -2000,9 +2028,16 @@ paths:
                     type: string
                     example: Carts fetched successfully
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Cart' # Full Cart schema
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Cart' # Full Cart schema
+                        required:
+                          - data
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid pagination parameters
         '401':
@@ -2119,9 +2154,16 @@ paths:
                     type: string
                     example: Users fetched successfully
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BaseUser' # Includes role, id, etc.
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/BaseUser' # Includes role, id, etc.
+                        required:
+                          - data
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid pagination parameters
         '401':
@@ -2249,9 +2291,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Order' # Use full Order schema for admin
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Order' # Use full Order schema for admin
+                        required:
+                          - data
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid query parameters
         '401':
@@ -2517,18 +2566,16 @@ paths:
                   message:
                     type: string
                   data:
-                    type: object
-                    properties:
-                      data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/ShippingMethod'
-                      page:
-                        type: integer
-                      pageSize:
-                        type: integer
-                      total:
-                        type: integer
+                    allOf:
+                      - $ref: '#/components/schemas/PaginationMeta'
+                      - type: object
+                        properties:
+                          data:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ShippingMethod'
+                        required:
+                          - data
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':

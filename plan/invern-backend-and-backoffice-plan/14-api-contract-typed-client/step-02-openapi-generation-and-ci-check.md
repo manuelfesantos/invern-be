@@ -21,9 +21,12 @@ blocks: ["14-api-contract-typed-client/step-03"]
 > green (91 ops / 63 paths), negative tests fail as expected (exit 1), type-check
 > clean. Runbook: `scripts/openapi/README.md`.
 >
-> Deferred to a follow-up: the reusable `PaginatedEnvelope` schema — the admin list
-> 200 responses under-document the real `{ data, page, pageSize, total }` envelope
-> (a shape-accuracy fix the freshness check does not gate).
+> Also done: reusable `PaginationMeta` schema. The 7 admin list 200 responses that
+> under-documented the envelope (`data: [T]` instead of `{ data: [T], page,
+> pageSize, total }`) now use `allOf: [PaginationMeta, { data: [T] }]`;
+> shipping/methods converted from its inline envelope to the same schema, so all 8
+> admin lists share one `PaginationMeta` (one clean type in the generated client).
+> Non-paginated lists (e.g. public `/countries`) left as plain arrays.
 
 ## Technical goal
 Implement whichever spec workflow step-01 chose, and add a CI check that fails when `swagger.yaml` is out of date relative to the code — the guardrail every Track B "swagger + tests" step relies on.
