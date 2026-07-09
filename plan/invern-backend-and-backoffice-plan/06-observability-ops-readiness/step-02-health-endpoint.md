@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 06-observability-ops-readiness
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: ["06-observability-ops-readiness/step-03"]
 ---
 # Step 02: Health endpoint + uptime monitoring
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
 
 ## Technical goal
 Add a lightweight, unauthenticated `/health` (and optionally `/ready`) endpoint that reports service liveness and key dependency reachability, and wire it to external uptime monitoring.

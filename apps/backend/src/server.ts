@@ -6,6 +6,7 @@ import { bootstrap } from "./middleware/bootstrap";
 import publicRoutes from "./routes/public";
 import privateRoutes from "./routes/private";
 import stripeRoutes from "./routes/stripe";
+import health from "./routes/health";
 
 const app = new Hono<HonoEnv>();
 
@@ -14,6 +15,7 @@ const app = new Hono<HonoEnv>();
 app.use("*", cors);
 app.use("*", bootstrap);
 
+app.route("/health", health);
 app.route("/public", publicRoutes);
 app.route("/private", privateRoutes);
 app.route("/stripe", stripeRoutes);

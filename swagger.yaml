@@ -23,6 +23,8 @@ servers:
         description: The versioned Workers preview subdomain from `wrangler deploy`.
 
 tags:
+  - name: Health
+    description: Unauthenticated readiness probe for uptime monitoring.
   # Public
   - name: Public - Countries
     description: Operations related to country listing and selection.
@@ -81,6 +83,29 @@ security:
   - AdminBearer: [] # Define a scheme for private endpoints needing a secret key
 
 paths:
+  # -------------------- Health --------------------
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Readiness Probe
+      description: >-
+        Pings D1, KV and R2 and reports each dependency's status. Returns 200
+        when all are reachable, 503 when any is down. Unauthenticated.
+      responses:
+        '200':
+          description: All dependencies reachable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: One or more dependencies are unreachable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+
   # -------------------- Public - Countries --------------------
   /public/countries:
     get:
@@ -3579,6 +3604,29 @@ components:
         stripeName:
           type: string
           example: eur
+    HealthStatus: # Readiness probe payload
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        checks:
+          type: object
+          properties:
+            d1:
+              type: string
+              enum: [ok, error]
+            kv:
+              type: string
+              enum: [ok, error]
+            r2:
+              type: string
+              enum: [ok, error]
+          required: [d1, kv, r2]
+      required:
+        - status
+        - checks
+
     DashboardSummary: # Operational overview for the backoffice home
       type: object
       properties:

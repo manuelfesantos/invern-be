@@ -4,6 +4,54 @@
  */
 
 export interface paths {
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Readiness Probe
+         * @description Pings D1, KV and R2 and reports each dependency's status. Returns 200 when all are reachable, 503 when any is down. Unauthenticated.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description All dependencies reachable. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatus"];
+                    };
+                };
+                /** @description One or more dependencies are unreachable. */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthStatus"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/countries": {
         parameters: {
             query?: never;
@@ -4817,6 +4865,18 @@ export interface components {
             symbol?: string;
             /** @example eur */
             stripeName?: string;
+        };
+        HealthStatus: {
+            /** @enum {string} */
+            status: "ok" | "degraded";
+            checks: {
+                /** @enum {string} */
+                d1: "ok" | "error";
+                /** @enum {string} */
+                kv: "ok" | "error";
+                /** @enum {string} */
+                r2: "ok" | "error";
+            };
         };
         DashboardSummary: {
             counts: {

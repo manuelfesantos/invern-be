@@ -54,6 +54,7 @@
       "@error-handling-utils": ["libs/utils/error-handling"],
       "@extender-utils": ["libs/utils/extender"],
       "@generics-db": ["libs/db/generics"],
+      "@health-module": ["libs/modules/health"],
       "@http-entity": ["libs/entities/http"],
       "@http-utils": ["libs/utils/http"],
       "@image-db": ["libs/db/image"],

@@ -1,0 +1,16 @@
+meta {
+  name: Readiness
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+docs {
+  Unauthenticated readiness probe. Pings D1/KV/R2. 200 { status: "ok", checks:
+  { d1, kv, r2 } } when all reachable; 503 { status: "degraded", ... } if any is down.
+}

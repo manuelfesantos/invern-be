@@ -77,6 +77,7 @@ function walk(file, prefix, out) {
 /** All real operations as a sorted list of `{ method, path }`. */
 export function getRealRoutes() {
   const out = [];
+  walk(path.join(ROUTES_DIR, "health.ts"), "/health", out);
   walk(path.join(ROUTES_DIR, "public/index.ts"), "/public", out);
   walk(path.join(ROUTES_DIR, "private/index.ts"), "/private", out);
   walk(path.join(ROUTES_DIR, "stripe/index.ts"), "/stripe", out);
