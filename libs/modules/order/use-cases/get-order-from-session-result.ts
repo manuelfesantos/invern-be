@@ -26,7 +26,6 @@ import type { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
 import { sendCheckoutSuccessfulEmail } from "@brevo-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { stringifyObject } from "@string-utils";
 import { getRandomUUID } from "@crypto-utils";
 import { runBatchOperation } from "@generics-db";
 import { withRetry } from "./payment/utils/retry-payment";
@@ -148,13 +147,14 @@ export const getOrderFromSessionResult = async (
 
   logger().info("Finished creating order after checkout session result", {
     useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-    data: { createdOrder: stringifyObject(clientOrder) },
+    data: { orderId: clientOrder.id },
   });
 
   if (!personalDetails.email) {
+    // Log the fact, not the customer's personal details.
     logger().warn("Email not found in personal details", {
       useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-      data: { personalDetails: stringifyObject(personalDetails) },
+      data: { orderId: clientOrder.id },
     });
     return clientOrder;
   }

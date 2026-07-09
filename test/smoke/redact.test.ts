@@ -25,13 +25,13 @@ describe("redactPropertiesFromData (smoke)", () => {
     expect(result.list[1].other).toBe(1);
   });
 
-  it("redacts additional caller-supplied keys", () => {
+  it("redacts additional caller-supplied keys, keeping non-sensitive ones", () => {
     const result = redactPropertiesFromData(
-      { password: "hunter2", email: "x@y.z" },
-      ["password"],
+      { customSecret: "hunter2", orderId: "o1" },
+      ["customSecret"],
     ) as Record<string, unknown>;
 
-    expect(result.password).toBe("REDACTED");
-    expect(result.email).toBe("x@y.z");
+    expect(result.customSecret).toBe("REDACTED");
+    expect(result.orderId).toBe("o1");
   });
 });

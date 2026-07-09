@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 06-observability-ops-readiness
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 01: Structural PII redaction in logging
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
 
 ## Technical goal
 Stop customer PII from reaching Honeycomb: expand and restructure redaction so it operates on structured data (not pre-stringified blobs), and rewrite the known PII-logging call sites to log identifiers instead of identities.

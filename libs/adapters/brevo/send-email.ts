@@ -16,8 +16,9 @@ export const sendEmail = async <T extends Record<string, unknown>>({
 }: SendEmailContext<T>): Promise<Response> => {
   logger().info("sending email", {
     useCase: LoggerUseCaseEnum.SEND_EMAIL,
+    // Recipient address is PII — log the template, not who it went to.
     data: {
-      to,
+      templateId: template.id,
     },
   });
 

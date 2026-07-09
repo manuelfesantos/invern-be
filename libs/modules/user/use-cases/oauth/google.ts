@@ -42,8 +42,10 @@ export const getGoogleOauthUser = async (
 
   logger().info("user from google", {
     useCase: LoggerUseCaseEnum.OAUTH_GOOGLE_CALLBACK,
+    // Only the hashed id + verification flag — never the Google email/name/picture.
     data: {
-      googleUser: { ...googleUser, id: hashedGoogleUserId },
+      googleUserId: hashedGoogleUserId,
+      verifiedEmail: googleUser.verified_email,
     },
   });
 

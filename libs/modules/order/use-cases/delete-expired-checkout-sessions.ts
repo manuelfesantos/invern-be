@@ -1,7 +1,6 @@
 import { getPopExpiredCheckoutSessionsAction } from "@checkout-session-db";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { stringifyObject } from "@string-utils";
 import type { CheckoutSession } from "@checkout-session-entity";
 import { releaseProductsStock } from "@stock-module";
 
@@ -14,7 +13,7 @@ export const deleteExpiredCheckoutSessions = async (): Promise<string> => {
   logger().info("Existing expired sessions", {
     useCase: LoggerUseCaseEnum.CHECK_EXPIRED_SESSIONS,
     data: {
-      sessions: stringifyObject(expiredSessions),
+      count: expiredSessions.length,
     },
   });
 

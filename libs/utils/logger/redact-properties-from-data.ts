@@ -1,4 +1,25 @@
-const redactedProperties = ["accessToken"];
+// Always-sensitive keys masked wherever they appear in a log's `data` (the
+// redactor recurses into nested objects). This is defense-in-depth — the
+// primary control is logging minimal, id-only data at each call site, since a
+// pre-stringified value (a JSON string) is opaque to key-based redaction.
+// Deliberately excludes ambiguous keys like `name` (product/tax names are not
+// PII); customer identity is covered by firstName/lastName/personalDetails.
+const redactedProperties = [
+  "accessToken",
+  "refreshToken",
+  "token",
+  "authorization",
+  "password",
+  "googleUserId",
+  "email",
+  "customerEmail",
+  "firstName",
+  "lastName",
+  "personalDetails",
+  "address",
+  "phone",
+  "phoneNumber",
+];
 
 //eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RedactedObject = Record<string, any>;

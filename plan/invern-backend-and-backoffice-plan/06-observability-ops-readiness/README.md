@@ -30,7 +30,7 @@ Shoppers: their personal data stops flowing into a third-party log store. On-cal
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Structural PII redaction in logging](./step-01-pii-safe-logging.md) | P1 | Not Started | — |
+| 01 | [Structural PII redaction in logging](./step-01-pii-safe-logging.md) | P1 | Done | — |
 | 02 | [Health endpoint + uptime monitoring](./step-02-health-endpoint.md) | P1 | Not Started | — |
 | 03 | [Honeycomb coverage verification & alerting](./step-03-honeycomb-coverage-alerting.md) | P1 | Not Started | step-02 |
 | 04 | [Operations runbook (deploy, rollback, scheduled maintenance, recovery)](./step-04-ops-runbook.md) | P1 | Not Started | 01-admin-auth-rbac-cors/step-02 |

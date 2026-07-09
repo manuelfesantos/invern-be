@@ -14,7 +14,6 @@ import {
   handleSessionExpiredEvent,
   mapPaymentIntentEvent,
 } from "@order-module";
-import { stringifyObject } from "@string-utils";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { errors } from "@error-handling-utils";
@@ -67,14 +66,14 @@ stripeRoutes.post("/session-result", async (c) => {
   if (isStripeSessionExpiredEvent(event)) {
     logger().info("Session expired event received", {
       useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-      data: { sessionExpired: stringifyObject(event) },
+      data: { eventId: event.id, type: event.type },
     });
     return successResponse.OK(await handleSessionExpiredEvent(sessionEvent));
   }
 
   logger().info("Session completed event received", {
     useCase: LoggerUseCaseEnum.HANDLE_CHECKOUT_SESSION,
-    data: { checkoutSessionResult: stringifyObject(event) },
+    data: { eventId: event.id, type: event.type },
   });
   const clientOrder = await getOrderFromSessionResult(sessionEvent);
 
@@ -99,9 +98,9 @@ stripeRoutes.post("/payment-intent", async (c) => {
     return successResponse.OK("Unsupported event, ignoring request");
   }
 
-  logger().addRedactedData({ checkoutPaymentIntent: stringifyObject(event) });
+  logger().addRedactedData({ eventId: event.id, type: event.type });
   const payment = await mapPaymentIntentEvent(paymentIntent, event.type);
-  logger().addRedactedData({ createdPayment: stringifyObject(payment) });
+  logger().addRedactedData({ paymentId: payment.id });
 
   return successResponse.OK("success getting checkout-session");
 });
