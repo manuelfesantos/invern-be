@@ -7,8 +7,11 @@
  *   node scripts/seed.mjs --env=prod --yes
  *   node scripts/seed.mjs --dry-run            # print the SQL, don't run it
  *
- * Replaces the old /private/insert-test-data endpoint. Runs entirely as SQL via
- * `wrangler d1 execute`, so it needs no server, no secrets and no Stripe call.
+ * Replaces the old /private/insert-test-data endpoint. Runs as SQL via
+ * `wrangler d1 execute` (no server needed). Taxes are the one exception: if a
+ * Stripe key is present in apps/backend/.dev.vars, the tax rows are keyed by
+ * real Stripe TaxRate ids (so checkout's `tax_rates` resolve); without a key it
+ * falls back to deterministic UUID ids and stays fully offline.
  *
  * Idempotent: every row has a deterministic id and is written with
  * `INSERT ... ON CONFLICT DO UPDATE`, so re-running never duplicates data — it
@@ -21,6 +24,8 @@
  *   --dry-run                    print the generated SQL and exit
  */
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import Stripe from "stripe";
 import { resolveTarget, executeSql, sqlValue } from "./lib/d1.mjs";
 
 const target = resolveTarget(process.argv.slice(2));
@@ -109,12 +114,81 @@ const countries = [
   { code: "PT", name: "Portugal", locale: "pt-PT", currency_code: "EUR" },
   { code: "ES", name: "Spain", locale: "es-ES", currency_code: "EUR" },
 ];
-// Rates stored as a fraction (matches the app's percentageToRate); SQLite keeps
-// the real value in the (INTEGER-affinity) `rate` column since it's not lossless.
-const taxes = [
-  { id: fixedId("tax-PT"), name: "VAT", rate: 0.23, country_id: "PT" },
-  { id: fixedId("tax-ES"), name: "VAT", rate: 0.21, country_id: "ES" },
+// Rates are a fraction (matches the app's percentageToRate), stored in a REAL
+// column. The tax `id` must be a Stripe TaxRate id (`txr_…`) — checkout charges
+// via `tax_rates: [tax.id]`. When a Stripe key is in apps/backend/.dev.vars we
+// resolve real ids (reuse an active matching rate, else create one); otherwise
+// we fall back to deterministic UUIDs (offline seed — those won't resolve at
+// Stripe checkout, printed as a warning).
+const taxesRaw = [
+  { key: "tax-PT", name: "VAT", rate: 0.23, country_id: "PT" },
+  { key: "tax-ES", name: "VAT", rate: 0.21, country_id: "ES" },
 ];
+
+const readDevVar = (name) => {
+  try {
+    const content = readFileSync(
+      new URL("../apps/backend/.dev.vars", import.meta.url),
+      "utf8",
+    );
+    return content.match(new RegExp(`^${name}="?([^"\\n]+)"?`, "m"))?.[1];
+  } catch {
+    return undefined;
+  }
+};
+
+const resolveTaxes = async () => {
+  const key = readDevVar("STRIPE_API_KEY");
+  if (!key || !key.startsWith("sk_")) {
+    console.log(
+      "  taxes: no Stripe key in apps/backend/.dev.vars → deterministic UUID " +
+        "ids (checkout tax_rates won't resolve in Stripe).",
+    );
+    return {
+      rows: taxesRaw.map((t) => ({
+        id: fixedId(t.key),
+        name: t.name,
+        rate: t.rate,
+        country_id: t.country_id,
+      })),
+      stripe: false,
+    };
+  }
+  const stripe = new Stripe(key);
+  const { data } = await stripe.taxRates.list({ active: true, limit: 100 });
+  const rows = [];
+  for (const t of taxesRaw) {
+    const percentage = Math.round(t.rate * 10000) / 100; // 0.23 -> 23
+    let rate = data.find(
+      (r) =>
+        r.active && r.country === t.country_id && r.percentage === percentage,
+    );
+    if (!rate) {
+      rate = await stripe.taxRates.create({
+        display_name: t.name,
+        percentage,
+        inclusive: false,
+        country: t.country_id,
+      });
+      console.log(
+        `  taxes: created Stripe TaxRate ${rate.id} for ${t.country_id} (${percentage}%)`,
+      );
+    } else {
+      console.log(
+        `  taxes: reusing Stripe TaxRate ${rate.id} for ${t.country_id} (${percentage}%)`,
+      );
+    }
+    rows.push({
+      id: rate.id,
+      name: t.name,
+      rate: t.rate,
+      country_id: t.country_id,
+    });
+  }
+  return { rows, stripe: true };
+};
+
+const { rows: taxes, stripe: taxesFromStripe } = await resolveTaxes();
 
 const methodId = fixedId("method-batch");
 const shippingMethods = [{ id: methodId, name: "Batch Logistics" }];
@@ -147,6 +221,16 @@ const statements = [
   upsert("collections", collections, ["id", "name", "description"], ["id"]),
   upsert("products", products, ["id", "name", "description", "stock", "collection_id", "price_in_cents", "weight"], ["id"]),
   upsert("images", images, ["url", "alt", "product_id", "collection_id", "is_thumbnail"], ["url"]),
+  // One-time cleanup: when switching to real Stripe ids, drop legacy non-`txr_`
+  // seed rows for these countries so the PK change doesn't leave duplicates.
+  // Leaves any real Stripe-id taxes (admin- or seed-created) untouched.
+  ...(taxesFromStripe
+    ? [
+        `DELETE FROM taxes WHERE country_id IN (${taxesRaw
+          .map((t) => q(t.country_id))
+          .join(", ")}) AND id NOT LIKE 'txr%';`,
+      ]
+    : []),
   upsert("taxes", taxes, ["id", "name", "rate", "country_id"], ["id"]),
   upsert("shipping_methods", shippingMethods, ["id", "name"], ["id"]),
   upsert("shipping_rates", shippingRates, ["id", "price_in_cents", "min_weight", "max_weight", "delivery_time", "shipping_method_id"], ["id"]),
