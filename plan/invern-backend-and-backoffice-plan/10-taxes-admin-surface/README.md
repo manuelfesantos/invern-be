@@ -1,6 +1,6 @@
 # 10 — Taxes Admin Surface
 
-**Status:** Not Started · **Priority:** P1 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P1 · **Track:** Backend API Completion
 
 ## Summary
 Taxes are effectively **unmanageable** today. Contrary to the task brief's §6 ("tax creation/update is bundled into the currency admin flow"), the currency module touches no tax or Stripe code at all (verified: `grep -rni "tax\|stripe" libs/modules/currency/` is empty). Taxes are seeded **once** via `/private/insert-test-data` (which pulls Stripe tax rates and inserts them into `taxesTable`), and the tax DB actions (`libs/db/tax/**`) plus the Stripe tax adapter (`libs/adapters/stripe/tax/**`) are otherwise unused. There is no tax module and no `/private/taxes` route. This feature gives taxes a first-class admin surface so staff can manage the per-country tax rates that pricing depends on — and fixes a latent rate-storage bug found during the audit.

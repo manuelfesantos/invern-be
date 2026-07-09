@@ -85,6 +85,7 @@ export const signup = async (
       isOauth: false,
       googleUserId: null,
       isValidated: false,
+      disabled: false,
     });
 
     await runBatchOperation(

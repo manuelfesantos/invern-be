@@ -9,7 +9,7 @@ import { DEFAULT_PAGE } from "@number-utils";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
 import type { SQL } from "drizzle-orm";
-import { and, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { usersTable } from "@schema";
 
 const NO_USER_VERSION = 0;
@@ -160,4 +160,17 @@ export const getSelectUserVersionByIdAction = actionBuilder(
 
 export const getSelectUserDetailsByIdAction = actionBuilder(
   selectUserDetailsByIdQuery,
+);
+
+// Count of ADMIN users — backs the last-admin guard (can't demote/disable/delete
+// the final admin and lock everyone out of the backoffice).
+const selectAdminCountQuery = () =>
+  db()
+    .select({ count: count() })
+    .from(usersTable)
+    .where(eq(usersTable.role, "ADMIN"));
+
+export const getSelectAdminCountAction = actionBuilder(
+  selectAdminCountQuery,
+  (result: { count: number }[]): number => result[0]?.count ?? 0,
 );

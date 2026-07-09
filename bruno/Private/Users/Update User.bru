@@ -1,0 +1,29 @@
+meta {
+  name: Update User
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/private/users/{{userId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "isValidated": true
+  }
+}
+
+docs {
+  Requires an ADMIN session. Whitelisted fields: role (ADMIN|USER), isValidated,
+  disabled. A role change or disable revokes the target's session. Returns the
+  safe admin projection (never the password hash). The last admin cannot be
+  demoted or disabled -> 409. Unknown id -> 404.
+
+  Examples:
+    { "role": "ADMIN" }        promote to admin
+    { "disabled": true }       disable the account
+    { "isValidated": true }    mark validated
+}

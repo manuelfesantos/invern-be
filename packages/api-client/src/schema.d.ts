@@ -3068,7 +3068,7 @@ export interface paths {
                         "application/json": {
                             /** @example User fetched successfully */
                             message?: string;
-                            data?: components["schemas"]["BaseUser"];
+                            data?: components["schemas"]["AdminUser"];
                         };
                     };
                 };
@@ -3078,11 +3078,57 @@ export interface paths {
                 500: components["responses"]["InternalServerError"];
             };
         };
-        put?: never;
+        /**
+         * Update User (Admin)
+         * @description Updates a user's admin-managed state — `role`, `isValidated`, and `disabled` (whitelisted; other fields ignored). A role change or a disable revokes the target's session. The last remaining admin cannot be demoted or disabled (409). Requires Admin Authentication.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The unique identifier (UUID) of the user. */
+                    id: components["parameters"]["UserId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserInput"];
+                };
+            };
+            responses: {
+                /** @description Updated user (safe projection). */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["AdminUser"];
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequest"];
+                401: components["responses"]["Unauthorized"];
+                404: components["responses"]["NotFound"];
+                /** @description Would remove the last admin (demote or disable). */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         post?: never;
         /**
          * Delete User by ID (Admin)
-         * @description Deletes a user account by its ID. Requires Admin Authentication.
+         * @description Hard-deletes a user account by its ID (guarded: the last admin cannot be deleted → 409). Prefer disabling for problem accounts. Requires Admin Authentication.
          */
         delete: {
             parameters: {
@@ -3108,6 +3154,15 @@ export interface paths {
                 400: components["responses"]["BadRequest"];
                 401: components["responses"]["Unauthorized"];
                 404: components["responses"]["NotFound"];
+                /** @description Would delete the last admin. */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorResponse"];
+                    };
+                };
                 500: components["responses"]["InternalServerError"];
             };
         };
@@ -5076,6 +5131,29 @@ export interface components {
             isOauth: boolean;
             googleUserId?: string | null;
             isValidated: boolean;
+        };
+        AdminUser: {
+            /** Format: uuid */
+            id: string;
+            /** Format: email */
+            email: string;
+            firstName: string;
+            lastName?: string | null;
+            /** @enum {string} */
+            role: "ADMIN" | "USER";
+            isOauth: boolean;
+            isValidated: boolean;
+            disabled: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModifiedAt?: string;
+        };
+        UpdateUserInput: {
+            /** @enum {string} */
+            role?: "ADMIN" | "USER";
+            isValidated?: boolean;
+            disabled?: boolean;
         };
         GetUserResponse: {
             message: string;

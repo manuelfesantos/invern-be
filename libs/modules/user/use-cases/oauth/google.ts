@@ -95,6 +95,7 @@ export const getGoogleOauthUser = async (
     cartId: newCartId,
     password: null,
     isValidated: false,
+    disabled: false,
   };
 
   logger().info("Creating new user", {

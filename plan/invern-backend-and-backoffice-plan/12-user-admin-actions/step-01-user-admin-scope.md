@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 12-user-admin-actions
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["12-user-admin-actions/step-02"]
 ---
 # Step 01: Define admin user-management scope & safeguards
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
 
 ## Technical goal
 Turn "the backoffice can manage users" into an explicit, agreed specification: which fields/actions are exposed, their safeguards, and any schema changes required (notably a disable/deactivation representation).

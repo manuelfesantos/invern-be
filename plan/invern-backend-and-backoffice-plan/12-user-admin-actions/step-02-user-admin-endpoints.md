@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 12-user-admin-actions
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["12-user-admin-actions/step-03"]
 ---
 # Step 02: Implement user admin update endpoints
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
 
 ## Technical goal
 Implement the admin user actions agreed in step-01: role change, validation toggle, disable/enable, and a safe full-detail projection — with the mandated safeguards and correct interplay with RBAC and session revocation.

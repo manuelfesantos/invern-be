@@ -2228,7 +2228,7 @@ paths:
                     type: string
                     example: User fetched successfully
                   data:
-                    $ref: '#/components/schemas/BaseUser'
+                    $ref: '#/components/schemas/AdminUser'
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid ID format
         '401':
@@ -2237,13 +2237,59 @@ paths:
           $ref: '#/components/responses/NotFound' # User not found
         '500':
           $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Users Admin
+      summary: Update User (Admin)
+      description: >-
+        Updates a user's admin-managed state — `role`, `isValidated`, and
+        `disabled` (whitelisted; other fields ignored). A role change or a
+        disable revokes the target's session. The last remaining admin cannot be
+        demoted or disabled (409). Requires Admin Authentication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserInput'
+      responses:
+        '200':
+          description: Updated user (safe projection).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Would remove the last admin (demote or disable).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       security:
         - AdminBearer: []
       tags:
         - Private - Users Admin
       summary: Delete User by ID (Admin)
-      description: Deletes a user account by its ID. Requires Admin Authentication.
+      description: >-
+        Hard-deletes a user account by its ID (guarded: the last admin cannot be
+        deleted → 409). Prefer disabling for problem accounts. Requires Admin
+        Authentication.
       responses:
         '200':
           description: User successfully deleted.
@@ -2257,6 +2303,12 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound' # User not found
+        '409':
+          description: Would delete the last admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -4202,6 +4254,53 @@ components:
         - role
         - isOauth
         - isValidated
+    AdminUser: # Safe admin projection — role included, never password or google id
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [ADMIN, USER]
+        isOauth:
+          type: boolean
+        isValidated:
+          type: boolean
+        disabled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - firstName
+        - role
+        - isOauth
+        - isValidated
+        - disabled
+    UpdateUserInput: # Body for PUT /private/users/{id} — whitelisted admin fields
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [ADMIN, USER]
+        isValidated:
+          type: boolean
+        disabled:
+          type: boolean
     GetUserResponse:
       type: object
       properties:

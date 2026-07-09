@@ -122,6 +122,12 @@ const handleLoggedInRefreshToken = async (
     throw errors.UNAUTHORIZED();
   }
 
+  // A disabled account can't refresh into a new access token (admin disable is
+  // honored here as well as at login).
+  if (user.disabled) {
+    throw errors.UNAUTHORIZED();
+  }
+
   let { id: cartId } = user.cart || {};
   const { address, userDetails, shippingMethod, customerEmail } =
     getCheckoutCredentialsFromHeaders(headers);

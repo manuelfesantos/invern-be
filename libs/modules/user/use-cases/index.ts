@@ -11,3 +11,4 @@ export * from "./signup/resend-email";
 export * from "./oauth";
 export * from "./get-all-users";
 export * from "./delete-expired-users";
+export * from "./admin";

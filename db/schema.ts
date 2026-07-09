@@ -61,6 +61,13 @@ export const usersTable = sqliteTable("users", {
   })
     .notNull()
     .default(false),
+  // Soft account state: disabled users are rejected at login and on refresh
+  // (admin action), without destroying their data like a hard delete.
+  disabled: int("disabled", {
+    mode: "boolean",
+  })
+    .notNull()
+    .default(false),
 });
 
 export const collectionsTable = sqliteTable("collections", {

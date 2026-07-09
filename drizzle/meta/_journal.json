@@ -15,6 +15,13 @@
       "when": 1783611266058,
       "tag": "0001_illegal_lionheart",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783614676660,
+      "tag": "0002_unusual_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

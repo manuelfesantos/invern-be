@@ -139,6 +139,13 @@ export const errors = {
     ),
   TAX_NOT_FOUND: (): CustomError =>
     new CustomError("Tax not found", HttpStatusEnum.NOT_FOUND),
+  ACCOUNT_DISABLED: (): CustomError =>
+    new CustomError("This account is disabled", HttpStatusEnum.FORBIDDEN),
+  CANNOT_REMOVE_LAST_ADMIN: (): CustomError =>
+    new CustomError(
+      "Cannot demote, disable or delete the last remaining admin",
+      HttpStatusEnum.CONFLICT,
+    ),
   TAX_IMMUTABLE_FIELD: (field?: string): CustomError =>
     new CustomError(
       `Cannot change ${field ?? "that field"} on an existing tax; ` +

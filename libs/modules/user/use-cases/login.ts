@@ -49,6 +49,12 @@ export const login = async (body: unknown): Promise<ReturnType> => {
 
   await validatePassword(password, user);
 
+  // Checked only after the password verifies, so a disabled state isn't
+  // revealed to anyone probing with a wrong password.
+  if (user.disabled) {
+    throw errors.ACCOUNT_DISABLED();
+  }
+
   const { id: userId } = user;
 
   if (!user.cart) {

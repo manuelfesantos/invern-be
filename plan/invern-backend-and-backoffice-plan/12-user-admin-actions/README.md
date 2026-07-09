@@ -1,6 +1,6 @@
 # 12 — User Admin Actions
 
-**Status:** Not Started · **Priority:** P1 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P1 · **Track:** Backend API Completion
 
 ## Summary
 Admin user management is nearly read-only: `/private/users` lists (paginated) and `/private/users/{id}` returns detail — and, contrary to the brief's "read-only" description, also exposes a working `onRequestDelete` that hard-deletes a user. There is **no update path**: no way to change a user's `role` (the very thing RBAC in [01](../01-admin-auth-rbac-cors/README.md) depends on), mark a user validated, or disable/enable an account. This feature defines the admin user-management scope as an explicit product decision and implements the chosen actions, most importantly role management — which is how the first and subsequent `ADMIN`s get created once RBAC is enforced.
@@ -32,9 +32,9 @@ Admin staff: manage users (create admins, help customers) from the UI. Shoppers:
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Define admin user-management scope & safeguards](./step-01-user-admin-scope.md) | P1 | Not Started | — |
-| 02 | [Implement user admin update endpoints](./step-02-user-admin-endpoints.md) | P1 | Not Started | step-01, 01-admin-auth-rbac-cors/step-02 |
-| 03 | [User admin swagger + tests](./step-03-user-admin-swagger-and-tests.md) | P1 | Not Started | step-02 |
+| 01 | [Define admin user-management scope & safeguards](./step-01-user-admin-scope.md) | P1 | Done | — |
+| 02 | [Implement user admin update endpoints](./step-02-user-admin-endpoints.md) | P1 | Done | step-01, 01-admin-auth-rbac-cors/step-02 |
+| 03 | [User admin swagger + tests](./step-03-user-admin-swagger-and-tests.md) | P1 | Done | step-02 |
 
 ## Key risks
 - **Privilege escalation / lockout.** Role change is the most sensitive action in the whole system. Guardrails are mandatory: prevent removing the last admin, require the actor to be an admin (RBAC handles that), and consider confirmation for self-demotion.

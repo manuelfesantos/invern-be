@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 12-user-admin-actions
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: User admin swagger + tests
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [User Admin Actions](./README.md)
 
 ## Technical goal
 Document the admin user endpoints in `swagger.yaml` and add tests for the safeguards (last-admin guard, session revocation on role/disable change), the safe projection (no password leak), and disabled-account auth rejection.
