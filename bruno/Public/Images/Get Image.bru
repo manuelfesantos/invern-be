@@ -1,0 +1,20 @@
+meta {
+  name: Get Image
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/public/images/{{imageKey}}
+  body: none
+  auth: none
+}
+
+docs {
+  Public — serves an uploaded image object from R2 by key. `imageKey` is set by
+  Private/Images/Upload Image. Open the URL in a browser to view the image.
+
+  In production images are served from the R2 public domain (`IMAGES_HOST`); this
+  route makes the upload URL resolvable locally, where that domain isn't reachable.
+  Unknown key -> 404.
+}

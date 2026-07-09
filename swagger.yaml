@@ -26,6 +26,8 @@ tags:
   # Public
   - name: Public - Countries
     description: Operations related to country listing and selection.
+  - name: Public - Images
+    description: Public serving of uploaded image objects from R2 by key.
   - name: Public - Config
     description: Endpoint to fetch initial configuration (cart, user, tokens).
   - name: Public - Products
@@ -125,6 +127,37 @@ paths:
           $ref: '#/components/responses/BadRequest' # e.g., Invalid country code format
         '404':
           $ref: '#/components/responses/NotFound' # Country not supported/found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # -------------------- Public - Images --------------------
+  /public/images/{key}:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        description: The R2 object key (the `<uuid>.<ext>` filename of the hosted image).
+        schema:
+          type: string
+    get:
+      tags:
+        - Public - Images
+      summary: Serve Image Object
+      description: >
+        Streams an uploaded image object from R2 by key. In production images are
+        served directly from the R2 public domain (`IMAGES_HOST`); this route makes
+        the upload URL resolvable on the worker itself (used locally, where the
+        public domain isn't reachable). Public — no auth.
+      responses:
+        '200':
+          description: The image bytes.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound' # No object with that key
         '500':
           $ref: '#/components/responses/InternalServerError'
 

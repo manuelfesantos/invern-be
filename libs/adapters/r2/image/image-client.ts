@@ -11,10 +11,15 @@ const CONTENT_TYPE_EXTENSIONS: Record<string, string> = {
 
 export const ALLOWED_IMAGE_CONTENT_TYPES = Object.keys(CONTENT_TYPE_EXTENSIONS);
 
-/** The R2 object key for a hosted image URL (the path after IMAGES_HOST). */
+/**
+ * The R2 object key for a hosted image URL. Keys are a single `<uuid>.<ext>`
+ * segment, so we take the last path segment — robust whether IMAGES_HOST is a
+ * bare domain (`https://images.invernspirit.com/<key>`) or has a path prefix
+ * (local dev: `http://localhost:8790/public/images/<key>`).
+ */
 const keyFromUrl = (url: string): string | undefined => {
   try {
-    return new URL(url).pathname.replace(/^\/+/, "") || undefined;
+    return new URL(url).pathname.split("/").pop() || undefined;
   } catch {
     return undefined;
   }
@@ -47,4 +52,8 @@ const remove = async (url: string): Promise<void> => {
   }
 };
 
-export const imageClient = { upload, delete: remove };
+/** Fetches a stored image object by its R2 key (null if it doesn't exist). */
+const get = (key: string): Promise<R2ObjectBody | null> =>
+  ENV.IMAGES_BUCKET.get(key);
+
+export const imageClient = { upload, delete: remove, get };

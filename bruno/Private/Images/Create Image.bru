@@ -19,9 +19,13 @@ body:json {
   }
 }
 
+vars:pre-request {
+  productId: b02b6985-3aab-498e-b5de-3aed42c40308
+}
+
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
-
+  
   Registers an uploaded URL (from Upload Image -> `imageUrl`) as a record and associates
   it with a product and/or collection. Body: { url, alt?, productId?, collectionId?,
   isThumbnail? }. Invalid body -> 400. Returns the full Image record.
