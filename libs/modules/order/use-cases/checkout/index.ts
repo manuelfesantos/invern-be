@@ -5,7 +5,7 @@ import { lineItemSchema } from "@product-entity";
 import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { reserveLineItems } from "./reserve-line-items";
+import { reserveProductsStock } from "@stock-module";
 import { stringifyObject } from "@string-utils";
 import { getDateTime, MILLISECONDS_IN_SECOND } from "@timer-utils";
 import { getInsertCheckoutSessionAction } from "@checkout-session-db";
@@ -54,7 +54,7 @@ export const getCheckoutSession = async (
     shippingMethodId,
   );
 
-  await reserveLineItems(cart.products);
+  await reserveProductsStock(cart.products);
 
   const orderId = getRandomUUID();
 

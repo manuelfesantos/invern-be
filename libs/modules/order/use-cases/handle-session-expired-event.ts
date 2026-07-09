@@ -1,6 +1,5 @@
 import type { StripeSessionResult } from "@stripe-entity";
-import { getIncreaseProductsStockAction } from "@product-db";
-import { stockClient } from "@r2-adapter";
+import { releaseProductsStock } from "@stock-module";
 import { getPopCheckoutSessionByIdAction } from "@checkout-session-db";
 import { logger, logCredentials } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
@@ -26,9 +25,7 @@ export const handleSessionExpiredEvent = async (
 
   logCredentials(cartId, userId);
 
-  const updatedProducts = await getIncreaseProductsStockAction(products).run();
-
-  await stockClient.updateMany(updatedProducts);
+  await releaseProductsStock(products);
 
   return "checkout session successfully expired";
 };

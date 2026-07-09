@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done
 priority: P0
 feature: 03-payment-stock-integrity
 track: backend-hardening
@@ -8,7 +8,17 @@ blocks: ["22-backoffice-stock/step-02", "18-backoffice-catalog/step-02"]
 ---
 # Step 02: Unify the tri-store stock write path (fix product-edit desync)
 
-**Status:** In Progress · **Priority:** P0 · **Feature:** [Payment & Stock Integrity](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Payment & Stock Integrity](./README.md)
+
+## Unification landed (SPIRIT-103) — the deferred criterion 5 + 6 are now done
+- **Single stock module `libs/modules/stock/`** (`@stock-module`) with the two authorized mutation paths:
+  - `reserveProductsStock(products)` — guarded D1 decrement + write-through; on write-through failure it **compensates by calling `releaseProductsStock`** (restore D1 + re-mirror).
+  - `releaseProductsStock(products)` — increment D1 + write-through (no-op on empty).
+- **Every writer now funnels through them** (criterion 5): checkout reserve (was the extracted `reserveLineItems`, now moved here as `reserveProductsStock`) and all four release paths — `handle-session-expired-event`, `invalidate-checkout-session`, `delete-expired-checkout-sessions`, and the failed/canceled-payment path in `get-payment-from-payment-intent`. Confirmed by grep: no `getIncrease/DecreaseProductsStockAction` or ad-hoc `stockClient.updateMany` remains in the module layer outside `libs/modules/stock/`.
+- **Swagger + Bruno reconciled** (criterion 6): added an `UpdateProduct` schema (`InsertProduct` minus `stock`) and pointed `PUT /private/products/{id}` at it; removed `stock` from the Bruno "Update Product" body. (Create still accepts `stock` via `InsertProduct`.)
+- Tests: `reserve-products-stock` suite (reserve happy-path + compensation-via-release + release + empty no-op). Full suite 110 tests / 24 suites; type-check (root + apps) clean, lint 0 errors.
+
+Still genuinely out of scope (unchanged from before): a fully **atomic reserve-abort when the D1 guard skips a row** needs a reservation counter / Durable Object — the guard already prevents the money-critical negative stock, so this is a hardening follow-up, not a launch blocker.
 
 > **Progress note (2026-07-08).** Concrete correctness bugs fixed + verified:
 > (1) **guarded D1 decrement** — `decreaseProductsStockQuery` only decrements
@@ -65,12 +75,12 @@ Shoppers: stock shown/checked at checkout matches reality; no oversell from nega
 - `update-cart-item-quantity.ts` uses `waitUntil(stockClient.setKV(...))` for a KV-only refresh — that's a cache refresh, not a mutation of truth; leave it, but confirm it can't resurrect a deleted product's KV entry.
 
 ## Acceptance criteria
-- [ ] Concurrent over-decrement cannot drive `products.stock` below zero (test proves the guard).
-- [ ] Lock exhaustion in `stockClient` raises an error; checkout compensation runs and restores D1.
-- [ ] `PUT /private/products/{id}` can no longer change stock out-of-band (payload rejected or routed through the unified operation).
-- [ ] Deleting a product removes its KV and R2 stock entries.
-- [ ] All stock writers (reserve, release ×3, admin) call the single unified operation.
-- [ ] `swagger.yaml` reflects any payload changes.
+- [x] Concurrent over-decrement cannot drive `products.stock` below zero (guarded decrement; test-proven).
+- [x] Lock exhaustion in `stockClient` raises an error; checkout compensation runs and restores D1.
+- [x] `PUT /private/products/{id}` can no longer change stock out-of-band (`stock` stripped from the update schema).
+- [x] Deleting a product removes its KV and R2 stock entries (`stockClient.delete`).
+- [x] All stock writers (reserve, release ×3, admin) call the single unified operation (`@stock-module`).
+- [x] `swagger.yaml` reflects any payload changes (`UpdateProduct` = Insert minus `stock`; Bruno updated too).
 
 ## References
 - `libs/adapters/r2/stock/stock-client.ts` — write ordering, silent give-up, `delete`.

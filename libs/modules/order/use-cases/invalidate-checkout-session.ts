@@ -7,8 +7,7 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { errors } from "@error-handling-utils";
 import { getCurrentTime } from "@timer-utils";
-import { getIncreaseProductsStockAction } from "@product-db";
-import { stockClient } from "@r2-adapter";
+import { releaseProductsStock } from "@stock-module";
 
 export const invalidateCheckoutSession = async (
   checkoutSessionId: string,
@@ -53,10 +52,7 @@ export const invalidateCheckoutSession = async (
 
     await getDeleteCheckoutSessionByIdAction(checkoutSessionId).run();
 
-    const updatedProducts =
-      await getIncreaseProductsStockAction(products).run();
-
-    await stockClient.updateMany(updatedProducts);
+    await releaseProductsStock(products);
   } catch (error) {
     logger().error("error expiring checkout session", {
       useCase: LoggerUseCaseEnum.INVALIDATE_CHECKOUT_SESSION,

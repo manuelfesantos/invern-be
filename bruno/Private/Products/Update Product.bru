@@ -16,16 +16,18 @@ body:json {
     "description": "Updated",
     "priceInCents": 1800,
     "collectionId": "{{collectionId}}",
-    "stock": 10,
     "weight": 400
   }
 }
 
 vars:pre-request {
   collectionId: 123
-  productId: 
+  productId:
 }
 
 docs {
   Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Note: `stock` is NOT accepted on product update (it lives in D1/KV/R2 and changes
+  only through the dedicated stock path); any `stock` in the body is ignored.
 }

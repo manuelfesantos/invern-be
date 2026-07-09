@@ -16,8 +16,7 @@ import {
   getSelectOrderProductsByPaymentIdAction,
   getUpdateOrderAction,
 } from "@order-db";
-import { getIncreaseProductsStockAction } from "@product-db";
-import { stockClient } from "@r2-adapter";
+import { releaseProductsStock } from "@stock-module";
 import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { getPaymentFromPaymentIntent } from "./utils/get-payment";
@@ -194,10 +193,7 @@ const handleFailedPayment = async (
   ).run();
 
   if (products && products.length && id) {
-    const updatedProducts =
-      await getIncreaseProductsStockAction(products).run();
-
-    await stockClient.updateMany(updatedProducts);
+    await releaseProductsStock(products);
 
     await getUpdateOrderAction(id, { isCanceled: true }).run();
   }

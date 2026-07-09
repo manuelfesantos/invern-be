@@ -3,8 +3,7 @@ import { logger } from "@logger-utils";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import type { CheckoutSession } from "@checkout-session-entity";
-import { getIncreaseProductsStockAction } from "@product-db";
-import { stockClient } from "@r2-adapter";
+import { releaseProductsStock } from "@stock-module";
 
 export const deleteExpiredCheckoutSessions = async (): Promise<string> => {
   const expiredSessions = await getPopExpiredCheckoutSessionsAction().run();
@@ -29,11 +28,7 @@ export const deleteExpiredCheckoutSessions = async (): Promise<string> => {
 const retrieveProductsStockFromSession = async (
   session: CheckoutSession,
 ): Promise<void> => {
-  const updatedProducts = await getIncreaseProductsStockAction(
-    session.products,
-  ).run();
-
-  await stockClient.updateMany(updatedProducts);
+  await releaseProductsStock(session.products);
 
   logger().info("Success retrieving products Stock", {
     useCase: LoggerUseCaseEnum.RELEASE_PRODUCTS,

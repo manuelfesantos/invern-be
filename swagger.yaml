@@ -1751,7 +1751,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InsertProduct' # Use Insert schema for update payload
+              $ref: '#/components/schemas/UpdateProduct' # stock is not editable via product update
       responses:
         '200':
           description: Product successfully updated. Returns the updated product details.
@@ -3099,7 +3099,7 @@ components:
         lastModifiedAt:
           type: string
           format: date-time
-    InsertProduct: # Schema for POST/PUT /private/products
+    InsertProduct: # Create body for POST /private/products (stock is set on create)
       type: object
       properties:
         name:
@@ -3123,6 +3123,33 @@ components:
         - description
         - priceInCents
         - stock
+        - weight
+        - collectionId
+    UpdateProduct: # Update body for PUT /private/products/{id}
+      description: >-
+        Same as InsertProduct **without `stock`**. Stock is not editable via a
+        product update — it lives in three stores (D1/KV/R2) and must change only
+        through the dedicated stock write-through path. Any `stock` in the body is
+        ignored.
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        priceInCents:
+          type: integer
+          format: int32
+        weight:
+          type: integer
+          format: int32
+        collectionId:
+          type: string
+          format: uuid
+      required:
+        - name
+        - description
+        - priceInCents
         - weight
         - collectionId
     ExtendedProduct: # Product with calculated prices and taxes
