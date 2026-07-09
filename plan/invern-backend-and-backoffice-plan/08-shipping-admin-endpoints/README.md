@@ -1,8 +1,8 @@
 # 08 — Shipping Admin Endpoints
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P0 · **Track:** Backend API Completion
 
-> **Progress (SPIRIT-108):** steps 01 (method CRUD) + 02 (rate CRUD + band validation) + 03 (rate↔country replace-set assignment) **Done** — verified live. Remaining: step-04 (swagger + tests).
+> **Done (SPIRIT-108):** all 4 steps — method CRUD (01), rate CRUD + half-open weight-band validation (02), rate↔country replace-set assignment (03), swagger + tests (04). The full `/private/shipping/*` admin surface is live over the existing DB layer; verified live end-to-end + 108 unit tests.
 
 ## Summary
 Shipping methods, rates, and rate-to-country assignments have a **complete data-access layer** (`libs/db/shipping/**` — insert/update/delete/select for methods and rates, plus a rate-to-countries operation) but **no admin HTTP surface at all**: there is no `functions/private/shipping/` folder, and the only shipping use-cases that exist are storefront/checkout-facing (list methods for a cart, select a method). This feature builds the missing admin use-case layer over the existing DB actions and exposes it as `/private/shipping/*` routes so the backoffice can manage shipping end-to-end.

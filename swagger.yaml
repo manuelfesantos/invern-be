@@ -2369,6 +2369,350 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Shipping Admin --------------------
+  /private/shipping/methods:
+    security:
+      - AdminBearer: []
+    get:
+      tags: [Private - Shipping Admin]
+      summary: List Shipping Methods (Admin)
+      description: >-
+        Paginated list of shipping methods, each with its rates. Supports sorting
+        and filtering; the envelope `total` reflects any applied filter. Requires
+        Admin Authentication.
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - name: sortBy
+          in: query
+          required: false
+          description: Field to sort by (allow-listed; other values -> 400).
+          schema:
+            type: string
+            enum: [name, createdAt]
+        - name: name
+          in: query
+          required: false
+          description: Filter to methods whose name contains this term.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of shipping methods.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ShippingMethod'
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      total:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags: [Private - Shipping Admin]
+      summary: Create Shipping Method (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertShippingMethod'
+      responses:
+        '200':
+          description: The created method (with an empty rates array).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingMethod'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /private/shipping/methods/{id}:
+    security:
+      - AdminBearer: []
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Private - Shipping Admin]
+      summary: Get Shipping Method (Admin)
+      description: Returns the method with all of its rates (unfiltered by weight).
+      responses:
+        '200':
+          description: The shipping method with its rates.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingMethod'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Private - Shipping Admin]
+      summary: Update Shipping Method (Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertShippingMethod'
+      responses:
+        '200':
+          description: The updated method (with its rates).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingMethod'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Private - Shipping Admin]
+      summary: Delete Shipping Method (Admin)
+      description: >-
+        Deletes the method. Returns 409 if it still has rates (delete/reassign
+        the rates first). Historical orders are unaffected (they store a
+        serialized snapshot).
+      responses:
+        '200':
+          description: Method deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The method still has rates; remove them first.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /private/shipping/methods/{methodId}/rates:
+    security:
+      - AdminBearer: []
+    parameters:
+      - name: methodId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Private - Shipping Admin]
+      summary: List Rates for a Method (Admin)
+      description: All rates for the method as a plain list (bounded by weight bands; not paginated).
+      responses:
+        '200':
+          description: The method's rates.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShippingRate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Private - Shipping Admin]
+      summary: Create a Rate under a Method (Admin)
+      description: >-
+        Validates the weight band (`minWeight <= maxWeight`) and that it does not
+        overlap the method's other rates. Bands are half-open `[min, max)`, so
+        adjacent bands do not clash.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertShippingRate'
+      responses:
+        '200':
+          description: The created rate.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingRate'
+        '400':
+          description: Invalid weight band (`minWeight > maxWeight`) or bad payload.
+        '404':
+          description: Parent shipping method not found.
+        '409':
+          description: The weight band overlaps an existing rate for this method.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /private/shipping/methods/{methodId}/rates/{rateId}:
+    security:
+      - AdminBearer: []
+    parameters:
+      - name: methodId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: rateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Private - Shipping Admin]
+      summary: Get a Rate (Admin)
+      responses:
+        '200':
+          description: The rate, including its country codes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingRate'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Private - Shipping Admin]
+      summary: Update a Rate (Admin)
+      description: Re-validates the weight band and overlap (excluding the rate itself).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsertShippingRate'
+      responses:
+        '200':
+          description: The updated rate.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingRate'
+        '400':
+          description: Invalid weight band or bad payload.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The weight band overlaps another rate for this method.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Private - Shipping Admin]
+      summary: Delete a Rate (Admin)
+      description: Deletes the rate and cascades its country assignments.
+      responses:
+        '200':
+          description: Rate deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /private/shipping/methods/{methodId}/rates/{rateId}/countries:
+    security:
+      - AdminBearer: []
+    parameters:
+      - name: methodId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: rateId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags: [Private - Shipping Admin]
+      summary: Set a Rate's Countries (Admin)
+      description: >-
+        Replaces the full set of countries the rate applies to, transactionally.
+        Unknown country codes are rejected (400); duplicates are deduped. An
+        empty set is allowed but leaves the rate unselectable at checkout.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateCountriesInput'
+      responses:
+        '200':
+          description: The rate with its resulting country set.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShippingRate'
+        '400':
+          description: Unknown or malformed country code(s).
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
   # -------------------- Private - Stock --------------------
   /private/stock/setup:
     post:
@@ -3679,6 +4023,60 @@ components:
               $ref: '#/components/schemas/ShippingRate'
       required:
         - rate
+
+    ShippingMethod: # Admin shipping method with all of its rates
+      allOf:
+        - $ref: '#/components/schemas/BaseShippingMethod'
+        - type: object
+          properties:
+            rates:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShippingRate'
+      required:
+        - rates
+    InsertShippingMethod: # Create/update body for a shipping method
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: Express Air
+    InsertShippingRate: # Create/update body for a rate (parent method from the path)
+      type: object
+      required: [priceInCents, minWeight, maxWeight, deliveryTime]
+      properties:
+        priceInCents:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 500
+        minWeight:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Inclusive lower bound of the half-open weight band [min, max).
+        maxWeight:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Exclusive upper bound of the half-open weight band [min, max).
+        deliveryTime:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Estimated delivery time in business days.
+    RateCountriesInput: # Replace-set of countries a rate applies to
+      type: object
+      required: [countryCodes]
+      properties:
+        countryCodes:
+          type: array
+          items:
+            type: string
+            pattern: '^[A-Z]{2}$'
+            example: PT
 
     # --- Payment / Order ---
     PaymentMethod: # Info about the payment method used

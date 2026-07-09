@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 08-shipping-admin-endpoints
 track: backend-api-completion
@@ -8,7 +8,14 @@ blocks: []
 ---
 # Step 04: Shipping admin swagger + tests
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+
+## Verified implementation (SPIRIT-108)
+- **Swagger:** documented all 11 shipping admin operations across 5 path items in `swagger.yaml` (`/private/shipping/methods` list+create, `/methods/{id}` get/put/delete, `/methods/{methodId}/rates` list+create, `/methods/{methodId}/rates/{rateId}` get/put/delete, and `/methods/{methodId}/rates/{rateId}/countries` put). Added the missing schemas `ShippingMethod` (BaseShippingMethod + rates[]), `InsertShippingMethod`, `InsertShippingRate`, `RateCountriesInput` (reusing the existing `ShippingRate`/`BaseShippingMethod`). Reuses the `PageParam`/`PageSizeParam`/`SortOrderParam` params and the shared `BadRequest`/`NotFound`/`Unauthorized` responses; documents the 409 (has-rates / band-overlap) cases. YAML validated.
+- **Tests (unit):** `shipping-band` (8 tests) covers the pure band logic — `assertValidBand` (min≤max) and `assertNoBandOverlap` (overlap/contained/adjacent-half-open/exclude-self/empty). `shipping-set-rate-countries` (4 tests) covers the replace-set use-case with `@shipping-db`/`@country-db` mocked — dedupe, unknown-code rejection (no write), empty set, and rate-not-found. Suite total **108 / 24 suites**.
+- The full CRUD + assignment paths were additionally **verified live end-to-end** in steps 01–03 (admin-authed against seeded D1).
+
+Verified: type-check (root + apps) clean, lint 0 errors, jest 108/108.
 
 ## Technical goal
 Document the entire new `/private/shipping/*` surface in `swagger.yaml` and add tests covering method CRUD, rate CRUD (incl. band validation), and rate-to-country assignment.
