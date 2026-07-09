@@ -1,6 +1,8 @@
 # 04 — Testing & Quality Gates
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend Hardening
+**Status:** Done · **Priority:** P0 · **Track:** Backend Hardening
+
+> **Done (SPIRIT-104):** all 3 steps complete — jest scaffolding + fakes (01), baseline suites on the riskiest paths (02: crypto/JWT/credentials/R2-lock/stock-guard/reserveLineItems-compensation/cart-ops/webhook-guards — **96 tests / 22 suites**), and the corrected CI gate running lint + typecheck (root + apps) + test (03).
 
 ## Summary
 The repo has a `jest.config.ts` and CI that runs `npm test` — but there are **zero** `*.test.ts` files anywhere, and the test script is `jest --coverage --passWithNoTests`, so "tests pass" is vacuously true. Meanwhile the PR gate into `main` (production) checks only that the source branch is named `preview` and re-runs nothing. This feature stands up real test infrastructure, writes the first suites on the riskiest code, and makes both CI gates meaningful. It is deliberately sequenced **early and in parallel** with the P0 security/integrity work, because those features' acceptance criteria all require tests.

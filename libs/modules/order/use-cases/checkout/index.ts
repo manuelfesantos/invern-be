@@ -1,13 +1,11 @@
 import { createStripeCheckoutSession } from "@stripe-adapter";
-import { getIncreaseProductsStockAction } from "@product-db";
 import { errors } from "@error-handling-utils";
 import type { LineItem } from "@product-entity";
 import { lineItemSchema } from "@product-entity";
 import { validateCartId } from "@cart-db";
 import { logger } from "@logger-utils";
-import { getDecreaseProductsStockAction } from "@product-db";
 import { LoggerUseCaseEnum } from "@logger-entity";
-import { stockClient } from "@r2-adapter";
+import { reserveLineItems } from "./reserve-line-items";
 import { stringifyObject } from "@string-utils";
 import { getDateTime, MILLISECONDS_IN_SECOND } from "@timer-utils";
 import { getInsertCheckoutSessionAction } from "@checkout-session-db";
@@ -103,26 +101,6 @@ export const getCheckoutSession = async (
     url,
     checkoutSessionId: id,
   };
-};
-
-const reserveLineItems = async (lineItems: LineItem[]): Promise<void> => {
-  const updatedLineItems =
-    await getDecreaseProductsStockAction(lineItems).run();
-
-  logger().info("products reserved", {
-    useCase: LoggerUseCaseEnum.RESERVE_PRODUCTS,
-    data: {
-      products: updatedLineItems,
-    },
-  });
-  try {
-    await stockClient.updateMany(updatedLineItems);
-  } catch {
-    const updatedProducts =
-      await getIncreaseProductsStockAction(lineItems).run();
-
-    await stockClient.updateMany(updatedProducts);
-  }
 };
 
 const getValidatedAddressFromString = async (

@@ -1,5 +1,5 @@
 ---
-status: In Progress
+status: Done
 priority: P0
 feature: 04-testing-quality-gates
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 02: Baseline suites for the riskiest existing paths
 
-**Status:** In Progress · **Priority:** P0 · **Feature:** [Testing & Quality Gates](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Testing & Quality Gates](./README.md)
 
 > **Progress note (2026-07-08).** Baseline suites now cover most enumerated
 > risk modules: crypto/hash (`password`,`hash`), JWT round-trip + AES-GCM
@@ -21,11 +21,22 @@ blocks: []
 > `typecheck` job now runs `npm run type-check` **and** `npm run type-check:apps`
 > (Turbo) so `apps/backend` is actually type-checked (root tsc excludes apps).
 >
-> **Remaining:** the two heavier mocked suites — `reserveLineItems` compensation
-> and cart quantity/stock validation (`select-product-stock-and-quantity`,
-> `upsert-product-quantity`) — plus the Stripe-signed webhook-replay integration
-> tests noted in 03-step-03. These need DB-action mocking / a Stripe signing
-> helper; add when those paths are next touched.
+> **Done (SPIRIT-104).** The two remaining mocked suites landed — **96 tests / 22
+> suites**:
+> - `reserve-line-items` (compensation): extracted `reserveLineItems` from
+>   `checkout/index.ts` into its own module and tested that a failed R2/KV
+>   stock-store write **restores the D1 decrement** (compensation), and that the
+>   happy path mirrors once with no compensation. D1 actions + `stockClient` mocked.
+> - `cart-operations`: `selectProductStockAndQuantityOperation` (returns
+>   stock/quantity; quantity defaults to 0; **stock 0 ≠ not-found**; throws
+>   `PRODUCT_NOT_FOUND` on a missing stock record) and `upsertProductQuantityOperation`
+>   (returns the cart; throws `CART_NOT_FOUND`), with `runBatchOperation` mocked.
+>
+> The Stripe-signed webhook-replay integration test was **verified live** in
+> [03 step-03](../03-payment-stock-integrity/step-03-webhook-idempotency.md) (signed events,
+> real handler); folding that into an automated CI suite is a noted non-blocking
+> follow-up there (needs a real D1 or a heavier Stripe+D1 harness), not part of
+> this baseline step.
 
 
 ## Technical goal
