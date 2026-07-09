@@ -52,8 +52,15 @@ export const decodeJwt = async (
   return jwtSchema.parse(tokenPayload);
 };
 
-export const getTokenCookie = (token: string, remember?: boolean): string =>
-  `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; Domain=${ENV.DOMAIN}; ${ENV.ENV === "local" ? "SameSite=None;" : "SameSite=Strict;"} ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+export const getTokenCookie = (token: string, remember?: boolean): string => {
+  const isLocal = ENV.ENV === "local";
+  // Local: host-only cookie (no Domain) with SameSite=None so the backoffice
+  // (localhost:5173) sends it cross-origin to the API (localhost:8790) — browsers
+  // reject `Domain=localhost`. Prod: the real Domain to share across subdomains.
+  const domain = isLocal ? "" : `Domain=${ENV.DOMAIN}; `;
+  const sameSite = isLocal ? "SameSite=None;" : "SameSite=Strict;";
+  return `${CookieNameEnum.REFRESH_TOKEN}=${token}; Path=/; HttpOnly; Secure; ${domain}${sameSite} ${remember ? `Max-Age=${TOKEN_COOKIE_MAX_AGE}` : ""}`;
+};
 
 export const getLoggedInToken = async (
   userId: string,

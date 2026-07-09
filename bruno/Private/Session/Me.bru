@@ -1,0 +1,16 @@
+meta {
+  name: Me
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/private/me
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session. Returns the current admin's safe profile (incl.
+  role). Used by the backoffice after login to confirm ADMIN. Non-admin -> 403.
+}

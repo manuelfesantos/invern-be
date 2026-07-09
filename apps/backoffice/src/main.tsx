@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import { queryClient } from "./lib/query-client";
+import { AuthProvider } from "./lib/auth/AuthProvider";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -15,7 +16,9 @@ createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

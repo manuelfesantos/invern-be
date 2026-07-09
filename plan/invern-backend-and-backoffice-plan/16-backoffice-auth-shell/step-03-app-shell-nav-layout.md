@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 16-backoffice-auth-shell
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["18-backoffice-catalog/step-01", "19-backoffice-orders/step-01", "20-ba
 ---
 # Step 03: Application shell: nav & layout
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
 
 ## Technical goal
 Build the persistent app shell — navigation (sidebar/menu grouping the entity areas), header (current admin, logout), and the page-content layout container — that every authenticated screen renders into.

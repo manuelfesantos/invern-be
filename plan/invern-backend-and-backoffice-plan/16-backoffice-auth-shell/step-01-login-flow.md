@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 16-backoffice-auth-shell
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["16-backoffice-auth-shell/step-02"]
 ---
 # Step 01: Admin login flow (JWT + ADMIN gate)
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
 
 ## Technical goal
 Build the login screen and flow that authenticates against the backend's login endpoint, stores the resulting token(s), captures the user (including `role`), and admits only `ADMIN`s — with the backend as the real enforcer.

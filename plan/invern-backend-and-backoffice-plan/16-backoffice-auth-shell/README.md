@@ -1,6 +1,6 @@
 # 16 — Auth & Application Shell
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backoffice App
+**Status:** Done · **Priority:** P0 · **Track:** Backoffice App
 
 ## Summary
 Build the backoffice's authentication and the shell that hosts every screen: an admin login against the backend's existing JWT flow, gated on the user's `role` actually being `ADMIN` (enforced server-side by feature [01](../01-admin-auth-rbac-cors/README.md)); protected routing with token-refresh handling and logout; and the nav/layout chrome (sidebar, header, page container) that entity screens render into.
@@ -28,9 +28,9 @@ Admin staff: secure sign-in and a coherent app frame. Shoppers: none. Security: 
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Admin login flow (JWT + ADMIN gate)](./step-01-login-flow.md) | P0 | Not Started | 01-admin-auth-rbac-cors/step-02, 15-backoffice-scaffolding/step-04 |
-| 02 | [Protected routing, token refresh & logout](./step-02-protected-routing-and-refresh.md) | P0 | Not Started | step-01 |
-| 03 | [Application shell: nav & layout](./step-03-app-shell-nav-layout.md) | P0 | Not Started | step-02 |
+| 01 | [Admin login flow (JWT + ADMIN gate)](./step-01-login-flow.md) | P0 | Done | 01-admin-auth-rbac-cors/step-02, 15-backoffice-scaffolding/step-04 |
+| 02 | [Protected routing, token refresh & logout](./step-02-protected-routing-and-refresh.md) | P0 | Done | step-01 |
+| 03 | [Application shell: nav & layout](./step-03-app-shell-nav-layout.md) | P0 | Done | step-02 |
 
 ## Key risks
 - **Client-side role checks are not security.** Hiding admin UI when `role !== ADMIN` is UX only; the real enforcement is the backend gate ([01](../01-admin-auth-rbac-cors/README.md)). Never rely on the SPA to protect data.

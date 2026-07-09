@@ -3238,6 +3238,37 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Session --------------------
+  /private/me:
+    get:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Users Admin
+      summary: Get Current Admin (Admin)
+      description: >-
+        The signed-in admin's own profile (safe projection incl. role). The
+        backoffice calls this after login to confirm ADMIN and show identity.
+        Requires Admin Authentication.
+      responses:
+        '200':
+          description: The current admin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/AdminUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # -------------------- Private - Dashboard --------------------
   /private/dashboard:
     get:

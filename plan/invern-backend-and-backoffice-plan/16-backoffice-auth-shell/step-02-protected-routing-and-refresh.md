@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 16-backoffice-auth-shell
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["16-backoffice-auth-shell/step-03"]
 ---
 # Step 02: Protected routing, token refresh & logout
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Auth & Application Shell](./README.md)
 
 ## Technical goal
 Gate all app routes behind authentication + `ADMIN`, implement silent access-token refresh (recovering session on reload and on expiry), and a logout that clears client state and revokes the server session.
