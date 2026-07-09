@@ -3,6 +3,7 @@ import type { AdminTax } from "@tax-entity";
 import { updateStripeTax } from "@stripe-adapter";
 import { getSelectTaxByIdAction, getUpdateTaxAction } from "@tax-db";
 import { errors } from "@error-handling-utils";
+import { runBatchOperation } from "@generics-db";
 
 // Only these are editable: a Stripe TaxRate's percentage (and thus `rate`) and
 // its country are immutable — changing a rate means deactivating this tax and
@@ -42,11 +43,17 @@ export const updateTax = async (
   if (mirrors) {
     await updateStripeTax(id, changes);
   }
+
+  // Batch the D1 name update (if any) with the re-select in one round-trip.
+  let updateTaxAction: ReturnType<typeof getUpdateTaxAction> | undefined;
   if (changes.name !== undefined) {
-    await getUpdateTaxAction(id, { name: changes.name }).run();
+    updateTaxAction = getUpdateTaxAction(id, { name: changes.name });
   }
 
-  const updated = await getSelectTaxByIdAction(id).run();
+  const [, updated] = await runBatchOperation(
+    updateTaxAction,
+    getSelectTaxByIdAction(id),
+  );
   if (!updated) {
     throw errors.TAX_NOT_FOUND();
   }

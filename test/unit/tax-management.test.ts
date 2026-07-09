@@ -24,8 +24,14 @@ jest.mock("@country-db", () => ({
   ...jest.requireActual("@country-db"),
   getSelectCountryByCodeAction: jest.fn(),
 }));
+jest.mock("@generics-db", () => ({
+  __esModule: true,
+  ...jest.requireActual("@generics-db"),
+  runBatchOperation: jest.fn(),
+}));
 
 import { createStripeTax, updateStripeTax } from "@stripe-adapter";
+import { runBatchOperation } from "@generics-db";
 import {
   getInsertTaxAction,
   getUpdateTaxAction,
@@ -45,6 +51,7 @@ const update = getUpdateTaxAction as unknown as jest.Mock;
 const del = getDeleteTaxAction as unknown as jest.Mock;
 const selById = getSelectTaxByIdAction as unknown as jest.Mock;
 const selCountry = getSelectCountryByCodeAction as unknown as jest.Mock;
+const batch = runBatchOperation as unknown as jest.Mock;
 
 const STRIPE_ID = "txr_test123";
 const TAX = {
@@ -68,6 +75,9 @@ beforeEach(() => {
   del.mockReset().mockReturnValue(actionReturning(undefined));
   selById.mockReset().mockReturnValue(actionReturning(TAX));
   selCountry.mockReset().mockReturnValue(actionReturning({ code: "PT" }));
+  // updateTax batches the D1 name update + re-select; the batcher returns
+  // [updateResult, reselectedTax].
+  batch.mockReset().mockResolvedValue([undefined, TAX]);
 });
 
 describe("addTax", () => {
