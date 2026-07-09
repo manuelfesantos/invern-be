@@ -1,0 +1,18 @@
+meta {
+  name: List Rates
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  All rates for the method as a plain list (bounded by weight bands; not paginated).
+  Each rate includes its countryCodes.
+}

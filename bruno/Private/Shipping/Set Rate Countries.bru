@@ -1,0 +1,25 @@
+meta {
+  name: Set Rate Countries
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates/{{shippingRateId}}/countries
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "countryCodes": ["PT", "ES"]
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Replaces the FULL set of countries the rate applies to (transactional). Duplicates are
+  deduped; unknown country codes -> 400; unknown rate -> 404. An empty array is allowed but
+  leaves the rate unselectable at checkout. Returns the rate with its resulting countryCodes.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Get Rate
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates/{{shippingRateId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Returns the rate, including its countryCodes. Unknown id -> 404.
+}

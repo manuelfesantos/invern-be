@@ -1,0 +1,35 @@
+meta {
+  name: Create Rate
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "priceInCents": 500,
+    "minWeight": 0,
+    "maxWeight": 1000,
+    "deliveryTime": 2
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setEnvVar("shippingRateId", res.body.data.id);
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Weight bands are half-open [minWeight, maxWeight). Validation:
+  minWeight > maxWeight -> 400; a band that overlaps another rate on this method -> 409;
+  unknown parent method -> 404. Adjacent bands (e.g. [0,1000) and [1000,2000)) do NOT clash.
+  Stores the new id in `shippingRateId`.
+}

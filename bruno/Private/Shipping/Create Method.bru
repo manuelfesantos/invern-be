@@ -1,0 +1,30 @@
+meta {
+  name: Create Method
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/private/shipping/methods
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Express Air"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.id) {
+    bru.setEnvVar("shippingMethodId", res.body.data.id);
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Body: { name }. Empty name -> 400. Stores the new id in `shippingMethodId` for the
+  Get/Update/Delete Method and the rate requests.
+}

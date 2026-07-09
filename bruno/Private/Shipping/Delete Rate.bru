@@ -1,0 +1,17 @@
+meta {
+  name: Delete Rate
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates/{{shippingRateId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Deletes the rate and cascades its country assignments. Unknown id -> 404.
+}

@@ -1,0 +1,27 @@
+meta {
+  name: Update Rate
+  type: http
+  seq: 9
+}
+
+put {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}/rates/{{shippingRateId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "priceInCents": 999,
+    "minWeight": 0,
+    "maxWeight": 1000,
+    "deliveryTime": 3
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Re-validates the weight band and overlap (excluding the rate itself).
+  minWeight > maxWeight -> 400; overlap with another rate -> 409; unknown id -> 404.
+}

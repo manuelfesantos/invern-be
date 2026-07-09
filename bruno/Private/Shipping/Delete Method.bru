@@ -1,0 +1,18 @@
+meta {
+  name: Delete Method
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Deletes the method. Returns 409 if it still has rates (delete/reassign them first).
+  Unknown id -> 404.
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Update Method
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Express Air 24h"
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Body: { name }. Returns the full updated method (with rates). Unknown id -> 404.
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Get Method
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/private/shipping/methods/{{shippingMethodId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Returns the method with all of its rates (unfiltered by weight). Unknown id -> 404.
+}
