@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 18-backoffice-catalog
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["18-backoffice-catalog/step-02"]
 ---
 # Step 01: Products list screen
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
 
 ## Technical goal
 Build the products list screen using the shared `<DataTable>`: paginated, sortable, and filterable against the product list endpoint, with thumbnail, name, price, stock, and collection columns, and row actions (view/edit/delete).

@@ -1,6 +1,6 @@
 # 18 — Catalog Management
 
-**Status:** Not Started · **Priority:** P1 · **Track:** Backoffice App
+**Status:** Done · **Priority:** P1 · **Track:** Backoffice App
 
 ## Summary
 The backoffice screens for managing the catalog: products (list + create/edit), collections (list + create/edit), and the image-upload UI that attaches photos to products/collections. Built on the shared data-table, forms, and design system ([17](../17-backoffice-design-system/README.md)), against the (now paginated) product/collection endpoints and the new image upload/CRUD API ([09](../09-image-management-upload/README.md)).
@@ -29,10 +29,10 @@ Admin staff: full catalog management from the UI. Shoppers: accurate products, c
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Products list screen](./step-01-products-list-screen.md) | P1 | Not Started | 16-backoffice-auth-shell/step-03, 17-backoffice-design-system/step-02 |
-| 02 | [Product create/edit form](./step-02-product-create-edit-form.md) | P1 | Not Started | step-01, 17-backoffice-design-system/step-03, 03-payment-stock-integrity/step-02 |
-| 03 | [Collections management](./step-03-collections-management.md) | P1 | Not Started | 17-backoffice-design-system/step-02, 17-backoffice-design-system/step-03 |
-| 04 | [Image upload UI](./step-04-image-upload-ui.md) | P1 | Not Started | step-02, 09-image-management-upload/step-03 |
+| 01 | [Products list screen](./step-01-products-list-screen.md) | P1 | Done | 16-backoffice-auth-shell/step-03, 17-backoffice-design-system/step-02 |
+| 02 | [Product create/edit form](./step-02-product-create-edit-form.md) | P1 | Done | step-01, 17-backoffice-design-system/step-03, 03-payment-stock-integrity/step-02 |
+| 03 | [Collections management](./step-03-collections-management.md) | P1 | Done | 17-backoffice-design-system/step-02, 17-backoffice-design-system/step-03 |
+| 04 | [Image upload UI](./step-04-image-upload-ui.md) | P1 | Done | step-02, 09-image-management-upload/step-03 |
 
 ## Key risks
 - **Stock desync via the product form.** If the product edit form writes `stock`, it desyncs D1/KV/R2 ([03](../03-payment-stock-integrity/README.md)). The form must exclude stock (read-only display, edited via the stock screen). This is the sharpest catalog-specific risk.

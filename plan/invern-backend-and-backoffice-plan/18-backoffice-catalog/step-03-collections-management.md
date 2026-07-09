@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 18-backoffice-catalog
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: Collections management
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
 
 ## Technical goal
 Build the collections list + create/edit screens (name, description, single collection image) on the shared table/forms layers, since products require a collection.

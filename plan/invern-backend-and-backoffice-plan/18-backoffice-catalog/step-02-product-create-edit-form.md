@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 18-backoffice-catalog
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["18-backoffice-catalog/step-04"]
 ---
 # Step 02: Product create/edit form
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
 
 ## Technical goal
 Build the product create/edit form on the shared forms layer, mirroring `insertProductSchema`, covering name, description, price, weight, and collection — but **excluding stock** (edited via the stock screen), with images managed via the upload UI ([step-04](./step-04-image-upload-ui.md)).

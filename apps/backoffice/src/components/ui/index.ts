@@ -20,3 +20,5 @@ export {
   SelectContent,
   SelectItem,
 } from "./select";
+export { Textarea } from "./textarea";
+export { ConfirmDialog } from "./confirm-dialog";

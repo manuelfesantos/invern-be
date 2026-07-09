@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 18-backoffice-catalog
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 04: Image upload UI
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Catalog Management](./README.md)
 
 ## Technical goal
 Build the image-management UI used in product and collection editing: upload a file (with client-side validation + optional downscale), preview it, attach it to the entity with alt text and thumbnail flag, reorder/replace, and remove — driving the upload + `/private/images` CRUD API ([09](../09-image-management-upload/README.md)).

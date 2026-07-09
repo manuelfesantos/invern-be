@@ -5,6 +5,8 @@ import { Button } from "./ui";
 // Nav grows as entity screens land (Features 18+).
 const NAV = [
   { to: "/", label: "Dashboard" },
+  { to: "/products", label: "Products" },
+  { to: "/collections", label: "Collections" },
   { to: "/users", label: "Users" },
 ];
 
