@@ -1,11 +1,25 @@
 import type { ShippingMethod } from "@shipping-entity";
 
 import { db } from "@db";
+import type { SQL } from "drizzle-orm";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { shippingMethodsTable, shippingRatesTable } from "@schema";
 import type { Result } from "@generics-db";
 import { actionBuilder } from "@generics-db";
+import { DEFAULT_PAGE } from "@number-utils";
 import * as z from "zod";
+
+const ratesWith = {
+  rates: {
+    with: {
+      ratesToCountries: {
+        columns: {
+          countryCode: true,
+        },
+      },
+    },
+  },
+} as const;
 
 const selectShippingMethodQuery = (id: string, weight?: number) =>
   db().query.shippingMethodsTable.findFirst({
@@ -88,6 +102,20 @@ const mapShippingMethodsFromSelectResult = (
   }));
 };
 
+const selectShippingMethodsPageQuery = (
+  page: number,
+  pageSize: number,
+  where?: SQL,
+  orderBy?: SQL[],
+) =>
+  db().query.shippingMethodsTable.findMany({
+    with: ratesWith,
+    ...(where && { where }),
+    ...(orderBy && { orderBy }),
+    limit: pageSize,
+    offset: (page - DEFAULT_PAGE) * pageSize,
+  });
+
 export const getSelectShippingMethodAction = actionBuilder(
   selectShippingMethodQuery,
   mapShippingMethodFromSelectResult,
@@ -95,5 +123,10 @@ export const getSelectShippingMethodAction = actionBuilder(
 
 export const getSelectShippingMethodsAction = actionBuilder(
   selectShippingMethodsQuery,
+  mapShippingMethodsFromSelectResult,
+);
+
+export const getSelectShippingMethodsPageAction = actionBuilder(
+  selectShippingMethodsPageQuery,
   mapShippingMethodsFromSelectResult,
 );

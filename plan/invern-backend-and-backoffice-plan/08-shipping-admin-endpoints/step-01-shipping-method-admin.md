@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 08-shipping-admin-endpoints
 track: backend-api-completion
@@ -8,7 +8,18 @@ blocks: ["08-shipping-admin-endpoints/step-02"]
 ---
 # Step 01: Shipping method admin use-cases & routes
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+
+## Verified implementation (SPIRIT-108)
+Built the admin use-case layer + routes over the existing method DB actions (routes are Hono in `apps/backend/src/routes/private/shipping.ts`, not the plan's old `functions/*` path).
+- **Use-cases** `libs/modules/shipping/use-cases/method/admin/`: `addShippingMethod` (validates `essentialShippingMethodSchema` — name only, id generated in the DB action), `getShippingMethodById` (detail incl. **all** rates, unfiltered by weight), `updateShippingMethod` (updates name, re-reads the full method), `getShippingMethodsPage` (paginated envelope + `name`/`createdAt` sort + `name` filter, like the other admin lists), `deleteShippingMethod`.
+- **New DB action** `getSelectShippingMethodsPageAction` (paginated methods+rates) added to `libs/db/shipping/method/actions/select.ts`.
+- **Routes** `/private/shipping/methods` (GET list, POST) + `/methods/:id` (GET, PUT, DELETE), mounted under the admin-gated `/private/shipping` (requireAdmin covers it by prefix — no per-route auth).
+- **Delete semantics (documented + enforced):** deleting a method that still has rates returns **409** (`SHIPPING_METHOD_HAS_RATES`) — the schema would cascade-delete rates, but that's destructive, so require them removed/reassigned first. Historical orders are unaffected (they store a serialized shippingMethod snapshot, not a FK).
+
+Verified live (admin-authed, seeded D1): list → envelope `total=1` (Batch Logistics, 12 rates); create → 200 (rates:[]); detail/update → 200; delete of a rate-less method → 200; delete of the seeded method (12 rates) → **409**; empty `name` → **400** (field-level message); unknown id → **404**. type-check (root + apps) clean, lint 0 errors, jest 96/96.
+
+## ~~Technical steps~~ (superseded by the verified implementation above)
 
 ## Technical goal
 Add admin use-cases and `/private/shipping/methods` (+ `/{id}`) routes for full CRUD of shipping methods, over the already-existing method DB actions, following the established layering.

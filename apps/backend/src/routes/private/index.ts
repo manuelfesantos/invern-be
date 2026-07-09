@@ -8,6 +8,7 @@ import collections from "./collections";
 import carts from "./carts";
 import users from "./users";
 import orders from "./orders";
+import shipping from "./shipping";
 import stock from "./stock";
 import maintenance from "./maintenance";
 
@@ -24,6 +25,7 @@ privateRoutes.route("/collections", collections);
 privateRoutes.route("/carts", carts);
 privateRoutes.route("/users", users);
 privateRoutes.route("/orders", orders);
+privateRoutes.route("/shipping", shipping);
 privateRoutes.route("/stock", stock);
 privateRoutes.route("/expired", maintenance);
 

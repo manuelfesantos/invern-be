@@ -103,6 +103,11 @@ export const errors = {
     ),
   SHIPPING_METHOD_NOT_FOUND: (): CustomError =>
     new CustomError("Shipping method not found", HttpStatusEnum.NOT_FOUND),
+  SHIPPING_METHOD_HAS_RATES: (): CustomError =>
+    new CustomError(
+      "Shipping method has rates; delete or reassign its rates first",
+      HttpStatusEnum.CONFLICT,
+    ),
   SHIPPING_RATE_NOT_FOUND: (): CustomError =>
     new CustomError("Shipping rate not found", HttpStatusEnum.NOT_FOUND),
   UNAUTHORIZED: (message?: string): CustomError =>
