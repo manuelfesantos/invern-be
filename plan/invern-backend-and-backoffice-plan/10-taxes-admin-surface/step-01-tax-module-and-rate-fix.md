@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 10-taxes-admin-surface
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["10-taxes-admin-surface/step-02"]
 ---
 # Step 01: Tax module, rate-storage fix & Stripe-mirroring decision
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Taxes Admin Surface](./README.md)
 
 ## Technical goal
 Create a tax business-logic module over the existing tax DB actions, diagnose and fix the rate-storage representation, and decide whether tax writes mirror to Stripe Tax or treat D1 as the source of truth.

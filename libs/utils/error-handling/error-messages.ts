@@ -137,6 +137,14 @@ export const errors = {
       `Unknown country code(s)${codes ? `: ${codes}` : ""}`,
       HttpStatusEnum.BAD_REQUEST,
     ),
+  TAX_NOT_FOUND: (): CustomError =>
+    new CustomError("Tax not found", HttpStatusEnum.NOT_FOUND),
+  TAX_IMMUTABLE_FIELD: (field?: string): CustomError =>
+    new CustomError(
+      `Cannot change ${field ?? "that field"} on an existing tax; ` +
+        "deactivate it and create a new one (Stripe tax rates are immutable)",
+      HttpStatusEnum.CONFLICT,
+    ),
   UNAUTHORIZED: (message?: string): CustomError =>
     new CustomError(message || "Unauthorized", HttpStatusEnum.UNAUTHORIZED),
   NOT_ALLOWED: (message?: string): CustomError =>

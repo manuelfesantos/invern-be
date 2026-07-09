@@ -6,6 +6,8 @@ const ONE_HUNDRED_MILLION = 100_000_000;
 export const percentageToRate = (percentage: number): number =>
   percentage / NUMBER_100;
 
+export const rateToPercentage = (rate: number): number => rate * NUMBER_100;
+
 export const isPositive = (number: number): boolean => number > NUMBER_ZERO;
 export const isZero = (number: number): boolean => number === NUMBER_ZERO;
 

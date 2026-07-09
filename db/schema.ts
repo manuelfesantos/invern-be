@@ -154,7 +154,10 @@ export const currenciesTable = sqliteTable("currencies", {
 export const taxesTable = sqliteTable("taxes", {
   ...baseResourceWithId,
   name: text("name").notNull(),
-  rate: int("rate"),
+  // Fraction (e.g. 0.23 = 23%); consumed by the extender as priceInCents * rate.
+  // REAL affinity so the fraction is stored/typed honestly (was `int`, which
+  // only survived via SQLite's lossless-int affinity — fragile).
+  rate: real("rate"),
   countryCode: text("country_id")
     .notNull()
     .references(() => countriesTable.code, {

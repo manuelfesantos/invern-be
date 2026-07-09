@@ -80,6 +80,8 @@
       "@stripe-adapter": ["../../libs/adapters/stripe"],
       "@stripe-entity": ["../../libs/entities/stripe"],
       "@tax-entity": ["../../libs/entities/tax"],
+      "@tax-db": ["../../libs/db/tax"],
+      "@tax-module": ["../../libs/modules/tax"],
       "@timer-utils": ["../../libs/utils/timer"],
       "@user-db": ["../../libs/db/user"],
       "@user-entity": ["../../libs/entities/user"],
