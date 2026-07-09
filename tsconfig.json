@@ -69,7 +69,7 @@
       "@request-entity": ["libs/entities/request"],
       "@response-entity": ["libs/entities/response"],
       "@schema": ["db/schema"],
-      "@sendgrid-adapter": ["libs/adapters/sendgrid"],
+      "@brevo-adapter": ["libs/adapters/brevo"],
       "@shipping-db": ["libs/db/shipping"],
       "@shipping-entity": ["libs/entities/shipping"],
       "@shipping-module": ["libs/modules/shipping"],

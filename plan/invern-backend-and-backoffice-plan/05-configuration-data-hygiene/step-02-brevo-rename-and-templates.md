@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 05-configuration-data-hygiene
 track: backend-hardening
@@ -8,7 +8,10 @@ blocks: []
 ---
 # Step 02: Rename the sendgrid adapter to Brevo; remove legacy templates
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Configuration & Data Hygiene](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Configuration & Data Hygiene](./README.md)
+
+## Verified implementation (SPIRIT-105)
+Pure rename, no behavior change. `git mv libs/adapters/sendgrid libs/adapters/brevo` (history preserved); alias `@sendgrid-adapter` → `@brevo-adapter` in **both** `tsconfig.json` and `apps/backend/tsconfig.json` (jest's `moduleNameMapper` derives from tsconfig paths, so it followed automatically); updated the 6 import sites (email use-cases). Deleted the 6 legacy `email-templates/sendgrid/*.html` and added `email-templates/README.md` noting the Brevo-dashboard source of truth. The eslint import-boundary rule uses a glob (`./libs/adapters/**/*`), not a literal path, so it needed no change. Verified: type-check (root + apps) clean, lint 0 errors, jest 88/88.
 
 ## Technical goal
 Rename `libs/adapters/sendgrid/**` (and its import alias) to reflect that it is a **Brevo** adapter, and delete the six legacy SendGrid HTML templates, so the email integration's name matches its behavior.

@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 05-configuration-data-hygiene
 track: backend-hardening
@@ -8,7 +8,14 @@ blocks: []
 ---
 # Step 05: Version the infra config & rewrite the README setup
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Configuration & Data Hygiene](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Configuration & Data Hygiene](./README.md)
+
+## Verified implementation (SPIRIT-105)
+Note: the Workers migration already committed the live Worker config (`apps/backend/wrangler.jsonc`, with D1/KV/R2/rate-limit bindings), so this step's original premise ("bindings not in version control") was partly overtaken. What was actually done:
+- **Infra config is version-controlled (option a).** Both the repo-root `wrangler.toml` (used by the root-level D1 CLI scripts — migrate/seed/query) and `apps/backend/wrangler.jsonc` (the Worker) turned out to be **already tracked** — the `wrangler.toml` line in `.gitignore` was a no-op (git never untracks an already-committed file). Verified `wrangler.toml` holds **only** bindings + resource ids (D1 `database_id`, R2 `stock-local`, KV ids) and **no secrets**, then removed the misleading `.gitignore` entry so the tracked state and the ignore rules agree.
+- **Rewrote the README** to current reality: removed the Turso/SQLite tech entry and the Docker prerequisite, fixed the "starts the local database server" phrasing (D1 is embedded in `wrangler dev` — no separate server), refreshed the tech list (Workers+Hono, D1, KV/R2, Stripe, Brevo, Turbo/workspaces monorepo), and added an "Infrastructure & configuration" section documenting where bindings vs secrets live and the local/preview/production environments.
+
+Secrets discipline preserved: secrets stay in `.dev.vars` (gitignored) / Cloudflare, never in the wrangler config or repo. Full environments/secrets runbook still belongs in [06](../06-observability-ops-readiness/README.md) (cross-linked). Verified: type-check clean, jest 88/88.
 
 ## Technical goal
 Make the backend's infrastructure reproducible from the repo — version-control the wrangler configuration (with secrets excluded) or explicitly document what is dashboard-managed — and rewrite the README's setup section so it matches the current D1/Brevo/wrangler reality.

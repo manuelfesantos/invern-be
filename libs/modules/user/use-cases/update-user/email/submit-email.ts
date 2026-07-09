@@ -6,7 +6,7 @@ import { generateRandomEightDigitCode } from "@number-utils";
 import { getDateTime, getFutureDate, SIGNUP_EMAIL_EXPIRY } from "@timer-utils";
 import type { User, ValidateNewEmailSecretBody } from "@user-entity";
 import { setValidationSecret } from "@kv-adapter";
-import { sendVerifyEmail } from "@sendgrid-adapter";
+import { sendVerifyEmail } from "@brevo-adapter";
 import { logCredentials } from "@logger-utils";
 import { SECRET_EXPIRY_MINUTES } from "../utils/values";
 

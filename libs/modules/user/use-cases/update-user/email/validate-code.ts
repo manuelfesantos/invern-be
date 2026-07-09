@@ -4,7 +4,7 @@ import { getSelectUserByIdAction, getUpdateUserAction } from "@user-db";
 import { validateSubmitEmailCodeBodySchema } from "../types/update-user";
 import { validateNewEmailSecret } from "@user-module";
 import { logCredentials } from "@logger-utils";
-import { sendEmailChangeSuccessfulEmail } from "@sendgrid-adapter";
+import { sendEmailChangeSuccessfulEmail } from "@brevo-adapter";
 import { ENV } from "@env-utils";
 import { type UserDTO, userDTOSchema } from "@user-entity";
 

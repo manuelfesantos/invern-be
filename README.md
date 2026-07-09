@@ -16,12 +16,15 @@ Invern Spirit Backend is the server-side component of the Invern Spirit ecommerc
 - **Monitoring and Observability**: Generates logs to provide insights into application health, sales performance and customer behavior.
 
 ## Technologies Used
-- **Cloudflare Workers**: Serverless platform for deploying and running server-side code in a distributed network.
-- **Node.js**: JavaScript runtime environment that executes the server-side code.
+- **Cloudflare Workers + Hono**: Serverless runtime (workerd) and the Hono web framework the API is built on. `nodejs_compat` is enabled for Node built-ins.
 - **TypeScript**: Superset of JavaScript that adds static typing, enhancing code quality and maintainability.
-- **Turso/SQLite**: Embedded SQL database engine that provides lightweight and efficient data storage.
-- **Drizzle ORM**: Lightweight TypeScript ORM for interacting with the relational database.
+- **Cloudflare D1 (SQLite)**: The database — a serverless SQLite accessed via a Workers binding (no local database server or Docker required; `wrangler dev` runs an embedded local D1).
+- **Cloudflare KV + R2**: KV namespaces (auth/validation/stock caches) and an R2 bucket (stock source of truth) via Workers bindings.
+- **Drizzle ORM**: Lightweight TypeScript ORM for interacting with D1.
+- **Stripe**: Payment processing (Checkout + webhooks).
+- **Brevo**: Transactional email provider (`libs/adapters/brevo`).
 - **Zod**: TypeScript-first schema validation library with static type inference, providing robust data validation and type checking throughout the application.
+- **Turbo + npm workspaces**: This repo is a monorepo (`apps/backend` + shared `libs/*`); `turbo` runs the build/lint/test/type-check task graph.
 - **Jest**: Testing framework used to write and run unit tests, ensuring code reliability.
 - **Husky**: Git hooks manager that enforces code quality checks before commits and pushes.
 
@@ -29,9 +32,8 @@ Invern Spirit Backend is the server-side component of the Invern Spirit ecommerc
 Follow these instructions to set up and run the project on your local machine.
 
 ### Prerequisites
-- **Node.js**: Ensure you have Node.js installed. You can download it from the official website.
-- **npm**: Node.js package manager, which comes bundled with Node.js.
-- **Docker**: Install Docker to run the local database server using a containerized environment.
+- **Node.js**: Ensure you have Node.js installed (matching the version in CI). You can download it from the official website.
+- **npm**: Node.js package manager, which comes bundled with Node.js. Wrangler (the Cloudflare CLI) is installed as a dev dependency — no global install needed.
 
 ### Installation
 1. **Clone the Repository**:
@@ -49,10 +51,11 @@ Follow these instructions to set up and run the project on your local machine.
    npm install
    ```
 
-4. **Build the Local Database**:
+4. **Apply Database Migrations (local D1)**:
    ```bash
    npm run db:migrate:local
    ```
+   This creates the local D1 schema (no separate database server — it's embedded in `wrangler dev`).
 
 ### Environment Variables
 The application requires specific environment variables to function correctly.
@@ -65,12 +68,17 @@ The application requires specific environment variables to function correctly.
 2. **Configure the Variables**:
    Open the `.dev.vars` file and replace the placeholder values with your actual configuration settings.
 
+### Infrastructure & configuration
+- **Bindings are version-controlled.** `wrangler.toml` (repo root, used by the root-level D1 CLI scripts — migrate/seed/query) and `apps/backend/wrangler.jsonc` (the Worker) hold the D1 database, R2 bucket, KV namespaces and rate-limit bindings. These contain **resource ids/names only — never secrets**.
+- **Secrets** live in `.dev.vars` locally (gitignored) and in Cloudflare (dashboard / `wrangler secret`) for `preview`/`production` — never in the wrangler config or the repo.
+- **Environments:** `local` (wrangler dev), `preview` (staging), `production`, mapped to the `preview` and `main` branches respectively.
+
 ## Running the Application
 **Start the Development Server**:
 ```bash
 npm run start
 ```
-This command starts the local database server and the local application server in development mode, enabling features like hot-reloading for efficient development.
+This runs the backend Worker locally via `wrangler dev` (with an embedded local D1, KV and R2), with hot-reloading. It reads runtime vars from `apps/backend/.dev.vars` (symlinked to the repo-root `.dev.vars`).
 
 ### First-Time Setup
 When running the application for the first time, you need to complete two additional steps:

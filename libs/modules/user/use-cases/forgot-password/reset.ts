@@ -4,7 +4,7 @@ import { getSelectUserByEmailAction, getUpdateUserAction } from "@user-db";
 import { errors } from "@error-handling-utils";
 import { getLoggedInRefreshToken } from "@jwt-utils";
 import { logCredentials } from "@logger-utils";
-import { sendPasswordResetSuccessfulEmail } from "@sendgrid-adapter";
+import { sendPasswordResetSuccessfulEmail } from "@brevo-adapter";
 import { ENV } from "@env-utils";
 import { contextStore } from "@context-utils";
 

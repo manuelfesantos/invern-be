@@ -24,7 +24,7 @@ import { ShippingTransactionStatusEnum } from "@shipping-transaction-entity";
 import { getDateTime } from "@timer-utils";
 import type { CheckoutSession } from "@checkout-session-entity";
 import { getPaymentFromSessionResult } from "./payment/utils/get-payment";
-import { sendCheckoutSuccessfulEmail } from "@sendgrid-adapter";
+import { sendCheckoutSuccessfulEmail } from "@brevo-adapter";
 import { LoggerUseCaseEnum } from "@logger-entity";
 import { stringifyObject } from "@string-utils";
 import { getRandomUUID } from "@crypto-utils";

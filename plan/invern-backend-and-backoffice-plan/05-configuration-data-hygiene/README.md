@@ -1,8 +1,8 @@
 # 05 — Configuration & Data Hygiene
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend Hardening
+**Status:** Done · **Priority:** P0 · **Track:** Backend Hardening
 
-> **Progress (SPIRIT-105):** steps 01 (env reconciliation), 03 (dead-code removal), 04 (dependency audit → production `npm audit` at **0 vulnerabilities**) are **Done**. Remaining: step-02 (rename sendgrid→Brevo adapter, P1) and step-05 (version wrangler config + rewrite README, P1).
+> **Done (SPIRIT-105):** all 5 steps complete — 01 env reconciliation, 03 dead-code removal, 04 dependency audit (production `npm audit` at **0 vulnerabilities**), 02 sendgrid→Brevo adapter rename, 05 versioned wrangler config + rewritten README. Verified: type-check (root + apps) clean, lint 0 errors, jest 88/88.
 
 > **Done ahead of plan (2026-07-03, user-requested · commit `SPIRIT-105`/`6b605b9`):** the privileged `/private/insert-test-data` endpoint was **removed** and replaced by an idempotent, env-aware CLI seed — `scripts/seed.mjs` (`npm run seed -- --env=local|preview|prod`). It uses deterministic ids + SQLite upserts (re-running never duplicates), runs via `wrangler d1 execute` (no server/secret/Stripe), and gates remote writes behind `--yes`. The now-dead `INSERT_TEST_DATA_SECRET` was removed from `Env`/`.dev.vars`/`.env.example` and the swagger path + middleware allowlist entry were dropped. This overlaps this feature's dead-config cleanup ([step-01](./step-01-env-drift-reconciliation.md)/[step-03](./step-03-remove-dead-turso-and-countries-bucket.md)) and the ops/seeding concerns in feature 06.
 

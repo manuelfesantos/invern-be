@@ -1,6 +1,6 @@
 import { getSelectUserByEmailAction } from "@user-db";
 import { errors } from "@error-handling-utils";
-import { sendResetPasswordEmail } from "@sendgrid-adapter";
+import { sendResetPasswordEmail } from "@brevo-adapter";
 import { generateRandomEightDigitCode } from "@number-utils";
 import {
   FORGOT_SECRET_EXPIRY,

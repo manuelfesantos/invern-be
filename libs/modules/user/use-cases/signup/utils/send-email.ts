@@ -1,6 +1,6 @@
 import type { User } from "@user-entity";
 import queryString from "query-string";
-import { sendSignupEmail as sendSignupEmailAdapter } from "@sendgrid-adapter";
+import { sendSignupEmail as sendSignupEmailAdapter } from "@brevo-adapter";
 import { contextStore } from "@context-utils";
 import { SECRET_EXPIRY_MINUTES } from "./values";
 import { ENV } from "@env-utils";
