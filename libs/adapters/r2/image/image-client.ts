@@ -20,6 +20,9 @@ const keyFromUrl = (url: string): string | undefined => {
   }
 };
 
+/** The hosted image URL (the DB primary key) for an R2 object key. */
+export const urlFromKey = (key: string): string => `${ENV.IMAGES_HOST}/${key}`;
+
 /**
  * Stores an image object in the images bucket under a collision-proof key
  * (`<uuid>.<ext>` — never the client filename) and returns its hosted URL.

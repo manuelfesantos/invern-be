@@ -1,8 +1,8 @@
 # 09 — Image Management & Upload
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P0 · **Track:** Backend API Completion
 
-> **Progress (SPIRIT-109):** step-01 (IMAGES_BUCKET binding + host) + step-02 (admin upload endpoint `POST /private/images/upload`: multipart → R2 → hosted URL, content-type allow-list + 5MB limit + uuid keys) **Done**, verified live. Remaining: step-03 (`/private/images` CRUD + association), step-04 (swagger + tests).
+> **Progress (SPIRIT-109):** all four steps **Done**, verified live. step-01 (IMAGES_BUCKET binding + host) + step-02 (admin upload `POST /private/images/upload`: multipart → R2 → hosted URL, content-type allow-list + 5MB limit + uuid keys). step-03 (`/private/images` CRUD: `GET ?productId=`, `POST` create+associate, `PUT` update by url, `DELETE /:key` removing D1 row **and** R2 object). step-04 (swagger `/private/images*` + `Private - Images` tag + Image/Create/Update schemas; Bruno `Private/Images` group of 5; `test/unit/image-management.test.ts`, 11 tests). Full CRUD lifecycle curl-verified against local worker.
 
 ## Summary
 There is **no image upload mechanism anywhere** in the backend (verified: no multipart/form-data/presigned/upload handling in `functions/**` or `libs/**`). `images.url` is a plain text primary key — something must already be hosting a file before its URL can be referenced. Images are only ever created via `insert-test-data` seeding (`functions/private/insert-test-data/_test-data/images.ts` inserts directly into `imagesTable`); the admin product/collection update payloads don't touch the images relation. For a non-technical user to manage product photos from a browser, the backend needs a real upload flow: an admin endpoint that accepts a file, stores it in R2, and returns a URL, plus `/private/images` CRUD to associate/detach/flag images. This feature builds that from scratch, mirroring the existing R2 adapter pattern used for stock.
@@ -31,10 +31,10 @@ Admin staff: upload and manage product/collection photos directly from the backo
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Provision the images R2 bucket, binding & host](./step-01-images-bucket-and-binding.md) | P0 | Not Started | 05-configuration-data-hygiene/step-03 |
-| 02 | [Admin image upload endpoint (file → R2 → URL)](./step-02-upload-endpoint.md) | P0 | Not Started | step-01, 01-admin-auth-rbac-cors/step-02 |
-| 03 | [`/private/images` CRUD & product/collection association](./step-03-images-crud-and-association.md) | P0 | Not Started | step-02 |
-| 04 | [Image swagger + tests](./step-04-image-swagger-and-tests.md) | P0 | Not Started | step-03 |
+| 01 | [Provision the images R2 bucket, binding & host](./step-01-images-bucket-and-binding.md) | P0 | Done | 05-configuration-data-hygiene/step-03 |
+| 02 | [Admin image upload endpoint (file → R2 → URL)](./step-02-upload-endpoint.md) | P0 | Done | step-01, 01-admin-auth-rbac-cors/step-02 |
+| 03 | [`/private/images` CRUD & product/collection association](./step-03-images-crud-and-association.md) | P0 | Done | step-02 |
+| 04 | [Image swagger + tests](./step-04-image-swagger-and-tests.md) | P0 | Done | step-03 |
 
 ## Key risks
 - **Upload abuse / unvalidated files.** An upload endpoint is an attack surface: enforce content-type allow-list, size limits, and safe key generation. Don't trust the client-supplied filename or MIME type blindly.

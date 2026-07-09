@@ -1,0 +1,28 @@
+meta {
+  name: Create Image
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/private/images
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "url": "{{imageUrl}}",
+    "alt": "Product photo",
+    "productId": "{{productId}}",
+    "isThumbnail": true
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Registers an uploaded URL (from Upload Image -> `imageUrl`) as a record and associates
+  it with a product and/or collection. Body: { url, alt?, productId?, collectionId?,
+  isThumbnail? }. Invalid body -> 400. Returns the full Image record.
+}

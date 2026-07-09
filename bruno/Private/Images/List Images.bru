@@ -1,0 +1,22 @@
+meta {
+  name: List Images
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/private/images?productId={{productId}}
+  body: none
+  auth: none
+}
+
+params:query {
+  productId: {{productId}}
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Returns { data: Image[] } — all image records associated with `productId`.
+  Not paginated. Set `productId` first (e.g. from Products/List Products).
+}

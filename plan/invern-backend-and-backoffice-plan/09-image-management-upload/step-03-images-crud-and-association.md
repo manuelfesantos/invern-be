@@ -8,7 +8,7 @@ blocks: ["09-image-management-upload/step-04"]
 ---
 # Step 03: `/private/images` CRUD & product/collection association
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
 
 ## Technical goal
 Expose `/private/images` endpoints to create, update, and delete image records (URL + alt + product/collection association + thumbnail flag) over the existing image DB actions, with delete removing the underlying R2 object, and ensure product/collection responses expose their images for the UI to manage.

@@ -1,0 +1,27 @@
+meta {
+  name: Update Image
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/private/images
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "url": "{{imageUrl}}",
+    "alt": "Renamed photo",
+    "isThumbnail": false
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  The `url` in the body identifies the record (it is the primary key); the rest are the
+  editable fields (alt, isThumbnail, productId, collectionId). Invalid body -> 400.
+  Unknown url -> 404. Returns the updated Image record.
+}

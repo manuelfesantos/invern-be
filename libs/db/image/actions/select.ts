@@ -20,3 +20,10 @@ export const getSelectImagesByProductIdAction = actionBuilder(
 export const getSelectImageByCollectionIdAction = actionBuilder(
   selectImageByCollectionIdQuery,
 );
+
+const selectImageByUrlQuery = (url: string) =>
+  db().query.imagesTable.findFirst({
+    where: eq(imagesTable.url, url),
+  });
+
+export const getSelectImageByUrlAction = actionBuilder(selectImageByUrlQuery);

@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 04: Image swagger + tests
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
 
 ## Technical goal
 Document the upload + `/private/images` CRUD surface in `swagger.yaml` (including the multipart upload) and add tests for upload validation, association rules, thumbnail uniqueness, and delete-removes-object behavior.

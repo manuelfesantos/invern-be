@@ -53,6 +53,8 @@ tags:
     description: Admin operations for viewing and managing all orders. Requires Admin Authentication. # Updated Description
   - name: Private - Stock
     description: Internal operations for managing product stock. Requires special auth/intended for specific triggers.
+  - name: Private - Images
+    description: Admin operations for uploading image files to R2 and managing image records (product/collection association).
   - name: Private - Test Data
     description: Internal operations for seeding test data. Requires special auth.
   - name: Private - Scheduled Tasks
@@ -2824,6 +2826,170 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /private/images/upload:
+    post:
+      tags:
+        - Private - Images
+      summary: Upload Image File
+      description: Uploads an image file to the R2 images bucket under a collision-proof `<uuid>.<ext>` key and returns its hosted URL. Accepts `multipart/form-data` with a single `file` field. Only jpeg/png/webp/gif up to 5MB are accepted.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded; returns its hosted URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Image uploaded successfully
+                  data:
+                    $ref: '#/components/schemas/ImageUploadResponseData'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Missing file, disallowed content type, empty, or over size limit
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/images:
+    get:
+      tags:
+        - Private - Images
+      summary: List Product Images
+      description: Returns all image records associated with a product.
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The product's image records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Images fetched successfully
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Image'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Private - Images
+      summary: Create Image Record
+      description: Registers an uploaded image URL as a database record and associates it with a product and/or collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateImageInput'
+      responses:
+        '200':
+          description: Image record created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Image created successfully
+                  data:
+                    $ref: '#/components/schemas/Image'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Private - Images
+      summary: Update Image Record
+      description: Updates an image record's editable fields. The `url` in the body identifies the record (it is the primary key).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateImageInput'
+      responses:
+        '200':
+          description: Image record updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Image updated successfully
+                  data:
+                    $ref: '#/components/schemas/Image'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # No image with that url
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/images/{key}:
+    parameters:
+      - name: key
+        in: path
+        required: true
+        description: The R2 object key of the image (the `<uuid>.<ext>` filename, i.e. the path segment of its hosted URL).
+        schema:
+          type: string
+    delete:
+      tags:
+        - Private - Images
+      summary: Delete Image
+      description: Deletes an image record and its underlying R2 object, so deleting an image never leaks storage.
+      responses:
+        '200':
+          description: Image deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Image deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # No image with that url
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # -------------------- Stripe Webhooks --------------------
   /stripe/session-result:
     post:
@@ -3108,12 +3274,70 @@ components:
         - $ref: '#/components/schemas/ImageDTO'
         - type: object
           properties:
+            productId:
+              type: string
+              format: uuid
+              nullable: true
+            collectionId:
+              type: string
+              format: uuid
+              nullable: true
+            isThumbnail:
+              type: boolean
             createdAt:
               type: string
               format: date-time
             lastModifiedAt:
               type: string
               format: date-time
+
+    ImageUploadResponseData: # The hosted URL returned by POST /private/images/upload
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          example: https://images.invernspirit.com/6f1c2b7a-....png
+
+    CreateImageInput: # Body for POST /private/images — register an uploaded URL as a record
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: url
+          description: The hosted image URL returned by the upload endpoint.
+        alt:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        collectionId:
+          type: string
+          format: uuid
+        isThumbnail:
+          type: boolean
+
+    UpdateImageInput: # Body for PUT /private/images — url identifies the record, the rest are editable
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: url
+          description: Identifies the image record to update (its primary key).
+        alt:
+          type: string
+        productId:
+          type: string
+          format: uuid
+        collectionId:
+          type: string
+          format: uuid
+        isThumbnail:
+          type: boolean
 
     # --- Product/Collection ---
     Product: # Core product data

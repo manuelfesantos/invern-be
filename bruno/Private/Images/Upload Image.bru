@@ -1,0 +1,34 @@
+meta {
+  name: Upload Image
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/private/images/upload
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(/absolute/path/to/image.png)
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.url) {
+    const url = res.body.data.url;
+    bru.setEnvVar("imageUrl", url);
+    bru.setEnvVar("imageKey", url.split("/").pop());
+  }
+}
+
+docs {
+  Requires an ADMIN session (run Public/Auth/Login (Admin) first). Anonymous -> 401, USER -> 403.
+
+  Multipart form-data with a single `file` field. Point the `@file(...)` at a real
+  jpeg/png/webp/gif on disk before sending. Disallowed content type, missing file,
+  empty file, or over 5MB -> 400.
+
+  Response: { data: { url } } — the hosted image URL. Stores it in `imageUrl` and the
+  R2 key in `imageKey` for the Create / Delete requests.
+}
