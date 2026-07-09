@@ -8,6 +8,13 @@ export const percentageToRate = (percentage: number): number =>
 
 export const rateToPercentage = (rate: number): number => rate * NUMBER_100;
 
+/**
+ * Shared low-stock threshold: a product with `stock <= LOW_STOCK_THRESHOLD` is
+ * "low". Single source of truth for the dashboard summary, list filtering, and
+ * the stock screen so they never disagree.
+ */
+export const LOW_STOCK_THRESHOLD = 5;
+
 export const isPositive = (number: number): boolean => number > NUMBER_ZERO;
 export const isZero = (number: number): boolean => number === NUMBER_ZERO;
 

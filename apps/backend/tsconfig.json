@@ -32,6 +32,8 @@
       "@country-module": ["../../libs/modules/country"],
       "@crypto-utils": ["../../libs/utils/crypto"],
       "@currency-db": ["../../libs/db/currency"],
+      "@dashboard-db": ["../../libs/db/dashboard"],
+      "@dashboard-module": ["../../libs/modules/dashboard"],
       "@currency-module": ["../../libs/modules/currency"],
       "@currency-entity": ["../../libs/entities/currency"],
       "@db": ["../../libs/db"],

@@ -65,6 +65,8 @@ tags:
     description: Internal operations for managing product stock. Requires special auth/intended for specific triggers.
   - name: Private - Taxes
     description: Admin operations for managing per-country tax rates (mirrored to Stripe TaxRates). Requires Admin Authentication.
+  - name: Private - Dashboard
+    description: Admin operational summary (counts, low-stock, recent orders) for the backoffice home. Requires Admin Authentication.
   - name: Private - Images
     description: Admin operations for uploading image files to R2 and managing image records (product/collection association).
   - name: Private - Test Data
@@ -3211,6 +3213,35 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  # -------------------- Private - Dashboard --------------------
+  /private/dashboard:
+    get:
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Dashboard
+      summary: Get Dashboard Summary (Admin)
+      description: >-
+        A cheap operational overview for the backoffice home: entity counts,
+        low-stock products, and the most recent orders. Computed in one D1 batch
+        (COUNT(*)s + bounded selects). Requires Admin Authentication.
+      responses:
+        '200':
+          description: The dashboard summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/DashboardSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   # -------------------- Private - Taxes --------------------
   /private/taxes:
     get:
@@ -3548,6 +3579,53 @@ components:
         stripeName:
           type: string
           example: eur
+    DashboardSummary: # Operational overview for the backoffice home
+      type: object
+      properties:
+        counts:
+          type: object
+          properties:
+            orders:
+              type: integer
+            products:
+              type: integer
+            users:
+              type: integer
+            collections:
+              type: integer
+          required: [orders, products, users, collections]
+        lowStock:
+          type: array
+          description: Products at/under the low-stock threshold (bounded).
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              stock:
+                type: integer
+        recentOrders:
+          type: array
+          description: Most recent orders (bounded, newest first).
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              createdAt:
+                type: string
+                format: date-time
+              isCanceled:
+                type: boolean
+      required:
+        - counts
+        - lowStock
+        - recentOrders
+
     AdminTax: # A per-country tax rate; `id` is the Stripe TaxRate id (txr_…)
       type: object
       properties:

@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 13-admin-dashboard-endpoint
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 02: Dashboard swagger + tests
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Admin Dashboard / Summary Endpoint](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Admin Dashboard / Summary Endpoint](./README.md)
 
 ## Technical goal
 Document the summary endpoint in `swagger.yaml` and add tests verifying the payload shape, the low-stock threshold behavior, and that aggregates are correct against seeded data.

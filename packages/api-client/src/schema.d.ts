@@ -4395,6 +4395,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/private/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Dashboard Summary (Admin)
+         * @description A cheap operational overview for the backoffice home: entity counts, low-stock products, and the most recent orders. Computed in one D1 batch (COUNT(*)s + bounded selects). Requires Admin Authentication.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description The dashboard summary. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message?: string;
+                            data?: components["schemas"]["DashboardSummary"];
+                        };
+                    };
+                };
+                401: components["responses"]["Unauthorized"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/private/taxes": {
         parameters: {
             query?: never;
@@ -4773,6 +4817,29 @@ export interface components {
             symbol?: string;
             /** @example eur */
             stripeName?: string;
+        };
+        DashboardSummary: {
+            counts: {
+                orders: number;
+                products: number;
+                users: number;
+                collections: number;
+            };
+            /** @description Products at/under the low-stock threshold (bounded). */
+            lowStock: {
+                /** Format: uuid */
+                id?: string;
+                name?: string;
+                stock?: number;
+            }[];
+            /** @description Most recent orders (bounded, newest first). */
+            recentOrders: {
+                /** Format: uuid */
+                id?: string;
+                /** Format: date-time */
+                createdAt?: string;
+                isCanceled?: boolean;
+            }[];
         };
         AdminTax: {
             /** @description The Stripe TaxRate id (txr_…) — checkout charges via this id. */

@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 13-admin-dashboard-endpoint
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["13-admin-dashboard-endpoint/step-02"]
 ---
 # Step 01: Summary aggregate endpoint
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Admin Dashboard / Summary Endpoint](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Admin Dashboard / Summary Endpoint](./README.md)
 
 ## Technical goal
 Add one admin-gated endpoint returning a small operational summary — entity counts, low-stock products, and recent orders — computed with efficient queries.

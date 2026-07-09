@@ -1,6 +1,6 @@
 # 13 — Admin Dashboard / Summary Endpoint
 
-**Status:** Not Started · **Priority:** P1 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P1 · **Track:** Backend API Completion
 
 ## Summary
 There is no dashboard/summary/analytics endpoint anywhere (verified via route inventory). The backoffice home screen needs a lightweight operational overview — counts of orders/products/users, low-stock items, recent orders — without the frontend making a dozen list calls and computing totals client-side. This feature adds one modest aggregate endpoint scoped to internal operations.
@@ -31,8 +31,8 @@ Admin staff: an at-a-glance operational home screen. Shoppers: none. Engineers: 
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Summary aggregate endpoint](./step-01-summary-endpoint.md) | P1 | Not Started | 01-admin-auth-rbac-cors/step-02 |
-| 02 | [Dashboard swagger + tests](./step-02-dashboard-swagger-and-tests.md) | P1 | Not Started | step-01 |
+| 01 | [Summary aggregate endpoint](./step-01-summary-endpoint.md) | P1 | Done | 01-admin-auth-rbac-cors/step-02 |
+| 02 | [Dashboard swagger + tests](./step-02-dashboard-swagger-and-tests.md) | P1 | Done | step-01 |
 
 ## Key risks
 - **Expensive aggregates.** Naive implementations (fetch all orders, count in JS) reintroduce the fetch-all problem [07](../07-pagination-filtering-envelope/README.md) is fixing. Use SQL `count()` and bounded selects.
