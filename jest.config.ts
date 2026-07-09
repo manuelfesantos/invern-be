@@ -21,6 +21,7 @@ const esmDeps = [
   "decode-uri-component",
   "split-on-first",
   "filter-obj",
+  "openapi-fetch",
 ];
 
 const jestConfig: JestConfigWithTsJest = {

@@ -18,6 +18,8 @@ export interface ApiClientOptions {
    * (`s_r`) rides along automatically via `credentials: "include"`.
    */
   getToken?: () => string | null | undefined;
+  /** Custom fetch (defaults to `globalThis.fetch`) — for SSR or tests. */
+  fetch?: (input: Request) => Promise<Response>;
 }
 
 /**
@@ -28,11 +30,13 @@ export interface ApiClientOptions {
 export function createApiClient({
   baseUrl,
   getToken,
+  fetch,
 }: ApiClientOptions): ApiClient {
   const client = createClient<paths>({
     baseUrl,
     // Send the s_r refresh cookie on /private/* calls (admin auth is JWT + cookie).
     credentials: "include",
+    ...(fetch ? { fetch } : {}),
   });
 
   if (getToken) {
