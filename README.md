@@ -72,6 +72,7 @@ The application requires specific environment variables to function correctly.
 - **Bindings are version-controlled.** `wrangler.toml` (repo root, used by the root-level D1 CLI scripts — migrate/seed/query) and `apps/backend/wrangler.jsonc` (the Worker) hold the D1 database, R2 bucket, KV namespaces and rate-limit bindings. These contain **resource ids/names only — never secrets**.
 - **Secrets** live in `.dev.vars` locally (gitignored) and in Cloudflare (dashboard / `wrangler secret`) for `preview`/`production` — never in the wrangler config or the repo.
 - **Environments:** `local` (wrangler dev), `preview` (staging), `production`, mapped to the `preview` and `main` branches respectively.
+- **Operations:** deploy, rollback, scheduled maintenance, stock recovery, admin bootstrap, secrets rotation, D1 backup, and observability/alerting are documented in the [Operations Runbook](docs/RUNBOOK.md).
 
 ## Running the Application
 **Start the Development Server**:

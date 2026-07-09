@@ -1,6 +1,6 @@
 # 06 — Observability & Operational Readiness
 
-**Status:** Not Started · **Priority:** P1 · **Track:** Backend Hardening
+**Status:** Done · **Priority:** P1 · **Track:** Backend Hardening
 
 ## Summary
 Logging goes to Honeycomb via the Pages plugin, but the redaction layer only masks a single property name (`accessToken`) and several call sites log full customer PII (personal details, whole Stripe events, Google profile objects) — often pre-stringified, which bypasses key-based redaction entirely. There is no health endpoint, no documented deploy/rollback procedure, and the three `/private/expired/*` maintenance routes have no documented scheduler. This feature makes logs safe, the service observable, and operations repeatable.
@@ -32,8 +32,8 @@ Shoppers: their personal data stops flowing into a third-party log store. On-cal
 |---|---|---|---|---|
 | 01 | [Structural PII redaction in logging](./step-01-pii-safe-logging.md) | P1 | Done | — |
 | 02 | [Health endpoint + uptime monitoring](./step-02-health-endpoint.md) | P1 | Done | — |
-| 03 | [Honeycomb coverage verification & alerting](./step-03-honeycomb-coverage-alerting.md) | P1 | Not Started | step-02 |
-| 04 | [Operations runbook (deploy, rollback, scheduled maintenance, recovery)](./step-04-ops-runbook.md) | P1 | Not Started | 01-admin-auth-rbac-cors/step-02 |
+| 03 | [Honeycomb coverage verification & alerting](./step-03-honeycomb-coverage-alerting.md) | P1 | Done | step-02 |
+| 04 | [Operations runbook (deploy, rollback, scheduled maintenance, recovery)](./step-04-ops-runbook.md) | P1 | Done | 01-admin-auth-rbac-cors/step-02 |
 
 ## Key risks
 - **Redaction that only works for object keys.** Much logging stringifies payloads *before* logging (`stringifyObject(...)`), so a key-based redactor never sees inside. The fix must change what is logged (structured, minimal fields), not just extend a key list.

@@ -7,6 +7,7 @@ import publicRoutes from "./routes/public";
 import privateRoutes from "./routes/private";
 import stripeRoutes from "./routes/stripe";
 import health from "./routes/health";
+import { scheduled } from "./scheduled";
 
 const app = new Hono<HonoEnv>();
 
@@ -36,4 +37,4 @@ app.onError((error) => {
   }
 });
 
-export default { fetch: app.fetch };
+export default { fetch: app.fetch, scheduled };

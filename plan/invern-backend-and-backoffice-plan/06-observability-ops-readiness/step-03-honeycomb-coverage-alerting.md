@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 06-observability-ops-readiness
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 03: Honeycomb coverage verification & alerting
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
 
 ## Technical goal
 Confirm every route is actually traced through Honeycomb, add consistent error/latency instrumentation where gaps exist, and configure alerting on the signals that matter (5xx rate, webhook failures, health-check failures).

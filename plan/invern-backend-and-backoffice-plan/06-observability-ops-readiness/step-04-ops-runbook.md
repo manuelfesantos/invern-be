@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P1
 feature: 06-observability-ops-readiness
 track: backend-hardening
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 04: Operations runbook (deploy, rollback, scheduled maintenance, recovery)
 
-**Status:** Not Started · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
+**Status:** Done · **Priority:** P1 · **Feature:** [Observability & Operational Readiness](./README.md)
 
 ## Technical goal
 Write a single operational runbook (committed to the repo) covering how to deploy, roll back, run and schedule the maintenance jobs, resync stock, bootstrap the first admin, and respond to the alerts from [step-03](./step-03-honeycomb-coverage-alerting.md).
