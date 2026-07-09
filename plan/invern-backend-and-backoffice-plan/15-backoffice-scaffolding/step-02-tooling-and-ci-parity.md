@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 15-backoffice-scaffolding
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 02: Join the shared tooling & CI (workspaces, turbo, lint, PR gate)
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
 
 ## Technical goal
 Wire `apps/backoffice` into the monorepo's **existing shared** tooling — ESLint + Prettier, Husky, turbo, and the GitHub Actions PR gate — so it inherits the same engineering-hygiene standard as `apps/backend` without a parallel setup. The only genuinely new pieces are React-specific lint rules and a React test runner.

@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 15-backoffice-scaffolding
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["16-backoffice-auth-shell/step-01", "17-backoffice-design-system/step-0
 ---
 # Step 04: Typed API client (workspace dep) + TanStack Query data layer
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
 
 ## Technical goal
 Wire the in-repo typed client package ([14 step-03](../14-api-contract-typed-client/step-03-typed-client-package.md), `packages/api-client`) into the backoffice as a **workspace dependency**, with a TanStack Query provider, a configured fetch layer (base URL from env, auth-header injection hook, standard error handling) — so every screen fetches data the same typed way. Generation lives in the shared package (feature 14); this step only consumes it.

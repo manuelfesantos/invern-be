@@ -2,6 +2,8 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginImport from "eslint-plugin-import";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
 import { globalIgnores, defineConfig } from "eslint/config";
 export default defineConfig([
   globalIgnores([
@@ -108,6 +110,29 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/no-restricted-imports": "off",
       "import/no-restricted-paths": "off",
+    },
+  },
+  {
+    // The backoffice React app: browser globals, JSX, React-specific rules, and
+    // the backend-layering restrictions turned off (they don't apply here).
+    files: ["apps/backoffice/**/*.{ts,tsx}"],
+    languageOptions: { globals: { ...globals.browser } },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+      "@typescript-eslint/no-restricted-imports": "off",
+      "import/no-restricted-paths": "off",
+      // React components read as `function Foo()` returning JSX — the explicit
+      // return-type rule fights idiomatic component code.
+      "@typescript-eslint/explicit-function-return-type": "off",
     },
   },
 ]);

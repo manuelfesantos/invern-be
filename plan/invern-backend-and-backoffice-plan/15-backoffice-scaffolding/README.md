@@ -1,6 +1,6 @@
 # 15 — Backoffice Scaffolding, Tooling & Cloudflare Target
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backoffice App
+**Status:** Done · **Priority:** P0 · **Track:** Backoffice App
 
 ## Summary
 Stand up the backoffice application as a **new app inside the monorepo** (`apps/backoffice`): Vite + React + TypeScript (strict), Tailwind CSS, wired into the repo's **shared** tooling (workspaces + turbo, ESLint + Prettier + Husky) and the **shared** GitHub Actions pipeline (the path-aware PR gate already covers new apps; add a per-app deploy workflow), a Cloudflare deployment target, environment-driven configuration, and the in-repo typed API client + TanStack Query data layer wired in. This is the foundation every other Track C feature builds on.
@@ -37,10 +37,10 @@ Internal/engineering only — but it's the substrate for every admin-facing scre
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Create the app: `apps/backoffice` (Vite + React + TS strict + Tailwind)](./step-01-repo-vite-react-ts-tailwind.md) | P0 | Not Started | — |
-| 02 | [Join the shared tooling & CI (workspaces, turbo, lint, PR gate)](./step-02-tooling-and-ci-parity.md) | P0 | Not Started | step-01 |
-| 03 | [Cloudflare target & environment-driven config](./step-03-cloudflare-target-and-config.md) | P0 | Not Started | step-01 |
-| 04 | [Typed API client (workspace dep) + TanStack Query data layer](./step-04-api-client-integration.md) | P0 | Not Started | step-01, 14-api-contract-typed-client/step-03 |
+| 01 | [Create the app: `apps/backoffice` (Vite + React + TS strict + Tailwind)](./step-01-repo-vite-react-ts-tailwind.md) | P0 | Done | — |
+| 02 | [Join the shared tooling & CI (workspaces, turbo, lint, PR gate)](./step-02-tooling-and-ci-parity.md) | P0 | Done | step-01 |
+| 03 | [Cloudflare target & environment-driven config](./step-03-cloudflare-target-and-config.md) | P0 | Done | step-01 |
+| 04 | [Typed API client (workspace dep) + TanStack Query data layer](./step-04-api-client-integration.md) | P0 | Done | step-01, 14-api-contract-typed-client/step-03 |
 
 ## Key risks
 - **Workspace wiring, not repo creation.** The backoffice must register as an `apps/*` workspace, extend the base tsconfig, and slot into the turbo pipeline + path-aware PR gate — mirror exactly how `apps/backend` is wired so tooling stays uniform.

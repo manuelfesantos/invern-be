@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 15-backoffice-scaffolding
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["15-backoffice-scaffolding/step-02", "15-backoffice-scaffolding/step-03
 ---
 # Step 01: Create the app `apps/backoffice`: Vite + React + TS strict + Tailwind
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
 
 ## Technical goal
 Create the backoffice as a new workspace member at **`apps/backoffice`** inside the monorepo — a Vite + React + TypeScript (strict) app scaffold, Tailwind CSS configured, React Router installed, and a minimal running shell — the empty-but-correct foundation. No new git repo.

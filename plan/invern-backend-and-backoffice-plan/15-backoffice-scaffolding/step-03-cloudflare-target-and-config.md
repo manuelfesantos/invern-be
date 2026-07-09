@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 15-backoffice-scaffolding
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["24-backoffice-deployment/step-01"]
 ---
 # Step 03: Cloudflare target & environment-driven config
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Backoffice Scaffolding, Tooling & Cloudflare Target](./README.md)
 
 ## Technical goal
 Choose and configure the Cloudflare hosting model for the built SPA (Workers static assets, per this plan's decision), and make all environment-specific configuration — especially the backend (`apps/backend`) API base URL — env-driven for local/preview/production.
