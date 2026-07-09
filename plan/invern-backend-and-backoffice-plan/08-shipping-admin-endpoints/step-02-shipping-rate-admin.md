@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 08-shipping-admin-endpoints
 track: backend-api-completion
@@ -8,7 +8,18 @@ blocks: ["08-shipping-admin-endpoints/step-03"]
 ---
 # Step 02: Shipping rate admin use-cases & routes
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shipping Admin Endpoints](./README.md)
+
+## Verified implementation (SPIRIT-108)
+- **Route structure — fully nested** (documented choice): `/private/shipping/methods/:methodId/rates` (GET list, POST) + `/methods/:methodId/rates/:rateId` (GET, PUT, DELETE). Nesting keeps the parent method always in scope (needed for band-overlap validation) and matches how the backoffice will present rates.
+- **Use-cases** `libs/modules/shipping/use-cases/rate/admin/`: `addShippingRate(methodId, body)`, `updateShippingRate(methodId, rateId, body)`, `getShippingRateById`, `getRatesForMethod`, `deleteShippingRate`. Body validated with `insertShippingRateSchema.omit({shippingMethodId})` (methodId comes from the path). Create returns 404 if the parent method is missing; the id is generated in the use-case (the insert action takes the id).
+- **Band validation (the value-add)** — `utils/band.ts`: `minWeight <= maxWeight` → **400** (`SHIPPING_RATE_INVALID_BAND`); no overlap with the method's other rates → **409** (`SHIPPING_RATE_BAND_OVERLAP`). Bands are treated **half-open `[min, max)`** to match checkout selection (`minWeight <= weight < maxWeight`), so adjacent bands like `[0,1000)` and `[1000,2000)` do **not** clash. Update excludes the rate being edited from its own overlap check. Overlap uses a new raw DB action `getSelectRateBandsByMethodAction` (returns `{id,minWeight,maxWeight}` — the mapped `ShippingRate` shape intentionally drops the id, so a raw read is needed).
+- **Gap behavior (documented):** a cart weight that falls in a gap between bands simply matches no rate at checkout — gaps are allowed, not auto-filled.
+- Method-scoped rate lists are returned as a plain list (bounded by weight bands); the pagination envelope is reserved for the unbounded top-level admin lists.
+
+Verified live (admin-authed, seeded D1): create `[0,1000)` → 200; overlapping `[500,1500)` → **409**; adjacent `[1000,2000)` → 200; `min>max` → **400**; list → 2 rates; update price → 200; update-into-overlap → **409**; delete → 200; create on unknown method → **404**. type-check (root + apps) clean, lint 0 errors, jest 96/96.
+
+## ~~Technical steps~~ (superseded by the verified implementation above)
 
 ## Technical goal
 Add admin use-cases and routes for full CRUD of shipping rates (price, weight band, delivery time, parent method) over the existing rate DB actions, with validation that prevents broken weight bands.

@@ -72,6 +72,26 @@ const mapShippingRatesFromSelectQueryResult = (
   }));
 };
 
+/**
+ * Raw weight bands (with ids) for a method — used by the admin rate use-cases to
+ * validate that a new/updated band does not overlap the method's other rates.
+ * Returns raw rows (id + bounds), unlike the mapped `ShippingRate` shape which
+ * intentionally drops the id.
+ */
+const selectRateBandsByMethodQuery = (shippingMethodId: string) =>
+  db().query.shippingRatesTable.findMany({
+    where: eq(shippingRatesTable.shippingMethodId, shippingMethodId),
+    columns: {
+      id: true,
+      minWeight: true,
+      maxWeight: true,
+    },
+  });
+
+export const getSelectRateBandsByMethodAction = actionBuilder(
+  selectRateBandsByMethodQuery,
+);
+
 export const getSelectShippingRateByIdAction = actionBuilder(
   selectShippingRateByIdQuery,
   mapShippingRateFromSelectQueryResult,

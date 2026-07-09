@@ -110,6 +110,16 @@ export const errors = {
     ),
   SHIPPING_RATE_NOT_FOUND: (): CustomError =>
     new CustomError("Shipping rate not found", HttpStatusEnum.NOT_FOUND),
+  SHIPPING_RATE_INVALID_BAND: (): CustomError =>
+    new CustomError(
+      "Invalid weight band: minWeight must be <= maxWeight",
+      HttpStatusEnum.BAD_REQUEST,
+    ),
+  SHIPPING_RATE_BAND_OVERLAP: (): CustomError =>
+    new CustomError(
+      "Weight band overlaps an existing rate for this method",
+      HttpStatusEnum.CONFLICT,
+    ),
   UNAUTHORIZED: (message?: string): CustomError =>
     new CustomError(message || "Unauthorized", HttpStatusEnum.UNAUTHORIZED),
   NOT_ALLOWED: (message?: string): CustomError =>
