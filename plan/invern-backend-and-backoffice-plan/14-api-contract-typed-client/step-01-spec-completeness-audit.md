@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 14-api-contract-typed-client
 track: backend-api-completion
@@ -8,7 +8,14 @@ blocks: ["14-api-contract-typed-client/step-02"]
 ---
 # Step 01: Spec completeness audit & generate-vs-maintain decision
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
+
+> **Outcome (SPIRIT-114):** see [AUDIT.md](./AUDIT.md). Spec now matches code exactly
+> (91 ops / 63 paths, 0 missing, 0 phantom). Decision: **hand-maintain + CI check**.
+> Fixed: unauthenticated public collection writes moved to `/private/collections`
+> (GET stays public for SSG), cart `PATCH` phantom removed, 3 real `/private/expired/*`
+> maintenance routes documented, stale auth-scheme path ref, server URLs. Bruno pruned
+> of its 2 phantom requests. Verified: type-check + lint + 127 tests + live curl.
 
 ## Technical goal
 Audit `swagger.yaml` against the real route inventory, correct the auth scheme and any drift, and decide whether the spec will be **hand-maintained (with a freshness check)** or **generated from Zod** — then commit to that one workflow.
@@ -42,11 +49,11 @@ None directly; establishes the trustworthy contract the backoffice client is gen
 - Keep `bruno-collection.json` in sync or explicitly deprecate it in favor of the OpenAPI spec + generated client — two drifting contracts is worse than one.
 
 ## Acceptance criteria
-- [ ] A documented diff of spec-vs-code exists; missing/phantom/mismatched routes are listed.
-- [ ] The generate-vs-maintain decision is made and recorded, with rationale.
-- [ ] The admin auth scheme, server URLs, and pagination envelope in the spec are corrected.
-- [ ] The "endpoint features own spec content; this feature owns the mechanism" rule is documented.
-- [ ] `bruno-collection.json`'s fate (sync vs deprecate) is decided.
+- [x] A documented diff of spec-vs-code exists; missing/phantom/mismatched routes are listed. → [AUDIT.md](./AUDIT.md)
+- [x] The generate-vs-maintain decision is made and recorded, with rationale. → hand-maintain + CI (step-02)
+- [x] The admin auth scheme, server URLs, and pagination envelope in the spec are corrected. → auth already `AdminBearer` (stale path ref fixed); servers fixed; envelope-schema extraction deferred to step-02 (noted in AUDIT.md)
+- [x] The "endpoint features own spec content; this feature owns the mechanism" rule is documented. → [AUDIT.md](./AUDIT.md)
+- [x] `bruno-collection.json`'s fate (sync vs deprecate) is decided. → already replaced by `bruno/` dir, synced by the api-contract rule
 
 ## References
 - `swagger.yaml` — the spec to audit.

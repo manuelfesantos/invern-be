@@ -7,12 +7,20 @@ info:
     Handles product catalog, user management, shopping cart, checkout, and order processing.
 
 servers:
-  - url: http://localhost:8788 # Default wrangler dev port (using http for local)
+  - url: http://localhost:8790 # `npm start` (wrangler dev --local --port 8790)
     description: Local Development Environment
   - url: https://api.invernspirit.com
     description: Production Environment
-  - url: https://{preview-id}.invern-be.pages.dev # Placeholder, replace {preview-id} as needed
-    description: Preview Environment (Cloudflare Pages Function URL)
+  - url: https://{preview-subdomain}.workers.dev
+    description: >
+      Preview Environment (Cloudflare Workers preview URL). The app runs as a
+      Worker (not a Pages Function); each deploy gets a versioned
+      `*.workers.dev` subdomain. Replace `{preview-subdomain}` with the one
+      wrangler prints. (Repo migrating to the `invern-spirit` monorepo.)
+    variables:
+      preview-subdomain:
+        default: preview-invern-be
+        description: The versioned Workers preview subdomain from `wrangler deploy`.
 
 tags:
   # Public
@@ -307,33 +315,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/CountryCode'
       - $ref: '#/components/parameters/ProductId'
-    patch:
-      tags:
-        - Public - Cart
-      summary: Add Quantity to Cart Item (Patch)
-      description: Increases the quantity of an existing item in the cart or adds it if not present. Requires `quantity` > 0. Creates an anonymous cart (`c_i` cookie) if one doesn't exist. Updates `lastModifiedAt` on the cart. Deletes checkout stage cookies.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CartItemQuantityInputPatch' # Minimum 1
-      responses:
-        '200':
-          description: The updated shopping cart. May set `s_r` and `c_i` cookies.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CartResponse'
-          headers:
-            Set-Cookie:
-              $ref: '#/components/headers/SetCookieOptional' # Sets checkout stage cookies to empty, may set s_r, c_i
-        '400':
-          $ref: '#/components/responses/BadRequest' # Invalid quantity (<=0), product out of stock, invalid product ID
-        '404':
-          $ref: '#/components/responses/NotFound' # Product or Country not found
-        '500':
-          $ref: '#/components/responses/InternalServerError'
     put:
       tags:
         - Public - Cart
@@ -2393,17 +2374,43 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   # -------------------- Private - Scheduled Tasks --------------------
-  /private/check-expired-sessions:
-    post:
+  # Maintenance/cleanup routes mounted under /private/expired. Admin-gated; also
+  # the endpoints a cron trigger calls to purge expired data.
+  /private/expired/carts:
+    delete:
       tags:
         - Private - Scheduled Tasks
-      summary: Check and Expire Checkout Sessions
-      description: Endpoint typically triggered by a cron schedule to find and invalidate expired Stripe Checkout sessions and release associated product stock. Auth handled by Cloudflare infrastructure (e.g., Cron Trigger auth header) or requires AdminBearer.
+      summary: Delete Expired Carts
+      description: Purges anonymous carts that have passed their expiry window. Triggered on a cron schedule or manually by an admin.
       security:
-        - AdminBearer: [] # Or implied Cron Trigger auth
+        - AdminBearer: []
       responses:
         '200':
-          description: Operation completed. Message indicates if sessions were expired.
+          description: Cleanup completed; message reports how many carts were deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Deleted 3 expired carts
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/expired/sessions:
+    delete:
+      tags:
+        - Private - Scheduled Tasks
+      summary: Delete Expired Checkout Sessions
+      description: Finds and invalidates expired Stripe Checkout sessions and releases their reserved product stock. Triggered on a cron schedule or manually by an admin.
+      security:
+        - AdminBearer: []
+      responses:
+        '200':
+          description: Cleanup completed; message indicates whether any sessions were expired.
           content:
             application/json:
               schema:
@@ -2413,7 +2420,31 @@ paths:
                     type: string
                     example: No sessions were expired
         '401':
-          $ref: '#/components/responses/Unauthorized' # If using AdminBearer and it's invalid
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /private/expired/users:
+    delete:
+      tags:
+        - Private - Scheduled Tasks
+      summary: Delete Expired Users
+      description: Purges unverified/expired user records. Triggered on a cron schedule or manually by an admin.
+      security:
+        - AdminBearer: []
+      responses:
+        '200':
+          description: Cleanup completed; message reports how many users were deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Deleted 2 expired users
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -3635,16 +3666,6 @@ components:
         - grossPrice
         - taxes
         - isCheckoutPossible
-    CartItemQuantityInputPatch: # For PATCH /cart/items/{id}
-      type: object
-      properties:
-        quantity:
-          type: integer
-          format: int32
-          minimum: 1 # PATCH implies adding quantity > 0
-          description: Quantity to add to the existing item quantity.
-      required:
-        - quantity
     CartItemQuantityInputPut: # For PUT /cart/items/{id}
       type: object
       properties:
@@ -4662,7 +4683,7 @@ components:
       description: >
         Admin access token (JWT) sent as `Authorization: Bearer <token>`. The
         token must carry `role: ADMIN`, enforced by
-        `functions/private/_middleware.ts`. The refresh-token cookie (`s_r`)
+        `apps/backend/src/middleware/require-admin.ts`. The refresh-token cookie (`s_r`)
         must also be present on the request — `getCredentials` requires both the
         access token and the refresh token. Obtain both by logging in
         (`POST /public/countries/{countryCode}/user/login`) as an ADMIN user.

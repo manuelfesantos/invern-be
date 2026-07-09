@@ -1,6 +1,11 @@
 # 14 — API Contract & Typed Client
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+
+> **Progress (SPIRIT-114):** step-01 **Done** — spec audited & reconciled to code
+> (91 ops / 63 paths, 0 drift); workflow decision = hand-maintain + CI; see
+> [AUDIT.md](./AUDIT.md). Remaining: step-02 (freshness CI + envelope schema),
+> step-03 (generated typed client).
 
 ## Summary
 `swagger.yaml` is the OpenAPI contract for the API and is the intended source for auto-generating the backoffice's typed client — but it will only be trustworthy if it's kept complete and accurate as Track B adds endpoints, and if it describes auth as it truly works (today it declares a placeholder `X-Admin-Secret-Key` scheme that doesn't match reality). This feature makes the spec authoritative: audits it for completeness against the real routes, adds a CI check that fails when code and spec drift, and publishes a generated typed client the backoffice consumes so its types stay honest against the real API.
@@ -29,7 +34,7 @@ Internal/engineering: the backoffice gets accurate types for free; API changes s
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Spec completeness audit & generate-vs-maintain decision](./step-01-spec-completeness-audit.md) | P0 | Not Started | — |
+| 01 | [Spec completeness audit & generate-vs-maintain decision](./step-01-spec-completeness-audit.md) | P0 | Done | — |
 | 02 | [OpenAPI generation & spec-freshness CI check](./step-02-openapi-generation-and-ci-check.md) | P0 | Not Started | step-01 |
 | 03 | [Generated typed client for the backoffice](./step-03-typed-client-package.md) | P0 | Not Started | step-02 |
 
