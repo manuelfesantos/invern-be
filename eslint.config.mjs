@@ -85,7 +85,7 @@ export default defineConfig([
         },
       ],
       "max-len": [
-        "warn",
+        "off",
         {
           code: 80,
           ignoreUrls: true,
