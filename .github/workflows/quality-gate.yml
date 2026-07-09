@@ -55,3 +55,21 @@ jobs:
         run: npm run type-check
       - name: Run Type Check (apps via Turbo)
         run: npm run type-check:apps
+
+  openapi:
+    name: Check OpenAPI Spec
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      # Validates swagger.yaml (OpenAPI validator) and fails if the documented
+      # paths/methods drift from the real Hono route inventory.
+      - name: Validate & freshness-check swagger.yaml
+        run: npm run openapi:check

@@ -1247,9 +1247,9 @@ paths:
 
   # -------------------- Private - Currencies --------------------
   /private/currencies:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Currencies
       summary: Get All Currencies (Admin)
@@ -1299,6 +1299,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Currencies
       summary: Add New Currency (Admin)
@@ -1331,8 +1333,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/currencies/{code}:
-    security:
-      - AdminBearer: []
     parameters:
       - name: code
         in: path
@@ -1342,6 +1342,8 @@ paths:
           type: string
           example: EUR
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Currencies
       summary: Get Currency by Code (Admin)
@@ -1367,6 +1369,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Currencies
       summary: Update Currency (Admin)
@@ -1398,6 +1402,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Currencies
       summary: Delete Currency (Admin)
@@ -1420,9 +1426,9 @@ paths:
 
   # -------------------- Private - Countries --------------------
   /private/countries:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Countries
       summary: Get All Countries (Admin)
@@ -1478,6 +1484,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Countries
       summary: Add New Country (Admin)
@@ -1510,8 +1518,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/countries/{code}:
-    security:
-      - AdminBearer: []
     parameters:
       - name: code
         in: path
@@ -1521,6 +1527,8 @@ paths:
           type: string
           example: PT
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Countries
       summary: Get Country by Code (Admin)
@@ -1546,6 +1554,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Countries
       summary: Update Country (Admin)
@@ -1577,6 +1587,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Countries
       summary: Delete Country (Admin)
@@ -1599,9 +1611,9 @@ paths:
 
   # -------------------- Private - Products Admin --------------------
   /private/products:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Products Admin
       summary: Get All Products (Admin)
@@ -1658,6 +1670,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Products Admin
       summary: Add New Product (Admin)
@@ -1694,11 +1708,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/products/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/ProductId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Products Admin
       summary: Get Product Details (Admin)
@@ -1725,6 +1739,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Products Admin
       summary: Update Product (Admin)
@@ -1756,6 +1772,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Products Admin
       summary: Delete Product (Admin)
@@ -1778,9 +1796,9 @@ paths:
 
   # -------------------- Private - Collections Admin --------------------
   /private/collections:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Collections Admin
       summary: Get All Collections (Admin)
@@ -1824,6 +1842,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Collections Admin
       summary: Add New Collection (Admin)
@@ -1854,11 +1874,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/collections/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/CollectionId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Collections Admin
       summary: Get Collection Details (Admin)
@@ -1884,6 +1904,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Collections Admin
       summary: Update Collection (Admin)
@@ -1915,6 +1937,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Collections Admin
       summary: Delete Collection (Admin)
@@ -1937,9 +1961,9 @@ paths:
 
   # -------------------- Private - Carts Admin (NEW) --------------------
   /private/carts:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Carts Admin
       summary: Get All Carts (Admin)
@@ -1987,11 +2011,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/carts/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/CartId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Carts Admin
       summary: Get Cart by ID (Admin)
@@ -2019,31 +2043,33 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-        tags:
-            - Private - Carts Admin
-        summary: Delete Cart by ID (Admin)
-        description: Deletes a cart by its ID. Requires Admin Authentication.
-        responses:
-            '200':
-            description: Cart successfully deleted.
-            content:
-                application/json:
-                schema:
-                    $ref: '#/components/schemas/SuccessResponse'
-            '400':
-              $ref: '#/components/responses/BadRequest' # Invalid ID format
-            '401':
-              $ref: '#/components/responses/Unauthorized'
-            '404':
-              $ref: '#/components/responses/NotFound' # Cart not found
-            '500':
-              $ref: '#/components/responses/InternalServerError'
+      security:
+        - AdminBearer: []
+      tags:
+        - Private - Carts Admin
+      summary: Delete Cart by ID (Admin)
+      description: Deletes a cart by its ID. Requires Admin Authentication.
+      responses:
+        '200':
+          description: Cart successfully deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # Invalid ID format
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound' # Cart not found
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   # -------------------- Private - Users Admin (NEW) --------------------
   /private/users:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Users Admin
       summary: Get All Users (Admin)
@@ -2104,11 +2130,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/users/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/UserId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Users Admin
       summary: Get User by ID (Admin)
@@ -2135,6 +2161,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Users Admin
       summary: Delete User by ID (Admin)
@@ -2157,9 +2185,9 @@ paths:
 
   # -------------------- Private - Orders Admin --------------------
   /private/orders:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Orders Admin
       summary: Get All Orders (Admin)
@@ -2232,11 +2260,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/orders/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/OrderId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Orders Admin
       summary: Get Order Details (Admin)
@@ -2263,6 +2291,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Orders Admin
       summary: Update Order (Admin)
@@ -2296,11 +2326,11 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /private/orders/{id}/cancel:
-    security:
-      - AdminBearer: []
     parameters:
       - $ref: '#/components/parameters/OrderId'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Orders Admin
       summary: Cancel Order (Admin)
@@ -2328,8 +2358,6 @@ paths:
           $ref: '#/components/responses/InternalServerError' # E.g., failed to release stock
 
   /private/orders/{id}/fulfillment:
-    security:
-      - AdminBearer: []
     parameters:
       - name: id
         in: path
@@ -2338,6 +2366,8 @@ paths:
           type: string
           format: uuid
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Orders Admin
       summary: Update Order Fulfillment (Admin)
@@ -2450,9 +2480,9 @@ paths:
 
   # -------------------- Private - Shipping Admin --------------------
   /private/shipping/methods:
-    security:
-      - AdminBearer: []
     get:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: List Shipping Methods (Admin)
       description: >-
@@ -2504,6 +2534,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Create Shipping Method (Admin)
       requestBody:
@@ -2530,8 +2562,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   /private/shipping/methods/{id}:
-    security:
-      - AdminBearer: []
     parameters:
       - name: id
         in: path
@@ -2540,6 +2570,8 @@ paths:
           type: string
           format: uuid
     get:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Get Shipping Method (Admin)
       description: Returns the method with all of its rates (unfiltered by weight).
@@ -2560,6 +2592,8 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     put:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Update Shipping Method (Admin)
       requestBody:
@@ -2587,6 +2621,8 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     delete:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Delete Shipping Method (Admin)
       description: >-
@@ -2604,8 +2640,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   /private/shipping/methods/{methodId}/rates:
-    security:
-      - AdminBearer: []
     parameters:
       - name: methodId
         in: path
@@ -2614,6 +2648,8 @@ paths:
           type: string
           format: uuid
     get:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: List Rates for a Method (Admin)
       description: All rates for the method as a plain list (bounded by weight bands; not paginated).
@@ -2634,6 +2670,8 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     post:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Create a Rate under a Method (Admin)
       description: >-
@@ -2668,8 +2706,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   /private/shipping/methods/{methodId}/rates/{rateId}:
-    security:
-      - AdminBearer: []
     parameters:
       - name: methodId
         in: path
@@ -2684,6 +2720,8 @@ paths:
           type: string
           format: uuid
     get:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Get a Rate (Admin)
       responses:
@@ -2703,6 +2741,8 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     put:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Update a Rate (Admin)
       description: Re-validates the weight band and overlap (excluding the rate itself).
@@ -2733,6 +2773,8 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
     delete:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Delete a Rate (Admin)
       description: Deletes the rate and cascades its country assignments.
@@ -2745,8 +2787,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 
   /private/shipping/methods/{methodId}/rates/{rateId}/countries:
-    security:
-      - AdminBearer: []
     parameters:
       - name: methodId
         in: path
@@ -2761,6 +2801,8 @@ paths:
           type: string
           format: uuid
     put:
+      security:
+        - AdminBearer: []
       tags: [Private - Shipping Admin]
       summary: Set a Rate's Countries (Admin)
       description: >-
@@ -2795,6 +2837,8 @@ paths:
   # -------------------- Private - Stock --------------------
   /private/stock/setup:
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Stock
       summary: Initialize Stock Bucket
@@ -2825,6 +2869,8 @@ paths:
     parameters:
       - $ref: '#/components/parameters/ProductId'
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Stock
       summary: Get Stock (Local Dev Only)
@@ -2859,6 +2905,8 @@ paths:
 
   /private/images/upload:
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Images
       summary: Upload Image File
@@ -2897,6 +2945,8 @@ paths:
 
   /private/images:
     get:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Images
       summary: List Product Images
@@ -2928,6 +2978,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Images
       summary: Create Image Record
@@ -2958,6 +3010,8 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
     put:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Images
       summary: Update Image Record
@@ -2999,6 +3053,8 @@ paths:
         schema:
           type: string
     delete:
+      security:
+        - AdminBearer: []
       tags:
         - Private - Images
       summary: Delete Image

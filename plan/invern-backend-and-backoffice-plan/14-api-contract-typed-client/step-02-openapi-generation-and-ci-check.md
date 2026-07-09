@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 14-api-contract-typed-client
 track: backend-api-completion
@@ -8,7 +8,22 @@ blocks: ["14-api-contract-typed-client/step-03"]
 ---
 # Step 02: OpenAPI generation & spec-freshness CI check
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
+
+> **Outcome (SPIRIT-114):** hand-maintain + freshness check (option b). Added
+> `npm run openapi:check` (`scripts/openapi/`): validates `swagger.yaml` as OpenAPI
+> 3.0 (`@apidevtools/swagger-parser`) and diffs its paths/methods against the real
+> Hono route inventory resolved from `apps/backend/src/routes/**` — fails on any
+> undocumented or phantom operation. Wired into `quality-gate.yml` (runs on PRs to
+> `preview` and `main`). Fixed pre-existing spec issues so the validator starts
+> green: 21 invalid path-item-level `security` blocks relocated to operation level,
+> one corrupt `carts/{id}` delete response. Verified: validator green, freshness
+> green (91 ops / 63 paths), negative tests fail as expected (exit 1), type-check
+> clean. Runbook: `scripts/openapi/README.md`.
+>
+> Deferred to a follow-up: the reusable `PaginatedEnvelope` schema — the admin list
+> 200 responses under-document the real `{ data, page, pageSize, total }` envelope
+> (a shape-accuracy fix the freshness check does not gate).
 
 ## Technical goal
 Implement whichever spec workflow step-01 chose, and add a CI check that fails when `swagger.yaml` is out of date relative to the code — the guardrail every Track B "swagger + tests" step relies on.
@@ -37,11 +52,11 @@ None directly; makes contract drift a build failure instead of a silent backoffi
 - If the OpenAPI validator flags pre-existing issues in the 3965-line spec, fix or explicitly baseline them so the check starts green.
 
 ## Acceptance criteria
-- [ ] The chosen spec workflow (generate or maintain) is implemented with a runnable script.
-- [ ] A CI check fails when the spec is out of date (generated-diff for (a); undocumented-route detection for (b)).
-- [ ] The spec passes an OpenAPI validator in CI.
-- [ ] The check runs on PRs into both `preview` and `main`.
-- [ ] The "how to update the spec when adding an endpoint" workflow is documented.
+- [x] The chosen spec workflow (generate or maintain) is implemented with a runnable script. → `npm run openapi:check`
+- [x] A CI check fails when the spec is out of date (undocumented-route/phantom detection for (b)). → verified (exit 1 on drift)
+- [x] The spec passes an OpenAPI validator in CI. → `@apidevtools/swagger-parser` strict validate
+- [x] The check runs on PRs into both `preview` and `main`. → added to the shared `quality-gate.yml`
+- [x] The "how to update the spec when adding an endpoint" workflow is documented. → `scripts/openapi/README.md`
 
 ## References
 - `swagger.yaml` — the spec under check.

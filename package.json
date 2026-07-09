@@ -28,12 +28,14 @@
     "dev": "turbo run dev",
     "dev:backend": "turbo run dev --filter=backend",
     "type-check:apps": "turbo run type-check",
+    "openapi:check": "node scripts/openapi/check-openapi.mjs",
     "docs": "http-server ./ -p 8081 -S -c-1 -C ./docs/cert.pem -K docs/key.pem --cors"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@apidevtools/swagger-parser": "^12.1.0",
     "@asteasolutions/zod-to-openapi": "^8.1.0",
     "@cloudflare/workers-types": "^4.20240419.0",
     "@eslint/js": "^9.2.0",
@@ -49,6 +51,7 @@
     "http-server": "^14.1.1",
     "husky": "^9.0.11",
     "jest": "^30.1.3",
+    "js-yaml": "^5.2.1",
     "prettier": "^3.2.5",
     "swagger-ui-dist": "^5.20.5",
     "ts-jest": "^29.1.2",
