@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 09-image-management-upload
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["09-image-management-upload/step-02"]
 ---
 # Step 01: Provision the images R2 bucket, binding & host
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
 
 ## Technical goal
 Create and bind a dedicated R2 bucket for product/collection images, exposed for public read over `IMAGES_HOST`, and add the adapter scaffolding to put/get/delete image objects — the storage foundation the upload endpoint builds on.

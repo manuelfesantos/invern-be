@@ -125,6 +125,13 @@ export const errors = {
       "Weight band overlaps an existing rate for this method",
       HttpStatusEnum.CONFLICT,
     ),
+  INVALID_IMAGE_UPLOAD: (reason?: string): CustomError =>
+    new CustomError(
+      `Invalid image upload${reason ? `: ${reason}` : ""}`,
+      HttpStatusEnum.BAD_REQUEST,
+    ),
+  IMAGE_NOT_FOUND: (): CustomError =>
+    new CustomError("Image not found", HttpStatusEnum.NOT_FOUND),
   UNKNOWN_COUNTRY_CODES: (codes?: string): CustomError =>
     new CustomError(
       `Unknown country code(s)${codes ? `: ${codes}` : ""}`,

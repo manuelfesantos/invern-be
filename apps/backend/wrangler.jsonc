@@ -13,7 +13,10 @@
       "migrations_dir": "../../drizzle"
     }
   ],
-  "r2_buckets": [{ "binding": "STOCK_BUCKET", "bucket_name": "stock-local" }],
+  "r2_buckets": [
+    { "binding": "STOCK_BUCKET", "bucket_name": "stock-local" },
+    { "binding": "IMAGES_BUCKET", "bucket_name": "images-local" }
+  ],
   "kv_namespaces": [
     { "binding": "AUTH_KV", "id": "auth_kv" },
     { "binding": "VALIDATION_KV", "id": "validation_kv" },

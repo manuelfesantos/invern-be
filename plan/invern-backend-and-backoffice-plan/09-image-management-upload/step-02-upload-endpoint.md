@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 09-image-management-upload
 track: backend-api-completion
@@ -8,7 +8,7 @@ blocks: ["09-image-management-upload/step-03"]
 ---
 # Step 02: Admin image upload endpoint (file → R2 → URL)
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Image Management & Upload](./README.md)
 
 ## Technical goal
 Add an admin-gated endpoint that accepts an uploaded image file, validates it, stores it in the images R2 bucket with a unique key, and returns the hosted URL — the primitive the backoffice's image picker uses.

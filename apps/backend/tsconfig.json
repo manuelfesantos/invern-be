@@ -46,6 +46,7 @@
       "@http-utils": ["../../libs/utils/http"],
       "@image-db": ["../../libs/db/image"],
       "@image-entity": ["../../libs/entities/image"],
+      "@image-module": ["../../libs/modules/image"],
       "@jwt-entity": ["../../libs/entities/jwt"],
       "@jwt-utils": ["../../libs/utils/jwt"],
       "@kv-adapter": ["../../libs/adapters/kv"],

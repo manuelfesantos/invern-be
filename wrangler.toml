@@ -12,6 +12,10 @@ migrations_dir = "./drizzle"
 binding = "STOCK_BUCKET"
 bucket_name = "stock-local"
 
+[[r2_buckets]]
+binding = "IMAGES_BUCKET"
+bucket_name = "images-local"
+
 [[kv_namespaces]]
 binding = "AUTH_KV"
 id = "auth_kv"

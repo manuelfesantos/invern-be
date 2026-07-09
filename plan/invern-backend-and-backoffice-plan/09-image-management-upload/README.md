@@ -1,6 +1,8 @@
 # 09 — Image Management & Upload
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+
+> **Progress (SPIRIT-109):** step-01 (IMAGES_BUCKET binding + host) + step-02 (admin upload endpoint `POST /private/images/upload`: multipart → R2 → hosted URL, content-type allow-list + 5MB limit + uuid keys) **Done**, verified live. Remaining: step-03 (`/private/images` CRUD + association), step-04 (swagger + tests).
 
 ## Summary
 There is **no image upload mechanism anywhere** in the backend (verified: no multipart/form-data/presigned/upload handling in `functions/**` or `libs/**`). `images.url` is a plain text primary key — something must already be hosting a file before its URL can be referenced. Images are only ever created via `insert-test-data` seeding (`functions/private/insert-test-data/_test-data/images.ts` inserts directly into `imagesTable`); the admin product/collection update payloads don't touch the images relation. For a non-technical user to manage product photos from a browser, the backend needs a real upload flow: an admin endpoint that accepts a file, stores it in R2, and returns a URL, plus `/private/images` CRUD to associate/detach/flag images. This feature builds that from scratch, mirroring the existing R2 adapter pattern used for stock.

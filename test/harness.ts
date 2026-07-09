@@ -39,6 +39,7 @@ export interface TestEnvBindings {
   validationKv: FakeKV;
   stockKv: FakeKV;
   stockBucket: FakeR2;
+  imagesBucket: FakeR2;
   countriesBucket: FakeR2;
 }
 
@@ -73,6 +74,7 @@ export const makeTestBindings = (
   validationKv: overrides.validationKv ?? makeFakeKV(),
   stockKv: overrides.stockKv ?? makeFakeKV(),
   stockBucket: overrides.stockBucket ?? makeFakeR2(),
+  imagesBucket: overrides.imagesBucket ?? makeFakeR2(),
   countriesBucket: overrides.countriesBucket ?? makeFakeR2(),
 });
 
@@ -86,6 +88,7 @@ export const makeTestEnv = (
     VALIDATION_KV: asKVNamespace(bindings.validationKv),
     STOCK_KV: asKVNamespace(bindings.stockKv),
     STOCK_BUCKET: asR2Bucket(bindings.stockBucket),
+    IMAGES_BUCKET: asR2Bucket(bindings.imagesBucket),
     INVERN_DB: throwingD1,
 
     // Rate limiters default to always-allow; a test overrides via `env` when it

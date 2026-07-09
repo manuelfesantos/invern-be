@@ -12,6 +12,7 @@ interface Env {
   VALIDATION_KV: KVNamespace;
   STOCK_KV: KVNamespace;
   STOCK_BUCKET: R2Bucket;
+  IMAGES_BUCKET: R2Bucket;
   INVERN_DB: D1Database;
   EMAIL_RATE_LIMITER: RateLimit;
   LOGIN_RATE_LIMITER: RateLimit;
