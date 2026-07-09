@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 17-backoffice-design-system
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: []
 ---
 # Step 04: Standard states & accessibility baseline
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
 
 ## Technical goal
 Provide the standard loading, empty, and error state components that every data view uses, plus the accessibility baseline (keyboard nav, focus management, semantic markup, error boundaries) so a non-technical user never sees a blank screen or an unhandled rejection.

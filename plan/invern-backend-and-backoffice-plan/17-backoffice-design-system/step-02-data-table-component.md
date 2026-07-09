@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 17-backoffice-design-system
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["18-backoffice-catalog/step-01", "19-backoffice-orders/step-01", "21-ba
 ---
 # Step 02: Data-table layer bound to the pagination envelope
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
 
 ## Technical goal
 Build one reusable `<DataTable>` (TanStack Table + the owned primitives) with server-side pagination, sorting, and filtering bound to the backend's `{ data, page, pageSize, total }` envelope and sort/filter contract — so every entity list screen shares the same table UX.

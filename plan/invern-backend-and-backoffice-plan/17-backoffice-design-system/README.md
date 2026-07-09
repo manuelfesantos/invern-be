@@ -1,6 +1,6 @@
 # 17 — Shared Design System & Data-Table Layer
 
-**Status:** Not Started · **Priority:** P0 · **Track:** Backoffice App
+**Status:** Done · **Priority:** P0 · **Track:** Backoffice App
 
 ## Summary
 Build the owned component library every entity screen shares — the shadcn/ui pattern (Radix UI primitives + Tailwind, copied in and customized rather than pulled in as an opaque dependency): buttons, inputs, selects, modal/dialog, toast, and consistent loading/empty/error states; a headless data-table layer (TanStack Table) bound to the backend's pagination envelope; and a forms layer (React Hook Form + Zod) whose schemas mirror the backend's validation. This is what makes "as good of code as possible" structural — every screen reuses these instead of reinventing table/form/modal/state handling.
@@ -29,10 +29,10 @@ Admin staff: a consistent, polished, accessible experience across every screen. 
 ## Steps
 | # | Step | Priority | Status | Depends on |
 |---|---|---|---|---|
-| 01 | [Owned component primitives (shadcn-style)](./step-01-owned-component-primitives.md) | P0 | Not Started | 15-backoffice-scaffolding/step-01 |
-| 02 | [Data-table layer bound to the pagination envelope](./step-02-data-table-component.md) | P0 | Not Started | step-01, 15-backoffice-scaffolding/step-04, 07-pagination-filtering-envelope/step-02 |
-| 03 | [Forms layer (RHF + Zod mirroring the backend)](./step-03-forms-layer.md) | P0 | Not Started | step-01 |
-| 04 | [Standard states & accessibility baseline](./step-04-states-and-accessibility.md) | P0 | Not Started | step-01 |
+| 01 | [Owned component primitives (shadcn-style)](./step-01-owned-component-primitives.md) | P0 | Done | 15-backoffice-scaffolding/step-01 |
+| 02 | [Data-table layer bound to the pagination envelope](./step-02-data-table-component.md) | P0 | Done | step-01, 15-backoffice-scaffolding/step-04, 07-pagination-filtering-envelope/step-02 |
+| 03 | [Forms layer (RHF + Zod mirroring the backend)](./step-03-forms-layer.md) | P0 | Done | step-01 |
+| 04 | [Standard states & accessibility baseline](./step-04-states-and-accessibility.md) | P0 | Done | step-01 |
 
 ## Key risks
 - **Reinvention creep.** If entity screens bypass these components "just this once," consistency erodes. Make the shared components genuinely ergonomic so they're the path of least resistance, and lint/review against one-off tables/forms.

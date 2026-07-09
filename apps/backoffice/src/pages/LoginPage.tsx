@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { useAuth } from "../lib/auth/use-auth";
+import { useZodForm } from "../components/form/use-zod-form";
+import { TextField } from "../components/form/TextField";
+import { Button, Card } from "../components/ui";
 
-interface FormValues {
-  email: string;
-  password: string;
-}
+const loginSchema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
+type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -15,8 +19,8 @@ export function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<FormValues>();
+    formState: { errors, isSubmitting },
+  } = useZodForm<LoginValues>(loginSchema);
 
   const onSubmit = handleSubmit(async ({ email, password }) => {
     setError(null);
@@ -30,45 +34,36 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-      <form
-        onSubmit={onSubmit}
-        className="w-full max-w-sm space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-      >
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Invern Spirit</h1>
-          <p className="text-sm text-slate-500">Backoffice — admin sign in</p>
-        </div>
-        {error && (
-          <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </p>
-        )}
-        <label className="block text-sm">
-          <span className="text-slate-700">Email</span>
-          <input
+      <Card className="w-full max-w-sm p-6">
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Invern Spirit</h1>
+            <p className="text-sm text-slate-500">Backoffice — admin sign in</p>
+          </div>
+          {error && (
+            <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          <TextField
+            label="Email"
             type="email"
             autoComplete="username"
-            {...register("email", { required: true })}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            {...register("email")}
+            error={errors.email?.message}
           />
-        </label>
-        <label className="block text-sm">
-          <span className="text-slate-700">Password</span>
-          <input
+          <TextField
+            label="Password"
             type="password"
             autoComplete="current-password"
-            {...register("password", { required: true })}
-            className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            {...register("password")}
+            error={errors.password?.message}
           />
-        </label>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
-        >
-          {isSubmitting ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
+          <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }

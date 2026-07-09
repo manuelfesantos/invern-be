@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 17-backoffice-design-system
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["17-backoffice-design-system/step-02", "17-backoffice-design-system/ste
 ---
 # Step 01: Owned component primitives (shadcn-style)
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
 
 ## Technical goal
 Establish the in-repo, owned component library (Radix UI primitives + Tailwind, copied and customized — the shadcn/ui pattern) with the core primitives every screen needs, plus the design tokens/theme that unify them.

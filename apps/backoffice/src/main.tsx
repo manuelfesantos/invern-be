@@ -6,6 +6,7 @@ import "./index.css";
 import App from "./App";
 import { queryClient } from "./lib/query-client";
 import { AuthProvider } from "./lib/auth/AuthProvider";
+import { Toaster } from "./components/ui";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -18,6 +19,7 @@ createRoot(rootElement).render(
       <BrowserRouter>
         <AuthProvider>
           <App />
+          <Toaster richColors position="top-right" />
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

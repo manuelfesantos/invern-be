@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 17-backoffice-design-system
 track: backoffice-app
@@ -8,7 +8,7 @@ blocks: ["18-backoffice-catalog/step-02", "20-backoffice-commerce-config/step-01
 ---
 # Step 03: Forms layer (RHF + Zod mirroring the backend)
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [Shared Design System & Data-Table Layer](./README.md)
 
 ## Technical goal
 Build the reusable forms layer — React Hook Form + Zod with owned field components — and establish the convention that form schemas mirror the backend's validation, so client and server never disagree about what's valid.
