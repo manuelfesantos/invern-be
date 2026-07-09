@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "npm run dev --workspace=backend",
+    "start": "npm run local --workspace=backend",
     "test": "jest --coverage",
     "lint": "eslint libs apps/*/src",
     "lint:fix": "eslint libs apps/*/src --fix",
@@ -25,8 +25,8 @@
     "db:generate": "drizzle-kit generate",
     "type-check": "tsc --noEmit",
     "build": "turbo run build",
-    "dev": "turbo run dev",
-    "dev:backend": "turbo run dev --filter=backend",
+    "dev": "turbo run local",
+    "dev:backend": "turbo run local --filter=backend",
     "type-check:apps": "turbo run type-check",
     "openapi:check": "node scripts/openapi/check-openapi.mjs",
     "docs": "http-server ./ -p 8081 -S -c-1 -C ./docs/cert.pem -K docs/key.pem --cors"

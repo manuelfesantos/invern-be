@@ -4,7 +4,7 @@
   "type": "module",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "wrangler dev --local --port 8790 --persist-to ../../.wrangler/state",
+    "local": "wrangler dev --local --port 8790 --persist-to ../../.wrangler/state",
     "type-check": "tsc --noEmit",
     "deploy": "wrangler deploy"
   },
