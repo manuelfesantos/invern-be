@@ -73,3 +73,7 @@ jobs:
       # paths/methods drift from the real Hono route inventory.
       - name: Validate & freshness-check swagger.yaml
         run: npm run openapi:check
+      # Fails if the committed generated client is stale vs swagger.yaml, so a
+      # spec change and its regenerated client must land in the same PR.
+      - name: Freshness-check the generated api-client
+        run: npm run api-client:check

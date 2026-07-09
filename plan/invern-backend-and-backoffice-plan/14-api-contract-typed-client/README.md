@@ -1,12 +1,16 @@
 # 14 — API Contract & Typed Client
 
-**Status:** In Progress · **Priority:** P0 · **Track:** Backend API Completion
+**Status:** Done · **Priority:** P0 · **Track:** Backend API Completion
 
-> **Progress (SPIRIT-114):** step-01 + step-02 **Done**. Spec audited & reconciled
-> to code (91 ops / 63 paths, 0 drift; see [AUDIT.md](./AUDIT.md)); `npm run
-> openapi:check` (validator + route-freshness diff) wired into CI on PRs to preview
-> and main; all 8 admin list responses share a `PaginationMeta` schema. Remaining:
-> step-03 (generated typed client).
+> **Progress (SPIRIT-114):** all three steps **Done**. step-01+02: spec audited &
+> reconciled to code (see [AUDIT.md](./AUDIT.md)); `npm run openapi:check`
+> (validator + route-freshness diff) wired into CI; all admin list responses share
+> a `PaginationMeta` schema. step-03: `packages/api-client` (`@invern/api-client`)
+> — a workspace package generated from `swagger.yaml` via `openapi-typescript` +
+> `openapi-fetch`, exporting a `createApiClient` factory + JWT/cookie auth hook.
+> `npm run api-client:generate` regenerates it; `api-client:check` (CI) fails if the
+> committed client is stale vs the spec. Verified: valid calls compile, contract
+> violations are type errors, 92 ops / 64 paths in sync.
 
 ## Summary
 `swagger.yaml` is the OpenAPI contract for the API and is the intended source for auto-generating the backoffice's typed client — but it will only be trustworthy if it's kept complete and accurate as Track B adds endpoints, and if it describes auth as it truly works (today it declares a placeholder `X-Admin-Secret-Key` scheme that doesn't match reality). This feature makes the spec authoritative: audits it for completeness against the real routes, adds a CI check that fails when code and spec drift, and publishes a generated typed client the backoffice consumes so its types stay honest against the real API.
@@ -37,7 +41,7 @@ Internal/engineering: the backoffice gets accurate types for free; API changes s
 |---|---|---|---|---|
 | 01 | [Spec completeness audit & generate-vs-maintain decision](./step-01-spec-completeness-audit.md) | P0 | Done | — |
 | 02 | [OpenAPI generation & spec-freshness CI check](./step-02-openapi-generation-and-ci-check.md) | P0 | Done | step-01 |
-| 03 | [Generated typed client for the backoffice](./step-03-typed-client-package.md) | P0 | Not Started | step-02 |
+| 03 | [Generated typed client for the backoffice](./step-03-typed-client-package.md) | P0 | Done | step-02 |
 
 ## Key risks
 - **Silent drift.** The whole value proposition collapses if the spec lags the code. The CI freshness check is what prevents that — it's the load-bearing step.

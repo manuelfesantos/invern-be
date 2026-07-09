@@ -1,5 +1,5 @@
 ---
-status: Not Started
+status: Done
 priority: P0
 feature: 14-api-contract-typed-client
 track: backend-api-completion
@@ -8,7 +8,7 @@ depends_on: ["14-api-contract-typed-client/step-02"]
 ---
 # Step 03: In-repo typed client package for the backoffice
 
-**Status:** Not Started · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
+**Status:** Done · **Priority:** P0 · **Feature:** [API Contract & Typed Client](./README.md)
 
 ## Technical goal
 Produce a typed API client generated from the (now accurate, freshness-checked) `swagger.yaml` as an **in-repo workspace package** (`packages/api-client`) that any app in the monorepo can depend on, and define how it is regenerated — so the backoffice's request/response types are honest against the real contract, enforced at compile time.

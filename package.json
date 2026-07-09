@@ -22,6 +22,7 @@
     "seed": "node scripts/seed.mjs",
     "create-admin": "node scripts/create-admin.mjs",
     "prepare": "husky",
+    "local": "turbo run local",
     "db:generate": "drizzle-kit generate",
     "type-check": "tsc --noEmit",
     "build": "turbo run build",
@@ -29,6 +30,8 @@
     "dev:backend": "turbo run local --filter=backend",
     "type-check:apps": "turbo run type-check",
     "openapi:check": "node scripts/openapi/check-openapi.mjs",
+    "api-client:generate": "npm run generate:api -w @invern/api-client",
+    "api-client:check": "npm run check:api -w @invern/api-client",
     "docs": "http-server ./ -p 8081 -S -c-1 -C ./docs/cert.pem -K docs/key.pem --cors"
   },
   "keywords": [],
