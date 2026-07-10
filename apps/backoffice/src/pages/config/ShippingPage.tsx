@@ -19,7 +19,6 @@ import {
 import { formatPrice } from "../../lib/format";
 import { ShippingMethodForm } from "./ShippingMethodForm";
 import { ShippingRateForm, type RateValues } from "./ShippingRateForm";
-import { RateCountriesDialog } from "./RateCountriesDialog";
 
 async function fetchMethods() {
   const { data, error } = await api.GET("/private/shipping/methods", {
@@ -62,6 +61,7 @@ const toRateValues = (r: Rate): RateValues => ({
   minWeight: r.minWeight ?? 0,
   maxWeight: r.maxWeight ?? 0,
   deliveryTime: r.deliveryTime ?? 0,
+  countryCodes: r.countryCodes ?? [],
 });
 
 export function ShippingPage() {
@@ -75,10 +75,6 @@ export function ShippingPage() {
     methodId: string;
     editing: RateValues | null;
   }>({ open: false, methodId: "", editing: null });
-  const [countriesFor, setCountriesFor] = useState<{
-    methodId: string;
-    rate: Rate;
-  } | null>(null);
   const [deleteMethod, setDeleteMethod] = useState<Method | null>(null);
   const [deleteRate, setDeleteRate] = useState<{
     methodId: string;
@@ -256,15 +252,6 @@ export function ShippingPage() {
                               size="sm"
                               variant="ghost"
                               onClick={() =>
-                                setCountriesFor({ methodId: m.id ?? "", rate: r })
-                              }
-                            >
-                              Countries
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() =>
                                 setDeleteRate({ methodId: m.id ?? "", rate: r })
                               }
                             >
@@ -293,15 +280,6 @@ export function ShippingPage() {
         methodId={rateForm.methodId}
         editing={rateForm.editing}
       />
-      {countriesFor && (
-        <RateCountriesDialog
-          open={countriesFor !== null}
-          onOpenChange={(o) => !o && setCountriesFor(null)}
-          methodId={countriesFor.methodId}
-          rateId={countriesFor.rate.id ?? ""}
-          current={countriesFor.rate.countryCodes ?? []}
-        />
-      )}
       <ConfirmDialog
         open={deleteMethod !== null}
         onOpenChange={(o) => !o && setDeleteMethod(null)}

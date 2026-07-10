@@ -1,10 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { useZodForm } from "../../components/form/use-zod-form";
 import { TextField } from "../../components/form/TextField";
-import { Button, Dialog, DialogContent, toast } from "../../components/ui";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  DialogContent,
+  Label,
+  toast,
+} from "../../components/ui";
 
 export interface RateValues {
   id: string;
@@ -12,6 +19,7 @@ export interface RateValues {
   minWeight: number;
   maxWeight: number;
   deliveryTime: number;
+  countryCodes: string[];
 }
 
 // Price entered in euros; weight band is half-open [min, max) in grams.
@@ -28,6 +36,14 @@ const schema = z
   });
 type Values = z.infer<typeof schema>;
 
+async function fetchCountries() {
+  const { data, error } = await api.GET("/private/countries", {
+    params: { query: { page: 1, pageSize: 100 } },
+  });
+  if (error) throw error;
+  return data.data?.data ?? [];
+}
+
 export function ShippingRateForm({
   open,
   onOpenChange,
@@ -41,6 +57,13 @@ export function ShippingRateForm({
 }) {
   const qc = useQueryClient();
   const isEdit = editing !== null;
+  const [countryCodes, setCountryCodes] = useState<Set<string>>(new Set());
+
+  const { data: countries } = useQuery({
+    queryKey: ["countries", "all"],
+    enabled: open,
+    queryFn: fetchCountries,
+  });
 
   const {
     register,
@@ -59,7 +82,16 @@ export function ShippingRateForm({
       maxWeight: editing?.maxWeight ?? 1000,
       deliveryTime: editing?.deliveryTime ?? 1,
     });
+    setCountryCodes(new Set(editing?.countryCodes ?? []));
   }, [open, editing, reset]);
+
+  const toggle = (code: string) =>
+    setCountryCodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
 
   const mutation = useMutation({
     mutationFn: async (values: Values) => {
@@ -69,16 +101,32 @@ export function ShippingRateForm({
         maxWeight: values.maxWeight,
         deliveryTime: values.deliveryTime,
       };
+      const codes = [...countryCodes];
+      let rateId: string;
       if (isEdit) {
         const { error } = await api.PUT(
           "/private/shipping/methods/{methodId}/rates/{rateId}",
           { params: { path: { methodId, rateId: editing.id } }, body },
         );
         if (error) throw error;
+        rateId = editing.id;
       } else {
-        const { error } = await api.POST(
+        // Create the rate, then assign its countries (separate endpoint that
+        // needs the new rate id).
+        const { data, error } = await api.POST(
           "/private/shipping/methods/{methodId}/rates",
           { params: { path: { methodId } }, body },
+        );
+        if (error) throw error;
+        rateId = data?.data?.id ?? "";
+      }
+      if (rateId) {
+        const { error } = await api.PUT(
+          "/private/shipping/methods/{methodId}/rates/{rateId}/countries",
+          {
+            params: { path: { methodId, rateId } },
+            body: { countryCodes: codes },
+          },
         );
         if (error) throw error;
       }
@@ -130,6 +178,37 @@ export function ShippingRateForm({
               {...register("deliveryTime")}
               error={errors.deliveryTime?.message}
             />
+          </div>
+          <div className="space-y-1">
+            <Label>Countries</Label>
+            <div className="max-h-40 space-y-1 overflow-auto rounded-md border border-slate-200 p-2">
+              {countries?.length ? (
+                countries.map((c) => (
+                  <label
+                    key={c.code}
+                    className="flex items-center gap-2 rounded px-1 py-1 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    <Checkbox
+                      checked={countryCodes.has(c.code ?? "")}
+                      onCheckedChange={() => toggle(c.code ?? "")}
+                    />
+                    <span className="font-mono text-xs text-slate-500">
+                      {c.code}
+                    </span>
+                    {c.name}
+                  </label>
+                ))
+              ) : (
+                <p className="px-1 text-sm text-slate-400">
+                  No countries yet — add one under Countries first.
+                </p>
+              )}
+            </div>
+            {countryCodes.size === 0 && (
+              <p className="text-xs text-amber-600">
+                No countries selected — this rate won't be offered at checkout.
+              </p>
+            )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
