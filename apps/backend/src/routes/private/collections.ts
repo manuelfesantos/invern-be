@@ -25,7 +25,11 @@ collections.post("/", async (c) => {
 });
 
 collections.get("/:id", async (c) => {
-  const collection = await getCollectionDetails(c.req.param("id"), true);
+  // Admin detail is country-agnostic — use the basic (non-extended) projection.
+  // Extending computes per-country product taxes, which needs a country context
+  // the admin route doesn't have (it would throw reading `taxes`). Matches the
+  // CollectionDetails response declared in swagger.
+  const collection = await getCollectionDetails(c.req.param("id"), false);
   return successResponse.OK("Collection details fetched successfully", collection);
 });
 
