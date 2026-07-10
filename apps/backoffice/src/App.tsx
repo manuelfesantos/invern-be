@@ -8,6 +8,7 @@ import { OrdersPage } from "./pages/orders/OrdersPage";
 import { OrderDetailPage } from "./pages/orders/OrderDetailPage";
 import { CurrenciesPage } from "./pages/config/CurrenciesPage";
 import { CountriesPage } from "./pages/config/CountriesPage";
+import { TaxesPage } from "./pages/config/TaxesPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/currencies" element={<CurrenciesPage />} />
         <Route path="/countries" element={<CountriesPage />} />
+        <Route path="/taxes" element={<TaxesPage />} />
         <Route path="/users" element={<UsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
