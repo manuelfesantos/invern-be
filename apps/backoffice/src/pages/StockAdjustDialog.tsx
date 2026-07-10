@@ -29,7 +29,7 @@ export function StockAdjustDialog({
   product: { id: string; name: string; stock: number } | null;
 }) {
   const qc = useQueryClient();
-  const [value, setValue] = useState("0");
+  const [delta, setDelta] = useState("0");
 
   const { data: detail } = useQuery({
     queryKey: ["product", product?.id],
@@ -40,64 +40,90 @@ export function StockAdjustDialog({
   const current = detail?.stock ?? product?.stock ?? 0;
 
   useEffect(() => {
-    if (open) setValue(String(current));
-  }, [open, current]);
+    if (open) setDelta("0");
+  }, [open]);
 
-  const parsed = Number(value);
-  const invalid = !Number.isInteger(parsed) || parsed < 0;
+  const d = Number(delta);
+  const validNumber = delta.trim() !== "" && Number.isInteger(d);
+  const newTotal = current + d;
+  const wouldGoNegative = validNumber && newTotal < 0;
+  const invalid = !validNumber || wouldGoNegative || d === 0;
+
+  const bump = (by: number) => setDelta(String((Number(delta) || 0) + by));
 
   const mutation = useMutation({
     mutationFn: async () => {
       const { error } = await api.PUT("/private/stock/{productId}", {
         params: { path: { productId: product?.id ?? "" } },
-        body: { stock: parsed },
+        body: { delta: d },
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(`Stock set to ${parsed}`);
+      toast.success(`Stock ${d > 0 ? "increased" : "reduced"} by ${Math.abs(d)}`);
       void qc.invalidateQueries({ queryKey: ["stock"] });
       void qc.invalidateQueries({ queryKey: ["products"] });
       void qc.invalidateQueries({ queryKey: ["product", product?.id] });
       onOpenChange(false);
     },
-    onError: () => toast.error("Couldn't update stock."),
+    onError: () => toast.error("Couldn't update stock (maybe not enough to remove)."),
   });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        title="Adjust stock"
-        description={product?.name}
-      >
+      <DialogContent title="Adjust stock" description={product?.name}>
         <div className="space-y-4">
           <p className="text-sm text-slate-500">
             Current stock: <span className="font-medium">{current}</span>
           </p>
           <div className="space-y-1">
-            <Label htmlFor="stock-value">New stock (absolute)</Label>
-            <Input
-              id="stock-value"
-              type="number"
-              min={0}
-              step={1}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              aria-invalid={invalid ? true : undefined}
-            />
-            {invalid && (
-              <p className="text-xs text-red-600">
-                Enter a non-negative whole number.
+            <Label htmlFor="stock-delta">Adjust by (+ add / − remove)</Label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => bump(-1)}
+              >
+                −
+              </Button>
+              <Input
+                id="stock-delta"
+                type="number"
+                step={1}
+                value={delta}
+                onChange={(e) => setDelta(e.target.value)}
+                aria-invalid={!validNumber || wouldGoNegative ? true : undefined}
+                className="text-center"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => bump(1)}
+              >
+                +
+              </Button>
+            </div>
+            {validNumber && d !== 0 && !wouldGoNegative && (
+              <p className="text-xs text-slate-500">
+                New total: {current} → <span className="font-medium">{newTotal}</span>
               </p>
             )}
-            {!invalid && parsed === 0 && (
+            {wouldGoNegative && (
+              <p className="text-xs text-red-600">
+                Can't remove {Math.abs(d)} — only {current} in stock.
+              </p>
+            )}
+            {validNumber && newTotal === 0 && d !== 0 && (
               <p className="text-xs text-amber-600">
-                Setting stock to 0 makes this product unsellable.
+                This brings stock to 0 (product becomes unsellable).
               </p>
             )}
           </div>
           <p className="text-xs text-slate-400">
-            Writes through to all stores (D1, KV, R2) at once.
+            A relative change is applied on top of any in-flight checkout
+            reservations, then written through to all stores (D1, KV, R2).
           </p>
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -105,9 +131,9 @@ export function StockAdjustDialog({
             </Button>
             <Button
               onClick={() => mutation.mutate()}
-              disabled={invalid || parsed === current || mutation.isPending}
+              disabled={invalid || mutation.isPending}
             >
-              {mutation.isPending ? "Saving…" : "Save"}
+              {mutation.isPending ? "Saving…" : "Apply"}
             </Button>
           </div>
         </div>

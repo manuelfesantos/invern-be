@@ -6,13 +6,15 @@ import { errorResponse, successResponse } from "@response-entity";
 import { ENV } from "@env-utils";
 import { stockClient } from "@r2-adapter";
 import { getSelectProductsAction } from "@product-db";
-import { setProductStock } from "@product-module";
+import { adjustProductStock } from "@product-module";
 
 const stock = new Hono<HonoEnv>();
 
 const setupBodySchema = z.object({ secretKey: z.string() });
-const setStockBodySchema = z.object({
-  stock: z.number().int().nonnegative(),
+const adjustStockBodySchema = z.object({
+  // Signed delta: +N adds stock, -N removes it. Absolute sets are disallowed —
+  // they'd clobber concurrent Stripe checkout reservations.
+  delta: z.number().int(),
 });
 const NO_STOCK = 0;
 
@@ -52,17 +54,18 @@ stock.get("/:productId", async (c) => {
   return successResponse.OK("success getting stock", response);
 });
 
-// Admin-only (RBAC applies — not in the self-gated bypass list). Sets a
-// product's absolute stock through the write-through path (D1 + KV + R2).
+// Admin-only (RBAC applies — not in the self-gated bypass list). Adjusts a
+// product's stock by a signed delta through the write-through path (D1 + KV +
+// R2), so it composes with in-flight checkout reservations.
 stock.put("/:productId", async (c) => {
   const productId = c.req.param("productId");
   if (!productId) {
     return errorResponse.BAD_REQUEST("productId is required");
   }
-  const { stock: newStock } = setStockBodySchema.parse(
+  const { delta } = adjustStockBodySchema.parse(
     await getBodyFromRequest(c.req.raw),
   );
-  const result = await setProductStock(productId, newStock);
+  const result = await adjustProductStock(productId, delta);
   return successResponse.OK("Stock updated successfully", result);
 });
 

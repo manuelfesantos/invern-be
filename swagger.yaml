@@ -3074,21 +3074,20 @@ paths:
         - AdminBearer: []
       tags:
         - Private - Stock
-      summary: Set Product Stock (Admin)
-      description: Sets a product's absolute stock across all stores (D1, KV, R2) via the write-through path. Requires Admin Authentication.
+      summary: Adjust Product Stock (Admin)
+      description: Adjusts a product's stock by a signed delta (+N adds, -N removes) across all stores (D1, KV, R2) via the write-through path. A delta (not an absolute set) is used so the change composes with in-flight checkout reservations. Removing more than is available returns an error. Requires Admin Authentication.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [stock]
+              required: [delta]
               properties:
-                stock:
+                delta:
                   type: integer
                   format: int32
-                  minimum: 0
-                  description: New absolute stock (non-negative).
+                  description: Signed change to apply (+N adds stock, -N removes it).
       responses:
         '200':
           description: Stock updated.

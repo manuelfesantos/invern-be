@@ -4216,8 +4216,8 @@ export interface paths {
             };
         };
         /**
-         * Set Product Stock (Admin)
-         * @description Sets a product's absolute stock across all stores (D1, KV, R2) via the write-through path. Requires Admin Authentication.
+         * Adjust Product Stock (Admin)
+         * @description Adjusts a product's stock by a signed delta (+N adds, -N removes) across all stores (D1, KV, R2) via the write-through path. A delta (not an absolute set) is used so the change composes with in-flight checkout reservations. Removing more than is available returns an error. Requires Admin Authentication.
          */
         put: {
             parameters: {
@@ -4234,9 +4234,9 @@ export interface paths {
                     "application/json": {
                         /**
                          * Format: int32
-                         * @description New absolute stock (non-negative).
+                         * @description Signed change to apply (+N adds stock, -N removes it).
                          */
-                        stock: number;
+                        delta: number;
                     };
                 };
             };
