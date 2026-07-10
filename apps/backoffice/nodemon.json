@@ -1,0 +1,6 @@
+{
+  "watch": ["src", "public", "index.html", "vite.config.ts"],
+  "ignore": ["dist"],
+  "exec": "node ../../scripts/kill-port.mjs 5173 && npm run build && npm run preview",
+  "ext": "js,mjs,ts,jsx,tsx,json,css,html"
+}

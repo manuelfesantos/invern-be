@@ -46,11 +46,22 @@ add/remove people.
 
 ## Run
 
-Start the dev servers on the host (two terminals, from the repo root):
+Start the host servers (two terminals, from the repo root):
 ```bash
-npm start                    # backend  (wrangler, :8790)
-npm run local -w backoffice  # backoffice (Vite, :5173)
+npm start                       # backend  (wrangler, :8790)
+npm run tunnel -w backoffice    # backoffice: build + preview on :5173, via nodemon
 ```
+
+`npm run tunnel` runs nodemon (see `apps/backoffice/nodemon.json`): it builds
+the app and serves the **production build** on :5173, then rebuilds + restarts
+on every source change. The tunnel serves this build, not the Vite dev server —
+Vite's HMR websocket can't reach a phone over the tunnel, so dev mode there only
+ever produced stale-module white pages. Loop: save → wait for the rebuild →
+reload the phone (a reload is needed either way; there's no HMR over the tunnel).
+
+> For **local desktop** development with hot-reload, use `npm run local -w
+> backoffice` instead (real dev server). It shares :5173, so stop the tunnel
+> server first — or run it only when you're not using the tunnel.
 
 Bring up the tunnel + auth layer:
 ```bash
