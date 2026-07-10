@@ -6,6 +6,8 @@ import { ProductsPage } from "./pages/catalog/ProductsPage";
 import { CollectionsPage } from "./pages/catalog/CollectionsPage";
 import { OrdersPage } from "./pages/orders/OrdersPage";
 import { OrderDetailPage } from "./pages/orders/OrderDetailPage";
+import { CurrenciesPage } from "./pages/config/CurrenciesPage";
+import { CountriesPage } from "./pages/config/CountriesPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
 
@@ -25,6 +27,8 @@ function App() {
         <Route path="/orders/:id" element={<OrderDetailPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/collections" element={<CollectionsPage />} />
+        <Route path="/currencies" element={<CurrenciesPage />} />
+        <Route path="/countries" element={<CountriesPage />} />
         <Route path="/users" element={<UsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
