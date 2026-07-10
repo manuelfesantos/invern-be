@@ -1812,7 +1812,7 @@ paths:
                     type: string
                     example: Product fetched successfully
                   data:
-                    $ref: '#/components/schemas/ProductDetails' # Admin likely needs full details
+                    $ref: '#/components/schemas/ProductWithCollectionDetails' # includes collection { id, name }
         '400':
           $ref: '#/components/responses/BadRequest' # Invalid ID format
         '401':

@@ -92,7 +92,7 @@ export function ProductForm({
       description: detail?.description ?? "",
       priceEuros: (detail?.priceInCents ?? 0) / 100,
       weight: detail?.weight ?? 0,
-      collectionId: detail?.collectionId ?? "",
+      collectionId: detail?.collection?.id ?? "",
       stock: detail?.stock ?? 0,
     });
   }, [open, detail, reset]);

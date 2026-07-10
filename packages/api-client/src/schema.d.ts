@@ -2582,7 +2582,7 @@ export interface paths {
                         "application/json": {
                             /** @example Product fetched successfully */
                             message?: string;
-                            data?: components["schemas"]["ProductDetails"];
+                            data?: components["schemas"]["ProductWithCollectionDetails"];
                         };
                     };
                 };
