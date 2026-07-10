@@ -4,6 +4,8 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
 import { ProductsPage } from "./pages/catalog/ProductsPage";
 import { CollectionsPage } from "./pages/catalog/CollectionsPage";
+import { OrdersPage } from "./pages/orders/OrdersPage";
+import { OrderDetailPage } from "./pages/orders/OrderDetailPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
 
@@ -19,6 +21,8 @@ function App() {
         }
       >
         <Route path="/" element={<DashboardPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/collections" element={<CollectionsPage />} />
         <Route path="/users" element={<UsersPage />} />

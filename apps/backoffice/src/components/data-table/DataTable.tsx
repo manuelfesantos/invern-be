@@ -19,6 +19,8 @@ interface DataTableProps<T> {
   isError?: boolean;
   onRetry?: () => void;
   emptyMessage?: string;
+  /** When set, rows are clickable (cursor + hover) and call this on click. */
+  onRowClick?: (row: T) => void;
 }
 
 export function DataTable<T>({
@@ -32,6 +34,7 @@ export function DataTable<T>({
   isError,
   onRetry,
   emptyMessage,
+  onRowClick,
 }: DataTableProps<T>) {
   const table = useReactTable({
     data,
@@ -73,7 +76,15 @@ export function DataTable<T>({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-slate-50">
+              <tr
+                key={row.id}
+                onClick={
+                  onRowClick ? () => onRowClick(row.original) : undefined
+                }
+                className={`hover:bg-slate-50 ${
+                  onRowClick ? "cursor-pointer" : ""
+                }`}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
