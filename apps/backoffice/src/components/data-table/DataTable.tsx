@@ -53,33 +53,41 @@ export function DataTable<T>({
 
   return (
     <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((h) => (
-                <th key={h.id} className="px-4 py-2 font-medium">
-                  {h.isPlaceholder
-                    ? null
-                    : flexRender(h.column.columnDef.header, h.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="hover:bg-slate-50">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-2 text-slate-700">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex items-center justify-between border-t border-slate-200 px-4 py-2 text-sm text-slate-500">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
+            {table.getHeaderGroups().map((hg) => (
+              <tr key={hg.id}>
+                {hg.headers.map((h) => (
+                  <th
+                    key={h.id}
+                    className="whitespace-nowrap px-4 py-2 font-medium"
+                  >
+                    {h.isPlaceholder
+                      ? null
+                      : flexRender(h.column.columnDef.header, h.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="hover:bg-slate-50">
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="whitespace-nowrap px-4 py-2 text-slate-700"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-2 text-sm text-slate-500">
         <span>
           {total === 0 ? "0" : `${from}–${to}`} of {total}
         </span>

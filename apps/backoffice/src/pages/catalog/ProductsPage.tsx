@@ -118,7 +118,7 @@ export function ProductsPage() {
           New product
         </Button>
       </div>
-      <div className="mb-3 flex items-center gap-4">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <Input
           placeholder="Search by name…"
           value={name}
@@ -126,7 +126,7 @@ export function ProductsPage() {
             setName(e.target.value);
             setPage(1);
           }}
-          className="max-w-xs"
+          className="w-full sm:max-w-xs"
         />
         <label className="flex items-center gap-2 text-sm text-slate-600">
           <Checkbox
