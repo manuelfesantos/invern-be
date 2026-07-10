@@ -5124,9 +5124,9 @@ export interface components {
              * @description The hosted image URL returned by the upload endpoint.
              */
             url: string;
-            alt?: string;
+            alt: string;
             /** Format: uuid */
-            productId?: string;
+            productId: string;
             /** Format: uuid */
             collectionId?: string;
             isThumbnail?: boolean;

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/api";
 import { uploadImageFile } from "../../lib/api-helpers";
 import { Badge, Button, Label, toast } from "../../components/ui";
+import { ImageCropDialog } from "../../components/ImageCropDialog";
 
 async function fetchImages(productId: string) {
   const { data, error } = await api.GET("/private/images", {
@@ -12,10 +13,17 @@ async function fetchImages(productId: string) {
   return data.data;
 }
 
-export function ProductImages({ productId }: { productId: string }) {
+export function ProductImages({
+  productId,
+  productName,
+}: {
+  productId: string;
+  productName?: string;
+}) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const { data: images } = useQuery({
     queryKey: ["images", productId],
     queryFn: () => fetchImages(productId),
@@ -26,7 +34,12 @@ export function ProductImages({ productId }: { productId: string }) {
   const associate = useMutation({
     mutationFn: async (url: string) => {
       const { error } = await api.POST("/private/images", {
-        body: { url, productId, isThumbnail: (images?.length ?? 0) === 0 },
+        body: {
+          url,
+          productId,
+          alt: productName?.trim() || "Product image",
+          isThumbnail: (images?.length ?? 0) === 0,
+        },
       });
       if (error) throw error;
     },
@@ -62,18 +75,25 @@ export function ProductImages({ productId }: { productId: string }) {
     onError: () => toast.error("Remove failed."),
   });
 
-  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Pick a file → open the crop/compress dialog (don't upload the raw file).
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (fileRef.current) fileRef.current.value = "";
+    if (file) setPendingFile(file);
+  };
+
+  // The dialog returns a cropped, compressed WebP blob → upload + associate.
+  const onCropped = async (blob: Blob) => {
+    const webp = new File([blob], "image.webp", { type: "image/webp" });
     setUploading(true);
     try {
-      const url = await uploadImageFile(file);
+      const url = await uploadImageFile(webp);
       await associate.mutateAsync(url);
     } catch {
       toast.error("Upload failed.");
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
+      setPendingFile(null);
     }
   };
 
@@ -98,15 +118,18 @@ export function ProductImages({ productId }: { productId: string }) {
         </Button>
       </div>
       {images && images.length > 0 ? (
-        <div className="mt-2 grid grid-cols-3 gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {images.map((img) => (
-            <div key={img.url} className="rounded border border-slate-200 p-1">
+            <div
+              key={img.url}
+              className="overflow-hidden rounded-lg border border-slate-200"
+            >
               <img
                 src={img.url}
                 alt={img.alt ?? ""}
-                className="h-20 w-full rounded bg-slate-100 object-cover"
+                className="aspect-square w-full bg-slate-100 object-cover"
               />
-              <div className="mt-1 flex items-center justify-between text-xs">
+              <div className="flex items-center justify-between gap-2 px-2 py-1.5 text-xs">
                 {img.isThumbnail ? (
                   <Badge variant="success">Thumb</Badge>
                 ) : (
@@ -132,6 +155,13 @@ export function ProductImages({ productId }: { productId: string }) {
       ) : (
         <p className="mt-2 text-sm text-slate-400">No images yet.</p>
       )}
+
+      <ImageCropDialog
+        file={pendingFile}
+        open={pendingFile !== null}
+        onOpenChange={(o) => !o && setPendingFile(null)}
+        onComplete={onCropped}
+      />
     </div>
   );
 }

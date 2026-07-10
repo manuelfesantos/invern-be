@@ -3979,6 +3979,8 @@ components:
       type: object
       required:
         - url
+        - alt
+        - productId
       properties:
         url:
           type: string
@@ -3986,6 +3988,7 @@ components:
           description: The hosted image URL returned by the upload endpoint.
         alt:
           type: string
+          minLength: 1
         productId:
           type: string
           format: uuid

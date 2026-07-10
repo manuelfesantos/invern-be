@@ -205,7 +205,9 @@ export function ProductForm({
               error={errors.stock?.message}
             />
           )}
-          {isEdit && editingId && <ProductImages productId={editingId} />}
+          {isEdit && editingId && (
+            <ProductImages productId={editingId} productName={detail?.name} />
+          )}
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
