@@ -6,8 +6,10 @@ import { useZodForm } from "../../components/form/use-zod-form";
 import { TextField } from "../../components/form/TextField";
 import {
   Button,
+  Combobox,
   Dialog,
   DialogContent,
+  Input,
   Label,
   Select,
   SelectContent,
@@ -16,6 +18,7 @@ import {
   SelectValue,
   toast,
 } from "../../components/ui";
+import { COUNTRIES, countryLocale, countryName } from "../../lib/geo";
 
 const schema = z.object({
   code: z.string().regex(/^[A-Z]{2}$/, "2 uppercase letters, e.g. PT"),
@@ -84,8 +87,16 @@ export function CountryForm({
     });
   }, [open, detail, reset]);
 
+  const code = watch("code");
   const currencyCode = watch("currencyCode");
   const noCurrencies = currencies !== undefined && currencies.length === 0;
+
+  // Pick a country from the world list → prefill name and primary locale.
+  function pickCountry(v: string) {
+    setValue("code", v, { shouldValidate: true });
+    setValue("name", countryName(v), { shouldValidate: true });
+    setValue("locale", countryLocale(v), { shouldValidate: true });
+  }
 
   const mutation = useMutation({
     mutationFn: async (values: Values) => {
@@ -115,26 +126,40 @@ export function CountryForm({
           onSubmit={handleSubmit((v) => mutation.mutate(v))}
           className="space-y-4"
         >
-          <div className="grid grid-cols-2 gap-3">
-            <TextField
-              label="Code"
-              placeholder="PT"
-              disabled={isEdit}
-              {...register("code")}
-              error={errors.code?.message}
-            />
-            <TextField
-              label="Locale"
-              placeholder="pt-PT"
-              {...register("locale")}
-              error={errors.locale?.message}
-            />
+          <div className="space-y-1">
+            <Label>Country</Label>
+            {isEdit ? (
+              <Input value={code} disabled />
+            ) : (
+              <Combobox
+                options={COUNTRIES}
+                value={code}
+                onChange={pickCountry}
+                placeholder="Search world countries…"
+                invalid={!!errors.code}
+              />
+            )}
+            {errors.code && (
+              <p className="text-xs text-red-600">{errors.code.message}</p>
+            )}
           </div>
           <TextField
             label="Name"
             {...register("name")}
             error={errors.name?.message}
           />
+          <div className="space-y-1">
+            <TextField
+              label="Locale"
+              placeholder="pt-PT"
+              {...register("locale")}
+              error={errors.locale?.message}
+            />
+            <p className="text-xs text-slate-400">
+              One locale per country. The primary official locale is prefilled;
+              edit if needed.
+            </p>
+          </div>
           <div className="space-y-1">
             <Label>Currency</Label>
             <Select

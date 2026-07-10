@@ -22,3 +22,4 @@ export {
 } from "./select";
 export { Textarea } from "./textarea";
 export { ConfirmDialog } from "./confirm-dialog";
+export { Combobox, type ComboboxOption } from "./combobox";
