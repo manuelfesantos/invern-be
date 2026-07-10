@@ -4163,8 +4163,8 @@ export interface paths {
             query?: never;
             header?: never;
             path: {
-                /** @description The unique identifier (UUID) of the product. */
-                id: components["parameters"]["ProductId"];
+                /** @description The product's unique identifier (UUID). */
+                productId: string;
             };
             cookie?: never;
         };
@@ -4177,8 +4177,8 @@ export interface paths {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description The unique identifier (UUID) of the product. */
-                    id: components["parameters"]["ProductId"];
+                    /** @description The product's unique identifier (UUID). */
+                    productId: string;
                 };
                 cookie?: never;
             };
@@ -4215,7 +4215,56 @@ export interface paths {
                 500: components["responses"]["InternalServerError"];
             };
         };
-        put?: never;
+        /**
+         * Set Product Stock (Admin)
+         * @description Sets a product's absolute stock across all stores (D1, KV, R2) via the write-through path. Requires Admin Authentication.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description The product's unique identifier (UUID). */
+                    productId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: int32
+                         * @description New absolute stock (non-negative).
+                         */
+                        stock: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Stock updated. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Stock updated successfully */
+                            message?: string;
+                            data?: {
+                                /** Format: uuid */
+                                id?: string;
+                                /** Format: int32 */
+                                stock?: number;
+                            };
+                        };
+                    };
+                };
+                400: components["responses"]["BadRequest"];
+                401: components["responses"]["Unauthorized"];
+                404: components["responses"]["NotFound"];
+                500: components["responses"]["InternalServerError"];
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;

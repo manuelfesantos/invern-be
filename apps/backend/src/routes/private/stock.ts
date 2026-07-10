@@ -6,10 +6,14 @@ import { errorResponse, successResponse } from "@response-entity";
 import { ENV } from "@env-utils";
 import { stockClient } from "@r2-adapter";
 import { getSelectProductsAction } from "@product-db";
+import { setProductStock } from "@product-module";
 
 const stock = new Hono<HonoEnv>();
 
 const setupBodySchema = z.object({ secretKey: z.string() });
+const setStockBodySchema = z.object({
+  stock: z.number().int().nonnegative(),
+});
 const NO_STOCK = 0;
 
 // Self-gated by SETUP_STOCK_SECRET (the admin RBAC middleware bypasses this path).
@@ -46,6 +50,20 @@ stock.get("/:productId", async (c) => {
   }
 
   return successResponse.OK("success getting stock", response);
+});
+
+// Admin-only (RBAC applies — not in the self-gated bypass list). Sets a
+// product's absolute stock through the write-through path (D1 + KV + R2).
+stock.put("/:productId", async (c) => {
+  const productId = c.req.param("productId");
+  if (!productId) {
+    return errorResponse.BAD_REQUEST("productId is required");
+  }
+  const { stock: newStock } = setStockBodySchema.parse(
+    await getBodyFromRequest(c.req.raw),
+  );
+  const result = await setProductStock(productId, newStock);
+  return successResponse.OK("Stock updated successfully", result);
 });
 
 export default stock;
