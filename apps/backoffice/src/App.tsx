@@ -3,6 +3,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
 import { UserDetailPage } from "./pages/UserDetailPage";
+import { StockPage } from "./pages/StockPage";
 import { ProductsPage } from "./pages/catalog/ProductsPage";
 import { CollectionsPage } from "./pages/catalog/CollectionsPage";
 import { OrdersPage } from "./pages/orders/OrdersPage";
@@ -34,6 +35,7 @@ function App() {
         <Route path="/countries" element={<CountriesPage />} />
         <Route path="/taxes" element={<TaxesPage />} />
         <Route path="/shipping" element={<ShippingPage />} />
+        <Route path="/stock" element={<StockPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/users/:id" element={<UserDetailPage />} />
       </Route>
