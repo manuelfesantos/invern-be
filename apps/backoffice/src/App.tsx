@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { UsersPage } from "./pages/UsersPage";
+import { UserDetailPage } from "./pages/UserDetailPage";
 import { ProductsPage } from "./pages/catalog/ProductsPage";
 import { CollectionsPage } from "./pages/catalog/CollectionsPage";
 import { OrdersPage } from "./pages/orders/OrdersPage";
@@ -34,6 +35,7 @@ function App() {
         <Route path="/taxes" element={<TaxesPage />} />
         <Route path="/shipping" element={<ShippingPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/users/:id" element={<UserDetailPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
