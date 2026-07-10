@@ -5,6 +5,7 @@ import { api } from "../lib/api";
 import { DataTable } from "../components/data-table/DataTable";
 import {
   Badge,
+  Button,
   Label,
   Select,
   SelectContent,
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "../components/ui";
 import { formatPrice } from "../lib/format";
+import { StockAdjustDialog } from "./StockAdjustDialog";
 
 const PAGE_SIZE = 10;
 const LOW_STOCK = 5;
@@ -43,24 +45,50 @@ function stockCell(stock: number) {
   return <span className="text-slate-700">{stock}</span>;
 }
 
-const columns: ColumnDef<Row, unknown>[] = [
-  { header: "Product", accessorKey: "name" },
-  {
-    header: "Price",
-    cell: ({ row }) => formatPrice(row.original.priceInCents ?? 0),
-  },
-  { header: "Stock", cell: ({ row }) => stockCell(row.original.stock ?? 0) },
-];
-
 export function StockPage() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<Filter>("all");
+  const [adjusting, setAdjusting] = useState<{
+    id: string;
+    name: string;
+    stock: number;
+  } | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["stock", page, filter],
     queryFn: () => fetchStock(page, filter),
     placeholderData: keepPreviousData,
   });
+
+  const columns: ColumnDef<Row, unknown>[] = [
+    { header: "Product", accessorKey: "name" },
+    {
+      header: "Price",
+      cell: ({ row }) => formatPrice(row.original.priceInCents ?? 0),
+    },
+    { header: "Stock", cell: ({ row }) => stockCell(row.original.stock ?? 0) },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() =>
+              setAdjusting({
+                id: row.original.id ?? "",
+                name: row.original.name ?? "",
+                stock: row.original.stock ?? 0,
+              })
+            }
+          >
+            Adjust
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -98,6 +126,11 @@ export function StockPage() {
         isError={isError}
         onRetry={() => void refetch()}
         emptyMessage="No products"
+      />
+      <StockAdjustDialog
+        open={adjusting !== null}
+        onOpenChange={(o) => !o && setAdjusting(null)}
+        product={adjusting}
       />
     </div>
   );
