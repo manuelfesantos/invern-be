@@ -12,6 +12,7 @@ const NAV = [
   { to: "/currencies", label: "Currencies" },
   { to: "/countries", label: "Countries" },
   { to: "/taxes", label: "Taxes" },
+  { to: "/shipping", label: "Shipping" },
   { to: "/users", label: "Users" },
 ];
 

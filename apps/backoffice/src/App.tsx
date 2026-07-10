@@ -9,6 +9,7 @@ import { OrderDetailPage } from "./pages/orders/OrderDetailPage";
 import { CurrenciesPage } from "./pages/config/CurrenciesPage";
 import { CountriesPage } from "./pages/config/CountriesPage";
 import { TaxesPage } from "./pages/config/TaxesPage";
+import { ShippingPage } from "./pages/config/ShippingPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="/currencies" element={<CurrenciesPage />} />
         <Route path="/countries" element={<CountriesPage />} />
         <Route path="/taxes" element={<TaxesPage />} />
+        <Route path="/shipping" element={<ShippingPage />} />
         <Route path="/users" element={<UsersPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -4970,6 +4970,9 @@ components:
     ShippingRate:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         priceInCents:
           type: integer
           format: int32
@@ -4989,6 +4992,12 @@ components:
             type: string
             example: PT
             pattern: '^[A-Z]{2}$'
+        createdAt:
+          type: string
+          format: date-time
+        lastModifiedAt:
+          type: string
+          format: date-time
     BaseShippingMethod:
       type: object
       properties:

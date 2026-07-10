@@ -5571,6 +5571,8 @@ export interface components {
             };
         };
         ShippingRate: {
+            /** Format: uuid */
+            id?: string;
             /** Format: int32 */
             priceInCents?: number;
             /** Format: int32 */
@@ -5583,6 +5585,10 @@ export interface components {
              */
             deliveryTime?: number;
             countryCodes?: string[];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            lastModifiedAt?: string;
         };
         BaseShippingMethod: {
             /** Format: uuid */
