@@ -24,7 +24,7 @@ export const loggedInResponse = async (
     return loggedOutResponse(headers);
   }
 
-  const accessToken = await getLoggedInToken(userId, cartId);
+  const accessToken = await getLoggedInToken(userId, cartId, user.role);
 
   const cartIdFromCookie = getCartIdFromHeaders(headers);
 

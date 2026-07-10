@@ -51,6 +51,17 @@ describe("AES-GCM per-message IV + legacy compatibility", () => {
     expect(db).toBe("same-value");
   });
 
+  it("emits cookie/URL-safe base64url (no '+', '/', or '=' padding)", async () => {
+    // Regression: standard base64 in a cookie value has its '+' turned into a
+    // space on the round-trip, breaking atob() on decrypt — so the refresh
+    // token in `s_r` failed to decode and reloads logged the user out.
+    const enc = await withTestContext(() =>
+      // long payload to make '+'/'/' bytes overwhelmingly likely
+      encrypt("x".repeat(256)),
+    );
+    expect(enc).not.toMatch(/[+/=]/);
+  });
+
   it("decrypts LEGACY fixed-IV ciphertext (no version prefix)", async () => {
     const legacy = await legacyEncrypt("legacy-secret");
     expect(legacy.startsWith("v1.")).toBe(false); // old bare-base64 format

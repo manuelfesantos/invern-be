@@ -95,11 +95,20 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   for (let i = 0; i < len; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary);
+  // base64url (no '+', '/', or '=' padding): these live in cookie values and
+  // URLs, where '+' silently becomes a space on the round-trip and breaks atob.
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 };
 
 const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
-  const binaryString = atob(base64);
+  // Accept base64url (new) and legacy standard base64 (stored data): normalize
+  // to standard base64 and re-pad before decoding.
+  const urlDecoded = base64.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = urlDecoded.padEnd(
+    urlDecoded.length + ((4 - (urlDecoded.length % 4)) % 4),
+    "=",
+  );
+  const binaryString = atob(padded);
   const length = binaryString.length;
   const arrayBuffer = new ArrayBuffer(length);
   const view = new Uint8Array(arrayBuffer);
