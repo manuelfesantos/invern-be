@@ -77,7 +77,13 @@ export function CurrencyForm({
   async function loadRate(currencyCode: string) {
     setRateLoading(true);
     const rate = await fetchRateToEuro(currencyCode);
-    if (rate != null) setValue("rateToEuro", rate, { shouldValidate: true });
+    if (rate != null) {
+      // Round to the field's step (4 decimals) — the raw API value has 6 and a
+      // number input rejects values that aren't a multiple of its step.
+      setValue("rateToEuro", Math.round(rate * 1e4) / 1e4, {
+        shouldValidate: true,
+      });
+    }
     setRateLoading(false);
   }
 
