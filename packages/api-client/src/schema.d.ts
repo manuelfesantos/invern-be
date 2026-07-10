@@ -3063,7 +3063,7 @@ export interface paths {
                             /** @example Users fetched successfully */
                             message?: string;
                             data?: components["schemas"]["PaginationMeta"] & {
-                                data: components["schemas"]["BaseUser"][];
+                                data: components["schemas"]["AdminUser"][];
                             };
                         };
                     };

@@ -1,4 +1,5 @@
-import type { BaseUser } from "@user-entity";
+import type { AdminUser } from "@user-entity";
+import { toAdminUser } from "@user-entity";
 import type { Paginated } from "@pagination-entity";
 import { parseListQuery, toPaginatedResponse } from "@pagination-entity";
 import {
@@ -26,7 +27,7 @@ const USER_FILTER_MAP = {
 
 export const getAllUsers = async (
   query?: unknown,
-): Promise<Paginated<BaseUser>> => {
+): Promise<Paginated<AdminUser>> => {
   const { page, pageSize, sortBy, sortOrder } = parseListQuery(
     ["createdAt", "email"],
     query,
@@ -42,5 +43,10 @@ export const getAllUsers = async (
     where,
     orderBy,
   );
-  return toPaginatedResponse(users, { page, pageSize, total: count });
+  // Safe projection — never expose the password hash or google id in the list.
+  return toPaginatedResponse(users.map(toAdminUser), {
+    page,
+    pageSize,
+    total: count,
+  });
 };

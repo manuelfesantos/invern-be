@@ -2223,7 +2223,7 @@ paths:
                           data:
                             type: array
                             items:
-                              $ref: '#/components/schemas/BaseUser' # Includes role, id, etc.
+                              $ref: '#/components/schemas/AdminUser' # Safe projection (no password/googleId)
                         required:
                           - data
         '400':
