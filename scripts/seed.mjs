@@ -39,6 +39,14 @@ const fixedId = (key) => {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-4${h.slice(13, 16)}-${variant}${h.slice(17, 20)}-${h.slice(20, 32)}`;
 };
 
+// Seed images deliberately point at the PRODUCTION CDN, even when seeding
+// locally. The image bytes live only in the prod R2 bucket, and we don't commit
+// the ~48 binary files to the repo, so referencing the CDN keeps the seed
+// lightweight. Consequence: on local dev, seeded product/collection images are
+// fetched from images.invernspirit.com (needs internet), while images YOU upload
+// go to local R2 and are served from IMAGES_HOST (http://localhost:8790/public/images).
+// To make seeded images fully local instead, fetch each into local R2
+// (`wrangler r2 object put <images-bucket>/<key> --local`) and store the local URL.
 const IMG = "https://images.invernspirit.com/products";
 
 const collectionsRaw = [
