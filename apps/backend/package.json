@@ -6,7 +6,11 @@
   "scripts": {
     "local": "wrangler dev --local --port 8790 --persist-to ../../.wrangler/state",
     "type-check": "tsc --noEmit",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "deploy:preview": "wrangler deploy --env preview",
+    "deploy:production": "wrangler deploy --env production",
+    "db:migrate:preview": "wrangler d1 migrations apply INVERN_DB --remote --env preview",
+    "db:migrate:production": "wrangler d1 migrations apply INVERN_DB --remote --env production"
   },
   "dependencies": {
     "hono": "^4.12.28"

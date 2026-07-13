@@ -1,10 +1,10 @@
 name: Deploy Backoffice
 
-# Per-app deploy for apps/backoffice → Cloudflare Workers static assets.
-# Fires after a merge to preview (staging) or main (production). The build bakes
-# in VITE_API_BASE_URL per environment.
+# apps/backoffice -> Cloudflare Worker (static assets). Fires on merge to
+# `preview` (staging) or `main` (production). The build bakes in VITE_API_BASE_URL
+# per environment; the deploy targets that env's worker/route (wrangler --env).
 #
-# Requires repo secrets (provisioned by the operator — see feature 24):
+# Requires repo secrets:
 #   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
 #   VITE_API_BASE_URL_PREVIEW, VITE_API_BASE_URL_PRODUCTION
 on:
@@ -19,22 +19,22 @@ jobs:
   deploy:
     name: Build & Deploy Backoffice
     runs-on: ubuntu-latest
+    env:
+      WRANGLER_ENV: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-      - run: npm ci
+      - uses: ./.github/actions/setup-node
+
       - name: Build
         working-directory: apps/backoffice
         env:
           VITE_API_BASE_URL: ${{ github.ref_name == 'main' && secrets.VITE_API_BASE_URL_PRODUCTION || secrets.VITE_API_BASE_URL_PREVIEW }}
         run: npm run build
-      - name: Deploy
-        uses: cloudflare/wrangler-action@v3
+
+      - name: Deploy (${{ env.WRANGLER_ENV }})
+        uses: ./.github/actions/deploy-cloudflare
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/backoffice
-          command: deploy
+          working-directory: apps/backoffice
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env ${{ env.WRANGLER_ENV }}

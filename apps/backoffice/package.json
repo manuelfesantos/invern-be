@@ -10,7 +10,9 @@
     "lint": "eslint src",
     "preview": "vite preview",
     "tunnel": "nodemon",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:preview": "npm run build && wrangler deploy --env preview",
+    "deploy:production": "npm run build && wrangler deploy --env production"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

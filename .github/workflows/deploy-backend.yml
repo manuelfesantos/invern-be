@@ -1,0 +1,49 @@
+name: Deploy Backend
+
+# apps/backend -> Cloudflare Worker. Fires on merge to `preview` (staging) or
+# `main` (production). Applies that env's remote D1 migrations, then deploys with
+# `wrangler --env <env>`. Each env has its own D1/KV/R2/route in wrangler.jsonc.
+#
+# Requires repo secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID.
+# Worker RUNTIME secrets (STRIPE_*, TOKEN_SECRET, ENCRYPTION_KEY, ...) are set
+# out-of-band on Cloudflare (`wrangler secret put ... --env <env>` / dashboard),
+# never in CI. See docs/DEPLOYMENT.md.
+on:
+  push:
+    branches: [preview, main]
+    paths:
+      - "apps/backend/**"
+      - "libs/**"
+      - "drizzle/**"
+      - "swagger.yaml"
+      - "package-lock.json"
+
+jobs:
+  deploy:
+    name: Migrate & Deploy Backend
+    runs-on: ubuntu-latest
+    env:
+      # main -> production, preview -> preview.
+      WRANGLER_ENV: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node
+
+      - name: Type-check
+        run: npm run type-check -w backend
+
+      - name: Apply D1 migrations (${{ env.WRANGLER_ENV }})
+        working-directory: apps/backend
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # INVERN_DB is the binding; --env resolves the env-specific database.
+        run: npx wrangler d1 migrations apply INVERN_DB --remote --env ${{ env.WRANGLER_ENV }}
+
+      - name: Deploy (${{ env.WRANGLER_ENV }})
+        uses: ./.github/actions/deploy-cloudflare
+        with:
+          working-directory: apps/backend
+          api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          account-id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env ${{ env.WRANGLER_ENV }}

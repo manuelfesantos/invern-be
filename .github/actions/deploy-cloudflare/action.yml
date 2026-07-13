@@ -1,0 +1,26 @@
+name: "Deploy to Cloudflare"
+description: "Runs a wrangler command (deploy by default) via cloudflare/wrangler-action."
+inputs:
+  working-directory:
+    description: "Directory containing the wrangler config"
+    required: true
+  api-token:
+    description: "Cloudflare API token"
+    required: true
+  account-id:
+    description: "Cloudflare account id"
+    required: true
+  command:
+    description: "wrangler command to run (e.g. 'deploy --env production')"
+    required: false
+    default: "deploy"
+runs:
+  using: "composite"
+  steps:
+    - name: Wrangler
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.api-token }}
+        accountId: ${{ inputs.account-id }}
+        workingDirectory: ${{ inputs.working-directory }}
+        command: ${{ inputs.command }}
